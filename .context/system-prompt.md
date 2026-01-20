@@ -3,7 +3,7 @@
 > **Uso**: Copiar este contenido a tu archivo de configuración de IA:
 >
 > - Claude Code: `./CLAUDE.md (en el root)`
-> - Gemini CLI: `.gemini/gemini.md`
+> - Gemini CLI: `.GEMINI.md`
 > - GitHub Copilot: `.github/copilot-instructions.md`
 > - Cursor: `.cursor/rules`
 > - Otros: Según documentación de la herramienta

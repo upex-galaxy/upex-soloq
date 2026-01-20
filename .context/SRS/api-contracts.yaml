@@ -1,0 +1,1441 @@
+openapi: 3.0.3
+info:
+  title: SoloQ API
+  description: API para la plataforma de facturación SoloQ
+  version: 1.0.0
+  contact:
+    name: SoloQ Support
+    email: support@soloq.app
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development
+  - url: https://staging.soloq.app/api
+    description: Staging
+  - url: https://soloq.app/api
+    description: Production
+
+tags:
+  - name: Auth
+    description: Autenticación y gestión de sesiones
+  - name: Profile
+    description: Perfil de negocio del usuario
+  - name: Clients
+    description: Gestión de clientes
+  - name: Invoices
+    description: Gestión de facturas
+  - name: Payments
+    description: Registro de pagos
+  - name: Subscription
+    description: Gestión de suscripción Pro
+
+paths:
+  # ============ AUTH ============
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Registrar nuevo usuario
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, confirmPassword]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 254
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 128
+                confirmPassword:
+                  type: string
+      responses:
+        '201':
+          description: Usuario registrado, email de verificación enviado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          description: Email ya registrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Iniciar sesión
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Cerrar sesión
+      operationId: logoutUser
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Logout exitoso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /auth/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Solicitar reset de contraseña
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Email enviado si existe la cuenta
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /auth/reset-password:
+    post:
+      tags: [Auth]
+      summary: Resetear contraseña con token
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, newPassword, confirmPassword]
+              properties:
+                token:
+                  type: string
+                newPassword:
+                  type: string
+                  minLength: 8
+                confirmPassword:
+                  type: string
+      responses:
+        '200':
+          description: Contraseña actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  # ============ PROFILE ============
+  /profile/business:
+    get:
+      tags: [Profile]
+      summary: Obtener perfil de negocio
+      operationId: getBusinessProfile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Perfil de negocio
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  profile:
+                    $ref: '#/components/schemas/BusinessProfile'
+        '404':
+          description: Perfil no existe (nuevo usuario)
+
+    put:
+      tags: [Profile]
+      summary: Actualizar perfil de negocio
+      operationId: updateBusinessProfile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessProfileInput'
+      responses:
+        '200':
+          description: Perfil actualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  profile:
+                    $ref: '#/components/schemas/BusinessProfile'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /profile/logo:
+    post:
+      tags: [Profile]
+      summary: Subir logo
+      operationId: uploadLogo
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Logo subido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  url:
+                    type: string
+                    format: uri
+        '400':
+          description: Archivo inválido
+
+  /profile/payment-methods:
+    get:
+      tags: [Profile]
+      summary: Obtener métodos de pago
+      operationId: getPaymentMethods
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Lista de métodos de pago
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  paymentMethods:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PaymentMethod'
+
+    put:
+      tags: [Profile]
+      summary: Actualizar métodos de pago
+      operationId: updatePaymentMethods
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                paymentMethods:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PaymentMethodInput'
+      responses:
+        '200':
+          description: Métodos actualizados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  paymentMethods:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PaymentMethod'
+
+  # ============ CLIENTS ============
+  /clients:
+    get:
+      tags: [Clients]
+      summary: Listar clientes
+      operationId: listClients
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [name, created_at, last_invoice_date]
+            default: name
+        - name: sortOrder
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+      responses:
+        '200':
+          description: Lista de clientes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  clients:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Client'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  totalPages:
+                    type: integer
+
+    post:
+      tags: [Clients]
+      summary: Crear cliente
+      operationId: createClient
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientInput'
+      responses:
+        '201':
+          description: Cliente creado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  client:
+                    $ref: '#/components/schemas/Client'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          description: Cliente con ese email ya existe
+
+  /clients/{clientId}:
+    parameters:
+      - name: clientId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      tags: [Clients]
+      summary: Obtener cliente
+      operationId: getClient
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Detalle del cliente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  client:
+                    $ref: '#/components/schemas/Client'
+        '404':
+          description: Cliente no encontrado
+
+    put:
+      tags: [Clients]
+      summary: Actualizar cliente
+      operationId: updateClient
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientInput'
+      responses:
+        '200':
+          description: Cliente actualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  client:
+                    $ref: '#/components/schemas/Client'
+        '404':
+          description: Cliente no encontrado
+
+    delete:
+      tags: [Clients]
+      summary: Eliminar cliente
+      operationId: deleteClient
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Cliente eliminado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Cliente tiene facturas asociadas
+        '404':
+          description: Cliente no encontrado
+
+  /clients/{clientId}/invoices:
+    parameters:
+      - name: clientId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      tags: [Clients]
+      summary: Obtener facturas de un cliente
+      operationId: getClientInvoices
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Facturas del cliente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  invoices:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InvoiceListItem'
+                  summary:
+                    type: object
+                    properties:
+                      total:
+                        type: number
+                      paid:
+                        type: number
+                      pending:
+                        type: number
+                      overdue:
+                        type: number
+
+  # ============ INVOICES ============
+  /invoices:
+    get:
+      tags: [Invoices]
+      summary: Listar facturas
+      operationId: listInvoices
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [all, draft, sent, paid, overdue]
+            default: all
+        - name: clientId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            enum: [created_at, due_date, total]
+            default: created_at
+        - name: sortOrder
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Lista de facturas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  invoices:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InvoiceListItem'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  totalPages:
+                    type: integer
+
+    post:
+      tags: [Invoices]
+      summary: Crear factura
+      operationId: createInvoice
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceInput'
+      responses:
+        '201':
+          description: Factura creada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  invoice:
+                    $ref: '#/components/schemas/Invoice'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /invoices/next-number:
+    get:
+      tags: [Invoices]
+      summary: Obtener siguiente número de factura
+      operationId: getNextInvoiceNumber
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Siguiente número
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  nextNumber:
+                    type: string
+                    example: "INV-2026-0042"
+
+  /invoices/dashboard:
+    get:
+      tags: [Invoices]
+      summary: Obtener resumen del dashboard
+      operationId: getDashboardSummary
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Resumen del dashboard
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  summary:
+                    $ref: '#/components/schemas/DashboardSummary'
+
+  /invoices/{invoiceId}:
+    parameters:
+      - name: invoiceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      tags: [Invoices]
+      summary: Obtener factura
+      operationId: getInvoice
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Detalle de factura
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  invoice:
+                    $ref: '#/components/schemas/Invoice'
+        '404':
+          description: Factura no encontrada
+
+    put:
+      tags: [Invoices]
+      summary: Actualizar factura
+      operationId: updateInvoice
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceInput'
+      responses:
+        '200':
+          description: Factura actualizada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  invoice:
+                    $ref: '#/components/schemas/Invoice'
+        '400':
+          description: Factura no editable (ya pagada)
+        '404':
+          description: Factura no encontrada
+
+    delete:
+      tags: [Invoices]
+      summary: Eliminar factura
+      operationId: deleteInvoice
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Factura eliminada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: No se puede eliminar factura pagada
+        '404':
+          description: Factura no encontrada
+
+  /invoices/{invoiceId}/pdf:
+    parameters:
+      - name: invoiceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    get:
+      tags: [Invoices]
+      summary: Descargar PDF de factura
+      operationId: downloadInvoicePdf
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: PDF de factura
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Factura no encontrada
+
+  /invoices/{invoiceId}/send:
+    parameters:
+      - name: invoiceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    post:
+      tags: [Invoices]
+      summary: Enviar factura por email
+      operationId: sendInvoice
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subject:
+                  type: string
+                  maxLength: 200
+                message:
+                  type: string
+                  maxLength: 2000
+                ccEmail:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Factura enviada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  emailId:
+                    type: string
+        '404':
+          description: Factura no encontrada
+        '500':
+          description: Error al enviar email
+
+  /invoices/{invoiceId}/payments:
+    parameters:
+      - name: invoiceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    post:
+      tags: [Payments]
+      summary: Registrar pago de factura
+      operationId: registerPayment
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentInput'
+      responses:
+        '201':
+          description: Pago registrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  payment:
+                    $ref: '#/components/schemas/Payment'
+                  invoice:
+                    $ref: '#/components/schemas/Invoice'
+        '400':
+          description: Factura ya está pagada
+        '404':
+          description: Factura no encontrada
+
+    delete:
+      tags: [Payments]
+      summary: Revertir pago (marcar como no pagada)
+      operationId: revertPayment
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Pago revertido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  invoice:
+                    $ref: '#/components/schemas/Invoice'
+        '400':
+          description: Factura no está pagada
+        '404':
+          description: Factura no encontrada
+
+  # ============ SUBSCRIPTION ============
+  /subscription:
+    get:
+      tags: [Subscription]
+      summary: Obtener estado de suscripción
+      operationId: getSubscription
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Estado de suscripción
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  subscription:
+                    $ref: '#/components/schemas/Subscription'
+
+  /subscription/checkout:
+    post:
+      tags: [Subscription]
+      summary: Crear sesión de checkout para upgrade
+      operationId: createCheckoutSession
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [successUrl, cancelUrl]
+              properties:
+                successUrl:
+                  type: string
+                  format: uri
+                cancelUrl:
+                  type: string
+                  format: uri
+      responses:
+        '200':
+          description: URL de checkout
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  checkoutUrl:
+                    type: string
+                    format: uri
+
+  /subscription/cancel:
+    post:
+      tags: [Subscription]
+      summary: Cancelar suscripción
+      operationId: cancelSubscription
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Suscripción cancelada (al final del período)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  subscription:
+                    $ref: '#/components/schemas/Subscription'
+
+  /webhooks/stripe:
+    post:
+      tags: [Subscription]
+      summary: Webhook de Stripe
+      operationId: stripeWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Webhook procesado
+        '400':
+          description: Webhook inválido
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # ===== Common =====
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+
+    # ===== Auth =====
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        createdAt:
+          type: string
+          format: date-time
+
+    # ===== Profile =====
+    BusinessProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        businessName:
+          type: string
+        contactEmail:
+          type: string
+          format: email
+        contactPhone:
+          type: string
+        address:
+          type: string
+        taxId:
+          type: string
+        logoUrl:
+          type: string
+          format: uri
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    BusinessProfileInput:
+      type: object
+      required: [businessName, contactEmail]
+      properties:
+        businessName:
+          type: string
+          maxLength: 100
+        contactEmail:
+          type: string
+          format: email
+        contactPhone:
+          type: string
+          maxLength: 20
+        address:
+          type: string
+          maxLength: 500
+        taxId:
+          type: string
+          maxLength: 50
+
+    PaymentMethod:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [bank_transfer, paypal, mercado_pago, cash, other]
+        label:
+          type: string
+        value:
+          type: string
+        isDefault:
+          type: boolean
+        sortOrder:
+          type: integer
+
+    PaymentMethodInput:
+      type: object
+      required: [type, label, value]
+      properties:
+        type:
+          type: string
+          enum: [bank_transfer, paypal, mercado_pago, cash, other]
+        label:
+          type: string
+          maxLength: 50
+        value:
+          type: string
+          maxLength: 200
+        isDefault:
+          type: boolean
+          default: false
+
+    # ===== Clients =====
+    Client:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        company:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        taxId:
+          type: string
+        notes:
+          type: string
+        invoiceCount:
+          type: integer
+        totalBilled:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ClientInput:
+      type: object
+      required: [name, email]
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        email:
+          type: string
+          format: email
+        company:
+          type: string
+          maxLength: 100
+        phone:
+          type: string
+          maxLength: 20
+        address:
+          type: string
+          maxLength: 500
+        taxId:
+          type: string
+          maxLength: 50
+        notes:
+          type: string
+          maxLength: 1000
+
+    # ===== Invoices =====
+    InvoiceListItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoiceNumber:
+          type: string
+        clientName:
+          type: string
+        clientEmail:
+          type: string
+        status:
+          type: string
+          enum: [draft, sent, paid, overdue]
+        total:
+          type: number
+        currency:
+          type: string
+        issueDate:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        isOverdue:
+          type: boolean
+        daysOverdue:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoiceNumber:
+          type: string
+        client:
+          $ref: '#/components/schemas/Client'
+        status:
+          type: string
+          enum: [draft, sent, paid, overdue]
+        issueDate:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceItem'
+        subtotal:
+          type: number
+        discountType:
+          type: string
+          enum: [percentage, fixed]
+        discountValue:
+          type: number
+        taxRate:
+          type: number
+        taxAmount:
+          type: number
+        total:
+          type: number
+        currency:
+          type: string
+        notes:
+          type: string
+        reminderCount:
+          type: integer
+        sentAt:
+          type: string
+          format: date-time
+        paidAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    InvoiceInput:
+      type: object
+      required: [clientId, dueDate, items]
+      properties:
+        clientId:
+          type: string
+          format: uuid
+        invoiceNumber:
+          type: string
+        issueDate:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        items:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/InvoiceItemInput'
+        taxRate:
+          type: number
+          minimum: 0
+          maximum: 100
+          default: 0
+        discountType:
+          type: string
+          enum: [percentage, fixed]
+        discountValue:
+          type: number
+        notes:
+          type: string
+          maxLength: 2000
+        status:
+          type: string
+          enum: [draft, sent]
+          default: draft
+        currency:
+          type: string
+          default: USD
+
+    InvoiceItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        description:
+          type: string
+        quantity:
+          type: number
+        unitPrice:
+          type: number
+        subtotal:
+          type: number
+
+    InvoiceItemInput:
+      type: object
+      required: [description, quantity, unitPrice]
+      properties:
+        description:
+          type: string
+          maxLength: 500
+        quantity:
+          type: number
+          minimum: 0.01
+        unitPrice:
+          type: number
+          minimum: 0
+
+    DashboardSummary:
+      type: object
+      properties:
+        totalPending:
+          type: number
+        totalOverdue:
+          type: number
+        totalPaidThisMonth:
+          type: number
+        counts:
+          type: object
+          properties:
+            draft:
+              type: integer
+            sent:
+              type: integer
+            paid:
+              type: integer
+            overdue:
+              type: integer
+
+    # ===== Payments =====
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoiceId:
+          type: string
+          format: uuid
+        paymentMethod:
+          type: string
+        amountReceived:
+          type: number
+        paymentDate:
+          type: string
+          format: date
+        reference:
+          type: string
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    PaymentInput:
+      type: object
+      required: [paymentMethod, amountReceived]
+      properties:
+        paymentMethod:
+          type: string
+          maxLength: 50
+        amountReceived:
+          type: number
+          minimum: 0.01
+        paymentDate:
+          type: string
+          format: date
+        reference:
+          type: string
+          maxLength: 100
+        notes:
+          type: string
+          maxLength: 500
+
+    # ===== Subscription =====
+    Subscription:
+      type: object
+      properties:
+        plan:
+          type: string
+          enum: [free, pro]
+        status:
+          type: string
+          enum: [active, canceled, past_due, incomplete]
+        currentPeriodEnd:
+          type: string
+          format: date
+        cancelAtPeriodEnd:
+          type: boolean
+
+  responses:
+    ValidationError:
+      description: Error de validación
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              error:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: VALIDATION_ERROR
+                  message:
+                    type: string
+                  details:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                        message:
+                          type: string
+
+    Unauthorized:
+      description: No autenticado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

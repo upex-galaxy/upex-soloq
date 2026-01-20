@@ -1,0 +1,113 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--caps",
+        "vision,pdf,testing,tracing,tabs",
+        "--timeout-action",
+        "10000",
+        "--timeout-navigation",
+        "30000",
+        "--viewport-size",
+        "1920x1080"
+      ]
+    },
+    "devtools": {
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp"]
+    },
+    "api": {
+      "command": "npx",
+      "args": ["-y", "@ivotoby/openapi-mcp-server", "--tools dynamic"],
+      "env": {
+        "API_BASE_URL": "https://{SUPABASE_URL}.supabase.co/rest/v1",
+        "OPENAPI_SPEC_PATH": "https://{SUPABASE_URL}.supabase.co/rest/v1/?apikey={SUPABASE_ANON_KEY}",
+        "API_HEADERS": "apikey:{SUPABASE_ANON_KEY}"
+      }
+    },
+    "sql": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@bytebase/dbhub",
+        "--transport",
+        "stdio",
+        "--dsn",
+        "postgresql://{USER}.{DATABASE}.{HOST}:{PORT}/{DATABASE}"
+      ]
+    },
+    "supabase": {
+      "command": "npx",
+      "args": ["-y", "@supabase/mcp-server-supabase@latest"],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
+      }
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    },
+    "tavily": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.tavily.com/mcp/?tavilyApiKey=${TAVILY_API_KEY}"]
+    },
+    "postman": {
+      "type": "http",
+      "url": "https://mcp.postman.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${POSTMAN_API_KEY}"
+      }
+    },
+    "sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.dev/mcp/${SENTRY_PROJECT_NAME}/${SENTRY_PROJECT_LANGUAGE}"
+    },
+    "vercel": {
+      "type": "http",
+      "url": "https://mcp.vercel.com/"
+    },
+    "notion": {
+      "type": "http",
+      "url": "https://mcp.notion.com/mcp"
+    },
+    "atlassian": {
+      "command": "uvx",
+      "args": ["mcp-atlassian"],
+      "env": {
+        "JIRA_URL": "https://tu-servidor.atlassian.net",
+        "JIRA_USERNAME": "tu.email@servidor.com",
+        "JIRA_API_TOKEN": "${JIRA_API_TOKEN}"
+      }
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${GITHUB_TOKEN}"
+      }
+    },
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "slack-mcp-server@latest", "--transport", "stdio"],
+      "env": {
+        "SLACK_MCP_XOXP_TOKEN": "${SLACK_MCP_XOXP_TOKEN}",
+        "SLACK_MCP_ADD_MESSAGE_TOOL": "true",
+        "SLACK_MCP_USERS_CACHE": "/context/mcp/outputs/slack/",
+        "SLACK_MCP_CHANNELS_CACHE": "/context/mcp/outputs/slack/"
+      }
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "env": {
+        "MEMORY_FILE_PATH": "/context/mcp/memory.jsonl"
+      }
+    }
+  }
+}

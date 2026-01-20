@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+.next/
+test-results/
+playwright-report/
+allure-results/
+allure-report/
+reports/
+*.lock
+.env
+.env.*

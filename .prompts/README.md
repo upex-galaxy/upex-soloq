@@ -93,13 +93,12 @@ Este directorio contiene prompts optimizados para generar documentación de proy
 
 #### **Fase 3: Infrastructure** (Setup tecnico base)
 
-| Archivo                                      | Proposito                                       |
-| -------------------------------------------- | ----------------------------------------------- |
-| `fase-3-infrastructure/backend-setup.md`     | DB schemas + API boilerplate + tipos TypeScript |
-| `fase-3-infrastructure/frontend-setup.md`    | Design System + proyecto frontend               |
-| `fase-3-infrastructure/project-doc-setup.md` | README profesional + System Prompt para AI      |
+| Archivo                                   | Proposito                                       |
+| ----------------------------------------- | ----------------------------------------------- |
+| `fase-3-infrastructure/backend-setup.md`  | DB schemas + API boilerplate + tipos TypeScript |
+| `fase-3-infrastructure/frontend-setup.md` | Design System + proyecto frontend               |
 
-**Orden critico:** Backend → Frontend → Project Docs (documentación final del proyecto)
+**Orden critico:** Backend → Frontend (tipos generados del backend se importan en frontend)
 
 **Features adicionales (opcionales):**
 
@@ -228,6 +227,7 @@ Este directorio contiene prompts optimizados para generar documentación de proy
 | `project-dev-guide.md`    | Guía de desarrollo basada en el Business Data Map              |
 | `project-test-guide.md`   | Guía de testing basada en el Business Data Map                 |
 | `api-architecture.md`     | Catálogo completo de API: endpoints, auth, guía de testing     |
+| `project-doc-setup.md`    | README profesional + System Prompt para AI coding agents       |
 
 ### **BUSINESS DATA MAP (Sistema de 3 Documentos)**
 
@@ -594,7 +594,7 @@ Despues de usar todos los prompts, tu directorio `.context/` debe verse asi:
 - **Fases totales:** 14 (3 sincronicas + 11 asincronicas)
 - **Prompts totales:** 50 archivos
 - **Workflows de sesion:** 2 (us-dev-workflow.md, us-qa-workflow.md)
-- **Utilidades standalone:** 7 (git-flow, git-conflict-fix, kata-framework-setup, business-data-map, project-dev-guide, project-test-guide, api-architecture)
+- **Utilidades standalone:** 8 (git-flow, git-conflict-fix, kata-framework-setup, business-data-map, project-dev-guide, project-test-guide, api-architecture, project-doc-setup)
 - **QA Learning Methodology:** 4 niveles (LEVEL0-3)
 - **Fase 3 features:** 4 prompts modulares opcionales
 

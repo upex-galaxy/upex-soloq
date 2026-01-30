@@ -24,13 +24,14 @@ La **Fase 3: Infrastructure** implementa la base técnica del proyecto ANTES de 
 
 ## 📋 Prompts de esta Fase
 
-| #   | Archivo                | Descripción                                                 | Duración   | MCP Requerido         |
-| --- | ---------------------- | ----------------------------------------------------------- | ---------- | --------------------- |
-| 1   | `backend-setup.md`     | Crear DB schemas, Auth, API layer, seed data                | 45-90 min  | ✅ Supabase, Context7 |
-| 2   | `frontend-setup.md`    | Design System, Layout, páginas demo, integrar tipos backend | 60-120 min | ✅ Context7           |
-| 3   | `project-doc-setup.md` | README profesional + System Prompt para AI coding agents    | 15-30 min  | ❌ Ninguno            |
+| #   | Archivo             | Descripción                                                 | Duración   | MCP Requerido         |
+| --- | ------------------- | ----------------------------------------------------------- | ---------- | --------------------- |
+| 1   | `backend-setup.md`  | Crear DB schemas, Auth, API layer, seed data                | 45-90 min  | ✅ Supabase, Context7 |
+| 2   | `frontend-setup.md` | Design System, Layout, páginas demo, integrar tipos backend | 60-120 min | ✅ Context7           |
 
-**Total estimado:** 2-4 horas (depende de complejidad del proyecto)
+**Total estimado:** 2-3.5 horas (depende de complejidad del proyecto)
+
+> **Tip:** Para documentación del proyecto (README + System Prompt para AI), usa el prompt standalone `project-doc-setup.md` ubicado en `.prompts/`.
 
 ---
 
@@ -42,8 +43,6 @@ La **Fase 3: Infrastructure** implementa la base técnica del proyecto ANTES de 
 1. backend-setup.md        (PRIMERO - Schemas + API + Tipos)
                            ↓
 2. frontend-setup.md       (SEGUNDO - UI + Integración de tipos)
-                           ↓
-3. project-doc-setup.md    (TERCERO - README + System Prompt para AI)
 ```
 
 ### **Por qué este orden:**
@@ -187,11 +186,12 @@ Al finalizar esta fase tendrás:
 
 1. Ejecuta `backend-setup.md` → Crea DB schemas, auth, seed data, genera tipos
 2. Ejecuta `frontend-setup.md` → Crea proyecto frontend, integra tipos del backend
-3. Ejecuta `project-doc-setup.md` → Genera README profesional y System Prompt
 
-**Duración:** 2-4 horas
+**Duración:** 2-3.5 horas
 
-**Output:** Stack completo funcional + documentación lista, listo para implementar features en Fase 7.
+**Output:** Stack completo funcional, listo para implementar features en Fase 7.
+
+> **Opcional:** Usa `.prompts/project-doc-setup.md` para generar README + System Prompt.
 
 ---
 
@@ -206,7 +206,6 @@ Al finalizar esta fase tendrás:
    - Importar tipos generados (`src/types/supabase.ts`)
    - Crear `lib/types.ts` helper
    - Reemplazar mock data con queries reales
-3. Ejecuta `project-doc-setup.md` → Documenta el proyecto
 
 **Duración:** 1-2 horas (sin frontend-setup)
 
@@ -224,7 +223,6 @@ Al finalizar esta fase tendrás:
    - Si no usas Supabase, adapta queries al ORM que uses (Prisma, Drizzle, etc.)
    - Genera tipos según tu stack
 2. Ejecuta `frontend-setup.md` → **Integra tipos de tu backend**
-3. Ejecuta `project-doc-setup.md` → **Documenta tu stack específico**
 
 **Duración:** 3-5 horas (requiere más adaptación manual)
 
@@ -355,13 +353,6 @@ Fase 7 (implementando story "Ver [recursos de negocio]"):
 - [ ] `npm run build` pasa sin errores
 - [ ] No hay type errors en editor
 
-**Después de `project-doc-setup.md`:**
-
-- [ ] README.md generado en el root del proyecto
-- [ ] System Prompt (CLAUDE.md/GEMINI.md/AGENTS.md) creado
-- [ ] Badges y links verificados
-- [ ] No hay información sensible expuesta
-
 ---
 
 ## 🚨 Problemas Comunes y Soluciones
@@ -438,12 +429,12 @@ Type 'User' is not assignable to type 'UserInsert'
 
 ### **1. Ejecuta en orden estricto**
 
-- ❌ NO saltes de `backend-setup` a `project-doc-setup`
-- ✅ Sigue: backend → frontend → project-docs
+- ❌ NO saltes `backend-setup` para ir directo a `frontend-setup`
+- ✅ Sigue: backend → frontend
 
 ### **2. Documenta todo**
 
-- Los 3 prompts crean archivos en `.context/`
+- Los 2 prompts crean archivos en `.context/`
 - Esta documentación es crítica para el equipo
 
 ### **3. Valida después de cada prompt**
@@ -460,9 +451,6 @@ git add . && git commit -m "feat: backend schemas + auth + types"
 
 # Después de frontend-setup.md
 git add . && git commit -m "feat: design system + frontend integration"
-
-# Después de project-doc-setup.md
-git add . && git commit -m "docs: project README + AI system prompt"
 ```
 
 ### **5. No implementes features todavía**

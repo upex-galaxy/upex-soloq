@@ -1,13 +1,18 @@
 import type { NextConfig } from 'next';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const currentDir = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
   // Enable React strict mode for better development experience
   reactStrictMode: true,
 
-  // Experimental features
-  experimental: {
-    // Enable typed routes for better TypeScript support
-    typedRoutes: true,
+  // Enable typed routes for better TypeScript support
+  typedRoutes: true,
+
+  turbopack: {
+    root: currentDir,
   },
 
   // Image optimization configuration

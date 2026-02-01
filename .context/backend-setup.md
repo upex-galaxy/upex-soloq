@@ -15,16 +15,16 @@ Este documento describe la configuración del backend de SoloQ, una plataforma d
 
 | Propiedad  | Valor                                      |
 | ---------- | ------------------------------------------ |
-| Project ID | `czuusjchqpgvanvbdrnz`                     |
-| URL        | `https://czuusjchqpgvanvbdrnz.supabase.co` |
-| Region     | `us-east-2`                                |
-| Database   | PostgreSQL 17                              |
+| Project ID | `tvppujtcvvfrbhyjgeyn`                     |
+| URL        | `https://tvppujtcvvfrbhyjgeyn.supabase.co` |
+| Region     | `eu-north-1`                               |
+| Database   | PostgreSQL 17.6.1.063                      |
 
 ### Variables de Entorno
 
 ```env
 # Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://czuusjchqpgvanvbdrnz.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://tvppujtcvvfrbhyjgeyn.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<tu_anon_key>
 SUPABASE_SERVICE_ROLE_KEY=<tu_service_role_key>
 
@@ -218,7 +218,7 @@ bun run build
 bun run typecheck
 
 # Regenerar tipos de Supabase
-bunx supabase gen types typescript --project-id czuusjchqpgvanvbdrnz > src/types/supabase.ts
+ bunx supabase gen types typescript --project-id tvppujtcvvfrbhyjgeyn > src/types/supabase.ts
 ```
 
 ---

@@ -9,7 +9,7 @@ SoloQ utiliza Supabase como backend, lo que proporciona:
 - **Auth API** para autenticación
 - **Storage API** para archivos (no implementado aún)
 
-**Base URL:** `https://czuusjchqpgvanvbdrnz.supabase.co`
+**Base URL:** `https://tvppujtcvvfrbhyjgeyn.supabase.co`
 
 ---
 
@@ -313,7 +313,7 @@ if (error) {
 
 ### Configuración
 
-1. **Base URL:** `https://czuusjchqpgvanvbdrnz.supabase.co/rest/v1`
+1. **Base URL:** `https://tvppujtcvvfrbhyjgeyn.supabase.co/rest/v1`
 
 2. **Headers globales:**
 
@@ -327,7 +327,7 @@ if (error) {
 3. **Obtener JWT Token:**
 
    ```http
-   POST https://czuusjchqpgvanvbdrnz.supabase.co/auth/v1/token?grant_type=password
+    POST https://tvppujtcvvfrbhyjgeyn.supabase.co/auth/v1/token?grant_type=password
    Content-Type: application/json
    apikey: <ANON_KEY>
 
@@ -342,7 +342,7 @@ if (error) {
 ### Ejemplo: Listar Clientes
 
 ```http
-GET https://czuusjchqpgvanvbdrnz.supabase.co/rest/v1/clients?deleted_at=is.null&order=created_at.desc
+GET https://tvppujtcvvfrbhyjgeyn.supabase.co/rest/v1/clients?deleted_at=is.null&order=created_at.desc
 apikey: <ANON_KEY>
 Authorization: Bearer <JWT_TOKEN>
 ```

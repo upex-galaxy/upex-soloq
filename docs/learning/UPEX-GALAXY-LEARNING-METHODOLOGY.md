@@ -328,8 +328,8 @@ En la plataforma, cada proyecto de software tiene:
 ```
 proyecto/
 ├── .context/
-│   ├── database-functional-map.md    ← Sistema (Nivel 3)
-│   ├── system-architecture.md        ← Sistema (Nivel 3)
+│   ├── business-data-map.md    ← Sistema (Nivel 3)
+│   ├── api-architecture.md        ← Sistema (Nivel 3)
 │   └── PBI/
 │       └── epics/
 │           ├── EPIC-001/             ← Objetivo (Nivel 2)

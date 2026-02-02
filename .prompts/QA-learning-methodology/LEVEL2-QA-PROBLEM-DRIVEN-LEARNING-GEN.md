@@ -126,8 +126,8 @@ EPIC-[KEY]-[name]/
 
 ```
 .context/
-├── database-functional-map.md  → Schema DB, tablas, relaciones
-├── system-architecture.md      → APIs, endpoints, flujos
+├── business-data-map.md  → Schema DB, tablas, relaciones
+├── api-architecture.md      → APIs, endpoints, flujos
 └── design-system.md            → Componentes UI (si aplica)
 ```
 

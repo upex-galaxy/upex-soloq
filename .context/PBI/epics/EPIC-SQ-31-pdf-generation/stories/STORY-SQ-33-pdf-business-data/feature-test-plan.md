@@ -27,6 +27,26 @@
 
 ---
 
+## 📊 Test Cases Summary
+
+| ID    | Test Case                          | AC Coverage     | Priority | Type        |
+| ----- | ---------------------------------- | --------------- | -------- | ----------- |
+| TC-01 | PDF con todos los campos completos | AC1+AC2+AC3+AC4 | Critical | Functional  |
+| TC-02 | PDF sin logo (fallback layout)     | AC5             | Critical | Functional  |
+| TC-03 | Tax ID con formatos LATAM          | AC4             | High     | Functional  |
+| TC-04 | Business data con unicode LATAM    | AC2+AC3         | High     | Functional  |
+| TC-05 | Logo URL inválida (fallback)       | AC5             | High     | Negative    |
+| TC-06 | Campos opcionales vacíos           | AC2+AC4         | Medium   | Functional  |
+| TC-07 | Fetch business data desde DB       | Todos           | High     | Integration |
+| TC-08 | Logo con transparencia PNG         | AC1             | Medium   | Functional  |
+
+**Total:** 8 test cases  
+**Breakdown:** 6 Functional, 1 Negative, 1 Integration  
+**Execution Time:** 1 día  
+**AC Coverage:** 100% (5 AC validados)
+
+---
+
 ## 🎯 Test Cases (8 casos - Esenciales)
 
 ### ✅ TC-01: PDF con todos los campos completos

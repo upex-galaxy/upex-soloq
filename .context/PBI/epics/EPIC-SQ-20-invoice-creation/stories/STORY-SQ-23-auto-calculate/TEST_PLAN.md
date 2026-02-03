@@ -1,8 +1,61 @@
+## Summary
+
+Este Feature Test Plan valida el cálculo automático y preciso de importes financieros en el flujo de creación de facturas, asegurando consistencia matemática, correcta aplicación de descuentos e impuestos, y estabilidad ante cambios en tiempo real.
+
+El plan cubre:
+- Cálculo de **subtotal**, **descuentos**, **impuestos** y **total final**
+- **Precisión decimal** y políticas de redondeo
+- **Reactividad** ante cambios del usuario
+- **Validaciones y edge cases financieros**
+- Casos reales y escenarios críticos de negocio
+
+Se han identificado varias **ambigüedades funcionales** que requieren confirmación del Product Owner antes de la implementación final, especialmente relacionadas con:
+- Orden de aplicación de descuentos e impuestos
+- Política oficial de redondeo
+- Límites y validaciones financieras
+
+Este documento sirve como referencia tanto para **QA manual**, **automatización** y **alineación funcional con producto y desarrollo**.
+
+---
+
+## Test Cases Overview (Highlights)
+
+| Área funcional                 | Casos clave   | Prioridad dominante |
+| ------------------------------ | ------------- | ------------------- |
+| Cálculo de Subtotal            | TC-01 → TC-08 | Alta                |
+| Descuentos (Porcentaje / Fijo) | TC-09 → TC-21 | Alta                |
+| Impuestos                      | TC-22 → TC-30 | Crítica             |
+| Cálculo de Total Final         | TC-31 → TC-36 | Crítica             |
+| Actualización en tiempo real   | TC-37 → TC-44 | Alta                |
+| Precisión decimal / Redondeo   | TC-45 → TC-48 | Alta                |
+| Validaciones y Edge Cases      | TC-49 → TC-54 | Media               |
+| Integración end-to-end         | TC-55 → TC-56 | Crítica             |
+
+**Total de casos definidos:** 56
+**Casos críticos:** TC-27, TC-28, TC-34, TC-35, TC-55, TC-56
+
+---
+
+## Jira References
+
+- **User Story:**
+  [SQ-23 – Automatic Subtotal and Total Calculation](https://upexgalaxy64.atlassian.net/browse/SQ-23)
+
+- **Epic:**
+  [SQ-20 – Invoice Creation](https://upexgalaxy64.atlassian.net/browse/SQ-20)
+
+- **Related Stories / Docs:**
+  - SQ-25 – Discount rules and capping logic
+  - EPIC-SQ-31 – PDF generation (out of scope)
+  - EPIC-SQ-37 – Invoice delivery (out of scope)
+
+---
+
 # Test Plan - SQ-23: Automatic Subtotal and Total Calculation
 
-**User Story:** [SQ-23](https://upexgalaxy64.atlassian.net/browse/SQ-23)  
-**Epic:** [SQ-20](https://upexgalaxy64.atlassian.net/browse/SQ-20) - Invoice Creation  
-**Fecha:** 2026-01-29  
+**User Story:** [SQ-23](https://upexgalaxy64.atlassian.net/browse/SQ-23)
+**Epic:** [SQ-20](https://upexgalaxy64.atlassian.net/browse/SQ-20) - Invoice Creation
+**Fecha:** 2026-01-29
 **Versión:** 1.0
 
 ---
@@ -924,7 +977,7 @@ Si discount_type = null o discount_value = 0:
 
 ---
 
-**Elaborado por:** Warp Agent  
-**Revisado por:** [Pending]  
-**Aprobado por:** [Pending]  
+**Elaborado por:** Warp Agent
+**Revisado por:** [Pending]
+**Aprobado por:** [Pending]
 **Última actualización:** 2026-01-29

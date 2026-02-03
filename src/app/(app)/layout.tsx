@@ -1,5 +1,6 @@
 'use client';
 
+import { Fragment } from 'react';
 import { usePathname } from 'next/navigation';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/app-sidebar';
@@ -18,6 +19,7 @@ const routeNames: Record<string, string> = {
   dashboard: 'Dashboard',
   invoices: 'Facturas',
   clients: 'Clientes',
+  create: 'Nuevo',
   settings: 'Configuración',
 };
 
@@ -45,14 +47,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <Breadcrumb>
             <BreadcrumbList>
               {breadcrumbItems.map((item, index) => (
-                <BreadcrumbItem key={item.href}>
+                <Fragment key={item.href}>
                   {index > 0 && <BreadcrumbSeparator />}
-                  {item.isLast ? (
-                    <BreadcrumbPage>{item.name}</BreadcrumbPage>
-                  ) : (
-                    <BreadcrumbLink href={item.href}>{item.name}</BreadcrumbLink>
-                  )}
-                </BreadcrumbItem>
+                  <BreadcrumbItem>
+                    {item.isLast ? (
+                      <BreadcrumbPage>{item.name}</BreadcrumbPage>
+                    ) : (
+                      <BreadcrumbLink href={item.href}>{item.name}</BreadcrumbLink>
+                    )}
+                  </BreadcrumbItem>
+                </Fragment>
               ))}
             </BreadcrumbList>
           </Breadcrumb>

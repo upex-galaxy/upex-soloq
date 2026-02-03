@@ -14,12 +14,12 @@
 
 **User Persona Affected:**
 
-- **Primary:** Carlos (Diseñador Organizado) - necesita aplicar promociones sin perder profesionalismo ni cometer errores de cálculo.
-- **Secondary:** Andrés (Consultor Tradicional) - requiere claridad en totales y descuentos para clientes corporativos.
+- **Primary:** Carlos (Disenador Organizado) - necesita aplicar promociones sin perder profesionalismo ni cometer errores de calculo.
+- **Secondary:** Andres (Consultor Tradicional) - requiere claridad en totales y descuentos para clientes corporativos.
 
 **Business Value:**
 
-- **Value Proposition:** Permite ofrecer descuentos y promociones, aumentando cierre de ventas y satisfacción del cliente.
+- **Value Proposition:** Permite ofrecer descuentos y promociones, aumentando cierre de ventas y satisfaccion del cliente.
 - **Business Impact:** Reduce errores en totales, mejora confianza del usuario y protege KPIs de tiempo a primera factura y facturas enviadas.
 
 **Related User Journey:**
@@ -35,14 +35,14 @@
 
 **Frontend:**
 
-- Components: formulario de creación/edición de factura, resumen de totales, selector de tipo de descuento.
-- Pages/Routes: `/app/invoices/create`, `/app/invoices/[invoiceId]` (edición).
-- State Management: React Hook Form + Zod (validación), cálculo en cliente.
+- Components: formulario de creacion/edicion de factura, resumen de totales, selector de tipo de descuento.
+- Pages/Routes: `/app/invoices/create`, `/app/invoices/[invoiceId]` (edicion).
+- State Management: React Hook Form + Zod (validacion), calculo en cliente.
 
 **Backend:**
 
 - API Endpoints: `POST /api/invoices`, `PUT /api/invoices/{invoiceId}`
-- Services: cálculo de totales (subtotal, descuento, impuesto, total).
+- Services: calculo de totales (subtotal, descuento, impuesto, total).
 - Database: `invoices` (discount_type, discount_value, discount_amount, tax_rate, tax_amount, subtotal, total), `invoice_items`.
 
 **External Services:**
@@ -51,8 +51,8 @@
 
 **Integration Points:**
 
-- Frontend ↔ Backend API (crear/actualizar factura).
-- Backend ↔ DB (persistencia de descuento y totales).
+- Frontend -> Backend API (crear/actualizar factura).
+- Backend -> DB (persistencia de descuento y totales).
 
 ---
 
@@ -62,9 +62,9 @@
 
 **Complexity Factors:**
 
-- Business logic complexity: Medium - reglas de descuento, cap y orden de cálculo con impuestos.
+- Business logic complexity: Medium - reglas de descuento, cap y orden de calculo con impuestos.
 - Integration complexity: Medium - frontend y backend deben calcular consistente.
-- Data validation complexity: Medium - valores inválidos, límites y redondeo.
+- Data validation complexity: Medium - valores invalidos, limites y redondeo.
 - UI complexity: Medium - selector, input, warning y summary.
 
 **Estimated Test Effort:** Medium
@@ -76,7 +76,7 @@
 
 **Critical Risks Already Identified at Epic Level:**
 
-- Not available. Feature test plan file missing and Jira comments not accessible.
+- Not available. Feature test plan file missing and Jira comments not accessible (MCP Atlassian not available).
 
 **Integration Points from Epic Analysis:**
 
@@ -96,8 +96,8 @@
 
 **Summary: How This Story Fits in Epic:**
 
-- **Story Role in Epic:** Agrega reglas de descuento que afectan el cálculo de totales en creación/edición de facturas.
-- **Inherited Risks:** Cálculos incorrectos en totales e inconsistencias UI/API.
+- **Story Role in Epic:** Agrega reglas de descuento que afectan el calculo de totales en creacion/edicion de facturas.
+- **Inherited Risks:** Calculos incorrectos en totales e inconsistencias UI/API.
 - **Unique Considerations:** Cap de descuento y warning al usuario, orden de descuento antes de impuestos.
 
 ---
@@ -106,24 +106,24 @@
 
 ### Ambiguities Identified
 
-**Ambiguity 1:** ¿Cuál es el mensaje exacto y el comportamiento del warning cuando el descuento supera el subtotal?
+**Ambiguity 1:** Mensaje y ubicacion del warning cuando el descuento supera el subtotal.
 
 - **Location in Story:** Scenario 4: Discount limit
-- **Question for PO/Dev:** ¿Cuál es el texto exacto del warning y dónde se muestra (inline, toast, summary)?
-- **Impact on Testing:** No se puede validar UI ni accesibilidad sin mensaje y ubicación definidos.
-- **Suggested Clarification:** Definir texto de warning, ubicación y severidad (alert vs helper text).
+- **Question for PO/Dev:** Cual es el texto exacto del warning y donde se muestra (inline, toast, summary)?
+- **Impact on Testing:** No se puede validar UI ni accesibilidad sin mensaje y ubicacion definidos.
+- **Suggested Clarification:** Definir texto de warning, ubicacion y severidad (alert vs helper text).
 
 **Ambiguity 2:** Reglas de redondeo para porcentajes y montos con decimales.
 
-- **Location in Story:** Scenarios 1-3 (cálculo de descuento y resumen)
-- **Question for PO/Dev:** ¿Se redondea a 2 decimales por moneda? ¿Se usa round half up?
-- **Impact on Testing:** Resultados esperados varían por regla de redondeo.
-- **Suggested Clarification:** Especificar precisión y regla de redondeo.
+- **Location in Story:** Scenarios 1-3 (calculo de descuento y resumen)
+- **Question for PO/Dev:** Se redondea a 2 decimales por moneda? Se usa round half up?
+- **Impact on Testing:** Resultados esperados varian por regla de redondeo.
+- **Suggested Clarification:** Especificar precision y regla de redondeo.
 
-**Ambiguity 3:** Validaciones de input: valores negativos, >100% o texto.
+**Ambiguity 3:** Validaciones de input para valores negativos, >100% o texto.
 
-- **Location in Story:** Technical Notes (discount_value) y Scenario 4
-- **Question for PO/Dev:** ¿Se bloquea input inválido o se permite y se muestra error? ¿Cuál es el mensaje?
+- **Location in Story:** Technical Notes y Scenario 4
+- **Question for PO/Dev:** Se bloquea input invalido o se permite y se muestra error? Cual es el mensaje?
 - **Impact on Testing:** No se pueden definir casos negativos con resultado esperado.
 - **Suggested Clarification:** Definir validaciones y mensajes de error.
 
@@ -131,25 +131,25 @@
 
 ### Missing Information / Gaps
 
-**Gap 1:** Reglas cuando el subtotal es 0 (items con precio 0) y se ingresa descuento.
+**Gap 1:** Regla cuando el subtotal es 0 y se ingresa descuento.
 
 - **Type:** Business Rule
-- **Why It's Critical:** Afecta total y warning; puede generar división o negativos.
+- **Why It's Critical:** Afecta total y warning; puede generar totales negativos.
 - **Suggested Addition:** Definir que descuento sea 0 y warning opcional si subtotal es 0.
-- **Impact if Not Added:** Cálculos inconsistentes o totales negativos.
+- **Impact if Not Added:** Calculos inconsistentes o totales negativos.
 
-**Gap 2:** Persistencia y recalculo cuando cambian items después de definir descuento.
+**Gap 2:** Recalculo cuando cambian items despues de definir descuento.
 
 - **Type:** Acceptance Criteria
-- **Why It's Critical:** Totales deben recalcularse automáticamente y mantener consistencia.
+- **Why It's Critical:** Totales deben recalcularse automaticamente y mantener consistencia.
 - **Suggested Addition:** AC que confirme recalculo y cap re-aplicado tras cambios en items.
 - **Impact if Not Added:** Totales incorrectos o stale en UI.
 
-**Gap 3:** Campo discount_amount en API/DB y visibilidad en respuesta.
+**Gap 3:** Campo `discount_amount` en API/DB y visibilidad en respuesta.
 
 - **Type:** Technical Details
 - **Why It's Critical:** La UI debe mostrar monto calculado del descuento.
-- **Suggested Addition:** Asegurar que API retorna discount_amount o suficiente para calcular en frontend.
+- **Suggested Addition:** Asegurar que API retorna `discount_amount` o suficiente para calcular en frontend.
 - **Impact if Not Added:** UI no puede mostrar monto exacto o calcula distinto al backend.
 
 ---
@@ -166,20 +166,20 @@
 **Edge Case 2:** Valor negativo (ej: -10 o -$50).
 
 - **Scenario:** Usuario ingresa valor negativo.
-- **Expected Behavior:** Validación rechaza con error claro, sin aplicar descuento.
+- **Expected Behavior:** Validacion rechaza con error claro, sin aplicar descuento.
 - **Criticality:** High
-- **Action Required:** Ask PO/Dev (definir validación/mensaje).
+- **Action Required:** Ask PO/Dev (definir validacion/mensaje).
 
-**Edge Case 3:** Decimales con muchos dígitos (ej: 12.345%).
+**Edge Case 3:** Decimales con muchos digitos (ej: 12.345%).
 
-- **Scenario:** Usuario ingresa valor con más de 2 decimales.
-- **Expected Behavior:** Redondeo o truncamiento según regla definida.
+- **Scenario:** Usuario ingresa valor con mas de 2 decimales.
+- **Expected Behavior:** Redondeo o truncamiento segun regla definida.
 - **Criticality:** Medium
 - **Action Required:** Ask PO/Dev.
 
-**Edge Case 4:** Subtotal cambia después de definir descuento (agrega/remueve items).
+**Edge Case 4:** Subtotal cambia despues de definir descuento.
 
-- **Scenario:** Descuento previamente válido deja de serlo por cambio de subtotal.
+- **Scenario:** Descuento previamente valido deja de serlo por cambio de subtotal.
 - **Expected Behavior:** Recalcular descuento y cap si aplica, warning actualizado.
 - **Criticality:** Medium
 - **Action Required:** Add to story and test cases.
@@ -215,7 +215,7 @@
 **Priority:** Critical
 
 - **Given:**
-  - Usuario autenticado en creación de factura.
+  - Usuario autenticado en creacion de factura.
   - Items: 2 x $50 y 1 x $100 (subtotal = $200.00).
   - Tax rate = 10%.
 
@@ -238,7 +238,7 @@
 **Priority:** High
 
 - **Given:**
-  - Usuario autenticado en creación de factura.
+  - Usuario autenticado en creacion de factura.
   - Subtotal = $200.00.
   - Tax rate = 10%.
 
@@ -260,7 +260,7 @@
 **Priority:** High
 
 - **Given:**
-  - Usuario ha definido un descuento válido.
+  - Usuario ha definido un descuento valido.
 
 - **When:**
   - Visualiza el resumen de factura.
@@ -285,7 +285,7 @@
 - **Then:**
   - Discount amount se capea a $80.00.
   - Total = $0.00.
-  - Se muestra warning de descuento excedido (texto y ubicación por definir).
+  - Se muestra warning de descuento excedido (texto y ubicacion por definir).
 
 ---
 
@@ -299,7 +299,7 @@
   - Tax rate = 10%.
 
 - **When:**
-  - Descuento vacío o 0.
+  - Descuento vacio o 0.
 
 - **Then:**
   - Discount amount = $0.00.
@@ -320,10 +320,10 @@
   - Ingresa -10 en el valor de descuento.
 
 - **Then:**
-  - Se muestra error de validación.
+  - Se muestra error de validacion.
   - Discount amount permanece en $0.00.
   - Total no cambia.
-  - **⚠️ NOTE:** Requiere confirmación de PO/Dev sobre mensaje y comportamiento.
+  - **NOTE:** Requiere confirmacion de PO/Dev sobre mensaje y comportamiento.
 
 ---
 
@@ -343,7 +343,7 @@
   - Discount amount se capea a $40.00.
   - Total = $0.00.
   - Warning se muestra actualizado.
-  - **⚠️ NOTE:** Needs PO/Dev confirmation.
+  - **NOTE:** Needs PO/Dev confirmation.
 
 ---
 
@@ -359,10 +359,11 @@
 - Negative: 2 test cases
 - Boundary: 2 test cases
 - Integration: 1 test case
-- API: 0 test cases (covered en integración UI/API)
+- API: 0 test cases (cubierto en integracion UI/API)
 
 **Rationale for This Number:**
-Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, cap, no discount, validaciones y recálculo por cambios en items, más una integración frontend-backend.
+
+Cobertura suficiente para los dos tipos de descuento, calculo con impuestos, cap, no discount, validaciones y recalculo por cambios en items, mas una integracion frontend-backend.
 
 ---
 
@@ -370,9 +371,9 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 
 **Parametrized Tests Recommended:** ✅ Yes
 
-**Parametrized Test Group 1:** Tipos y valores de descuento válidos
+**Parametrized Test Group 1:** Tipos y valores de descuento validos
 
-- **Base Scenario:** Cálculo de descuento y total en resumen.
+- **Base Scenario:** Calculo de descuento y total en resumen.
 - **Parameters to Vary:** Tipo, valor, subtotal, tax rate.
 - **Test Data Sets:**
 
@@ -384,13 +385,13 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 | fixed        | 0             | 200.00   | 10      | 0.00              | 220.00         |
 
 **Total Tests from Parametrization:** 4
-**Benefit:** Reduce duplicación al validar cálculos con mismas precondiciones.
+**Benefit:** Reduce duplicacion al validar calculos con mismas precondiciones.
 
 ---
 
-**Parametrized Test Group 2:** Valores inválidos de descuento
+**Parametrized Test Group 2:** Valores invalidos de descuento
 
-- **Base Scenario:** Validación de input y mensaje de error.
+- **Base Scenario:** Validacion de input y mensaje de error.
 - **Parameters to Vary:** Valor negativo, texto, porcentaje > 100.
 - **Test Data Sets:**
 
@@ -404,7 +405,7 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 
 ### Test Outlines
 
-#### **Validar cálculo de descuento porcentual con impuestos aplicados**
+#### **Validar calculo de descuento porcentual con impuestos aplicados**
 
 **Related Scenario:** Scenario 1
 **Type:** Positive
@@ -415,7 +416,7 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 **Preconditions:**
 
 - Usuario autenticado.
-- Factura en creación con items definidos (subtotal $200.00).
+- Factura en creacion con items definidos (subtotal $200.00).
 - Tax rate configurado en 10%.
 
 **Test Steps:**
@@ -428,6 +429,8 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 **Expected Result:**
 
 - **UI:** Muestra tipo de descuento, valor 10% y monto $20.00.
+- **API Response:** N/A
+- **Database:** N/A
 - **System State:** Totales recalculados con descuento antes de impuestos.
 
 **Test Data:**
@@ -442,6 +445,10 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
     "taxRate": 10,
     "discountType": "percentage",
     "discountValue": 10
+  },
+  "user": {
+    "email": "qa.user@soloq.test",
+    "role": "freelancer"
   }
 }
 ```
@@ -452,7 +459,7 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 
 ---
 
-#### **Validar descuento fijo con impuestos aplicados**
+#### **Validar calculo de descuento fijo con impuestos aplicados**
 
 **Related Scenario:** Scenario 2
 **Type:** Positive
@@ -475,6 +482,8 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 **Expected Result:**
 
 - **UI:** Muestra descuento fijo con valor 50 y monto $50.00.
+- **API Response:** N/A
+- **Database:** N/A
 - **System State:** Totales recalculados correctamente.
 
 **Test Data:**
@@ -486,13 +495,17 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
     "taxRate": 10,
     "discountType": "fixed",
     "discountValue": 50
+  },
+  "user": {
+    "email": "qa.user@soloq.test",
+    "role": "freelancer"
   }
 }
 ```
 
 ---
 
-#### **Validar visualización del descuento en el resumen**
+#### **Validar visualizacion del descuento en el resumen**
 
 **Related Scenario:** Scenario 3
 **Type:** Positive
@@ -502,20 +515,34 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 
 **Preconditions:**
 
-- Descuento válido aplicado.
+- Descuento valido aplicado.
 
 **Test Steps:**
 
 1. Abrir resumen de factura.
-2. Verificar sección de descuento.
+2. Verificar seccion de descuento.
 
 **Expected Result:**
 
 - **UI:** Se muestra tipo, valor y monto calculado.
+- **API Response:** N/A
+- **Database:** N/A
+- **System State:** Resumen refleja el descuento aplicado.
+
+**Test Data:**
+
+```json
+{
+  "input": {
+    "discountType": "percentage",
+    "discountValue": 10
+  }
+}
+```
 
 ---
 
-#### **Validar cap de descuento fijo cuando excede subtotal**
+#### **Validar cap de descuento fijo al exceder el subtotal**
 
 **Related Scenario:** Scenario 4
 **Type:** Boundary
@@ -536,10 +563,25 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 
 - **UI:** Discount amount = $80.00, total = $0.00.
 - **UI:** Warning visible (texto/ubicacion por definir).
+- **API Response:** N/A
+- **Database:** N/A
+
+**Test Data:**
+
+```json
+{
+  "input": {
+    "subtotal": 80,
+    "taxRate": 0,
+    "discountType": "fixed",
+    "discountValue": 100
+  }
+}
+```
 
 ---
 
-#### **Validar porcentaje 100% como limite aceptado**
+#### **Validar limite de porcentaje 100% sin error**
 
 **Related Scenario:** Scenario 4
 **Type:** Boundary
@@ -559,11 +601,26 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 **Expected Result:**
 
 - **UI:** Discount amount = $80.00, total = $0.00.
-- **UI:** No error de validación.
+- **UI:** No error de validacion.
+- **API Response:** N/A
+- **Database:** N/A
+
+**Test Data:**
+
+```json
+{
+  "input": {
+    "subtotal": 80,
+    "taxRate": 0,
+    "discountType": "percentage",
+    "discountValue": 100
+  }
+}
+```
 
 ---
 
-#### **Validar no aplicar descuento cuando valor es 0 o vacío**
+#### **Validar no aplicar descuento cuando el valor es 0 o vacio**
 
 **Related Scenario:** Scenario 5
 **Type:** Positive
@@ -577,17 +634,32 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 
 **Test Steps:**
 
-1. Dejar descuento vacío o ingresar 0.
+1. Dejar descuento vacio o ingresar 0.
 2. Verificar totales.
 
 **Expected Result:**
 
 - **UI:** Discount amount = $0.00.
 - **UI:** Total = $220.00.
+- **API Response:** N/A
+- **Database:** N/A
+
+**Test Data:**
+
+```json
+{
+  "input": {
+    "subtotal": 200,
+    "taxRate": 10,
+    "discountType": "fixed",
+    "discountValue": 0
+  }
+}
+```
 
 ---
 
-#### **Validar error con descuento negativo**
+#### **Validar error de validacion con descuento negativo**
 
 **Related Scenario:** Scenario 6
 **Type:** Negative
@@ -607,8 +679,22 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 **Expected Result:**
 
 - **UI:** Error visible en input de descuento.
+- **API Response:** N/A
+- **Database:** N/A
 - **System State:** Descuento no aplicado.
-- **Note:** Mensaje exacto pendiente de definición.
+- **Note:** Mensaje exacto pendiente de definicion.
+
+**Test Data:**
+
+```json
+{
+  "input": {
+    "subtotal": 200,
+    "discountType": "percentage",
+    "discountValue": -10
+  }
+}
+```
 
 ---
 
@@ -633,10 +719,24 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 
 - **UI:** Discount amount = $200.00 (cap).
 - **UI:** Warning visible.
+- **API Response:** N/A
+- **Database:** N/A
+
+**Test Data:**
+
+```json
+{
+  "input": {
+    "subtotal": 200,
+    "discountType": "percentage",
+    "discountValue": 150
+  }
+}
+```
 
 ---
 
-#### **Validar recálculo de descuento tras cambios en items**
+#### **Validar recalculo de descuento al cambiar items**
 
 **Related Scenario:** Scenario 7
 **Type:** Edge Case
@@ -657,14 +757,29 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 
 - **UI:** Discount amount = $40.00, total = $0.00.
 - **UI:** Warning actualizado.
+- **API Response:** N/A
+- **Database:** N/A
+
+**Test Data:**
+
+```json
+{
+  "input": {
+    "initialSubtotal": 200,
+    "discountType": "fixed",
+    "discountValue": 50,
+    "updatedSubtotal": 40
+  }
+}
+```
 
 ---
 
 ## 🔗 Integration Test Cases (If Applicable)
 
-### Integration Test 1: Frontend ↔ Backend - Crear factura con descuento
+### Integration Test 1: Frontend -> Backend - Crear factura con descuento
 
-**Integration Point:** Frontend → Backend API
+**Integration Point:** Frontend -> Backend API
 **Type:** Integration
 **Priority:** High
 
@@ -676,8 +791,8 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 
 **Test Flow:**
 
-1. Frontend envía `POST /api/invoices` con items, taxRate, discountType y discountValue.
-2. API procesa el cálculo y persiste en DB.
+1. Frontend envia `POST /api/invoices` con items, taxRate, discountType y discountValue.
+2. API procesa el calculo y persiste en DB.
 3. API responde con la factura creada.
 
 **Contract Validation:**
@@ -688,7 +803,7 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 
 **Expected Result:**
 
-- Integración exitosa sin discrepancias entre cálculo UI y backend.
+- Integracion exitosa sin discrepancias entre calculo UI y backend.
 - Total y taxAmount consistentes con descuento aplicado antes de impuestos.
 
 ---
@@ -699,7 +814,7 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 | ---------------------------- | -------------------------- | ------------------------ | --------- | -------- |
 | Porcentaje > 100%            | ❌ No                      | ✅ Yes (Scenario 4)      | TC-008    | High     |
 | Valor negativo               | ❌ No                      | ✅ Yes (Scenario 6)      | TC-007    | High     |
-| Decimales con muchos dígitos | ❌ No                      | ⚠️ Needs PO confirmation | TBD       | Medium   |
+| Decimales con muchos digitos | ❌ No                      | ⚠️ Needs PO confirmation | TBD       | Medium   |
 | Recalcular al cambiar items  | ❌ No                      | ✅ Yes (Scenario 7)      | TC-009    | Medium   |
 | Subtotal = 0 con descuento   | ❌ No                      | ⚠️ Needs PO confirmation | TBD       | Medium   |
 
@@ -738,7 +853,7 @@ Cobertura suficiente para los dos tipos de descuento, cálculo con impuestos, ca
 
 ---
 
-## 📝 PARTE 2: Integración y Output
+## 📝 PARTE 2: Integracion y Output
 
 ### Paso 5: Update Story in Jira
 
@@ -766,7 +881,7 @@ Esta story se considera "Done" desde QA cuando:
 - [ ] Story is updated with suggested improvements (if accepted by PO)
 - [ ] All test cases are executed and passing
 - [ ] Critical/High test cases: 100% passing
-- [ ] Medium/Low test cases: ≥95% passing
+- [ ] Medium/Low test cases: >=95% passing
 - [ ] All critical and high bugs resolved and verified
 - [ ] Integration tests passing (if applicable)
 - [ ] API contract validation passed (if applicable)
@@ -782,7 +897,7 @@ Esta story se considera "Done" desde QA cuando:
 
 - **Story:** `.context/PBI/epics/EPIC-SQ-20-invoice-creation/stories/STORY-SQ-25-add-discounts/story.md`
 - **Epic:** `.context/PBI/epics/EPIC-SQ-20-invoice-creation/epic.md`
-- **Feature Test Plan:** `.context/PBI/epics/EPIC-SQ-20-invoice-creation/feature-test-plan.md`
+- **Feature Test Plan:** `.context/PBI/epics/EPIC-SQ-20-invoice-creation/feature-test-plan.md` (missing)
 - **Business Model:** `.context/idea/business-model.md`
 - **PRD:** `.context/PRD/` (all files)
 - **SRS:** `.context/SRS/` (all files)
@@ -793,7 +908,7 @@ Esta story se considera "Done" desde QA cuando:
 
 ## 📋 Test Execution Tracking
 
-[Esta sección se completa durante ejecución]
+[Esta seccion se completa durante ejecucion]
 
 **Test Execution Date:** [TBD]
 **Environment:** Staging
@@ -808,7 +923,7 @@ Esta story se considera "Done" desde QA cuando:
 
 **Bugs Found:**
 
-- [Bug ID 1]: [Descripción breve]
-- [Bug ID 2]: [Descripción breve]
+- [Bug ID 1]: [Descripcion breve]
+- [Bug ID 2]: [Descripcion breve]
 
 **Sign-off:** [Nombre QA] - [Fecha]

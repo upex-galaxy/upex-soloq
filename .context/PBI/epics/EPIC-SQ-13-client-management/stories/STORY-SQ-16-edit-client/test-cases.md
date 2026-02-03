@@ -744,7 +744,7 @@ La story es de complejidad baja, pero requiere cubrir validaciones, constraint d
 
 ## 📝 PARTE 2: Integracion y Output
 
-**Nota:** No se pudo actualizar Jira ni agregar comentarios por falta de acceso a MCP Atlassian. El archivo local sirve como mirror propuesto.
+**Nota:** Jira actualizado y comentario de test cases agregado el 2026-02-03.
 
 ---
 

@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import type { Route } from 'next';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, FileText, Users, Settings, type LucideIcon } from 'lucide-react';
 
@@ -15,29 +14,29 @@ import {
 
 interface NavItem {
   title: string;
-  url: Route;
+  url: string;
   icon: LucideIcon;
 }
 
 const navItems: NavItem[] = [
   {
     title: 'Dashboard',
-    url: '/dashboard' as Route,
+    url: '/dashboard',
     icon: LayoutDashboard,
   },
   {
     title: 'Facturas',
-    url: '/invoices' as Route,
+    url: '/invoices',
     icon: FileText,
   },
   {
     title: 'Clientes',
-    url: '/clients' as Route,
+    url: '/clients',
     icon: Users,
   },
   {
     title: 'Configuración',
-    url: '/settings' as Route,
+    url: '/settings',
     icon: Settings,
   },
 ];

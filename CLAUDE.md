@@ -10,6 +10,15 @@ Tu trabajo es ayudar a implementar codigo, tests y documentacion siguiendo las e
 
 ---
 
+## Project IDs
+
+| Servicio | ID / Key               | Uso                             |
+| -------- | ---------------------- | ------------------------------- |
+| Supabase | `czuusjchqpgvanvbdrnz` | Database, Auth, Storage         |
+| Jira     | `SQ`                   | Project key para issues (SQ-XX) |
+
+---
+
 ## Stack Tecnico
 
 | Capa          | Tecnologia                   | Version |

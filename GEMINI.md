@@ -1,211 +1,242 @@
-# System Prompt - Context Engineering
+# System Prompt - SoloQ
 
-## Instrucciones para la IA
-
-Eres un asistente de desarrollo para un proyecto que sigue **Context Engineering** y **Spec-Driven Development**. Tu trabajo es ayudar a implementar código, tests y documentación siguiendo las especificaciones definidas.
+> Generic AI Agent Instructions for SoloQ Project
+> Compatible with: Google Gemini, AI Studio, and Gemini-based tools
 
 ---
 
-## Principios Fundamentales
+## Project Overview
+
+**SoloQ** is an invoicing platform for LATAM freelancers built with:
+
+- **Framework:** Next.js 16.1 (App Router)
+- **Backend:** Supabase (PostgreSQL + Auth)
+- **Styling:** Tailwind CSS 4 + shadcn/ui
+- **Forms:** React Hook Form + Zod
+- **Language:** TypeScript (strict mode)
+- **Runtime:** Bun
+
+**Description:** SoloQ enables freelancers to create professional invoices in under 2 minutes, manage clients, send invoices via email with PDF attachments, and track payments with automatic reminders (Pro feature).
+
+---
+
+## Project IDs
+
+| Service  | ID / Key               | Usage                          |
+| -------- | ---------------------- | ------------------------------ |
+| Supabase | `czuusjchqpgvanvbdrnz` | Database, Auth, Storage        |
+| Jira     | `SQ`                   | Project key for issues (SQ-XX) |
+
+---
+
+## Core Principles
 
 ### 1. Spec-Driven Development
 
-- **Nunca** implementes código sin leer primero la especificación
-- Las **User Stories** definen QUÉ hacer
-- Los **Acceptance Criteria** definen CUÁNDO está listo
-- Los **Test Cases** definen CÓMO probar
-- El **Implementation Plan** define CÓMO implementar
+- **Never** implement code without reading the specification first
+- **User Stories** define WHAT to do
+- **Acceptance Criteria** define WHEN it's done
+- **Test Cases** define HOW to test
+- **Implementation Plan** defines HOW to implement
 
 ### 2. Context Loading
 
-- **Siempre** carga el contexto relevante antes de trabajar
-- Lee los **guidelines** correspondientes a tu rol
-- Usa los **MCPs** para datos en vivo (schema, docs, issues)
-- **No asumas** - verifica en la documentación
+- **Always** load relevant context before working
+- Read the **guidelines** for your role
+- Use **MCPs** for live data (schema, docs, issues)
+- **Don't assume** - verify in documentation
 
 ### 3. Quality First
 
-- Sigue los **estándares de código** desde la primera línea
-- Implementa **error handling** correctamente
-- Agrega **data-testid** a elementos interactivos
-- **No hardcodees** valores - usa configuración
+- Follow **code standards** from the first line
+- Implement **error handling** correctly
+- Add **data-testid** to interactive elements
+- **Don't hardcode** values - use configuration
 
 ---
 
-## Context Loading por Rol
-
-### Si estás haciendo DESARROLLO (DEV)
+## Project Structure
 
 ```
-Antes de codear, leer:
-├── .context/guidelines/DEV/
-│   ├── code-standards.md          # Estándares de código
-│   ├── error-handling.md          # Manejo de errores
-│   ├── data-testid-standards.md   # Cómo crear data-testid
-│   └── spec-driven-development.md # Principio SDD
-│
-├── .context/PBI/epics/.../stories/.../
-│   ├── story.md                   # User story + AC
-│   ├── test-cases.md              # Test cases esperados
-│   └── implementation-plan.md     # Plan técnico
-│
-└── MCPs relevantes:
-    ├── Supabase → Schema de DB
-    └── Context7 → Docs de bibliotecas
-    └── Playwright → Revisión de UI/UX
-```
+soloq/
+   src/
+      app/                       # Next.js App Router
+         (auth)/                # Auth pages (login, signup)
+         (app)/                 # Protected app pages
+            dashboard/         # Main dashboard
+            invoices/          # Invoice management
+            clients/           # Client management
+            settings/          # Business settings
+         auth/callback/         # OAuth callback
 
-### Si estás haciendo QA (Testing Manual)
+      components/
+         ui/                    # shadcn/ui components
+         layout/                # Layout components
 
-```
-Antes de testear, leer:
-├── .context/guidelines/QA/
-│   ├── spec-driven-testing.md     # Principio SDT
-│   ├── exploratory-testing.md     # Técnicas + Trifuerza
-│   └── jira-test-management.md    # Gestión en Jira
-│
-├── .context/PBI/epics/.../stories/.../
-│   ├── story.md                   # User story + AC
-│   └── test-cases.md              # Test cases a ejecutar
-│
-├── .prompts/fase-10-exploratory-testing/
-│   ├── exploratory-test.md        # UI Testing
-│   ├── exploratory-api-test.md    # API Testing
-│   └── exploratory-db-test.md     # Database Testing
-│
-└── MCPs relevantes (Trifuerza):
-    ├── Playwright → UI Testing
-    ├── Postman/OpenAPI → API Testing
-    ├── DBHub → Database Testing
-    └── Atlassian → Gestión de tests
-```
+      lib/
+         supabase/              # Supabase clients
+             client.ts          # Browser client
+             server.ts          # Server client
+             admin.ts           # Admin client
 
-### Si estás haciendo TAE (Test Automation)
+      contexts/                  # React contexts (auth)
+      hooks/                     # Custom hooks
+      types/
+          supabase.ts            # Generated DB types
 
-```
-Antes de automatizar, leer:
-├── .context/guidelines/TAE/
-│   ├── KATA-AI-GUIDE.md           # Entry point para IA
-│   ├── kata-architecture.md       # Arquitectura KATA
-│   ├── automation-standards.md    # Estándares de tests
-│   └── test-data-management.md    # Manejo de datos
-│
-├── .context/PBI/epics/.../stories/.../
-│   └── test-cases.md              # Test cases a automatizar
-│
-└── MCPs relevantes:
-    ├── Playwright → Tests E2E UI
-    ├── DevTools → Debugging
-    ├── Postman/OpenAPI → Tests de API
-    ├── DBHub → Verificación de datos
-    ├── Context7 → Docs de testing
-    └── Atlassian → Gestión de tests
+   scripts/                       # Build & dev scripts
+   docs/                          # System documentation
+   .context/                      # AI context engineering
+      idea/                      # Phase 1: Constitution
+      PRD/                       # Phase 2: Product Requirements
+      SRS/                       # Phase 2: Software Requirements
+      PBI/                       # Phases 4-6: Product Backlog
+         epics/.../stories/...  # Stories with test cases
+      guidelines/                # Reference material
+          DEV/                   # Development guidelines
+          QA/                    # Manual testing guidelines
+          TAE/                   # Test automation guidelines
+          MCP/                   # MCP guidelines
 
-Nota: Usa gh (CLI de GitHub) para crear PR, hacer reviews, y todo lo relacionado con git.
+   .prompts/                      # Prompt templates
 ```
 
 ---
 
-## Estructura del Proyecto
+## Context Loading by Role
+
+### Development (DEV)
+
+Before coding, read:
+
+- `.context/guidelines/DEV/code-standards.md`
+- `.context/guidelines/DEV/error-handling.md`
+- `.context/guidelines/DEV/data-testid-standards.md`
+- `.context/PBI/epics/.../stories/.../story.md` (User story + AC)
+- `.context/PBI/epics/.../stories/.../implementation-plan.md`
+
+### QA (Manual Testing)
+
+Before testing, read:
+
+- `.context/guidelines/QA/spec-driven-testing.md`
+- `.context/guidelines/QA/exploratory-testing.md`
+- `.context/PBI/epics/.../stories/.../test-cases.md`
+- `.prompts/fase-10-exploratory-testing/`
+
+### TAE (Test Automation)
+
+Before automating, read:
+
+- `.context/guidelines/TAE/KATA-AI-GUIDE.md`
+- `.context/guidelines/TAE/kata-architecture.md`
+- `.context/guidelines/TAE/automation-standards.md`
+- `.context/PBI/epics/.../stories/.../test-cases.md`
+
+---
+
+## Database Schema
+
+### Main Entities
+
+| Table               | Description                        |
+| ------------------- | ---------------------------------- |
+| `profiles`          | User profile data                  |
+| `business_profiles` | Business info (name, logo, tax_id) |
+| `clients`           | Client database                    |
+| `invoices`          | Invoice records                    |
+| `invoice_items`     | Line items per invoice             |
+| `payments`          | Payment records                    |
+| `payment_methods`   | User's configured payment methods  |
+| `subscription`      | Free/Pro subscription status       |
+| `reminder_settings` | Auto-reminder configuration (Pro)  |
+| `invoice_events`    | Audit log for invoices             |
+
+### Enums
+
+- `invoice_status`: draft, sent, paid, overdue, cancelled
+- `discount_type`: percentage, fixed
+- `payment_method_type`: bank_transfer, paypal, mercado_pago, cash, other
+- `subscription_plan`: free, pro
+- `subscription_status`: active, canceled, past_due, incomplete
+- `invoice_event_type`: created, updated, sent, reminder_sent, viewed, paid, cancelled
+
+### Invoice Status Flow
 
 ```
-.context/                          # Documentación que la IA lee
-├── system-prompt.md               # Este archivo (copiar a CLAUDE.md o GEMINI.md o etc.)
-├── idea/                          # Fase 1: Constitution
-├── PRD/                           # Fase 2: Product Requirements
-├── SRS/                           # Fase 2: Software Requirements
-├── PBI/                           # Fases 4-6: Product Backlog
-│   └── epics/.../stories/...      # Stories con test cases y plans
-└── guidelines/                    # Reference material
-    ├── DEV/                       # Guidelines de desarrollo
-    ├── QA/                        # Guidelines de testing manual
-    ├── TAE/                       # Guidelines de automatización
-    └── MCP/                       # Guidelines de MCPs
-
-.prompts/                          # Prompts para generar documentación
-├── git-flow.md                    # Workflow completo de git (branching, merging, etc.)
-├── us-dev-workflow.md             # Workflow completo de desarrollo
-├── us-qa-workflow.md              # Workflow completo de testing QA/TAE
-├── kata-framework-setup.md        # Setup inicial o refactoring de KATA framework (test automation)
-└── fase-X-.../                    # Prompts por fase
+draft -> sent -> paid
+            |
+            +-> overdue -> paid
+            |
+            +-> cancelled
 ```
 
 ---
 
-## Flujo de Trabajo General
+## Available Commands
 
+```bash
+# Development
+bun dev              # Start dev server (Turbopack)
+bun build            # Production build
+bun typecheck        # TypeScript check
+
+# Code Quality
+bun lint             # Run ESLint
+bun lint:fix         # Auto-fix ESLint errors
+bun format           # Format with Prettier
+bun format:check     # Check formatting
+
+# AI Tooling
+bun ai {preset}      # Load MCPs by task
+bun up               # Update prompt templates
+bun kata:manifest    # Generate test automation manifest
+bun api:sync         # Sync OpenAPI spec
 ```
-1. IDENTIFICAR ROL
-   └─ ¿DEV? ¿QA? ¿TAE?
-
-2. CARGAR CONTEXTO
-   └─ Leer guidelines del rol
-   └─ Leer story/test-cases/plan relevantes
-
-3. EJECUTAR TAREA
-   └─ Seguir principios del rol
-   └─ Usar MCPs para datos en vivo
-
-4. VERIFICAR
-   └─ ¿Cumple acceptance criteria?
-   └─ ¿Sigue estándares?
-   └─ ¿Tests pasan?
-```
 
 ---
 
-## MCPs Disponibles
+## MCP Integration
 
-| MCP        | Cuándo usar                        |
-| ---------- | ---------------------------------- |
-| Supabase   | Schema, datos, policies de DB      |
-| Context7   | Docs oficiales de bibliotecas      |
-| Tavily     | Búsqueda web, foros, errores       |
-| Playwright | Tests E2E, interacciones UI        |
-| DevTools   | Debug de tests, network, console   |
-| Postman    | API testing con colecciones        |
-| OpenAPI    | API testing via spec (requests)    |
-| DBHub      | SQL queries, verificación de datos |
-| Sentry     | Errores en producción              |
-| Atlassian  | Jira, Confluence                   |
-| GitHub     | Issues, PRs, código                |
-| Slack      | Notificaciones                     |
-| Memory     | Contexto entre sesiones            |
+| MCP        | When to Use                    |
+| ---------- | ------------------------------ |
+| Supabase   | Schema, data, RLS policies     |
+| Context7   | Official library documentation |
+| Playwright | E2E tests, UI interactions     |
+| Atlassian  | Jira, Confluence               |
+| GitHub     | Issues, PRs, code              |
 
-### Trifuerza Testing (QA)
+### Testing Triforce (QA)
 
-| Capa | MCPs                 |
-| ---- | -------------------- |
-| UI   | `playwright`         |
-| API  | `postman`, `openapi` |
-| DB   | `dbhub`              |
-
-Ver `.context/guidelines/MCP/` para detalles de cada uno.
+| Layer | MCPs                 |
+| ----- | -------------------- |
+| UI    | `playwright`         |
+| API   | `postman`, `openapi` |
+| DB    | `dbhub`              |
 
 ---
 
-## Reglas de Oro
+## Golden Rules
 
-1. **Spec First**: Lee la especificación antes de actuar
-2. **Context Matters**: Carga el contexto correcto para el rol
-3. **Living Data**: Usa MCPs para datos en vivo, no docs estáticos
-4. **Quality Built-In**: Aplica estándares desde el inicio
-5. **Traceability**: Todo código/test mapea a una especificación
-
----
-
-## Cómo Usar Este Archivo
-
-1. **Copia** el contenido de este archivo
-2. **Pega** en tu archivo de configuración de IA:
-   - Claude Code: `.CLAUDE.md`
-   - Gemini CLI: `.gemini/GEMINI.md`
-   - GitHub Copilot: `.github/copilot-instructions.md`
-   - Cursor: `.cursor/rules`
-3. **Inicia** una nueva sesión con tu IA
-4. La IA ahora sabrá cómo cargar contexto correctamente
+1. **Spec First**: Read the specification before acting
+2. **Context Matters**: Load the correct context for your role
+3. **Living Data**: Use MCPs for live data, not static docs
+4. **Quality Built-In**: Apply standards from the start
+5. **Traceability**: All code/tests map to a specification
 
 ---
 
-**Última actualización**: 2025-12-26
-**Ver también**: `.context/guidelines/` para guidelines detallados por rol
+## Key Files Reference
+
+| File                         | Purpose                         |
+| ---------------------------- | ------------------------------- |
+| `src/types/supabase.ts`      | Database types (auto-generated) |
+| `src/lib/supabase/client.ts` | Browser Supabase client         |
+| `src/lib/supabase/server.ts` | Server Supabase client          |
+| `middleware.ts`              | Auth middleware                 |
+| `.env.example`               | Environment variables template  |
+
+---
+
+**Last updated:** 2026-02-03
+**See also:** `.context/guidelines/` for detailed role-specific guidelines

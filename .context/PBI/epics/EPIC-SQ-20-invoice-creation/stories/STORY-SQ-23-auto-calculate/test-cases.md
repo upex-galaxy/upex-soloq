@@ -3,6 +3,7 @@
 Este Feature Test Plan valida el cálculo automático y preciso de importes financieros en el flujo de creación de facturas, asegurando consistencia matemática, correcta aplicación de descuentos e impuestos, y estabilidad ante cambios en tiempo real.
 
 El plan cubre:
+
 - Cálculo de **subtotal**, **descuentos**, **impuestos** y **total final**
 - **Precisión decimal** y políticas de redondeo
 - **Reactividad** ante cambios del usuario
@@ -10,6 +11,7 @@ El plan cubre:
 - Casos reales y escenarios críticos de negocio
 
 Se han identificado varias **ambigüedades funcionales** que requieren confirmación del Product Owner antes de la implementación final, especialmente relacionadas con:
+
 - Orden de aplicación de descuentos e impuestos
 - Política oficial de redondeo
 - Límites y validaciones financieras

@@ -1526,8 +1526,8 @@ Ver documentación:
 
 ---
 
-**Versión:** 3.2 - Git Branch Naming Convention + Paso 0
-**Última actualización:** 2025-12-06
+**Versión:** 3.3 - Git Branch Naming Convention + Paso 0 + Custom Field Sync
+**Última actualización:** 2025-02-05
 **Cambios principales:**
 
 - ✅ Agregado flujo Jira-First (Pasos 5-8)
@@ -1546,3 +1546,49 @@ Ver documentación:
 - ✅ **Branch Naming Convention para Git** - formato `test/{JIRA_KEY}/{short-description}`
 - ✅ **Paso 0: Crear rama de trabajo** - checkout desde `staging` antes de generar test cases
 - ✅ **Paso 9: Commit del archivo** - commit del `acceptance-test-plan.md` en la rama de trabajo
+- ✅ **Sincronización condicional con custom field de Jira**
+
+---
+
+## 📤 SINCRONIZACIÓN CON JIRA (Condicional - UPEX Workspace)
+
+### Custom Field para Acceptance Test Plan
+
+| Field ID            | Nombre                      | Tipo     | Nivel |
+| ------------------- | --------------------------- | -------- | ----- |
+| `customfield_12400` | Acceptance Test Plan (QA)🧪 | Textarea | Story |
+
+### Instrucciones de Sincronización
+
+**DESPUÉS de generar el archivo `acceptance-test-plan.md` localmente:**
+
+1. **Verificar si la Story tiene el custom field:**
+   - Usar MCP de Atlassian para obtener la Story: `jira_get_issue`
+   - Verificar si `customfield_12400` existe y está disponible en el response
+
+2. **Si el campo existe:**
+   - Copiar el contenido COMPLETO del `acceptance-test-plan.md` generado
+   - Actualizar la Story en Jira usando MCP `jira_update_issue`:
+     ```
+     fields: {
+       "customfield_12400": "[contenido del acceptance-test-plan.md]"
+     }
+     ```
+   - Agregar label: `test-plan-ready`
+
+3. **Si el campo NO existe (Workspace non-UPEX):**
+   - Buscar campo equivalente con nombre similar ("Test Plan", "QA Plan", "Acceptance Tests")
+   - Si no existe ningún campo equivalente, agregar como **comentario** en la Story:
+
+     ```
+     🧪 **Acceptance Test Plan (QA)**
+
+     [contenido del acceptance-test-plan.md]
+     ```
+
+### Output Esperado
+
+- [ ] Archivo `acceptance-test-plan.md` creado en `.context/PBI/epics/.../stories/.../`
+- [ ] Custom field `customfield_12400` actualizado en Jira (si existe)
+- [ ] Label `test-plan-ready` agregado a la Story
+- [ ] Comentario agregado como fallback (si campo no existe)

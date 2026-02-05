@@ -741,7 +741,7 @@ Crear carpeta:
 
 ## Testing Strategy
 
-See: `.context/PBI/epics/EPIC-{PROJECT_KEY}-{NUM}-{nombre}/stories/STORY-{PROJECT_KEY}-{NUM}-{nombre}/test-cases.md` (se crea en Fase 5)
+See: `.context/PBI/epics/EPIC-{PROJECT_KEY}-{NUM}-{nombre}/stories/STORY-{PROJECT_KEY}-{NUM}-{nombre}/acceptance-test-plan.md` (se crea en Fase 5)
 
 **Test Cases Expected:** 6+ detailed test cases covering:
 
@@ -917,7 +917,7 @@ Al completar este prompt para todo el MVP (todas las épicas), tendrás:
 **Archivos que se crean en fases posteriores:**
 
 - `feature-test-plan.md` - Fase 4 (Shift-Left Testing)
-- `story-xxx/test-cases.md` - Fase 4
+- `story-xxx/acceptance-test-plan.md` - Fase 4
 - `feature-implementation-plan.md` - Fase 5 (Planning)
 - `story-xxx/implementation-plan.md` - Fase 5
 

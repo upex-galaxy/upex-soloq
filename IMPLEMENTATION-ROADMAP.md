@@ -40,7 +40,7 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 
 | Key   | Story                                    | Status            | Priority | PR                        |
 | ----- | ---------------------------------------- | ----------------- | -------- | ------------------------- |
-| SQ-21 | Create Invoice by Selecting Client       | **Ready For Dev** | Medium   | #19 (MERGED - solo tests) |
+| SQ-21 | Create Invoice by Selecting Client       | **In Review**     | Medium   | #29 (OPEN)                |
 | SQ-22 | Add Line Items to Invoice                | Backlog           | Medium   | -                         |
 | SQ-23 | Automatic Subtotal and Total Calculation | Estimation        | Medium   | #16 (MERGED - solo tests) |
 | SQ-24 | Add Taxes to Invoice                     | **Ready For Dev** | Medium   | #9 (MERGED - solo tests)  |
@@ -235,22 +235,33 @@ Todas las US de FASE 1 implementadas:
 
 ### US en Trabajo Actual: SQ-21 - Create Invoice by Selecting Client
 
-| Paso                      | Estado    | Notas                        |
-| ------------------------- | --------- | ---------------------------- |
-| 0. Precondiciones Epic    | Pendiente | Verificar feature-test-plan  |
-| 1. Jira In Progress       | Pendiente |                              |
-| 2. Implementation Plan    | Pendiente |                              |
-| 3. Implementacion         | Pendiente |                              |
-| 4. PR Creado              | Pendiente |                              |
-| 5. Jira In Review         | Pendiente |                              |
-| 6. Code Review            | Pendiente |                              |
-| 7. Docs Actualizados      | Pendiente |                              |
-| 8. Merge PR               | Pendiente |                              |
-| 9. Jira Ready For QA      | Pendiente |                              |
-| 10. Comentario Jira       | Pendiente |                              |
-| 11. Preparar Siguiente US | Pendiente | Siguiente: SQ-24 (Add Taxes) |
+| Paso                      | Estado     | Notas                         |
+| ------------------------- | ---------- | ----------------------------- |
+| 0. Precondiciones Epic    | Completado | feature-test-plan.md existe   |
+| 1. Jira In Progress       | Completado | Transicionado                 |
+| 2. Implementation Plan    | Completado | implementation-plan.md creado |
+| 3. Implementacion         | Completado | 8 archivos, 946 lineas        |
+| 4. PR Creado              | Completado | PR #29 (OPEN)                 |
+| 5. Jira In Review         | Completado | Transicionado + comentario    |
+| 6. Code Review            | **Actual** | Esperando aprobacion          |
+| 7. Docs Actualizados      | Pendiente  |                               |
+| 8. Merge PR               | Pendiente  |                               |
+| 9. Jira Ready For QA      | Pendiente  |                               |
+| 10. Comentario Jira       | Pendiente  |                               |
+| 11. Preparar Siguiente US | Pendiente  | Siguiente: SQ-24 (Add Taxes)  |
 
-**Siguiente paso:** PASO 0 - Verificar precondiciones del Epic SQ-20
+**Siguiente paso:** PASO 6 - Code Review del PR #29
+
+**Archivos implementados:**
+
+- `src/lib/validations/invoice.ts` - Zod schema
+- `src/app/api/invoices/route.ts` - POST endpoint
+- `src/hooks/invoices/use-create-invoice.ts` - React Query mutation
+- `src/hooks/invoices/index.ts` - Barrel export
+- `src/components/invoices/client-selector.tsx` - Combobox con busqueda
+- `src/components/invoices/create-client-dialog.tsx` - Modal inline
+- `src/components/invoices/index.ts` - Barrel export
+- `src/app/(app)/invoices/create/page.tsx` - Pagina de creacion
 
 ---
 

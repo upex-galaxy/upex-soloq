@@ -53,6 +53,7 @@ export function ClientForm({
       phone: '',
       address: '',
       notes: '',
+      tax_id: '',
       ...defaultValues,
     },
   });
@@ -140,6 +141,25 @@ export function ClientForm({
                 )}
               />
             </div>
+
+            {/* Tax ID - full width */}
+            <FormField
+              control={form.control}
+              name="tax_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>ID Fiscal (RFC/NIT/CUIT)</FormLabel>
+                  <FormControl>
+                    <Input
+                      data-testid="client-taxid-input"
+                      placeholder="Ej: XAXX010101000 (opcional)"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Address - full width */}
             <FormField

@@ -162,7 +162,7 @@ export async function POST(request: Request): Promise<NextResponse<CreateClientR
       );
     }
 
-    const { name, email, company, phone, address, notes } = validationResult.data;
+    const { name, email, company, phone, address, notes, tax_id } = validationResult.data;
 
     // Check for duplicate email for this user
     const { data: existingClient } = await supabase
@@ -188,6 +188,7 @@ export async function POST(request: Request): Promise<NextResponse<CreateClientR
         phone: phone || null,
         address: address || null,
         notes: notes || null,
+        tax_id: tax_id || null,
       })
       .select()
       .single();

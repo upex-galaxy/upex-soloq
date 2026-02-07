@@ -5,6 +5,23 @@
 
 ---
 
+## Instrucciones para Continuar (Contexto IA)
+
+**Para retomar el desarrollo en un nuevo chat:**
+
+1. **Workflow a seguir:** `.prompts/us-dev-workflow.md` (12 pasos)
+2. **Test Cases:** Buscar primero en **comentarios de Jira** de la US (Acceptance Test Plan del QA)
+3. **Siguiente tarea:** Ver sección "US en Trabajo Actual" abajo
+4. **Si la US actual esta completa:** Tomar la siguiente de "Lista Estratégica de Implementación"
+
+**Comando sugerido para iniciar:**
+
+```
+Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
+```
+
+---
+
 ## Estado Actual del Tablero Jira
 
 ### Epic: SQ-13 - Client Management

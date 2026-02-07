@@ -1,0 +1,237 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { ClientSelector, CreateClientDialog } from '@/components/invoices';
+import { useClients } from '@/hooks/clients';
+import { useCreateInvoice } from '@/hooks/invoices';
+import { createInvoiceSchema, type CreateInvoiceFormData } from '@/lib/validations/invoice';
+import type { Client } from '@/lib/types';
+
+/**
+ * Calculate default due date (30 days from now)
+ */
+function getDefaultDueDate(): string {
+  const date = new Date();
+  date.setDate(date.getDate() + 30);
+  return date.toISOString().split('T')[0];
+}
+
+export default function CreateInvoicePage() {
+  const router = useRouter();
+
+  // State for selected client and dialog
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [isCreateClientOpen, setIsCreateClientOpen] = useState(false);
+
+  // Fetch all clients (no pagination for selector)
+  const { data: clientsData, isLoading: isLoadingClients } = useClients({
+    limit: 100,
+    sortBy: 'name',
+    sortOrder: 'asc',
+  });
+
+  // Create invoice mutation
+  const { mutate: createInvoice, isPending: isCreating } = useCreateInvoice();
+
+  // Form setup
+  const form = useForm<CreateInvoiceFormData>({
+    resolver: zodResolver(createInvoiceSchema),
+    defaultValues: {
+      clientId: '',
+      dueDate: getDefaultDueDate(),
+      notes: '',
+    },
+  });
+
+  // Handle client selection
+  const handleClientSelect = (client: Client | null) => {
+    setSelectedClient(client);
+    if (client) {
+      form.setValue('clientId', client.id, { shouldValidate: true });
+    } else {
+      form.setValue('clientId', '', { shouldValidate: true });
+    }
+  };
+
+  // Handle new client created
+  const handleClientCreated = (client: Client) => {
+    handleClientSelect(client);
+    toast.success(`Cliente "${client.name}" creado`);
+  };
+
+  // Handle form submission
+  const handleSubmit = (data: CreateInvoiceFormData) => {
+    createInvoice(data, {
+      onSuccess: invoice => {
+        toast.success(`Factura ${invoice.invoice_number} creada`);
+        router.push(`/invoices`); // TODO: Change to /invoices/${invoice.id} when detail page exists
+      },
+      onError: error => {
+        toast.error(error.message);
+      },
+    });
+  };
+
+  const clients = clientsData?.clients ?? [];
+
+  return (
+    <div className="space-y-6" data-testid="create-invoice-page">
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="icon" asChild>
+          <Link href="/invoices">
+            <ArrowLeft className="h-4 w-4" />
+            <span className="sr-only">Volver</span>
+          </Link>
+        </Button>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Crear Factura</h1>
+          <p className="text-muted-foreground">Crea una nueva factura seleccionando un cliente.</p>
+        </div>
+      </div>
+
+      {/* Form Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Información de la Factura</CardTitle>
+          <CardDescription>
+            Selecciona un cliente y configura los detalles básicos de la factura.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleSubmit)}
+              className="space-y-6"
+              data-testid="create-invoice-form"
+            >
+              {/* Client Selector */}
+              <FormField
+                control={form.control}
+                name="clientId"
+                render={({ fieldState }) => (
+                  <FormItem>
+                    <FormLabel>Cliente *</FormLabel>
+                    <FormControl>
+                      <ClientSelector
+                        value={selectedClient}
+                        clients={clients}
+                        isLoading={isLoadingClients}
+                        onSelect={handleClientSelect}
+                        onAddNew={() => setIsCreateClientOpen(true)}
+                        error={fieldState.error?.message}
+                        disabled={isCreating}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Selecciona el cliente al que se enviará esta factura.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Due Date */}
+              <FormField
+                control={form.control}
+                name="dueDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Fecha de vencimiento</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        {...field}
+                        disabled={isCreating}
+                        data-testid="due-date-picker"
+                      />
+                    </FormControl>
+                    <FormDescription>La fecha límite de pago para esta factura.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Notes */}
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notas (opcional)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Notas adicionales para esta factura..."
+                        className="min-h-[100px]"
+                        {...field}
+                        disabled={isCreating}
+                        data-testid="invoice-notes-input"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Estas notas aparecerán en el PDF de la factura.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Actions */}
+              <div className="flex justify-end gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.push('/invoices')}
+                  disabled={isCreating}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isCreating || !selectedClient}
+                  data-testid="save-invoice-button"
+                >
+                  {isCreating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Guardando...
+                    </>
+                  ) : (
+                    'Guardar como borrador'
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+
+      {/* Create Client Dialog */}
+      <CreateClientDialog
+        open={isCreateClientOpen}
+        onOpenChange={setIsCreateClientOpen}
+        onSuccess={handleClientCreated}
+      />
+    </div>
+  );
+}

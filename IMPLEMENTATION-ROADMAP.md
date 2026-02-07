@@ -9,15 +9,15 @@
 
 ### Epic: SQ-13 - Client Management
 
-| Key   | Story                                | Status            | Priority | PR                        |
-| ----- | ------------------------------------ | ----------------- | -------- | ------------------------- |
-| SQ-14 | Add New Client                       | In Test           | Medium   | #21 (MERGED)              |
-| SQ-15 | List All Clients                     | **Ready For Dev** | Medium   | #2 (MERGED - solo tests)  |
-| SQ-16 | Edit Client Data                     | **Ready For Dev** | Medium   | #14 (MERGED - solo tests) |
-| SQ-17 | Add Client Tax Information           | **Ready For Dev** | Medium   | -                         |
-| SQ-18 | View Client Invoice History          | Shift-Left QA     | Medium   | #20 (OPEN)                |
-| SQ-19 | Delete Client                        | **Ready For Dev** | Medium   | -                         |
-| SQ-68 | Validate client email deliverability | Backlog           | Medium   | -                         |
+| Key   | Story                                | Status            | Priority | PR                          |
+| ----- | ------------------------------------ | ----------------- | -------- | --------------------------- |
+| SQ-14 | Add New Client                       | In Test           | Medium   | #21 (MERGED)                |
+| SQ-15 | List All Clients                     | **In Progress**   | Medium   | #25 (OPEN - implementation) |
+| SQ-16 | Edit Client Data                     | **Ready For Dev** | Medium   | #14 (MERGED - solo tests)   |
+| SQ-17 | Add Client Tax Information           | **Ready For Dev** | Medium   | -                           |
+| SQ-18 | View Client Invoice History          | Shift-Left QA     | Medium   | #20 (OPEN)                  |
+| SQ-19 | Delete Client                        | **Ready For Dev** | Medium   | -                           |
+| SQ-68 | Validate client email deliverability | Backlog           | Medium   | -                           |
 
 ### Epic: SQ-20 - Invoice Creation
 
@@ -175,22 +175,22 @@ FASE 3 - PDF Generation
 
 ### US en Trabajo Actual: SQ-15
 
-| Paso                      | Estado    | Notas                          |
-| ------------------------- | --------- | ------------------------------ |
-| 0. Precondiciones Epic    | Pendiente | Verificar feature-test-plan.md |
-| 1. Jira In Progress       | Pendiente |                                |
-| 2. Implementation Plan    | Pendiente |                                |
-| 3. Implementacion         | Pendiente |                                |
-| 4. PR Creado              | Pendiente |                                |
-| 5. Jira In Review         | Pendiente |                                |
-| 6. Code Review            | Pendiente |                                |
-| 7. Docs Actualizados      | Pendiente |                                |
-| 8. Merge PR               | Pendiente |                                |
-| 9. Jira Ready For QA      | Pendiente |                                |
-| 10. Comentario Jira       | Pendiente |                                |
-| 11. Preparar Siguiente US | Pendiente |                                |
+| Paso                      | Estado     | Notas                                  |
+| ------------------------- | ---------- | -------------------------------------- |
+| 0. Precondiciones Epic    | Completado | feature-test-plan.md existe            |
+| 1. Jira In Progress       | Completado | Transitado a In Progress               |
+| 2. Implementation Plan    | Completado | implementation-plan.md creado          |
+| 3. Implementacion         | Completado | API, hook, 4 componentes UI, page      |
+| 4. PR Creado              | Completado | PR #25 hacia staging                   |
+| 5. Jira In Review         | Manual     | Automation no transito automaticamente |
+| 6. Code Review            | Completado | APPROVED                               |
+| 7. Docs Actualizados      | Completado | Este archivo actualizado               |
+| 8. Merge PR               | Pendiente  |                                        |
+| 9. Jira Ready For QA      | Pendiente  |                                        |
+| 10. Comentario Jira       | Pendiente  |                                        |
+| 11. Preparar Siguiente US | Pendiente  | Siguiente: SQ-16 Edit Client Data      |
 
-**Siguiente paso:** PASO 0 - Verificar Precondiciones del Epic SQ-13
+**Siguiente paso:** PASO 8 - Merge del PR #25
 
 ---
 

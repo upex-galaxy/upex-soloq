@@ -128,7 +128,7 @@ export async function PUT(
       );
     }
 
-    const { name, email, company, phone, address, notes } = validationResult.data;
+    const { name, email, company, phone, address, notes, tax_id } = validationResult.data;
 
     // Check for duplicate email for this user (excluding current client)
     const { data: duplicateClient } = await supabase
@@ -154,6 +154,7 @@ export async function PUT(
         phone: phone || null,
         address: address || null,
         notes: notes || null,
+        tax_id: tax_id || null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', id)

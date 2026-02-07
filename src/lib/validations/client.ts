@@ -33,6 +33,11 @@ export const clientFormSchema = z.object({
     .max(1000, 'Las notas no pueden exceder 1000 caracteres')
     .optional()
     .or(z.literal('')),
+  tax_id: z
+    .string()
+    .max(30, 'El ID fiscal no puede exceder 30 caracteres')
+    .optional()
+    .or(z.literal('')),
 });
 
 /** Type inferred from the client form schema */

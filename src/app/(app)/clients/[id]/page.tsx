@@ -111,6 +111,7 @@ export default function EditClientPage({ params }: EditClientPageProps) {
     phone: client.phone || '',
     address: client.address || '',
     notes: client.notes || '',
+    tax_id: client.tax_id || '',
   };
 
   return (

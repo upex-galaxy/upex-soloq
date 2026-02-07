@@ -178,3 +178,84 @@ export async function PUT(
     );
   }
 }
+
+// =============================================================================
+// DELETE /api/clients/[id] - Soft delete a client
+// =============================================================================
+
+interface DeleteClientResponse {
+  data?: { id: string; name: string };
+  error?: string;
+}
+
+/**
+ * DELETE /api/clients/[id] - Soft delete a client
+ *
+ * Performs a soft delete by setting deleted_at timestamp.
+ * Client data is preserved for invoice references.
+ *
+ * Responses:
+ * - 200: Client deleted successfully
+ * - 401: Unauthorized
+ * - 404: Client not found (or already deleted)
+ * - 500: Internal server error
+ */
+export async function DELETE(
+  _request: NextRequest,
+  context: RouteContext
+): Promise<NextResponse<DeleteClientResponse>> {
+  try {
+    const { id } = await context.params;
+    const supabase = await createServer();
+
+    // Verify authentication
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    // Verify client exists and is not already deleted (RLS handles user filtering)
+    const { data: existingClient, error: findError } = await supabase
+      .from('clients')
+      .select('id, name')
+      .eq('id', id)
+      .is('deleted_at', null)
+      .single();
+
+    if (findError || !existingClient) {
+      return NextResponse.json({ error: 'Cliente no encontrado' }, { status: 404 });
+    }
+
+    // Soft delete: set deleted_at timestamp
+    const { error: deleteError } = await supabase
+      .from('clients')
+      .update({
+        deleted_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id);
+
+    if (deleteError) {
+      console.error('Error deleting client:', deleteError);
+      return NextResponse.json(
+        { error: 'Error al eliminar el cliente. Intenta de nuevo.' },
+        { status: 500 }
+      );
+    }
+
+    // Return deleted client info for success message
+    return NextResponse.json({
+      data: { id: existingClient.id, name: existingClient.name },
+    });
+  } catch (error) {
+    console.error('Unexpected error in DELETE /api/clients/[id]:', error);
+    return NextResponse.json(
+      { error: 'Error al eliminar el cliente. Intenta de nuevo.' },
+      { status: 500 }
+    );
+  }
+}

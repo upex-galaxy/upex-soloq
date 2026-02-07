@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Trash2 } from 'lucide-react';
 
 import {
   Table,
@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Client } from '@/lib/types';
 
@@ -22,6 +23,7 @@ interface ClientsTableProps {
   sortBy: SortField;
   sortOrder: SortOrder;
   onSort: (field: SortField) => void;
+  onDelete?: (client: Client) => void;
   isLoading?: boolean;
 }
 
@@ -34,6 +36,7 @@ export function ClientsTable({
   sortBy,
   sortOrder,
   onSort,
+  onDelete,
   isLoading = false,
 }: ClientsTableProps) {
   const router = useRouter();
@@ -104,6 +107,9 @@ export function ClientsTable({
               {getSortIcon('created_at')}
             </button>
           </TableHead>
+          <TableHead className="w-[60px]">
+            <span className="sr-only">Acciones</span>
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -121,6 +127,21 @@ export function ClientsTable({
             </TableCell>
             <TableCell className="hidden sm:table-cell text-muted-foreground">
               {formatDate(client.created_at)}
+            </TableCell>
+            <TableCell>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                onClick={e => {
+                  e.stopPropagation();
+                  onDelete?.(client);
+                }}
+                data-testid={`delete-client-${client.id}`}
+              >
+                <Trash2 className="h-4 w-4" />
+                <span className="sr-only">Eliminar {client.name}</span>
+              </Button>
             </TableCell>
           </TableRow>
         ))}
@@ -141,6 +162,9 @@ function ClientsTableSkeleton() {
           <TableHead>Email</TableHead>
           <TableHead className="hidden md:table-cell">Empresa</TableHead>
           <TableHead className="hidden sm:table-cell">Creado</TableHead>
+          <TableHead className="w-[60px]">
+            <span className="sr-only">Acciones</span>
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -157,6 +181,9 @@ function ClientsTableSkeleton() {
             </TableCell>
             <TableCell className="hidden sm:table-cell">
               <Skeleton className="h-4 w-20" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-8 w-8" />
             </TableCell>
           </TableRow>
         ))}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,8 +13,10 @@ import {
   ClientsEmptyState,
   ClientsPagination,
 } from '@/components/clients';
-import { useClients } from '@/hooks/clients/use-clients';
+import { DeleteClientDialog } from '@/components/clients/delete-client-dialog';
+import { useClients, useDeleteClient } from '@/hooks/clients';
 import { useDebounce } from '@/hooks/use-debounce';
+import type { Client } from '@/lib/types';
 
 type SortField = 'name' | 'created_at' | 'email';
 type SortOrder = 'asc' | 'desc';
@@ -27,6 +30,9 @@ export default function ClientsPage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [page, setPage] = useState(1);
 
+  // State for delete dialog
+  const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
+
   // Debounce search to avoid too many API calls
   const debouncedSearch = useDebounce(search, 300);
 
@@ -38,6 +44,29 @@ export default function ClientsPage() {
     page,
     limit: ITEMS_PER_PAGE,
   });
+
+  // Delete client mutation
+  const { mutate: deleteClient, isPending: isDeleting } = useDeleteClient();
+
+  // Handle delete button click
+  const handleDeleteClick = (client: Client) => {
+    setClientToDelete(client);
+  };
+
+  // Handle delete confirmation
+  const handleDeleteConfirm = () => {
+    if (!clientToDelete) return;
+
+    deleteClient(clientToDelete.id, {
+      onSuccess: data => {
+        toast.success(`Cliente "${data.name}" eliminado correctamente`);
+        setClientToDelete(null);
+      },
+      onError: err => {
+        toast.error(err.message);
+      },
+    });
+  };
 
   // Handle sort toggle
   const handleSort = (field: SortField) => {
@@ -121,6 +150,7 @@ export default function ClientsPage() {
                 sortBy={sortBy}
                 sortOrder={sortOrder}
                 onSort={handleSort}
+                onDelete={handleDeleteClick}
                 isLoading={isLoading}
               />
 
@@ -138,6 +168,15 @@ export default function ClientsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete confirmation dialog */}
+      <DeleteClientDialog
+        open={clientToDelete !== null}
+        onOpenChange={open => !open && setClientToDelete(null)}
+        clientName={clientToDelete?.name ?? ''}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

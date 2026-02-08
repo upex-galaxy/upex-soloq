@@ -114,7 +114,7 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
       );
     }
 
-    const { clientId, dueDate, notes, taxRate = 0 } = validationResult.data;
+    const { clientId, dueDate, notes, terms, taxRate = 0 } = validationResult.data;
 
     // Verify client exists and belongs to user (RLS handles ownership)
     const { data: client, error: clientError } = await supabase
@@ -148,6 +148,7 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
         due_date: dueDate || getDefaultDueDate(),
         status: 'draft',
         notes: notes || null,
+        terms: terms || null,
         subtotal,
         tax_rate: taxRate,
         tax_amount: taxAmount,

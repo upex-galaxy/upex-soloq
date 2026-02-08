@@ -1,43 +1,78 @@
+// src/app/(app)/clients/create/page.tsx
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-
 import { ClientForm } from '@/components/clients/client-form';
 import { useCreateClient } from '@/hooks/clients/use-create-client';
-import type { ClientFormData } from '@/lib/validations/client';
+import { ClientFormData } from '@/lib/validations/client';
+import { useToast } from '@/components/ui/use-toast';
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'; // Assuming shadcn/ui breadcrumb
 
 export default function CreateClientPage() {
   const router = useRouter();
-  const { mutate: createClient, isPending } = useCreateClient();
+  const { toast } = useToast();
+  const createClient = useCreateClient();
 
-  const handleSubmit = (data: ClientFormData) => {
-    createClient(data, {
-      onSuccess: () => {
-        toast.success('Cliente guardado correctamente');
-        router.push('/clients');
-      },
-      onError: error => {
-        toast.error(error.message);
-      },
-    });
+  const onSubmit = async (data: ClientFormData) => {
+    try {
+      await createClient.mutateAsync(data);
+      toast({
+        title: 'Cliente guardado correctamente',
+        description: 'El nuevo cliente ha sido añadido a tu lista.',
+      });
+      router.push('/clients');
+    } catch (error: any) {
+      const errorMessage = error.message || 'Error al guardar el cliente. Intenta de nuevo.';
+      let displayMessage = errorMessage;
+
+      // Handle specific duplicate email error from API
+      if (errorMessage.includes('Ya existe un cliente con este email')) {
+        displayMessage = 'Ya existe un cliente con este email.';
+      }
+
+      toast({
+        title: 'Error al guardar cliente',
+        description: displayMessage,
+        variant: 'destructive',
+      });
+    }
   };
 
-  const handleCancel = () => {
+  const onCancel = () => {
     router.push('/clients');
   };
 
   return (
-    <div className="space-y-6">
-      {/* Page header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Agregar cliente</h1>
-        <p className="text-muted-foreground">Ingresa los datos de tu nuevo cliente</p>
+    <div className="flex flex-col gap-4 p-4 md:p-6">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/clients">Clientes</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Nuevo Cliente</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold">Agregar Cliente</h1>
+          <p className="text-muted-foreground">Ingresa los datos de tu nuevo cliente.</p>
+        </div>
       </div>
 
-      {/* Form */}
-      <div className="max-w-2xl">
-        <ClientForm onSubmit={handleSubmit} onCancel={handleCancel} isLoading={isPending} />
+      <div className="mx-auto w-full max-w-2xl">
+        <ClientForm onSubmit={onSubmit} onCancel={onCancel} isLoading={createClient.isPending} />
       </div>
     </div>
   );

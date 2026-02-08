@@ -1,66 +1,25 @@
-'use client';
-
+// src/hooks/clients/use-create-client.ts
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { ClientFormData } from '@/lib/validations/client';
-import type { Client } from '@/lib/types';
+import { ClientFormData } from '@/lib/validations/client';
+import { Client } from '@/lib/types'; // Assuming Client type exists in lib/types.ts
 
-interface CreateClientResponse {
-  data?: Client;
-  error?: string;
-  details?: unknown;
-}
-
-interface CreateClientError {
-  message: string;
-  status: number;
-}
-
-/**
- * Hook for creating a new client
- *
- * Uses React Query mutation with cache invalidation on success.
- *
- * @example
- * const { mutate, isPending, isError, error } = useCreateClient();
- *
- * const handleSubmit = (data: ClientFormData) => {
- *   mutate(data, {
- *     onSuccess: () => router.push('/clients'),
- *     onError: (error) => toast.error(error.message),
- *   });
- * };
- */
 export function useCreateClient() {
   const queryClient = useQueryClient();
 
-  return useMutation<Client, CreateClientError, ClientFormData>({
+  return useMutation({
     mutationFn: async (data: ClientFormData) => {
       const response = await fetch('/api/clients', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-
-      const result: CreateClientResponse = await response.json();
-
       if (!response.ok) {
-        throw {
-          message: result.error || 'Error al crear cliente',
-          status: response.status,
-        };
+        const error = await response.json();
+        throw new Error(error.error?.message || 'Error al crear cliente');
       }
-
-      if (!result.data) {
-        throw {
-          message: 'Respuesta inválida del servidor',
-          status: 500,
-        };
-      }
-
-      return result.data;
+      return response.json();
     },
     onSuccess: () => {
-      // Invalidate clients list cache to refetch with new data
       queryClient.invalidateQueries({ queryKey: ['clients'] });
     },
   });

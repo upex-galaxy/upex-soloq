@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,7 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Textarea } from '@/components/ui/textarea';
+import { TextareaWithCounter } from '@/components/ui/textarea-with-counter';
 import {
   ClientSelector,
   CreateClientDialog,
@@ -29,6 +29,7 @@ import {
 } from '@/components/invoices';
 import { useClients } from '@/hooks/clients';
 import { useCreateInvoice } from '@/hooks/invoices';
+import { useBusinessProfile } from '@/hooks/business-profile';
 import { createInvoiceSchema, type CreateInvoiceFormData } from '@/lib/validations/invoice';
 import type { Client } from '@/lib/types';
 
@@ -55,6 +56,9 @@ export default function CreateInvoicePage() {
     sortOrder: 'asc',
   });
 
+  // Fetch business profile for default terms
+  const { data: businessProfile } = useBusinessProfile();
+
   // Create invoice mutation
   const { mutate: createInvoice, isPending: isCreating } = useCreateInvoice();
 
@@ -65,9 +69,17 @@ export default function CreateInvoicePage() {
       clientId: '',
       dueDate: getDefaultDueDate(),
       notes: '',
+      terms: '',
       taxRate: 0,
     },
   });
+
+  // Prefill terms with default_terms from business profile (only on mount)
+  useEffect(() => {
+    if (businessProfile?.default_terms && !form.getValues('terms')) {
+      form.setValue('terms', businessProfile.default_terms);
+    }
+  }, [businessProfile, form]);
 
   // Watch tax rate for reactive summary
   const taxRate = form.watch('taxRate') ?? 0;
@@ -212,8 +224,9 @@ export default function CreateInvoicePage() {
                   <FormItem>
                     <FormLabel>Notas (opcional)</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="Notas adicionales para esta factura..."
+                      <TextareaWithCounter
+                        maxLength={2000}
+                        placeholder="Mensaje personal para el cliente..."
                         className="min-h-[100px]"
                         {...field}
                         disabled={isCreating}
@@ -221,7 +234,33 @@ export default function CreateInvoicePage() {
                       />
                     </FormControl>
                     <FormDescription>
-                      Estas notas aparecerán en el PDF de la factura.
+                      Mensaje personalizado que aparecerá en la factura.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Terms */}
+              <FormField
+                control={form.control}
+                name="terms"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Términos y condiciones (opcional)</FormLabel>
+                    <FormControl>
+                      <TextareaWithCounter
+                        maxLength={1000}
+                        placeholder="Condiciones de pago, políticas, etc..."
+                        className="min-h-[100px]"
+                        {...field}
+                        disabled={isCreating}
+                        data-testid="invoice-terms-input"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Términos legales o condiciones de pago. Se pre-llenan desde tu perfil de
+                      negocio.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

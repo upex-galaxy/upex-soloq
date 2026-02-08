@@ -21,7 +21,12 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ClientSelector, CreateClientDialog } from '@/components/invoices';
+import {
+  ClientSelector,
+  CreateClientDialog,
+  TaxInput,
+  InvoiceSummary,
+} from '@/components/invoices';
 import { useClients } from '@/hooks/clients';
 import { useCreateInvoice } from '@/hooks/invoices';
 import { createInvoiceSchema, type CreateInvoiceFormData } from '@/lib/validations/invoice';
@@ -60,8 +65,12 @@ export default function CreateInvoicePage() {
       clientId: '',
       dueDate: getDefaultDueDate(),
       notes: '',
+      taxRate: 0,
     },
   });
+
+  // Watch tax rate for reactive summary
+  const taxRate = form.watch('taxRate') ?? 0;
 
   // Handle client selection
   const handleClientSelect = (client: Client | null) => {
@@ -172,6 +181,29 @@ export default function CreateInvoicePage() {
                 )}
               />
 
+              {/* Tax Rate */}
+              <FormField
+                control={form.control}
+                name="taxRate"
+                render={({ field, fieldState }) => (
+                  <FormItem>
+                    <FormLabel>Impuesto (IVA)</FormLabel>
+                    <FormControl>
+                      <TaxInput
+                        value={field.value ?? 0}
+                        onChange={field.onChange}
+                        disabled={isCreating}
+                        error={fieldState.error?.message}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Selecciona la tasa de impuesto. Presets comunes para LATAM disponibles.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               {/* Notes */}
               <FormField
                 control={form.control}
@@ -195,6 +227,9 @@ export default function CreateInvoicePage() {
                   </FormItem>
                 )}
               />
+
+              {/* Invoice Summary */}
+              <InvoiceSummary subtotal={0} discountAmount={0} taxRate={taxRate} />
 
               {/* Actions */}
               <div className="flex justify-end gap-4">

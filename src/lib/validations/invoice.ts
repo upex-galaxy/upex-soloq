@@ -15,6 +15,11 @@ export const createInvoiceSchema = z.object({
     .max(2000, 'Las notas no pueden exceder 2000 caracteres')
     .optional()
     .or(z.literal('')),
+  terms: z
+    .string()
+    .max(1000, 'Los términos no pueden exceder 1000 caracteres')
+    .optional()
+    .or(z.literal('')),
   taxRate: z
     .number()
     .min(0, 'La tasa de impuesto no puede ser negativa')

@@ -19,11 +19,11 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
   ClientSelector,
   CreateClientDialog,
+  DueDatePicker,
   TaxInput,
   InvoiceSummary,
 } from '@/components/invoices';
@@ -164,15 +164,15 @@ export default function CreateInvoicePage() {
               <FormField
                 control={form.control}
                 name="dueDate"
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel>Fecha de vencimiento</FormLabel>
                     <FormControl>
-                      <Input
-                        type="date"
-                        {...field}
+                      <DueDatePicker
+                        value={field.value ?? ''}
+                        onChange={field.onChange}
                         disabled={isCreating}
-                        data-testid="due-date-picker"
+                        error={fieldState.error?.message}
                       />
                     </FormControl>
                     <FormDescription>La fecha límite de pago para esta factura.</FormDescription>

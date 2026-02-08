@@ -15,6 +15,7 @@ export type Database = {
           contact_email: string | null;
           contact_phone: string | null;
           created_at: string | null;
+          default_terms: string | null;
           id: string;
           logo_url: string | null;
           tax_id: string | null;
@@ -27,6 +28,7 @@ export type Database = {
           contact_email?: string | null;
           contact_phone?: string | null;
           created_at?: string | null;
+          default_terms?: string | null;
           id?: string;
           logo_url?: string | null;
           tax_id?: string | null;
@@ -39,6 +41,7 @@ export type Database = {
           contact_email?: string | null;
           contact_phone?: string | null;
           created_at?: string | null;
+          default_terms?: string | null;
           id?: string;
           logo_url?: string | null;
           tax_id?: string | null;
@@ -182,6 +185,7 @@ export type Database = {
           subtotal: number | null;
           tax_amount: number | null;
           tax_rate: number | null;
+          terms: string | null;
           total: number | null;
           updated_at: string | null;
           user_id: string;
@@ -205,6 +209,7 @@ export type Database = {
           subtotal?: number | null;
           tax_amount?: number | null;
           tax_rate?: number | null;
+          terms?: string | null;
           total?: number | null;
           updated_at?: string | null;
           user_id: string;
@@ -228,6 +233,7 @@ export type Database = {
           subtotal?: number | null;
           tax_amount?: number | null;
           tax_rate?: number | null;
+          terms?: string | null;
           total?: number | null;
           updated_at?: string | null;
           user_id?: string;

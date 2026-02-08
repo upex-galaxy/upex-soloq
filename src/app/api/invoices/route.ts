@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServer } from '@/lib/supabase/server';
 import { createInvoiceApiSchema } from '@/lib/validations/invoice';
+import { calculateTax, calculateTotal } from '@/lib/utils/invoice-calculations';
 import type { Invoice, Client } from '@/lib/types';
 
 // =============================================================================
@@ -113,7 +114,7 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
       );
     }
 
-    const { clientId, dueDate, notes } = validationResult.data;
+    const { clientId, dueDate, notes, taxRate = 0 } = validationResult.data;
 
     // Verify client exists and belongs to user (RLS handles ownership)
     const { data: client, error: clientError } = await supabase
@@ -130,6 +131,13 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
     // Generate invoice number
     const invoiceNumber = await generateInvoiceNumber(supabase, user.id);
 
+    // Calculate tax and total amounts
+    // At creation, subtotal is 0 (line items will be added later via SQ-22)
+    const subtotal = 0;
+    const discountAmount = 0;
+    const taxAmount = calculateTax(subtotal, discountAmount, taxRate);
+    const total = calculateTotal(subtotal, discountAmount, taxAmount);
+
     // Create invoice with status 'draft'
     const { data: invoice, error: insertError } = await supabase
       .from('invoices')
@@ -140,12 +148,12 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
         due_date: dueDate || getDefaultDueDate(),
         status: 'draft',
         notes: notes || null,
-        subtotal: 0,
-        tax_rate: 0,
-        tax_amount: 0,
-        discount_value: 0,
+        subtotal,
+        tax_rate: taxRate,
+        tax_amount: taxAmount,
+        discount_value: discountAmount,
         discount_type: 'fixed',
-        total: 0,
+        total,
       })
       .select()
       .single();

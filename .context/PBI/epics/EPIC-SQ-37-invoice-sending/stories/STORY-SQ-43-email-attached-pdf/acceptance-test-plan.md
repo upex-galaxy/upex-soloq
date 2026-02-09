@@ -1,406 +1,406 @@
-## Acceptance Test Plan - Generated 2026-02-09
+## Plan de Pruebas de Aceptacion - Generado 2026-02-09
 
 **QA Engineer:** AI-Generated
-**Status:** Draft - Pending PO/Dev Review
+**Status:** Borrador - Pendiente de revision PO/Dev
 
 ---
 
-# Acceptance Test Plan: STORY-SQ-43 - Include PDF Attachment in Email
+# Plan de Pruebas de Aceptacion: STORY-SQ-43 - Incluir PDF adjunto en email
 
 **Fecha:** 2026-02-09
 **QA Engineer:** AI-Generated
 **Story Jira Key:** SQ-43
 **Epic:** EPIC-SQ-37 - Invoice Sending
-**Status:** Draft
+**Status:** Borrador
 
 ---
 
-## Paso 1: Critical Analysis
+## Paso 1: Analisis Critico
 
-### Business Context of This Story
+### Contexto de Negocio de esta Story
 
-**User Persona Affected:**
+**Persona de usuario afectada:**
 
-- **Primary:** Carlos - needs professional invoices sent with no manual steps
-- **Secondary:** Valentina - wants reliable sending so clients can pay on time
+- **Primaria:** Carlos - necesita facturas profesionales enviadas sin pasos manuales
+- **Secundaria:** Valentina - requiere envio confiable para cobrar a tiempo
 
-**Business Value:**
+**Valor de negocio:**
 
-- **Value Proposition:** Email includes PDF so the client receives the invoice without extra steps
-- **Business Impact:** Supports KPI for invoices sent by email and reduces time to first invoice
+- **Propuesta de valor:** El email incluye el PDF para que el cliente reciba la factura sin friccion
+- **Impacto de negocio:** Soporta el KPI de facturas enviadas por email y reduce el tiempo a la primera factura
 
-**Related User Journey:**
+**Recorrido de usuario relacionado:**
 
-- Journey: J1 Registro y Primera Factura
-- Step: Step 13-14 (send invoice and confirm sending)
+- Recorrido: J1 Registro y Primera Factura
+- Paso: Paso 13-14 (enviar factura y confirmar envio)
 
 ---
 
-### Technical Context of This Story
+### Contexto Tecnico de esta Story
 
-**Architecture Components:**
+**Componentes de arquitectura:**
 
 **Frontend:**
 
-- Components: Invoice detail send action, invoice list quick send, email preview modal
-- Pages/Routes: /invoices, /invoices/[id]
-- State Management: React state + server actions
+- Componentes: accion de envio en detalle de factura, envio rapido en lista, modal de preview del email
+- Paginas/Rutas: /invoices, /invoices/[id]
+- Gestion de estado: React state + server actions
 
 **Backend:**
 
-- API Endpoints: POST /api/invoices/{invoiceId}/send, GET /api/invoices/{invoiceId}/pdf
-- Services: PDF generator (@react-pdf/renderer), email sender (Resend)
-- Database: invoices, invoice_items, business_profiles, clients, payment_methods, email_logs, invoice_events
+- Endpoints API: POST /api/invoices/{invoiceId}/send, GET /api/invoices/{invoiceId}/pdf
+- Servicios: generador PDF (@react-pdf/renderer), envio de email (Resend)
+- Base de datos: invoices, invoice_items, business_profiles, clients, payment_methods, email_logs, invoice_events
 
-**External Services:**
+**Servicios externos:**
 
-- Resend API (email send)
-- Supabase Storage (optional PDF cache)
+- Resend API (envio de email)
+- Supabase Storage (cache de PDF opcional)
 
-**Integration Points:**
+**Puntos de integracion:**
 
-- Frontend to Backend API (send invoice)
-- Backend to PDF generator (create attachment)
-- Backend to Resend (send email with attachment)
-- Backend to DB (email_logs, invoice_events, invoice status)
-- Backend to Storage (optional cache)
-
----
-
-### Story Complexity Analysis
-
-**Overall Complexity:** Medium
-
-**Complexity Factors:**
-
-- Business logic complexity: Medium - attachment rules + naming + size
-- Integration complexity: Medium - PDF generator + Resend + DB logging
-- Data validation complexity: Medium - size limits, MIME type, naming
-- UI complexity: Low - relies on existing send flow
-
-**Estimated Test Effort:** Medium
-**Rationale:** Multiple integration points and file constraints to validate
+- Frontend a Backend API (envio de factura)
+- Backend a generador PDF (crear adjunto)
+- Backend a Resend (envio de email con adjunto)
+- Backend a DB (email_logs, invoice_events, estado de factura)
+- Backend a Storage (cache opcional)
 
 ---
 
-### Epic-Level Context (From Feature Test Plan in Jira)
+### Analisis de complejidad de la Story
 
-**Critical Risks Already Identified at Epic Level:**
+**Complejidad global:** Media
 
-- Risk 1: PDF generation/attachment failure
-  - **Relevance to This Story:** Directly impacts attachment creation and send success
-- Risk 2: State inconsistencies on retries
-  - **Relevance to This Story:** Failed attachment should not mark invoice as sent
+**Factores de complejidad:**
 
-**Integration Points from Epic Analysis:**
+- Complejidad de logica de negocio: Media - reglas de adjunto, nombre, tamano
+- Complejidad de integracion: Media - PDF generator + Resend + logging en DB
+- Complejidad de validacion de datos: Media - limites de tamano, MIME type, naming
+- Complejidad de UI: Baja - se apoya en flujo de envio existente
 
-- Frontend to/from Backend API (send)
-  - **Applies to This Story:** Yes
-  - **If Yes:** User triggers send and backend attaches PDF
-- Backend to/from PDF Generator
-  - **Applies to This Story:** Yes
-  - **If Yes:** Attachment buffer is generated before sending
-- Backend to/from Resend API
-  - **Applies to This Story:** Yes
-  - **If Yes:** Attachment is sent via Resend
-- Backend to/from Database (invoices, email_logs, invoice_events)
-  - **Applies to This Story:** Yes
-  - **If Yes:** Log send attempt and update invoice status
-- Resend Webhooks to/from Backend (delivery status)
-  - **Applies to This Story:** No
-
-**Critical Questions Already Asked at Epic Level:**
-
-**Questions for PO:**
-
-- Subject/message limits
-  - **Status:** Not Relevant to This Story
-  - **Impact on This Story:** None
-- Quick send vs personalization
-  - **Status:** Not Relevant to This Story
-  - **Impact on This Story:** None
-- Sent vs delivered semantics
-  - **Status:** Not Relevant to This Story
-  - **Impact on This Story:** None
-
-**Questions for Dev:**
-
-- Missing endpoints in OpenAPI (/email-status, /webhooks/resend)
-  - **Status:** Not Relevant to This Story
-  - **Impact on This Story:** None
-- Payment methods structure
-  - **Status:** Not Relevant to This Story
-  - **Impact on This Story:** None
-
-**Test Strategy from Epic:**
-
-- Test Levels: Unit, Integration, E2E, API
-- Tools: Playwright, Postman/Newman, Vitest/Jest
-- **How This Story Aligns:** Requires Integration (PDF generator + Resend) and E2E send flow validation
-
-**Updates and Clarifications from Epic Refinement:**
-
-- No updates found after initial Feature Test Plan comment
-
-**Summary: How This Story Fits in Epic:**
-
-- **Story Role in Epic:** Adds the PDF attachment requirement to the send flow
-- **Inherited Risks:** PDF generation/attachment failure and state consistency
-- **Unique Considerations:** Attachment naming and size limit enforcement
+**Esfuerzo de testing estimado:** Medio
+**Razon:** Multiples integraciones y restricciones de archivo
 
 ---
 
-## Paso 2: Story Quality Analysis
+### Contexto a Nivel Epica (FTP en Jira)
 
-### Ambiguities Identified
+**Riesgos criticos ya identificados a nivel epica:**
 
-**Ambiguity 1:** Attachment filename format
+- Riesgo 1: fallo en generacion/adjunto de PDF
+  - **Relevancia para esta Story:** Impacta directamente el adjunto y el exito de envio
+- Riesgo 2: inconsistencias de estado por reintentos
+  - **Relevancia para esta Story:** Un adjunto fallido no debe marcar la factura como enviada
 
-- **Location in Story:** Scenario 2 (Attachment name)
-- **Question for PO/Dev:** Should the filename be `Invoice-{invoiceNumber}.pdf` or `{invoiceNumber}.pdf` as per FR-018 content-disposition example?
-- **Impact on Testing:** Cannot assert exact filename without clarity
-- **Suggested Clarification:** Align story with FR-018 naming or update FR-018 example
+**Puntos de integracion desde la epica:**
 
-**Ambiguity 2:** Size limit definition and enforcement
+- Frontend a/desde Backend API (envio)
+  - **Aplica a esta Story:** Si
+  - **Si aplica:** El usuario dispara el envio y el backend adjunta el PDF
+- Backend a/desde PDF Generator
+  - **Aplica a esta Story:** Si
+  - **Si aplica:** Se genera el buffer del adjunto antes de enviar
+- Backend a/desde Resend API
+  - **Aplica a esta Story:** Si
+  - **Si aplica:** El adjunto se envia via Resend
+- Backend a/desde Database (invoices, email_logs, invoice_events)
+  - **Aplica a esta Story:** Si
+  - **Si aplica:** Se registra intento y se actualiza estado de factura
+- Webhooks Resend a/desde Backend (estado de delivery)
+  - **Aplica a esta Story:** No
 
-- **Location in Story:** Scenario 3 (Attachment size under 5MB)
-- **Question for PO/Dev:** Is 5MB limit applied to raw PDF size or base64 payload size, and what should happen when it exceeds?
-- **Impact on Testing:** Cannot validate failure behavior without expected error and status
-- **Suggested Clarification:** Define size threshold and expected error (code + UI copy)
+**Preguntas criticas ya hechas a nivel epica:**
 
-**Ambiguity 3:** Where PDF is generated (server vs client)
+**Preguntas para PO:**
 
-- **Location in Story:** Technical Notes
-- **Question for Dev:** Is PDF always generated server-side for sending, or can client-side generation be used?
-- **Impact on Testing:** Affects how we validate attachment generation and error handling
-- **Suggested Clarification:** Prefer server-side generation to ensure consistency
+- Limites de subject/message
+  - **Estado:** No relevante para esta Story
+  - **Impacto:** Ninguno
+- Quick send vs personalizacion
+  - **Estado:** No relevante para esta Story
+  - **Impacto:** Ninguno
+- Semantica de sent vs delivered
+  - **Estado:** No relevante para esta Story
+  - **Impacto:** Ninguno
 
----
+**Preguntas para Dev:**
 
-### Missing Information / Gaps
+- Endpoints faltantes en OpenAPI (/email-status, /webhooks/resend)
+  - **Estado:** No relevante para esta Story
+  - **Impacto:** Ninguno
+- Estructura de payment_methods
+  - **Estado:** No relevante para esta Story
+  - **Impacto:** Ninguno
 
-**Gap 1:** Error handling for PDF generation failure
+**Estrategia de pruebas desde la epica:**
 
-- **Type:** Acceptance Criteria / Technical Details
-- **Why It's Critical:** We need expected status code, UI message, and DB updates
-- **Suggested Addition:** Define error response and UI message when PDF generation fails
-- **Impact if Not Added:** Inconsistent UX and unclear test assertions
+- Niveles de prueba: Unit, Integration, E2E, API
+- Herramientas: Playwright, Postman/Newman, Vitest/Jest
+- **Como se alinea esta Story:** Requiere integracion (PDF generator + Resend) y validacion E2E del envio
 
-**Gap 2:** Error handling for attachment size limit exceeded
+**Actualizaciones y aclaraciones del refinement de la epica:**
 
-- **Type:** Acceptance Criteria / Business Rule
-- **Why It's Critical:** Must know if send is blocked or retried
-- **Suggested Addition:** Define expected behavior and error code when PDF exceeds 5MB
-- **Impact if Not Added:** Risk of silent failure or unexpected invoice status changes
+- No hay actualizaciones posteriores al FTP inicial
 
----
+**Resumen: Como encaja esta Story en la epica:**
 
-### Edge Cases NOT Covered in Original Story
-
-**Edge Case 1:** Large logo + many items produces PDF over 5MB
-
-- **Scenario:** Invoice with high-res logo and 100+ items
-- **Expected Behavior:** Send is blocked, clear error shown, invoice remains draft
-- **Criticality:** High
-- **Action Required:** Add to story and test cases
-
-**Edge Case 2:** PDF generation returns empty/0 bytes
-
-- **Scenario:** PDF generator error or template failure
-- **Expected Behavior:** Send fails with error, no email sent
-- **Criticality:** Medium
-- **Action Required:** Add to test cases
-
-**Edge Case 3:** Invoice number contains special characters
-
-- **Scenario:** Invoice number contains spaces or slashes
-- **Expected Behavior:** Filename is sanitized to a safe format
-- **Criticality:** Low
-- **Action Required:** Ask PO/Dev to confirm expected behavior
+- **Rol de la Story en la epica:** Agrega el requisito de adjuntar el PDF en el envio
+- **Riesgos heredados:** fallos en generacion/adjunto y consistencia de estado
+- **Consideraciones unicas:** nombre del adjunto y limite de tamano
 
 ---
 
-### Testability Validation
+## Paso 2: Analisis de Calidad de la Story
 
-**Is this story testable as written?** Partially
+### Ambiguedades identificadas
 
-**Testability Issues:**
+**Ambiguedad 1:** Formato del nombre del adjunto
 
-- Expected results are not specific enough
-- Missing error scenarios
-- Missing performance criteria (size limit enforcement)
-- Cannot be tested in isolation (depends on PDF generator and Resend)
+- **Ubicacion en la Story:** Escenario 2 (Attachment name)
+- **Pregunta para PO/Dev:** El nombre debe ser `Invoice-{invoiceNumber}.pdf` o `{invoiceNumber}.pdf` segun el ejemplo de FR-018?
+- **Impacto en testing:** No se puede afirmar el nombre exacto sin aclarar
+- **Sugerencia de aclaracion:** Alinear la story con FR-018 o actualizar el ejemplo
 
-**Recommendations to Improve Testability:**
+**Ambiguedad 2:** Definicion del limite de tamano y enforcement
 
-- Define exact filename pattern and error responses
-- Define size limit enforcement behavior and UI copy
-- Confirm PDF generation location (server-side preferred)
+- **Ubicacion en la Story:** Escenario 3 (tamano del adjunto bajo 5MB)
+- **Pregunta para PO/Dev:** El limite aplica al PDF raw o al payload base64, y que pasa al excederlo?
+- **Impacto en testing:** No se puede validar el comportamiento de error sin respuesta
+- **Sugerencia de aclaracion:** Definir umbral y respuesta de error (code + UI copy)
 
----
+**Ambiguedad 3:** Donde se genera el PDF (server vs client)
 
-## Paso 3: Refined Acceptance Criteria
-
-### Scenario 1: PDF attachment included on send
-
-**Type:** Positive
-**Priority:** Critical
-
-- **Given:**
-  - User is authenticated with a business profile and at least one payment method
-  - Invoice exists in status `draft` with number `INV-2026-0042` and 3 items
-  - Client has a valid email address
-
-- **When:**
-  - User sends the invoice via the send action (UI or API)
-
-- **Then:**
-  - Email is sent with exactly one PDF attachment
-  - Attachment MIME type is `application/pdf`
-  - Invoice status becomes `sent`
-  - `invoice_events` includes a `sent` event
-  - `email_logs` records the send attempt
+- **Ubicacion en la Story:** Notas tecnicas
+- **Pregunta para Dev:** El PDF se genera siempre server-side para envio, o puede ser client-side?
+- **Impacto en testing:** Afecta como validar generacion y manejo de errores
+- **Sugerencia de aclaracion:** Preferir server-side para consistencia
 
 ---
 
-### Scenario 2: Attachment filename uses invoice number
+### Informacion faltante / Gaps
 
-**Type:** Positive
-**Priority:** High
+**Gap 1:** Manejo de error cuando falla la generacion de PDF
 
-- **Given:** Client receives the email for invoice `INV-2026-0042`
-- **When:** Client views the attachment
-- **Then:** Filename matches `Invoice-INV-2026-0042.pdf` (requires PO/Dev confirmation)
+- **Tipo:** Acceptance Criteria / Detalles tecnicos
+- **Por que es critico:** Se necesita status code, mensaje UI y updates en DB
+- **Sugerencia:** Definir error response y mensaje en UI
+- **Impacto si no se agrega:** UX inconsistente y asserts ambiguos
 
----
+**Gap 2:** Manejo de error cuando el PDF supera el limite
 
-### Scenario 3: Attachment size within limit
-
-**Type:** Boundary
-**Priority:** High
-
-- **Given:** Invoice includes a logo and many items
-- **When:** PDF is generated and attached
-- **Then:** PDF size is at most 5MB and email send succeeds
+- **Tipo:** Acceptance Criteria / Regla de negocio
+- **Por que es critico:** Debe definirse si se bloquea envio o se reintenta
+- **Sugerencia:** Definir comportamiento y error code al exceder 5MB
+- **Impacto si no se agrega:** Riesgo de fallos silenciosos o estados incorrectos
 
 ---
 
-### Scenario 4: Attachment opens correctly with all data
+### Edge cases no cubiertos en la Story original
 
-**Type:** Positive
-**Priority:** High
+**Edge Case 1:** Logo grande + muchos items generan PDF mayor a 5MB
 
-- **Given:** Client downloads the attachment
-- **When:** PDF is opened
-- **Then:** PDF displays invoice number, client name, totals, and due date
+- **Escenario:** Factura con logo de alta resolucion y 100+ items
+- **Comportamiento esperado:** Se bloquea el envio, error claro, factura queda en draft
+- **Criticidad:** Alta
+- **Accion requerida:** Agregar a story y test cases
 
----
+**Edge Case 2:** Generador de PDF retorna archivo vacio
 
-### Scenario 5: PDF generation fails
+- **Escenario:** Error en template o render
+- **Comportamiento esperado:** Envio falla, no se envia email
+- **Criticidad:** Media
+- **Accion requerida:** Agregar a test cases
 
-**Type:** Negative
-**Priority:** High
+**Edge Case 3:** Numero de factura con caracteres especiales
 
-- **Given:** PDF generator fails (template or data error)
-- **When:** User attempts to send the invoice
-- **Then:**
-  - Send fails with error response
-  - No email is sent
-  - Invoice status remains `draft`
-  - Error message is shown to user (exact copy TBD)
-
----
-
-### Scenario 6: PDF exceeds size limit
-
-**Type:** Negative
-**Priority:** High
-
-- **Given:** PDF generated exceeds 5MB
-- **When:** User attempts to send the invoice
-- **Then:**
-  - Send is blocked with a clear error response
-  - No email is sent
-  - Invoice status remains `draft`
+- **Escenario:** Numero con espacios o barras
+- **Comportamiento esperado:** Se sanitiza el nombre del archivo
+- **Criticidad:** Baja
+- **Accion requerida:** Confirmar con PO/Dev
 
 ---
 
-## Paso 4: Test Design
+### Validacion de testabilidad
 
-### Test Coverage Analysis
+**La story es testeable como esta?** Parcialmente
 
-**Total Test Cases Needed:** 10
+**Problemas de testabilidad:**
 
-**Breakdown:**
+- Resultados esperados no especificos
+- Faltan escenarios de error
+- Faltan criterios de performance (limite de tamano)
+- No se puede testear en aislamiento (depende de PDF generator y Resend)
 
-- Positive: 3
-- Negative: 3
-- Boundary: 2
-- Integration: 1
+**Recomendaciones para mejorar la testabilidad:**
+
+- Definir patron exacto del nombre del adjunto y responses de error
+- Definir comportamiento de enforcement del limite y UI copy
+- Confirmar generacion de PDF server-side
+
+---
+
+## Paso 3: Acceptance Criteria refinados
+
+### Escenario 1: PDF adjunto incluido al enviar
+
+**Tipo:** Positivo
+**Prioridad:** Critica
+
+- **Dado:**
+  - Usuario autenticado con perfil de negocio y al menos un metodo de pago
+  - Factura en estado `draft` con numero `INV-2026-0042` y 3 items
+  - Cliente con email valido
+
+- **Cuando:**
+  - El usuario envia la factura via accion de envio (UI o API)
+
+- **Entonces:**
+  - El email se envia con un adjunto PDF
+  - MIME type del adjunto es `application/pdf`
+  - El estado de la factura cambia a `sent`
+  - `invoice_events` incluye un evento `sent`
+  - `email_logs` registra el intento de envio
+
+---
+
+### Escenario 2: Nombre del adjunto usa el numero de factura
+
+**Tipo:** Positivo
+**Prioridad:** Alta
+
+- **Dado:** El cliente recibe el email de la factura `INV-2026-0042`
+- **Cuando:** Visualiza el adjunto
+- **Entonces:** El nombre del archivo coincide con `Invoice-INV-2026-0042.pdf` (requiere confirmacion)
+
+---
+
+### Escenario 3: Tamano del adjunto dentro del limite
+
+**Tipo:** Limite
+**Prioridad:** Alta
+
+- **Dado:** Factura con logo y muchos items
+- **Cuando:** Se genera y adjunta el PDF
+- **Entonces:** El PDF tiene tamano como maximo 5MB y el envio es exitoso
+
+---
+
+### Escenario 4: El adjunto abre correctamente con todos los datos
+
+**Tipo:** Positivo
+**Prioridad:** Alta
+
+- **Dado:** El cliente descarga el adjunto
+- **Cuando:** Abre el PDF
+- **Entonces:** El PDF muestra numero de factura, nombre del cliente, total y fecha de vencimiento
+
+---
+
+### Escenario 5: Falla la generacion de PDF
+
+**Tipo:** Negativo
+**Prioridad:** Alta
+
+- **Dado:** El generador de PDF falla (template o data error)
+- **Cuando:** El usuario intenta enviar la factura
+- **Entonces:**
+  - El envio falla con error
+  - No se envia email
+  - La factura queda en `draft`
+  - Se muestra error al usuario (copy por definir)
+
+---
+
+### Escenario 6: El PDF supera el limite de tamano
+
+**Tipo:** Negativo
+**Prioridad:** Alta
+
+- **Dado:** El PDF generado supera 5MB
+- **Cuando:** El usuario intenta enviar la factura
+- **Entonces:**
+  - Se bloquea el envio con error claro
+  - No se envia email
+  - La factura queda en `draft`
+
+---
+
+## Paso 4: Diseno de Pruebas
+
+### Analisis de cobertura
+
+**Total de casos necesarios:** 10
+
+**Desglose:**
+
+- Positivos: 3
+- Negativos: 3
+- Limite: 2
+- Integracion: 1
 - API: 1
 
-**Rationale for This Number:**
+**Razon del numero:**
 
-Attachment requires validation of content, name, size, and failure paths across multiple integration points.
-
----
-
-### Parametrization Opportunities
-
-**Parametrized Tests Recommended:** Yes
-
-**Parametrized Test Group 1:** PDF size and content variability
-
-- **Base Scenario:** Attachment size within limit
-- **Parameters to Vary:** Logo size, item count, template type
-- **Test Data Sets:**
-
-| Logo Size | Item Count | Template | Expected Result        |
-| --------- | ---------- | -------- | ---------------------- |
-| 200KB     | 5          | basic    | Attachment at most 1MB |
-| 1.5MB     | 25         | basic    | Attachment at most 5MB |
-| 3MB       | 60         | basic    | Attachment at most 5MB |
-| 4.5MB     | 80         | basic    | Attachment at most 5MB |
-
-**Total Tests from Parametrization:** 4
-**Benefit:** Covers size thresholds without duplicating setup steps
+Se valida contenido, nombre, tamano y fallos del adjunto en multiples integraciones.
 
 ---
 
-### Test Outlines
+### Oportunidades de parametrizacion
 
-#### **Should attach PDF when sending invoice**
+**Se recomienda parametrizar:** Si
 
-**Related Scenario:** Scenario 1
-**Type:** Positive
-**Priority:** Critical
-**Test Level:** E2E
-**Parametrized:** No
+**Grupo parametrizado 1:** Tamano del PDF y variabilidad de contenido
 
-**Preconditions:**
+- **Escenario base:** Tamano dentro del limite
+- **Parametros a variar:** Tamano de logo, cantidad de items, template
+- **Conjuntos de datos:**
 
-- User with business profile and payment methods exists
-- Client with email `client@example.com` exists
-- Invoice `INV-2026-0042` exists in status `draft` with 3 items
+| Tamano Logo | Cantidad Items | Template | Resultado esperado      |
+| ----------- | -------------- | -------- | ----------------------- |
+| 200KB       | 5              | basic    | Adjunto como maximo 1MB |
+| 1.5MB       | 25             | basic    | Adjunto como maximo 5MB |
+| 3MB         | 60             | basic    | Adjunto como maximo 5MB |
+| 4.5MB       | 80             | basic    | Adjunto como maximo 5MB |
 
-**Test Steps:**
+**Total de tests por parametrizacion:** 4
+**Beneficio:** Cobertura de umbrales sin duplicar setup
 
-1. Open invoice detail for `INV-2026-0042`
-2. Click `Send invoice`
-3. Confirm send
-4. Open the sent email in Resend sandbox or test inbox
-   - **Verify:** Attachment is present
+---
 
-**Expected Result:**
+### Guia de pruebas
 
-- **UI:** Success confirmation shown
-- **API Response:** 200 OK
-- **Database:**
+#### **Validar adjunto PDF al enviar factura**
+
+**Escenario relacionado:** Escenario 1
+**Tipo:** Positivo
+**Prioridad:** Critica
+**Nivel de prueba:** E2E
+**Parametrizado:** No
+
+**Precondiciones:**
+
+- Usuario con perfil de negocio y metodos de pago existe
+- Cliente con email `client@example.com` existe
+- Factura `INV-2026-0042` existe en estado `draft` con 3 items
+
+**Pasos de prueba:**
+
+1. Abrir detalle de factura `INV-2026-0042`
+2. Click en `Enviar factura`
+3. Confirmar envio
+4. Abrir el email enviado en sandbox de Resend o inbox de prueba
+   - **Verificar:** Adjunto presente
+
+**Resultado esperado:**
+
+- **UI:** Se muestra confirmacion de exito
+- **Respuesta API:** 200 OK
+- **Base de datos:**
   - `invoices.status` = `sent`
-  - `invoice_events` includes `sent`
-  - `email_logs` has a new record
+  - `invoice_events` incluye `sent`
+  - `email_logs` tiene un nuevo registro
 
-**Test Data:**
+**Datos de prueba:**
 
 ```json
 {
@@ -410,35 +410,35 @@ Attachment requires validation of content, name, size, and failure paths across 
 }
 ```
 
-**Post-conditions:**
+**Post-condiciones:**
 
-- Invoice remains in sent state
-- Email log record exists
+- La factura queda en estado sent
+- Existe registro en email_logs
 
 ---
 
-#### **Should use invoice number in attachment filename**
+#### **Validar nombre del adjunto con numero de factura**
 
-**Related Scenario:** Scenario 2
-**Type:** Positive
-**Priority:** High
-**Test Level:** E2E
-**Parametrized:** No
+**Escenario relacionado:** Escenario 2
+**Tipo:** Positivo
+**Prioridad:** Alta
+**Nivel de prueba:** E2E
+**Parametrizado:** No
 
-**Preconditions:**
+**Precondiciones:**
 
-- Email was sent for invoice `INV-2026-0042`
+- Email enviado para factura `INV-2026-0042`
 
-**Test Steps:**
+**Pasos de prueba:**
 
-1. Open the sent email
-2. Inspect attachment filename
+1. Abrir el email enviado
+2. Inspeccionar el nombre del adjunto
 
-**Expected Result:**
+**Resultado esperado:**
 
-- **UI:** Attachment filename matches `Invoice-INV-2026-0042.pdf` (pending confirmation)
+- **UI:** El nombre coincide con `Invoice-INV-2026-0042.pdf` (pendiente de confirmacion)
 
-**Test Data:**
+**Datos de prueba:**
 
 ```json
 {
@@ -446,35 +446,35 @@ Attachment requires validation of content, name, size, and failure paths across 
 }
 ```
 
-**Post-conditions:**
+**Post-condiciones:**
 
-- None
+- Ninguna
 
 ---
 
-#### **Should open PDF attachment with correct invoice data**
+#### **Validar apertura del PDF con datos correctos**
 
-**Related Scenario:** Scenario 4
-**Type:** Positive
-**Priority:** High
-**Test Level:** E2E
-**Parametrized:** No
+**Escenario relacionado:** Escenario 4
+**Tipo:** Positivo
+**Prioridad:** Alta
+**Nivel de prueba:** E2E
+**Parametrizado:** No
 
-**Preconditions:**
+**Precondiciones:**
 
-- Email sent with PDF attachment for invoice `INV-2026-0042`
+- Email enviado con PDF adjunto para factura `INV-2026-0042`
 
-**Test Steps:**
+**Pasos de prueba:**
 
-1. Download the PDF attachment
-2. Open the PDF
-3. Verify invoice number, client name, total, due date
+1. Descargar el adjunto PDF
+2. Abrir el PDF
+3. Verificar numero de factura, nombre del cliente, total y fecha de vencimiento
 
-**Expected Result:**
+**Resultado esperado:**
 
-- **UI:** PDF renders correctly and includes all required fields
+- **UI:** El PDF renderiza correctamente y muestra todos los datos requeridos
 
-**Test Data:**
+**Datos de prueba:**
 
 ```json
 {
@@ -485,36 +485,36 @@ Attachment requires validation of content, name, size, and failure paths across 
 }
 ```
 
-**Post-conditions:**
+**Post-condiciones:**
 
-- None
+- Ninguna
 
 ---
 
-#### **Should attach PDF with correct MIME type**
+#### **Validar MIME type correcto del adjunto**
 
-**Related Scenario:** Scenario 1
-**Type:** Positive
-**Priority:** High
-**Test Level:** Integration
-**Parametrized:** No
+**Escenario relacionado:** Escenario 1
+**Tipo:** Positivo
+**Prioridad:** Alta
+**Nivel de prueba:** Integracion
+**Parametrizado:** No
 
-**Preconditions:**
+**Precondiciones:**
 
-- Resend sandbox configured for staging
-- Invoice exists in `draft`
+- Resend sandbox configurado en staging
+- Factura existe en `draft`
 
-**Test Steps:**
+**Pasos de prueba:**
 
-1. Send invoice via POST /api/invoices/{invoiceId}/send
-2. Inspect email attachment metadata in Resend logs
+1. Enviar factura via POST /api/invoices/{invoiceId}/send
+2. Revisar metadata del adjunto en logs de Resend
 
-**Expected Result:**
+**Resultado esperado:**
 
-- **API Response:** 200 OK
-- **Integration:** Attachment content type is `application/pdf`
+- **Respuesta API:** 200 OK
+- **Integracion:** Content type del adjunto es `application/pdf`
 
-**Test Data:**
+**Datos de prueba:**
 
 ```json
 {
@@ -522,35 +522,35 @@ Attachment requires validation of content, name, size, and failure paths across 
 }
 ```
 
-**Post-conditions:**
+**Post-condiciones:**
 
-- Email log record exists
+- Existe registro en email_logs
 
 ---
 
-#### **Should keep attachment size under 5MB for large logos**
+#### **Validar tamano del adjunto bajo limite con logos grandes**
 
-**Related Scenario:** Scenario 3
-**Type:** Boundary
-**Priority:** High
-**Test Level:** Integration
-**Parametrized:** Yes (Group 1)
+**Escenario relacionado:** Escenario 3
+**Tipo:** Limite
+**Prioridad:** Alta
+**Nivel de prueba:** Integracion
+**Parametrizado:** Si (Grupo 1)
 
-**Preconditions:**
+**Precondiciones:**
 
-- Invoice with large logo and many items exists
+- Factura con logo grande y muchos items existe
 
-**Test Steps:**
+**Pasos de prueba:**
 
-1. Send invoice via UI or API
-2. Check attachment size in email logs or Resend metadata
+1. Enviar factura via UI o API
+2. Revisar tamano del adjunto en logs de Resend
 
-**Expected Result:**
+**Resultado esperado:**
 
-- **Integration:** Attachment size at most 5MB
-- **System State:** Invoice marked as sent
+- **Integracion:** Tamano del adjunto como maximo 5MB
+- **Estado del sistema:** Factura marcada como sent
 
-**Test Data:**
+**Datos de prueba:**
 
 ```json
 {
@@ -559,35 +559,35 @@ Attachment requires validation of content, name, size, and failure paths across 
 }
 ```
 
-**Post-conditions:**
+**Post-condiciones:**
 
-- Invoice remains in sent state
+- La factura permanece en sent
 
 ---
 
-#### **Should accept attachment size at limit (at most 5MB)**
+#### **Validar tamano al limite (como maximo 5MB)**
 
-**Related Scenario:** Scenario 3
-**Type:** Boundary
-**Priority:** Medium
-**Test Level:** Integration
-**Parametrized:** Yes (Group 1)
+**Escenario relacionado:** Escenario 3
+**Tipo:** Limite
+**Prioridad:** Media
+**Nivel de prueba:** Integracion
+**Parametrizado:** Si (Grupo 1)
 
-**Preconditions:**
+**Precondiciones:**
 
-- Invoice with near-limit PDF setup exists
+- Factura con PDF cerca del limite
 
-**Test Steps:**
+**Pasos de prueba:**
 
-1. Send invoice
-2. Verify attachment size is just under limit
+1. Enviar factura
+2. Verificar tamano del adjunto justo bajo el limite
 
-**Expected Result:**
+**Resultado esperado:**
 
-- **Integration:** Attachment size at most 5MB
-- **UI:** Success confirmation shown
+- **Integracion:** Tamano del adjunto como maximo 5MB
+- **UI:** Confirmacion de exito
 
-**Test Data:**
+**Datos de prueba:**
 
 ```json
 {
@@ -596,36 +596,36 @@ Attachment requires validation of content, name, size, and failure paths across 
 }
 ```
 
-**Post-conditions:**
+**Post-condiciones:**
 
-- Invoice remains in sent state
+- La factura permanece en sent
 
 ---
 
-#### **Should block send when PDF exceeds size limit**
+#### **Validar bloqueo cuando el PDF supera el limite**
 
-**Related Scenario:** Scenario 6
-**Type:** Negative
-**Priority:** High
-**Test Level:** Integration
-**Parametrized:** No
+**Escenario relacionado:** Escenario 6
+**Tipo:** Negativo
+**Prioridad:** Alta
+**Nivel de prueba:** Integracion
+**Parametrizado:** No
 
-**Preconditions:**
+**Precondiciones:**
 
-- Invoice setup produces PDF over 5MB
+- Factura genera PDF mayor a 5MB
 
-**Test Steps:**
+**Pasos de prueba:**
 
-1. Attempt to send invoice
-2. Observe API response and UI message
+1. Intentar enviar la factura
+2. Observar respuesta de API y mensaje UI
 
-**Expected Result:**
+**Resultado esperado:**
 
-- **API Response:** 400 or 413 with error code `PDF_TOO_LARGE` (TBD)
-- **UI:** Error message shown
-- **Database:** No `sent` event, invoice remains `draft`
+- **Respuesta API:** 400 o 413 con error code `PDF_TOO_LARGE` (por definir)
+- **UI:** Mensaje de error
+- **Base de datos:** Sin evento `sent`, factura queda en `draft`
 
-**Test Data:**
+**Datos de prueba:**
 
 ```json
 {
@@ -634,36 +634,36 @@ Attachment requires validation of content, name, size, and failure paths across 
 }
 ```
 
-**Post-conditions:**
+**Post-condiciones:**
 
-- No email log record
+- No hay registro en email_logs
 
 ---
 
-#### **Should fail send when PDF generation returns empty file**
+#### **Validar fallo cuando el PDF esta vacio**
 
-**Related Scenario:** Scenario 5
-**Type:** Negative
-**Priority:** High
-**Test Level:** Integration
-**Parametrized:** No
+**Escenario relacionado:** Escenario 5
+**Tipo:** Negativo
+**Prioridad:** Alta
+**Nivel de prueba:** Integracion
+**Parametrizado:** No
 
-**Preconditions:**
+**Precondiciones:**
 
-- PDF generator returns empty buffer (mock or forced error)
+- El generador de PDF retorna buffer vacio (mock o error forzado)
 
-**Test Steps:**
+**Pasos de prueba:**
 
-1. Attempt to send invoice
-2. Observe API response and UI message
+1. Intentar enviar la factura
+2. Observar respuesta de API y mensaje UI
 
-**Expected Result:**
+**Resultado esperado:**
 
-- **API Response:** 500 with error code `PDF_GENERATION_FAILED` (TBD)
-- **UI:** Error message shown
-- **Database:** No `sent` event, invoice remains `draft`
+- **Respuesta API:** 500 con error code `PDF_GENERATION_FAILED` (por definir)
+- **UI:** Mensaje de error
+- **Base de datos:** Sin evento `sent`, factura queda en `draft`
 
-**Test Data:**
+**Datos de prueba:**
 
 ```json
 {
@@ -671,37 +671,37 @@ Attachment requires validation of content, name, size, and failure paths across 
 }
 ```
 
-**Post-conditions:**
+**Post-condiciones:**
 
-- No email log record
+- No hay registro en email_logs
 
 ---
 
-#### **Should return correct headers for invoice PDF endpoint**
+#### **Validar headers correctos en endpoint PDF**
 
-**Related Scenario:** Scenario 2
-**Type:** API
-**Priority:** Medium
-**Test Level:** API
-**Parametrized:** No
+**Escenario relacionado:** Escenario 2
+**Tipo:** API
+**Prioridad:** Media
+**Nivel de prueba:** API
+**Parametrizado:** No
 
-**Preconditions:**
+**Precondiciones:**
 
-- Invoice exists and belongs to user
+- Factura existe y pertenece al usuario
 
-**Test Steps:**
+**Pasos de prueba:**
 
-1. Call GET /api/invoices/{invoiceId}/pdf
-2. Inspect response headers and file name
+1. Llamar GET /api/invoices/{invoiceId}/pdf
+2. Inspeccionar headers y nombre de archivo
 
-**Expected Result:**
+**Resultado esperado:**
 
-- **API Response:** 200 OK
+- **Respuesta API:** 200 OK
 - **Headers:**
   - `Content-Type: application/pdf`
-  - `Content-Disposition` includes filename with invoice number
+  - `Content-Disposition` incluye el nombre con numero de factura
 
-**Test Data:**
+**Datos de prueba:**
 
 ```json
 {
@@ -709,113 +709,113 @@ Attachment requires validation of content, name, size, and failure paths across 
 }
 ```
 
-**Post-conditions:**
+**Post-condiciones:**
 
-- None
-
----
-
-## Integration Test Cases (If Applicable)
-
-### Integration Test 1: Backend to PDF Generator
-
-**Integration Point:** API to PDF Generator
-**Type:** Integration
-**Priority:** High
-
-**Preconditions:**
-
-- PDF generator service available
-- Invoice data includes business profile, client, items
-
-**Test Flow:**
-
-1. Trigger PDF generation during send
-2. Verify PDF buffer returned is non-empty
-
-**Expected Result:**
-
-- PDF buffer generated with valid size and MIME type
+- Ninguna
 
 ---
 
-### Integration Test 2: Backend to Resend (Attachment)
+## Casos de Integracion (si aplica)
 
-**Integration Point:** Backend to Resend API
-**Type:** Integration
-**Priority:** High
+### Caso de Integracion 1: Backend a PDF Generator
 
-**Mock Strategy:**
+**Punto de integracion:** API a PDF Generator
+**Tipo:** Integracion
+**Prioridad:** Alta
 
-- Mock Resend in automated tests
-- Validate real sending in staging with sandbox
+**Precondiciones:**
 
-**Test Flow:**
+- Servicio de PDF generator disponible
+- Data de factura incluye perfil de negocio, cliente e items
 
-1. Send email with PDF attachment
-2. Confirm Resend accepts the payload
+**Flujo de prueba:**
 
-**Expected Result:**
+1. Disparar generacion de PDF durante envio
+2. Verificar que el buffer no es vacio
 
-- Resend returns success and attachment is visible in logs
+**Resultado esperado:**
 
----
-
-## Edge Cases Summary
-
-| Edge Case                       | Covered in Original Story? | Added to Refined AC? | Test Case                                               | Priority |
-| ------------------------------- | -------------------------- | -------------------- | ------------------------------------------------------- | -------- |
-| PDF over 5MB                    | No                         | Yes (Scenario 6)     | Should block send when PDF exceeds size limit           | High     |
-| Empty PDF                       | No                         | Yes (Scenario 5)     | Should fail send when PDF generation returns empty file | Medium   |
-| Special chars in invoice number | No                         | No (needs PO/Dev)    | TBD                                                     | Low      |
+- Buffer PDF generado con tamano y MIME type valido
 
 ---
 
-## Test Data Summary
+### Caso de Integracion 2: Backend a Resend (Adjunto)
 
-### Data Categories
+**Punto de integracion:** Backend a Resend API
+**Tipo:** Integracion
+**Prioridad:** Alta
 
-| Data Type       | Count | Purpose        | Examples                                         |
-| --------------- | ----- | -------------- | ------------------------------------------------ |
-| Valid data      | 3     | Positive tests | Draft invoice with 1-3 items, valid client email |
-| Invalid data    | 2     | Negative tests | PDF over 5MB, empty PDF buffer                   |
-| Boundary values | 2     | Boundary tests | PDF at ~4.5-5MB, many items                      |
-| Edge case data  | 1     | Edge tests     | Invoice number with special chars                |
+**Estrategia de mock:**
 
-### Data Generation Strategy
+- Mock de Resend para tests automatizados
+- Validar envio real en staging con sandbox
 
-**Static Test Data:**
+**Flujo de prueba:**
 
-- Invoice number: `INV-2026-0042`
-- Client email: `client@example.com`
+1. Enviar email con PDF adjunto
+2. Confirmar que Resend acepta el payload
 
-**Dynamic Test Data (using Faker.js):**
+**Resultado esperado:**
+
+- Resend responde success y el adjunto se ve en logs
+
+---
+
+## Resumen de Edge Cases
+
+| Edge Case                       | Cubierto en Story original? | Agregado a AC refinado? | Test Case                                      | Prioridad |
+| ------------------------------- | --------------------------- | ----------------------- | ---------------------------------------------- | --------- |
+| PDF mayor a 5MB                 | No                          | Si (Escenario 6)        | Validar bloqueo cuando el PDF supera el limite | Alta      |
+| PDF vacio                       | No                          | Si (Escenario 5)        | Validar fallo cuando el PDF esta vacio         | Media     |
+| Caracteres especiales en numero | No                          | No (needs PO/Dev)       | TBD                                            | Baja      |
+
+---
+
+## Resumen de Datos de Prueba
+
+### Categorias de datos
+
+| Tipo de dato    | Cantidad | Proposito         | Ejemplos                                    |
+| --------------- | -------- | ----------------- | ------------------------------------------- |
+| Datos validos   | 3        | Pruebas positivas | Factura draft con 1-3 items, email valido   |
+| Datos invalidos | 2        | Pruebas negativas | PDF mayor a 5MB, buffer vacio               |
+| Valores limite  | 2        | Pruebas limite    | PDF cerca de 4.5-5MB, muchos items          |
+| Datos edge      | 1        | Edge tests        | Numero de factura con caracteres especiales |
+
+### Estrategia de generacion de datos
+
+**Datos estaticos:**
+
+- Numero de factura: `INV-2026-0042`
+- Email del cliente: `client@example.com`
+
+**Datos dinamicos (Faker.js):**
 
 - User data: faker.internet.email(), faker.person.firstName()
-- Numbers: faker.number.int({ min: 1, max: 120 })
-- Dates: faker.date.soon()
+- Numeros: faker.number.int({ min: 1, max: 120 })
+- Fechas: faker.date.soon()
 
-**Test Data Cleanup:**
+**Cleanup de datos:**
 
-- All test data is cleaned up after test execution
-- Tests are idempotent and do not depend on execution order
+- Todos los datos de prueba se limpian despues de la ejecucion
+- Los tests son idempotentes y no dependen del orden
 
 ---
 
-## Test Execution Tracking
+## Seguimiento de Ejecucion
 
-**Test Execution Date:** TBD
-**Environment:** Staging
-**Executed By:** TBD
+**Fecha de ejecucion:** TBD
+**Entorno:** Staging
+**Ejecutado por:** TBD
 
-**Results:**
+**Resultados:**
 
-- Total Tests: 10
-- Passed: TBD
-- Failed: TBD
-- Blocked: TBD
+- Total de tests: 10
+- Pasados: TBD
+- Fallados: TBD
+- Bloqueados: TBD
 
-**Bugs Found:**
+**Bugs encontrados:**
 
 - TBD
 
@@ -823,33 +823,33 @@ Attachment requires validation of content, name, size, and failure paths across 
 
 ---
 
-## Action Required
+## Accion requerida
 
 **PO:**
 
-- Review and answer critical questions (filename pattern, size limit behavior)
-- Validate suggested story improvements
+- Revisar y responder preguntas criticas (patron de nombre, limite de tamano)
+- Validar mejoras sugeridas a la story
 
-**Dev Lead:**
+**Lider Dev:**
 
-- Confirm PDF generation location (server-side)
-- Define error codes and response for size/generation failures
+- Confirmar generacion de PDF server-side
+- Definir error codes y response para fallos de tamano/generacion
 
-**QA Team:**
+**Equipo QA:**
 
-- Review test cases for completeness
-- Validate parametrization strategy and test data setup
-
----
-
-**Next Steps:**
-
-1. Team discusses critical questions and ambiguities
-2. PO/Dev provide answers and clarifications
-3. QA updates test cases based on feedback
-4. Dev starts implementation with clear acceptance criteria
+- Revisar casos para completitud
+- Validar estrategia de parametrizacion y data setup
 
 ---
 
-**Documentation:** Full test cases also available at:
+**Siguientes pasos:**
+
+1. El equipo discute preguntas criticas y ambiguedades
+2. PO/Dev responden y aclaran
+3. QA actualiza test cases con feedback
+4. Dev inicia implementacion con AC claros
+
+---
+
+**Documentacion:** Test cases completos en:
 `.context/PBI/epics/EPIC-SQ-37-invoice-sending/stories/STORY-SQ-43-email-attached-pdf/acceptance-test-plan.md`

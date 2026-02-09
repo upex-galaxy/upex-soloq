@@ -305,6 +305,41 @@ Ver `.context/guidelines/MCP/` para detalles de cada uno.
 
 ---
 
+## Reglas de Git (IMPORTANTE)
+
+> **ATENCION:** Este proyecto usa `staging` como rama principal de desarrollo, NO `main`.
+
+### Rama Principal: `staging`
+
+| Accion                | Rama correcta | NUNCA usar |
+| --------------------- | ------------- | ---------- |
+| Crear feature branch  | `staging`     | `main`     |
+| Base para PRs         | `staging`     | `main`     |
+| Sincronizar cambios   | `staging`     | `main`     |
+| Pull despues de merge | `staging`     | `main`     |
+
+### Comandos Correctos
+
+```bash
+# Sincronizar despues de merge de PR
+git checkout staging && git pull origin staging
+
+# Crear nueva rama de feature
+git checkout staging && git checkout -b feat/SQ-XX/nombre
+
+# NUNCA hacer esto:
+# git checkout main        ❌ PROHIBIDO
+# git pull origin main     ❌ PROHIBIDO
+```
+
+### Por que?
+
+- Los PRs se mergean a `staging` (deploy automatico a staging environment)
+- `main` es solo para releases a produccion
+- Hacer checkout a `main` puede causar perdida de cambios locales no commiteados
+
+---
+
 ## Comandos Utiles
 
 ```bash

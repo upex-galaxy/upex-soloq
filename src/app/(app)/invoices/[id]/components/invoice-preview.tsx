@@ -2,9 +2,10 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { Loader2, Download, AlertCircle, RefreshCw, FileText } from 'lucide-react';
+import { Loader2, Download, AlertCircle, RefreshCw, FileText, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDebounce } from '@/hooks/use-debounce';
+import { generateInvoiceFilename } from '@/lib/utils/pdf-utils';
 import type { InvoiceWithDetails } from '@/hooks/invoices/use-invoice';
 
 // =============================================================================
@@ -50,7 +51,13 @@ const DEBOUNCE_DELAY = 1500; // 1.5 seconds as per spec
  * - Loading state during PDF generation
  * - Error handling with retry capability
  * - Memory cleanup for blob URLs
- * - Download functionality
+ * - Download functionality with professional filename (SQ-35)
+ *
+ * Download features (SQ-35):
+ * - Filename format: Invoice-{number}-{client}.pdf
+ * - Client name sanitized (no accents, special chars)
+ * - Double-click prevention with loading state
+ * - Success feedback after download
  */
 export function InvoicePreview({ invoice, InvoiceDocument }: InvoicePreviewProps) {
   // Debounce invoice data to prevent excessive PDF regeneration
@@ -60,6 +67,10 @@ export function InvoicePreview({ invoice, InvoiceDocument }: InvoicePreviewProps
   const [previewState, setPreviewState] = useState<PreviewState>('loading');
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [retryKey, setRetryKey] = useState(0);
+
+  // Download state (SQ-35) - prevents double-click
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadSuccess, setDownloadSuccess] = useState(false);
 
   // Ref for tracking previous blob URL to cleanup
   const previousBlobUrlRef = useRef<string | null>(null);
@@ -106,17 +117,34 @@ export function InvoicePreview({ invoice, InvoiceDocument }: InvoicePreviewProps
     setRetryKey(prev => prev + 1);
   }, []);
 
-  // Handle download
+  // Handle download (SQ-35)
+  // - Uses professional filename format: Invoice-{number}-{client}.pdf
+  // - Prevents double-click with loading state
+  // - Shows brief success feedback
   const handleDownload = useCallback(() => {
-    if (!blobUrl) return;
+    if (!blobUrl || isDownloading) return;
 
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = `${invoice.invoice_number}.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }, [blobUrl, invoice.invoice_number]);
+    setIsDownloading(true);
+    setDownloadSuccess(false);
+
+    try {
+      // Generate professional filename with client name
+      const filename = generateInvoiceFilename(invoice.invoice_number, invoice.client.name);
+
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Show success briefly
+      setDownloadSuccess(true);
+      setTimeout(() => setDownloadSuccess(false), 2000);
+    } finally {
+      setIsDownloading(false);
+    }
+  }, [blobUrl, isDownloading, invoice.invoice_number, invoice.client.name]);
 
   return (
     <div className="flex flex-col h-full" data-testid="invoice-preview-container">
@@ -128,12 +156,18 @@ export function InvoicePreview({ invoice, InvoiceDocument }: InvoicePreviewProps
         </div>
         <Button
           onClick={handleDownload}
-          disabled={previewState !== 'ready'}
+          disabled={previewState !== 'ready' || isDownloading}
           size="sm"
           data-testid="download-pdf-button"
         >
-          <Download className="h-4 w-4 mr-2" />
-          Descargar PDF
+          {isDownloading ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : downloadSuccess ? (
+            <Check className="h-4 w-4 mr-2 text-green-500" />
+          ) : (
+            <Download className="h-4 w-4 mr-2" />
+          )}
+          {isDownloading ? 'Descargando...' : downloadSuccess ? 'Descargado' : 'Descargar PDF'}
         </Button>
       </div>
 

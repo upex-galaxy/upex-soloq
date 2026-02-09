@@ -140,3 +140,70 @@ export function isValidImageUrl(url: string | null | undefined): boolean {
     return false;
   }
 }
+
+/**
+ * Sanitize text for use in filename
+ *
+ * Removes accents, replaces special characters with hyphens,
+ * and limits length for filesystem compatibility.
+ *
+ * @param text - Text to sanitize
+ * @param maxLength - Maximum length (default: 50)
+ * @returns Sanitized text safe for filenames
+ *
+ * @example
+ * sanitizeFilename("Diseño & Cía.") // => "Diseno-Cia"
+ * sanitizeFilename("John's \"Company\"") // => "Johns-Company"
+ * sanitizeFilename("Café López") // => "Cafe-Lopez"
+ */
+export function sanitizeFilename(text: string, maxLength = 50): string {
+  if (!text) return '';
+
+  return (
+    text
+      // Normalize unicode and remove accents
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      // Replace special characters with hyphen
+      .replace(/[^a-zA-Z0-9\s-]/g, '')
+      // Replace whitespace with hyphen
+      .replace(/\s+/g, '-')
+      // Remove consecutive hyphens
+      .replace(/-+/g, '-')
+      // Remove leading/trailing hyphens
+      .replace(/^-+|-+$/g, '')
+      // Limit length
+      .slice(0, maxLength)
+      // Remove trailing hyphen after slice
+      .replace(/-+$/, '')
+  );
+}
+
+/**
+ * Generate invoice filename for download
+ *
+ * Creates a professional filename with invoice number and client name.
+ * Format: Invoice-{number}-{client}.pdf
+ *
+ * @param invoiceNumber - Invoice number (e.g., "INV-2026-0001")
+ * @param clientName - Client name to include in filename
+ * @returns Formatted filename with .pdf extension
+ *
+ * @example
+ * generateInvoiceFilename("INV-2026-0001", "Acme Corp")
+ * // => "Invoice-INV-2026-0001-Acme-Corp.pdf"
+ *
+ * generateInvoiceFilename("INV-2026-0002", "Diseño & Cía. López")
+ * // => "Invoice-INV-2026-0002-Diseno-Cia-Lopez.pdf"
+ */
+export function generateInvoiceFilename(invoiceNumber: string, clientName: string): string {
+  const sanitizedClient = sanitizeFilename(clientName, 40);
+  const sanitizedNumber = sanitizeFilename(invoiceNumber, 30);
+
+  // Ensure we always have at least the invoice number
+  if (!sanitizedClient) {
+    return `Invoice-${sanitizedNumber || 'draft'}.pdf`;
+  }
+
+  return `Invoice-${sanitizedNumber}-${sanitizedClient}.pdf`;
+}

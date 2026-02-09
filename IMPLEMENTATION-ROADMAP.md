@@ -49,13 +49,13 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | SQ-27 | Assign Unique Invoice Number             | Estimation    | Medium   | #13 (MERGED - solo tests) |
 | SQ-28 | Set Invoice Due Date                     | Ready For QA  | Medium   | #33 (MERGED)              |
 | SQ-29 | Add Notes and Terms to Invoice           | Ready For QA  | Medium   | #34 (MERGED)              |
-| SQ-30 | Save Invoice as Draft                    | Backlog       | Medium   | -                         |
+| SQ-30 | Save Invoice as Draft                    | Estimation    | Medium   | -                         |
 
 ### Epic: SQ-1 - User Authentication & Onboarding
 
 | Key  | Story                                     | Status            | Priority | PR                        |
 | ---- | ----------------------------------------- | ----------------- | -------- | ------------------------- |
-| SQ-2 | User Registration with Email and Password | Shift-Left QA     | Highest  | #5 (MERGED - solo tests)  |
+| SQ-2 | User Registration with Email and Password | **Ready For Dev** | Highest  | #5 (MERGED - solo tests)  |
 | SQ-3 | User Login with Credentials               | **Ready For Dev** | Highest  | #4 (MERGED - solo tests)  |
 | SQ-4 | Password Recovery via Email               | Shift-Left QA     | High     | #12 (MERGED - solo tests) |
 | SQ-5 | Secure Logout                             | Shift-Left QA     | High     | -                         |
@@ -152,7 +152,7 @@ SQ-31 (PDF Generation Epic)
 | SQ-25 | Add Discounts               | Shift-Left QA | No Ready For Dev                             |
 | SQ-26 | Preview Invoice             | Estimation    | No Ready For Dev                             |
 | SQ-27 | Unique Invoice Number       | Estimation    | No Ready For Dev                             |
-| SQ-30 | Save as Draft               | Backlog       | No Ready For Dev                             |
+| SQ-30 | Save as Draft               | Estimation    | No Ready For Dev                             |
 | SQ-34 | Payment Methods in PDF      | Shift-Left QA | No Ready For Dev                             |
 
 ---
@@ -302,4 +302,4 @@ No hay más US en "Ready For Dev" en el roadmap principal.
 
 ---
 
-_Actualizado por Claude Code - 2026-02-09_
+_Actualizado por Claude Code - 2026-02-09 (Auditoria Jira completada)_

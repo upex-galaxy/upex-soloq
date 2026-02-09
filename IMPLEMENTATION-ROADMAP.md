@@ -53,12 +53,12 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 
 ### Epic: SQ-1 - User Authentication & Onboarding
 
-| Key  | Story                                     | Status            | Priority | PR                        |
-| ---- | ----------------------------------------- | ----------------- | -------- | ------------------------- |
-| SQ-2 | User Registration with Email and Password | **Ready For Dev** | Highest  | #5 (MERGED - solo tests)  |
-| SQ-3 | User Login with Credentials               | **Ready For Dev** | Highest  | #4 (MERGED - solo tests)  |
-| SQ-4 | Password Recovery via Email               | Shift-Left QA     | High     | #12 (MERGED - solo tests) |
-| SQ-5 | Secure Logout                             | Shift-Left QA     | High     | -                         |
+| Key  | Story                                     | Status           | Priority | PR                        |
+| ---- | ----------------------------------------- | ---------------- | -------- | ------------------------- |
+| SQ-2 | User Registration with Email and Password | **Ready For QA** | Highest  | #5 (MERGED - solo tests)  |
+| SQ-3 | User Login with Credentials               | **Ready For QA** | Highest  | #4 (MERGED - solo tests)  |
+| SQ-4 | Password Recovery via Email               | Shift-Left QA    | High     | #12 (MERGED - solo tests) |
+| SQ-5 | Secure Logout                             | Shift-Left QA    | High     | -                         |
 
 ### Epic: SQ-31 - PDF Generation & Download
 
@@ -143,17 +143,18 @@ SQ-31 (PDF Generation Epic)
 
 ### OMITIDAS (No Ready For Dev o Dependencias Bloqueadas)
 
-| Key   | Story                       | Status        | Razon de Omision                             |
-| ----- | --------------------------- | ------------- | -------------------------------------------- |
-| SQ-3  | User Login                  | Ready For Dev | Auth ya funciona, baja prioridad vs features |
-| SQ-18 | View Client Invoice History | Shift-Left QA | No Ready + Depende de invoices               |
-| SQ-22 | Add Line Items              | Backlog       | No Ready For Dev                             |
-| SQ-23 | Auto Calculation            | Estimation    | No Ready For Dev                             |
-| SQ-25 | Add Discounts               | Shift-Left QA | No Ready For Dev                             |
-| SQ-26 | Preview Invoice             | Estimation    | No Ready For Dev                             |
-| SQ-27 | Unique Invoice Number       | Estimation    | No Ready For Dev                             |
-| SQ-30 | Save as Draft               | Estimation    | No Ready For Dev                             |
-| SQ-34 | Payment Methods in PDF      | Shift-Left QA | No Ready For Dev                             |
+| Key   | Story                       | Status        | Razon de Omision                         |
+| ----- | --------------------------- | ------------- | ---------------------------------------- |
+| SQ-2  | User Registration           | Ready For QA  | Implementado - gaps documentados en Jira |
+| SQ-3  | User Login                  | Ready For QA  | Implementado - gaps documentados en Jira |
+| SQ-18 | View Client Invoice History | Shift-Left QA | No Ready + Depende de invoices           |
+| SQ-22 | Add Line Items              | Backlog       | No Ready For Dev                         |
+| SQ-23 | Auto Calculation            | Estimation    | No Ready For Dev                         |
+| SQ-25 | Add Discounts               | Shift-Left QA | No Ready For Dev                         |
+| SQ-26 | Preview Invoice             | Estimation    | No Ready For Dev                         |
+| SQ-27 | Unique Invoice Number       | Estimation    | No Ready For Dev                         |
+| SQ-30 | Save as Draft               | Estimation    | No Ready For Dev                         |
+| SQ-34 | Payment Methods in PDF      | Shift-Left QA | No Ready For Dev                         |
 
 ---
 
@@ -183,10 +184,10 @@ FASE 3 - PDF Generation 🔶 EN PROGRESO (3/4)
 
 ### Metricas
 
-- **Total US implementadas:** 11/11 del roadmap original
-- **US en Ready For QA:** 11 (listas para testing)
+- **Total US implementadas:** 13/13 del roadmap (incluye Auth)
+- **US en Ready For QA:** 13 (listas para testing)
 - **US bloqueadas (Shift-Left QA):** 1 (SQ-34)
-- **US en Ready For Dev:** 2 (SQ-2, SQ-3 - Auth, omitidas inicialmente)
+- **US en Ready For Dev:** 0
 
 ---
 
@@ -297,9 +298,8 @@ No hay más US en "Ready For Dev" en el roadmap principal.
 **Opciones disponibles:**
 
 1. Esperar a que SQ-34 pase a Ready For Dev
-2. Implementar SQ-2 o SQ-3 (Auth) si se desea
-3. Pasar a QA manual de las 11+ US en Ready For QA
+2. Pasar a QA manual de las 13 US en Ready For QA
 
 ---
 
-_Actualizado por Claude Code - 2026-02-09 (Auditoria Jira completada)_
+_Actualizado por Claude Code - 2026-02-09 (SQ-2 y SQ-3 movidos a Ready For QA)_

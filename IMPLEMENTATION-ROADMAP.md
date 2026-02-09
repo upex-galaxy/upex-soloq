@@ -38,18 +38,18 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 
 ### Epic: SQ-20 - Invoice Creation
 
-| Key   | Story                                    | Status            | Priority | PR                        |
-| ----- | ---------------------------------------- | ----------------- | -------- | ------------------------- |
-| SQ-21 | Create Invoice by Selecting Client       | **In Review**     | Medium   | #29 (OPEN)                |
-| SQ-22 | Add Line Items to Invoice                | Backlog           | Medium   | -                         |
-| SQ-23 | Automatic Subtotal and Total Calculation | Estimation        | Medium   | #16 (MERGED - solo tests) |
-| SQ-24 | Add Taxes to Invoice                     | **Ready For Dev** | Medium   | #9 (MERGED - solo tests)  |
-| SQ-25 | Add Discounts to Invoice                 | Shift-Left QA     | Medium   | #24 (OPEN)                |
-| SQ-26 | Preview Invoice Before Sending           | Estimation        | Medium   | #15 (MERGED - solo tests) |
-| SQ-27 | Assign Unique Invoice Number             | Estimation        | Medium   | #13 (MERGED - solo tests) |
-| SQ-28 | Set Invoice Due Date                     | **Ready For Dev** | Medium   | #10 (MERGED - solo tests) |
-| SQ-29 | Add Notes and Terms to Invoice           | **Ready For Dev** | Medium   | #17 (MERGED - solo tests) |
-| SQ-30 | Save Invoice as Draft                    | Backlog           | Medium   | -                         |
+| Key   | Story                                    | Status        | Priority | PR                        |
+| ----- | ---------------------------------------- | ------------- | -------- | ------------------------- |
+| SQ-21 | Create Invoice by Selecting Client       | Ready For QA  | Medium   | #29 (MERGED)              |
+| SQ-22 | Add Line Items to Invoice                | Backlog       | Medium   | -                         |
+| SQ-23 | Automatic Subtotal and Total Calculation | Estimation    | Medium   | #16 (MERGED - solo tests) |
+| SQ-24 | Add Taxes to Invoice                     | Ready For QA  | Medium   | #32 (MERGED)              |
+| SQ-25 | Add Discounts to Invoice                 | Shift-Left QA | Medium   | #24 (OPEN)                |
+| SQ-26 | Preview Invoice Before Sending           | Estimation    | Medium   | #15 (MERGED - solo tests) |
+| SQ-27 | Assign Unique Invoice Number             | Estimation    | Medium   | #13 (MERGED - solo tests) |
+| SQ-28 | Set Invoice Due Date                     | Ready For QA  | Medium   | #33 (MERGED)              |
+| SQ-29 | Add Notes and Terms to Invoice           | Ready For QA  | Medium   | #34 (MERGED)              |
+| SQ-30 | Save Invoice as Draft                    | Backlog       | Medium   | -                         |
 
 ### Epic: SQ-1 - User Authentication & Onboarding
 
@@ -62,12 +62,12 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 
 ### Epic: SQ-31 - PDF Generation & Download
 
-| Key   | Story                                 | Status            | Priority | PR                        |
-| ----- | ------------------------------------- | ----------------- | -------- | ------------------------- |
-| SQ-32 | Generate Professional PDF Invoice     | **Ready For Dev** | Medium   | #8 (MERGED - solo tests)  |
-| SQ-33 | Include Logo and Business Data in PDF | **Ready For Dev** | Medium   | -                         |
-| SQ-34 | Include Payment Methods in PDF        | Shift-Left QA     | Medium   | -                         |
-| SQ-35 | Download PDF to Device                | **Ready For Dev** | Medium   | #18 (MERGED - solo tests) |
+| Key   | Story                                 | Status        | Priority | PR           |
+| ----- | ------------------------------------- | ------------- | -------- | ------------ |
+| SQ-32 | Generate Professional PDF Invoice     | Ready For QA  | Medium   | #35 (MERGED) |
+| SQ-33 | Include Logo and Business Data in PDF | Ready For QA  | Medium   | #36 (MERGED) |
+| SQ-34 | Include Payment Methods in PDF        | Shift-Left QA | Medium   | -            |
+| SQ-35 | Download PDF to Device                | Ready For QA  | Medium   | #37 (MERGED) |
 
 ---
 
@@ -110,35 +110,36 @@ SQ-31 (PDF Generation Epic)
 
 ## Lista Estrategica de Implementacion
 
-### FASE 1: Client Management (Prioridad Maxima)
+### FASE 1: Client Management ✅ COMPLETADA
 
-| Orden | Key   | Story                      | Status        | Implementable | Razon                 |
-| ----- | ----- | -------------------------- | ------------- | ------------- | --------------------- |
-| 1     | SQ-15 | List All Clients           | Ready For Dev | SI            | SQ-14 ya implementado |
-| 2     | SQ-16 | Edit Client Data           | Ready For Dev | SI            | Despues de SQ-15      |
-| 3     | SQ-17 | Add Client Tax Information | Ready For Dev | SI            | Despues de SQ-16      |
-| 4     | SQ-19 | Delete Client              | Ready For Dev | SI            | Despues de SQ-15      |
+| Orden | Key   | Story                      | Status       | PR           |
+| ----- | ----- | -------------------------- | ------------ | ------------ |
+| 1     | SQ-15 | List All Clients           | Ready For QA | #25 (MERGED) |
+| 2     | SQ-16 | Edit Client Data           | Ready For QA | #26 (MERGED) |
+| 3     | SQ-17 | Add Client Tax Information | Ready For QA | #27 (MERGED) |
+| 4     | SQ-19 | Delete Client              | Ready For QA | #28 (MERGED) |
 
-**Nota:** SQ-18 (View Client Invoice History) esta en Shift-Left QA y ademas depende de tener facturas, se omite por ahora.
+**Nota:** SQ-18 (View Client Invoice History) esta en Shift-Left QA y ademas depende de tener facturas.
 
-### FASE 2: Invoice Creation (Segunda Prioridad)
+### FASE 2: Invoice Creation ✅ COMPLETADA
 
-| Orden | Key   | Story                              | Status        | Implementable | Razon                      |
-| ----- | ----- | ---------------------------------- | ------------- | ------------- | -------------------------- |
-| 5     | SQ-21 | Create Invoice by Selecting Client | Ready For Dev | SI            | Requiere FASE 1 completada |
-| 6     | SQ-24 | Add Taxes to Invoice               | Ready For Dev | SI            | Despues de SQ-21           |
-| 7     | SQ-28 | Set Invoice Due Date               | Ready For Dev | SI            | Despues de SQ-21           |
-| 8     | SQ-29 | Add Notes and Terms to Invoice     | Ready For Dev | SI            | Despues de SQ-21           |
+| Orden | Key   | Story                              | Status       | PR           |
+| ----- | ----- | ---------------------------------- | ------------ | ------------ |
+| 5     | SQ-21 | Create Invoice by Selecting Client | Ready For QA | #29 (MERGED) |
+| 6     | SQ-24 | Add Taxes to Invoice               | Ready For QA | #32 (MERGED) |
+| 7     | SQ-28 | Set Invoice Due Date               | Ready For QA | #33 (MERGED) |
+| 8     | SQ-29 | Add Notes and Terms to Invoice     | Ready For QA | #34 (MERGED) |
 
 **Nota:** SQ-22, SQ-23, SQ-25, SQ-26, SQ-27, SQ-30 no estan en Ready For Dev.
 
-### FASE 3: PDF Generation (Tercera Prioridad)
+### FASE 3: PDF Generation 🔶 EN PROGRESO (3/4)
 
-| Orden | Key   | Story                             | Status        | Implementable | Razon                      |
-| ----- | ----- | --------------------------------- | ------------- | ------------- | -------------------------- |
-| 9     | SQ-32 | Generate Professional PDF Invoice | Ready For Dev | SI            | Requiere FASE 2 completada |
-| 10    | SQ-33 | Include Logo and Business Data    | Ready For Dev | SI            | Despues de SQ-32           |
-| 11    | SQ-35 | Download PDF to Device            | Ready For Dev | SI            | Despues de SQ-32           |
+| Orden | Key   | Story                             | Status        | PR           |
+| ----- | ----- | --------------------------------- | ------------- | ------------ |
+| 9     | SQ-32 | Generate Professional PDF Invoice | Ready For QA  | #35 (MERGED) |
+| 10    | SQ-33 | Include Logo and Business Data    | Ready For QA  | #36 (MERGED) |
+| 11    | SQ-35 | Download PDF to Device            | Ready For QA  | #37 (MERGED) |
+| 12    | SQ-34 | Include Payment Methods in PDF    | Shift-Left QA | ⏳ BLOQUEADA |
 
 ### OMITIDAS (No Ready For Dev o Dependencias Bloqueadas)
 
@@ -158,33 +159,34 @@ SQ-31 (PDF Generation Epic)
 
 ## Resumen Ejecutivo
 
-### User Stories Implementables en Orden
+### User Stories Implementadas
 
 ```
-FASE 1 - Client Management
-  1. SQ-15: List All Clients
-  2. SQ-16: Edit Client Data
-  3. SQ-17: Add Client Tax Information
-  4. SQ-19: Delete Client
+FASE 1 - Client Management ✅ COMPLETADA
+  1. SQ-15: List All Clients ✅
+  2. SQ-16: Edit Client Data ✅
+  3. SQ-17: Add Client Tax Information ✅
+  4. SQ-19: Delete Client ✅
 
-FASE 2 - Invoice Creation
-  5. SQ-21: Create Invoice by Selecting Client
-  6. SQ-24: Add Taxes to Invoice
-  7. SQ-28: Set Invoice Due Date
-  8. SQ-29: Add Notes and Terms to Invoice
+FASE 2 - Invoice Creation ✅ COMPLETADA
+  5. SQ-21: Create Invoice by Selecting Client ✅
+  6. SQ-24: Add Taxes to Invoice ✅
+  7. SQ-28: Set Invoice Due Date ✅
+  8. SQ-29: Add Notes and Terms to Invoice ✅
 
-FASE 3 - PDF Generation
-  9.  SQ-32: Generate Professional PDF Invoice
-  10. SQ-33: Include Logo and Business Data in PDF
-  11. SQ-35: Download PDF to Device
+FASE 3 - PDF Generation 🔶 EN PROGRESO (3/4)
+  9.  SQ-32: Generate Professional PDF Invoice ✅
+  10. SQ-33: Include Logo and Business Data in PDF ✅
+  11. SQ-35: Download PDF to Device ✅
+  12. SQ-34: Include Payment Methods in PDF ⏳ (BLOQUEADA)
 ```
 
 ### Metricas
 
-- **Total US en Ready For Dev:** 11
-- **Total US implementables consecutivamente:** 11
-- **US bloqueadas por dependencias:** 0
-- **US omitidas (no Ready For Dev):** 8
+- **Total US implementadas:** 11/11 del roadmap original
+- **US en Ready For QA:** 11 (listas para testing)
+- **US bloqueadas (Shift-Left QA):** 1 (SQ-34)
+- **US en Ready For Dev:** 2 (SQ-2, SQ-3 - Auth, omitidas inicialmente)
 
 ---
 
@@ -233,36 +235,71 @@ Todas las US de FASE 1 implementadas:
 
 ---
 
-### US en Trabajo Actual: SQ-21 - Create Invoice by Selecting Client
+### US Completada: SQ-21 - Create Invoice by Selecting Client ✅
 
-| Paso                      | Estado     | Notas                         |
-| ------------------------- | ---------- | ----------------------------- |
-| 0. Precondiciones Epic    | Completado | feature-test-plan.md existe   |
-| 1. Jira In Progress       | Completado | Transicionado                 |
-| 2. Implementation Plan    | Completado | implementation-plan.md creado |
-| 3. Implementacion         | Completado | 8 archivos, 946 lineas        |
-| 4. PR Creado              | Completado | PR #29 (OPEN)                 |
-| 5. Jira In Review         | Completado | Transicionado + comentario    |
-| 6. Code Review            | **Actual** | Esperando aprobacion          |
-| 7. Docs Actualizados      | Pendiente  |                               |
-| 8. Merge PR               | Pendiente  |                               |
-| 9. Jira Ready For QA      | Pendiente  |                               |
-| 10. Comentario Jira       | Pendiente  |                               |
-| 11. Preparar Siguiente US | Pendiente  | Siguiente: SQ-24 (Add Taxes)  |
-
-**Siguiente paso:** PASO 6 - Code Review del PR #29
-
-**Archivos implementados:**
-
-- `src/lib/validations/invoice.ts` - Zod schema
-- `src/app/api/invoices/route.ts` - POST endpoint
-- `src/hooks/invoices/use-create-invoice.ts` - React Query mutation
-- `src/hooks/invoices/index.ts` - Barrel export
-- `src/components/invoices/client-selector.tsx` - Combobox con busqueda
-- `src/components/invoices/create-client-dialog.tsx` - Modal inline
-- `src/components/invoices/index.ts` - Barrel export
-- `src/app/(app)/invoices/create/page.tsx` - Pagina de creacion
+| Paso | Estado     | Notas                       |
+| ---- | ---------- | --------------------------- |
+| 0-11 | Completado | PR #29 MERGED, Ready For QA |
 
 ---
 
-_Generado por Claude Code - 2026-02-07_
+### 🎉 FASE 2 COMPLETADA - Invoice Creation
+
+Todas las US de FASE 2 implementadas:
+
+- SQ-21: Create Invoice by Selecting Client ✅ (PR #29)
+- SQ-24: Add Taxes to Invoice ✅ (PR #32)
+- SQ-28: Set Invoice Due Date ✅ (PR #33)
+- SQ-29: Add Notes and Terms to Invoice ✅ (PR #34)
+
+---
+
+### US Completada: SQ-32 - Generate Professional PDF Invoice ✅
+
+| Paso | Estado     | Notas                       |
+| ---- | ---------- | --------------------------- |
+| 0-11 | Completado | PR #35 MERGED, Ready For QA |
+
+---
+
+### US Completada: SQ-33 - Include Logo and Business Data in PDF ✅
+
+| Paso | Estado     | Notas                       |
+| ---- | ---------- | --------------------------- |
+| 0-11 | Completado | PR #36 MERGED, Ready For QA |
+
+---
+
+### US Completada: SQ-35 - Download PDF to Device ✅
+
+| Paso | Estado     | Notas                       |
+| ---- | ---------- | --------------------------- |
+| 0-11 | Completado | PR #37 MERGED, Ready For QA |
+
+---
+
+### 🎉 FASE 3 EN PROGRESO - PDF Generation (3/4)
+
+US de FASE 3 implementadas:
+
+- SQ-32: Generate Professional PDF Invoice ✅ (PR #35)
+- SQ-33: Include Logo and Business Data in PDF ✅ (PR #36)
+- SQ-35: Download PDF to Device ✅ (PR #37)
+- SQ-34: Include Payment Methods in PDF ⏳ (Shift-Left QA - BLOQUEADA)
+
+---
+
+### ⚠️ Estado Actual: BLOQUEADO
+
+**SQ-34 (Include Payment Methods in PDF)** está en **Shift-Left QA**.
+No hay más US en "Ready For Dev" en el roadmap principal.
+
+**Opciones disponibles:**
+
+1. Esperar a que SQ-34 pase a Ready For Dev
+2. Implementar SQ-2 o SQ-3 (Auth) si se desea
+3. Pasar a QA manual de las 11+ US en Ready For QA
+
+---
+
+_Actualizado por Claude Code - 2026-02-09_

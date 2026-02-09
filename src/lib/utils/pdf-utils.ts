@@ -106,3 +106,37 @@ export function sanitizeForPDF(text: string | null | undefined): string {
   if (!text) return '';
   return removeEmojis(text.trim());
 }
+
+/**
+ * Check if a URL is valid for image loading in PDF
+ *
+ * Validates that the URL is properly formatted and uses http/https protocol.
+ * Used to prevent react-pdf rendering errors with invalid image URLs.
+ *
+ * @param url - URL to validate
+ * @returns true if URL is valid for image loading
+ *
+ * @example
+ * isValidImageUrl('https://example.com/logo.png') // => true
+ * isValidImageUrl('not-a-url') // => false
+ * isValidImageUrl(null) // => false
+ */
+export function isValidImageUrl(url: string | null | undefined): boolean {
+  if (!url || typeof url !== 'string') return false;
+
+  const trimmed = url.trim();
+  if (trimmed.length === 0) return false;
+
+  // Must start with http:// or https://
+  if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+    return false;
+  }
+
+  // Basic URL structure validation
+  try {
+    new URL(trimmed);
+    return true;
+  } catch {
+    return false;
+  }
+}

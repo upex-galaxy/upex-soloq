@@ -1,5 +1,10 @@
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
-import { formatCurrency, formatDateShort, sanitizeForPDF } from '@/lib/utils/pdf-utils';
+import { Document, Page, Text, View, Image, StyleSheet } from '@react-pdf/renderer';
+import {
+  formatCurrency,
+  formatDateShort,
+  sanitizeForPDF,
+  isValidImageUrl,
+} from '@/lib/utils/pdf-utils';
 import type { InvoiceWithDetails } from '@/hooks/invoices/use-invoice';
 
 // =============================================================================
@@ -237,6 +242,27 @@ const styles = StyleSheet.create({
     fontSize: 8,
     color: colors.textMuted,
   },
+
+  // Logo styles (SQ-33)
+  logoContainer: {
+    width: 120,
+    height: 60,
+    marginRight: 16,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  logo: {
+    maxWidth: 120,
+    maxHeight: 60,
+    objectFit: 'contain',
+  },
+  headerWithLogo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerBusinessInfo: {
+    flex: 1,
+  },
 });
 
 // =============================================================================
@@ -258,11 +284,16 @@ interface InvoiceDocumentProps {
  * All text is sanitized to remove emojis (not supported by PDF renderer).
  *
  * Sections:
- * 1. Header: Invoice title, number, dates
+ * 1. Header: Logo (if available), business name, invoice number, dates
  * 2. Info boxes: From (Business) / Bill To (Client)
  * 3. Items table: Description, Qty, Price, Total
  * 4. Totals: Subtotal, Discount, Tax, Total
  * 5. Footer: Notes and Terms
+ *
+ * Logo handling (SQ-33):
+ * - Logo URL is validated before rendering
+ * - Invalid URLs fall back to text-only header
+ * - Max dimensions: 120x60px with aspect ratio preserved
  */
 export function InvoiceDocument({ data }: InvoiceDocumentProps) {
   const { client, items, business_profile } = data;
@@ -273,21 +304,32 @@ export function InvoiceDocument({ data }: InvoiceDocumentProps) {
       ? (data.subtotal * (data.discount_value ?? 0)) / 100
       : (data.discount_value ?? 0);
 
+  // Check if logo URL is valid (SQ-33)
+  const hasValidLogo = isValidImageUrl(business_profile?.logo_url);
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         {/* HEADER */}
         <View style={styles.header}>
-          <View>
-            {/* Business name or placeholder */}
-            <Text style={styles.invoiceTitle}>
-              {sanitizeForPDF(business_profile?.business_name) || 'FACTURA'}
-            </Text>
-            {business_profile?.tax_id && (
-              <Text style={styles.invoiceDate}>
-                RFC/NIF: {sanitizeForPDF(business_profile.tax_id)}
-              </Text>
+          <View style={styles.headerWithLogo}>
+            {/* Logo (SQ-33) - Only render if valid URL */}
+            {hasValidLogo && (
+              <View style={styles.logoContainer}>
+                <Image src={business_profile!.logo_url!} style={styles.logo} />
+              </View>
             )}
+            {/* Business name and tax ID */}
+            <View style={styles.headerBusinessInfo}>
+              <Text style={styles.invoiceTitle}>
+                {sanitizeForPDF(business_profile?.business_name) || 'FACTURA'}
+              </Text>
+              {business_profile?.tax_id && (
+                <Text style={styles.invoiceDate}>
+                  RFC/NIF: {sanitizeForPDF(business_profile.tax_id)}
+                </Text>
+              )}
+            </View>
           </View>
           <View style={{ alignItems: 'flex-end' }}>
             <Text style={styles.invoiceNumber}>N {data.invoice_number}</Text>

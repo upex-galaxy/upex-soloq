@@ -30,7 +30,7 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | ----- | ------------------------------------ | ------------- | -------- | ------------- | ------------ |
 | SQ-14 | Add New Client                       | In Test       | Medium   | -             | #21 (MERGED) |
 | SQ-15 | List All Clients                     | Ready For QA  | Medium   | #2 (MERGED)   | #25 (MERGED) |
-| SQ-16 | Edit Client Data                     | **In Test**   | Medium   | #14 (MERGED)  | #26 (MERGED) |
+| SQ-16 | Edit Client Data                     | **BLOCKED**   | Medium   | #14 (MERGED)  | #26 (MERGED) |
 | SQ-17 | Add Client Tax Information           | Ready For QA  | Medium   | -             | #27 (MERGED) |
 | SQ-18 | View Client Invoice History          | Shift-Left QA | Medium   | #20 (CLOSED)  | -            |
 | SQ-19 | Delete Client                        | Ready For QA  | Medium   | -             | #28 (MERGED) |
@@ -56,7 +56,7 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | Key  | Story                                     | Status           | Priority | PR Shift-Left | PR Impl |
 | ---- | ----------------------------------------- | ---------------- | -------- | ------------- | ------- |
 | SQ-2 | User Registration with Email and Password | **Ready For QA** | Highest  | #5 (MERGED)   | -       |
-| SQ-3 | User Login with Credentials               | **Ready For QA** | Highest  | #4 (MERGED)   | -       |
+| SQ-3 | User Login with Credentials               | **BLOCKED**      | Highest  | #4 (MERGED)   | -       |
 | SQ-4 | Password Recovery via Email               | Shift-Left QA    | High     | #12 (MERGED)  | -       |
 | SQ-5 | Secure Logout                             | Shift-Left QA    | High     | -             | -       |
 
@@ -115,7 +115,7 @@ SQ-31 (PDF Generation Epic)
 | Orden | Key   | Story                      | Status       | PR Shift-Left | PR Impl      |
 | ----- | ----- | -------------------------- | ------------ | ------------- | ------------ |
 | 1     | SQ-15 | List All Clients           | Ready For QA | #2 (MERGED)   | #25 (MERGED) |
-| 2     | SQ-16 | Edit Client Data           | **In Test**  | #14 (MERGED)  | #26 (MERGED) |
+| 2     | SQ-16 | Edit Client Data           | **BLOCKED**  | #14 (MERGED)  | #26 (MERGED) |
 | 3     | SQ-17 | Add Client Tax Information | Ready For QA | -             | #27 (MERGED) |
 | 4     | SQ-19 | Delete Client              | Ready For QA | -             | #28 (MERGED) |
 
@@ -312,4 +312,22 @@ No hay más US en "Ready For Dev" en el roadmap principal.
 
 ---
 
-_Actualizado por Claude Code - 2026-02-09 (Auditoría completa: columnas PR Shift-Left/Impl separadas, SQ-16 corregido a In Test)_
+## Bloqueos por Defects
+
+> **Ver:** [BUGFIX-ROADMAP.md](./BUGFIX-ROADMAP.md) para tracking completo de bugs
+
+### User Stories Bloqueadas
+
+| Story | Summary          | Bloqueada por | Defect Summary                        |
+| ----- | ---------------- | ------------- | ------------------------------------- |
+| SQ-3  | User Login       | SQ-74         | Logout no funciona después de refresh |
+| SQ-16 | Edit Client Data | SQ-71         | Breadcrumb muestra user_ID            |
+
+**Prioridad de Fixes:**
+
+1. SQ-74 (Highest) → Desbloquea SQ-3
+2. SQ-71 (High) → Desbloquea SQ-16
+
+---
+
+_Actualizado por Claude Code - 2026-02-09 (SQ-3 y SQ-16 bloqueados por defects, agregada sección de Bloqueos)_

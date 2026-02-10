@@ -164,12 +164,15 @@ export async function POST(request: Request): Promise<NextResponse<CreateClientR
 
     const { name, email, company, phone, address, notes, tax_id } = validationResult.data;
 
-    // Check for duplicate email for this user
+    // Normalize email to lowercase for case-insensitive comparison and storage
+    const normalizedEmail = email.toLowerCase();
+
+    // Check for duplicate email for this user (case-insensitive)
     const { data: existingClient } = await supabase
       .from('clients')
       .select('id')
       .eq('user_id', user.id)
-      .eq('email', email)
+      .ilike('email', normalizedEmail)
       .is('deleted_at', null)
       .single();
 
@@ -177,13 +180,13 @@ export async function POST(request: Request): Promise<NextResponse<CreateClientR
       return NextResponse.json({ error: 'Ya existe un cliente con este email' }, { status: 409 });
     }
 
-    // Insert new client
+    // Insert new client with normalized email
     const { data: client, error: insertError } = await supabase
       .from('clients')
       .insert({
         user_id: user.id,
         name,
-        email,
+        email: normalizedEmail,
         company: company || null,
         phone: phone || null,
         address: address || null,

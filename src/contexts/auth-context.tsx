@@ -126,9 +126,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Initialize auth state and listen for changes
   useEffect(() => {
-    // Get initial session
+    // Get initial session - use getUser() to validate token with server
     const initializeAuth = async () => {
       try {
+        // First validate the user with the server (not just cached session)
+        const {
+          data: { user: validatedUser },
+          error: userError,
+        } = await supabase.auth.getUser();
+
+        // If no valid user, clear state
+        if (userError || !validatedUser) {
+          setState({
+            user: null,
+            session: null,
+            isLoading: false,
+            isAuthenticated: false,
+          });
+          return;
+        }
+
+        // User is valid, now get the session for token info
         const {
           data: { session },
         } = await supabase.auth.getSession();

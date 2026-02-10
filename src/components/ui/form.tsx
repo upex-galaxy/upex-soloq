@@ -124,18 +124,16 @@ function FormMessage({ className, ...props }: React.ComponentProps<'p'>) {
   const { error, formMessageId } = useFormField();
   const body = error ? String(error?.message ?? '') : props.children;
 
-  if (!body) {
-    return null;
-  }
-
+  // Always render to maintain consistent height and prevent layout shift
+  // Use invisible when no message to reserve space
   return (
     <p
       data-slot="form-message"
       id={formMessageId}
-      className={cn('text-destructive text-sm', className)}
+      className={cn('text-sm min-h-5', body ? 'text-destructive' : 'invisible', className)}
       {...props}
     >
-      {body}
+      {body || '\u00A0'}
     </p>
   );
 }

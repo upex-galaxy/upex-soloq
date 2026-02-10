@@ -1,6 +1,6 @@
 'use client';
 
-import { use } from 'react';
+import { use, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ClientForm } from '@/components/clients/client-form';
 import { useClient } from '@/hooks/clients/use-client';
 import { useUpdateClient } from '@/hooks/clients/use-update-client';
+import { useBreadcrumb } from '@/contexts/breadcrumb-context';
 import type { ClientFormData } from '@/lib/validations/client';
 
 interface EditClientPageProps {
@@ -23,6 +24,15 @@ export default function EditClientPage({ params }: EditClientPageProps) {
 
   const { data: client, isLoading, error } = useClient(id);
   const { mutate: updateClient, isPending } = useUpdateClient();
+  const { setOverride, clearOverride } = useBreadcrumb();
+
+  // Set breadcrumb override to show client name instead of UUID
+  useEffect(() => {
+    if (client?.name) {
+      setOverride(id, client.name);
+    }
+    return () => clearOverride(id);
+  }, [client?.name, id, setOverride, clearOverride]);
 
   const handleSubmit = (data: ClientFormData) => {
     updateClient(

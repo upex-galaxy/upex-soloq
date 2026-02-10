@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -22,6 +23,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { signIn } = useAuth();
@@ -117,6 +119,23 @@ export default function LoginPage() {
               autoComplete="current-password"
             />
           </div>
+
+          {/* Remember me checkbox */}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="remember"
+              checked={rememberMe}
+              onCheckedChange={checked => setRememberMe(checked === true)}
+              disabled={isLoading}
+            />
+            <Label
+              htmlFor="remember"
+              className="text-sm font-normal cursor-pointer text-muted-foreground"
+            >
+              Recordarme
+            </Label>
+          </div>
+
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>

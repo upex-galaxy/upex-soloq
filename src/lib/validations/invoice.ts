@@ -6,6 +6,12 @@ import { z } from 'zod';
  */
 export const createInvoiceSchema = z.object({
   clientId: z.string().uuid('Selecciona un cliente'),
+  invoiceNumber: z
+    .string()
+    .max(20, 'El número de factura no puede exceder 20 caracteres')
+    .regex(/^[A-Za-z0-9\-_/]*$/, 'Solo letras, números, guiones, guiones bajos y barras')
+    .optional()
+    .or(z.literal('')),
   dueDate: z
     .string()
     .optional()

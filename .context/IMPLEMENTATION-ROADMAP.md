@@ -104,18 +104,18 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 
 ### Epic: SQ-20 - Invoice Creation
 
-| Key   | Story                                    | Status        | Priority | Assignee                      | PR Shift-Left | PR Impl      |
-| ----- | ---------------------------------------- | ------------- | -------- | ----------------------------- | ------------- | ------------ |
-| SQ-21 | Create Invoice by Selecting Client       | Ready For QA  | Medium   | Ely                           | #19 (MERGED)  | #29 (MERGED) |
-| SQ-22 | Add Line Items to Invoice                | Backlog       | Medium   | Carlos Arevalo                | -             | -            |
-| SQ-23 | Automatic Subtotal and Total Calculation | Estimation    | Medium   | Raúl González                 | #16 (MERGED)  | -            |
-| SQ-24 | Add Taxes to Invoice                     | Ready For QA  | Medium   | Gloria Jesely Galindez Suárez | #9 (MERGED)   | #32 (MERGED) |
-| SQ-25 | Add Discounts to Invoice                 | Ready For Dev | Medium   | Ely                           | #24 (MERGED)  | -            |
-| SQ-26 | Preview Invoice Before Sending           | Estimation    | Medium   | Marianela Portas              | #15 (MERGED)  | -            |
-| SQ-27 | Assign Unique Invoice Number             | Ready For QA  | Medium   | Ely                           | #13 (MERGED)  | #46 (MERGED) |
-| SQ-28 | Set Invoice Due Date                     | Ready For QA  | Medium   | Yaneth Quintero               | #10 (MERGED)  | #33 (MERGED) |
-| SQ-29 | Add Notes and Terms to Invoice           | Ready For QA  | Medium   | Ximena Quintana               | #17 (MERGED)  | #34 (MERGED) |
-| SQ-30 | Save Invoice as Draft                    | Ready For QA  | Medium   | Luis Eduardo Flores           | #30 (MERGED)  | #49 (MERGED) |
+| Key   | Story                                    | Status       | Priority | Assignee                      | PR Shift-Left | PR Impl      |
+| ----- | ---------------------------------------- | ------------ | -------- | ----------------------------- | ------------- | ------------ |
+| SQ-21 | Create Invoice by Selecting Client       | Ready For QA | Medium   | Ely                           | #19 (MERGED)  | #29 (MERGED) |
+| SQ-22 | Add Line Items to Invoice                | Backlog      | Medium   | Carlos Arevalo                | -             | -            |
+| SQ-23 | Automatic Subtotal and Total Calculation | Estimation   | Medium   | Raúl González                 | #16 (MERGED)  | -            |
+| SQ-24 | Add Taxes to Invoice                     | Ready For QA | Medium   | Gloria Jesely Galindez Suárez | #9 (MERGED)   | #32 (MERGED) |
+| SQ-25 | Add Discounts to Invoice                 | Ready For QA | Medium   | GENESIS OJOSE                 | #24 (MERGED)  | #51 (MERGED) |
+| SQ-26 | Preview Invoice Before Sending           | Estimation   | Medium   | Marianela Portas              | #15 (MERGED)  | -            |
+| SQ-27 | Assign Unique Invoice Number             | Ready For QA | Medium   | Ely                           | #13 (MERGED)  | #46 (MERGED) |
+| SQ-28 | Set Invoice Due Date                     | Ready For QA | Medium   | Yaneth Quintero               | #10 (MERGED)  | #33 (MERGED) |
+| SQ-29 | Add Notes and Terms to Invoice           | Ready For QA | Medium   | Ximena Quintana               | #17 (MERGED)  | #34 (MERGED) |
+| SQ-30 | Save Invoice as Draft                    | Ready For QA | Medium   | Luis Eduardo Flores           | #30 (MERGED)  | #49 (MERGED) |
 
 ### Epic: SQ-1 - User Authentication & Onboarding
 
@@ -222,7 +222,7 @@ SQ-31 (PDF Generation Epic)
 | 13    | SQ-27 | Assign Unique Invoice No.   | Ready For QA  | Ely      | #13 (MERGED)  | #46 (MERGED) |
 | 14    | SQ-30 | Save Invoice as Draft       | Ready For QA  | Luis E.  | #30 (MERGED)  | #49 (MERGED) |
 | 15    | SQ-4  | Password Recovery via Email | Ready For QA  | Maxe A.  | #12 (MERGED)  | #50 (MERGED) |
-| 16    | SQ-25 | Add Discounts to Invoice    | Ready For Dev | Ely      | #24 (MERGED)  | -            |
+| 16    | SQ-25 | Add Discounts to Invoice    | Ready For QA  | GENESIS  | #24 (MERGED)  | #51 (MERGED) |
 | 17    | SQ-18 | View Client Invoice History | Ready For Dev | Ely      | #43 (MERGED)  | -            |
 
 ### OMITIDAS (No Ready For Dev o Dependencias Bloqueadas)
@@ -264,12 +264,11 @@ FASE 3 - PDF Generation 🔶 EN PROGRESO (3/4)
 
 ### Metricas
 
-- **Total US implementadas:** 15/15 del roadmap (incluye Auth + SQ-27 + SQ-30)
-- **US en Ready For QA:** 13 (listas para testing, incluye SQ-27 y SQ-30)
+- **Total US implementadas:** 16/16 del roadmap (incluye Auth + SQ-27 + SQ-30 + SQ-25)
+- **US en Ready For QA:** 15 (listas para testing)
 - **US en In Test:** 3 (SQ-3, SQ-14, SQ-16)
 - **US bloqueadas (Shift-Left QA):** 1 (SQ-34)
-- **US en Ready For Dev:** 2 (SQ-18, SQ-25)
-- **US en Ready For QA:** 14 (incluye SQ-4)
+- **US en Ready For Dev:** 1 (SQ-18)
 
 ---
 
@@ -413,20 +412,19 @@ US de FASE 3 implementadas:
 
 ---
 
-### 🎉 FASE 4 EN PROGRESO - Invoice Creation Avanzado (2/5)
+### 🎉 FASE 4 EN PROGRESO - Invoice Creation Avanzado (4/5)
 
 US de FASE 4 implementadas:
 
 - SQ-27: Assign Unique Invoice Number ✅ (PR #46)
 - SQ-30: Save Invoice as Draft ✅ (PR #49 MERGED)
 - SQ-4: Password Recovery via Email ✅ (PR #50 MERGED)
-- SQ-25: Add Discounts to Invoice ⏳ (Ready For Dev)
+- SQ-25: Add Discounts to Invoice ✅ (PR #51 MERGED)
 - SQ-18: View Client Invoice History ⏳ (Ready For Dev)
 
-**Próximas US en Ready For Dev (2 disponibles):**
+**Próximas US en Ready For Dev (1 disponible):**
 
-1. **SQ-25** - Add Discounts to Invoice (Ely) - Invoice Creation
-2. **SQ-18** - View Client Invoice History (Ely) - Client Management
+1. **SQ-18** - View Client Invoice History (Ely) - Client Management
 
 ---
 
@@ -485,4 +483,39 @@ FT-SQ4-01 a FT-SQ4-19 (ver PR #50 para detalles)
 
 ---
 
-_Actualizado por Claude Code - 2026-02-12 (SQ-4: PR #50 MERGED - Password Recovery via Email completado ✅)_
+### US Completada: SQ-25 - Add Discounts to Invoice ✅
+
+| Paso | Estado     | Notas                                  |
+| ---- | ---------- | -------------------------------------- |
+| 0    | Completado | Precondiciones verificadas             |
+| 1    | Completado | Jira transitado a In Progress          |
+| 2    | Completado | Plan de implementación creado          |
+| 3    | Completado | Implementación completa (9 archivos)   |
+| 4    | Completado | PR #51 creado                          |
+| 5    | N/A        | E2E/UI testing por usuario             |
+| 6    | Completado | Code review (self)                     |
+| 7    | Completado | Documentación actualizada              |
+| 8    | Completado | **PR #51 MERGED** ✅                   |
+| 9-11 | Completado | Ready For QA, asignado a GENESIS OJOSE |
+
+**Implementación incluye:**
+
+- Utility: `calculateDiscountAmount` en `invoice-calculations.ts`
+- Component: `DiscountInput` (toggle buttons + numeric input + warning)
+- Validación: `discountType/discountValue` schemas con refinements
+- UI: InvoiceSummary muestra tipo de descuento (e.g., "Descuento (10%)")
+- API: POST/PUT routes calculan y persisten discount_amount
+
+**Test Cases cubiertos (7/7):**
+
+- TC-01: No discount by default
+- TC-02: Percentage discount calculation
+- TC-03: Fixed amount discount
+- TC-04: Discount capped at subtotal (+ warning)
+- TC-05: Tax on (subtotal - discount)
+- TC-06: Reject percentage > 100%
+- TC-07: Reject negative values
+
+---
+
+_Actualizado por Claude Code - 2026-02-12 (SQ-25: PR #51 MERGED - Add Discounts to Invoice completado ✅)_

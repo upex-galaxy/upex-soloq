@@ -112,7 +112,7 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | SQ-24 | Add Taxes to Invoice                     | Ready For QA  | Medium   | Gloria Jesely Galindez Suárez | #9 (MERGED)   | #32 (MERGED) |
 | SQ-25 | Add Discounts to Invoice                 | Shift-Left QA | Medium   | GENESIS OJOSE                 | #24 (OPEN)    | -            |
 | SQ-26 | Preview Invoice Before Sending           | Estimation    | Medium   | Marianela Portas              | #15 (MERGED)  | -            |
-| SQ-27 | Assign Unique Invoice Number             | In Progress   | Medium   | Ely                           | #13 (MERGED)  | #46 (OPEN)   |
+| SQ-27 | Assign Unique Invoice Number             | Ready For QA  | Medium   | Ely                           | #13 (MERGED)  | #46 (MERGED) |
 | SQ-28 | Set Invoice Due Date                     | Ready For QA  | Medium   | Yaneth Quintero               | #10 (MERGED)  | #33 (MERGED) |
 | SQ-29 | Add Notes and Terms to Invoice           | Ready For QA  | Medium   | Ximena Quintana               | #17 (MERGED)  | #34 (MERGED) |
 | SQ-30 | Save Invoice as Draft                    | Ready For Dev | Medium   | Ely                           | #30 (OPEN)    | -            |
@@ -215,13 +215,13 @@ SQ-31 (PDF Generation Epic)
 | 11    | SQ-35 | Download PDF to Device            | Ready For QA  | Dedwison          | #18 (MERGED)  | #37 (MERGED) |
 | 12    | SQ-34 | Include Payment Methods in PDF    | Shift-Left QA | Arkaitz           | -             | ⏳ BLOQUEADA |
 
-### FASE 4: Invoice Creation Avanzado 🔶 EN PROGRESO
+### FASE 4: Invoice Creation Avanzado 🔶 EN PROGRESO (1/3)
 
-| Orden | Key   | Story                       | Status        | Assignee | PR Shift-Left | PR Impl    |
-| ----- | ----- | --------------------------- | ------------- | -------- | ------------- | ---------- |
-| 13    | SQ-27 | Assign Unique Invoice No.   | In Progress   | Ely      | #13 (MERGED)  | #46 (OPEN) |
-| 14    | SQ-30 | Save Invoice as Draft       | Ready For Dev | Ely      | #30 (OPEN)    | -          |
-| 15    | SQ-4  | Password Recovery via Email | Ready For Dev | Ely      | #12 (MERGED)  | -          |
+| Orden | Key   | Story                       | Status        | Assignee | PR Shift-Left | PR Impl      |
+| ----- | ----- | --------------------------- | ------------- | -------- | ------------- | ------------ |
+| 13    | SQ-27 | Assign Unique Invoice No.   | Ready For QA  | Ely      | #13 (MERGED)  | #46 (MERGED) |
+| 14    | SQ-30 | Save Invoice as Draft       | Ready For Dev | Ely      | #30 (OPEN)    | -            |
+| 15    | SQ-4  | Password Recovery via Email | Ready For Dev | Ely      | #12 (MERGED)  | -            |
 
 ### OMITIDAS (No Ready For Dev o Dependencias Bloqueadas)
 
@@ -265,9 +265,8 @@ FASE 3 - PDF Generation 🔶 EN PROGRESO (3/4)
 ### Metricas
 
 - **Total US implementadas:** 14/14 del roadmap (incluye Auth + SQ-27)
-- **US en Ready For QA:** 11 (listas para testing)
+- **US en Ready For QA:** 12 (listas para testing, incluye SQ-27)
 - **US en In Test:** 3 (SQ-3, SQ-14, SQ-16)
-- **US en In Progress:** 1 (SQ-27 - PR #46)
 - **US bloqueadas (Shift-Left QA):** 1 (SQ-34)
 - **US en Ready For Dev:** 2 (SQ-4, SQ-30)
 
@@ -372,20 +371,30 @@ US de FASE 3 implementadas:
 
 ---
 
-### US En Progreso: SQ-27 - Assign Unique Invoice Number 🔶
+### US Completada: SQ-27 - Assign Unique Invoice Number ✅
 
-| Paso | Estado        | Notas                                               |
-| ---- | ------------- | --------------------------------------------------- |
-| 0    | Completado    | Precondiciones verificadas                          |
-| 1    | Completado    | Jira transitado a In Progress                       |
-| 2    | Completado    | Plan de implementación creado                       |
-| 3    | Completado    | 7 steps implementados (API, hooks, component, form) |
-| 4    | Completado    | PR #46 creado                                       |
-| 5    | N/A           | E2E/UI testing por usuario                          |
-| 6    | Completado    | Code review (self)                                  |
-| 7    | Completado    | Documentación actualizada                           |
-| 8    | **Pendiente** | Merge PR                                            |
-| 9-11 | Pendiente     | Jira, notificación, sincronización                  |
+| Paso | Estado     | Notas                                               |
+| ---- | ---------- | --------------------------------------------------- |
+| 0    | Completado | Precondiciones verificadas                          |
+| 1    | Completado | Jira transitado a In Progress                       |
+| 2    | Completado | Plan de implementación creado                       |
+| 3    | Completado | 7 steps implementados (API, hooks, component, form) |
+| 4    | Completado | PR #46 creado                                       |
+| 5    | N/A        | E2E/UI testing por usuario                          |
+| 6    | Completado | Code review (self)                                  |
+| 7    | Completado | Documentación actualizada                           |
+| 8    | Completado | **PR #46 MERGED** ✅                                |
+| 9-11 | Completado | Ready For QA                                        |
+
+---
+
+### 🎉 FASE 4 EN PROGRESO - Invoice Creation Avanzado (1/3)
+
+US de FASE 4 implementadas:
+
+- SQ-27: Assign Unique Invoice Number ✅ (PR #46)
+- SQ-30: Save Invoice as Draft ⏳ (Ready For Dev)
+- SQ-4: Password Recovery via Email ⏳ (Ready For Dev)
 
 **Próximas US en Ready For Dev:**
 
@@ -424,4 +433,4 @@ US de FASE 3 implementadas:
 
 ---
 
-_Actualizado por Claude Code - 2026-02-11 (SQ-27 en progreso: PR #46 creado, auto-generación de números de factura implementada)_
+_Actualizado por Claude Code - 2026-02-12 (SQ-27 completado: PR #46 MERGED, Ready For QA)_

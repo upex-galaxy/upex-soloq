@@ -99,6 +99,51 @@ export function calculateInvoiceAmounts(
 }
 
 /**
+ * Calculate discount amount based on type and value
+ *
+ * @param subtotal - Invoice subtotal (sum of line items)
+ * @param discountType - Type of discount ('percentage' | 'fixed')
+ * @param discountValue - Input value (percentage 0-100 or fixed amount)
+ * @returns Object with calculated amount and whether it was capped
+ *
+ * @example
+ * calculateDiscountAmount(1000, 'percentage', 10) // => { amount: 100, capped: false }
+ * calculateDiscountAmount(80, 'fixed', 100) // => { amount: 80, capped: true }
+ */
+export function calculateDiscountAmount(
+  subtotal: number,
+  discountType: 'percentage' | 'fixed' | null | undefined,
+  discountValue: number | null | undefined
+): { amount: number; capped: boolean } {
+  // No discount if type or value is missing/invalid
+  if (
+    !discountType ||
+    discountValue === null ||
+    discountValue === undefined ||
+    discountValue <= 0
+  ) {
+    return { amount: 0, capped: false };
+  }
+
+  let amount: number;
+
+  if (discountType === 'percentage') {
+    // Calculate percentage of subtotal
+    amount = roundCurrency(subtotal * (discountValue / 100));
+  } else {
+    // Fixed amount
+    amount = roundCurrency(discountValue);
+  }
+
+  // Cap at subtotal to prevent negative totals
+  const capped = amount > subtotal;
+  return {
+    amount: capped ? subtotal : amount,
+    capped,
+  };
+}
+
+/**
  * Common tax rate presets for LATAM countries
  */
 export const TAX_PRESETS = [

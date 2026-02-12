@@ -25,9 +25,12 @@ import {
   CreateClientDialog,
   DueDatePicker,
   TaxInput,
+  DiscountInput,
   InvoiceSummary,
 } from '@/components/invoices';
 import { InvoiceNumberInput } from '@/components/invoices/invoice-number-input';
+import { calculateDiscountAmount } from '@/lib/utils/invoice-calculations';
+import type { DiscountType } from '@/lib/validations/invoice';
 import { useClients } from '@/hooks/clients';
 import { useCreateInvoice } from '@/hooks/invoices';
 import { useBusinessProfile } from '@/hooks/business-profile';
@@ -76,6 +79,8 @@ export default function CreateInvoicePage() {
       notes: '',
       terms: '',
       taxRate: 0,
+      discountType: null,
+      discountValue: 0,
     },
   });
 
@@ -86,8 +91,14 @@ export default function CreateInvoicePage() {
     }
   }, [businessProfile, form]);
 
-  // Watch tax rate for reactive summary
+  // Watch values for reactive summary
   const taxRate = form.watch('taxRate') ?? 0;
+  const discountType = form.watch('discountType');
+  const discountValue = form.watch('discountValue') ?? 0;
+
+  // Calculate discount amount for summary (subtotal is 0 for new invoices)
+  const subtotal = 0; // Will be updated when line items are added (SQ-22)
+  const { amount: discountAmount } = calculateDiscountAmount(subtotal, discountType, discountValue);
 
   // Handle client selection
   const handleClientSelect = (client: Client | null) => {
@@ -247,6 +258,28 @@ export default function CreateInvoicePage() {
                 )}
               />
 
+              {/* Discount */}
+              <FormItem>
+                <FormLabel>Descuento (opcional)</FormLabel>
+                <FormControl>
+                  <DiscountInput
+                    subtotal={subtotal}
+                    discountType={discountType as DiscountType | null}
+                    discountValue={discountValue}
+                    onChange={(type, value) => {
+                      form.setValue('discountType', type);
+                      form.setValue('discountValue', value);
+                    }}
+                    disabled={isCreating}
+                    error={form.formState.errors.discountValue?.message}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Aplica un descuento porcentual o de monto fijo a la factura.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+
               {/* Notes */}
               <FormField
                 control={form.control}
@@ -299,7 +332,13 @@ export default function CreateInvoicePage() {
               />
 
               {/* Invoice Summary */}
-              <InvoiceSummary subtotal={0} discountAmount={0} taxRate={taxRate} />
+              <InvoiceSummary
+                subtotal={subtotal}
+                discountAmount={discountAmount}
+                discountType={discountType as DiscountType | null}
+                discountInputValue={discountValue}
+                taxRate={taxRate}
+              />
 
               {/* Actions */}
               <div className="flex justify-end gap-4">

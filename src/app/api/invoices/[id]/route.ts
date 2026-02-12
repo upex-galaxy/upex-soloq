@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 import { createServer } from '@/lib/supabase/server';
 import { updateInvoiceSchema } from '@/lib/validations/invoice';
-import { calculateTax, calculateTotal } from '@/lib/utils/invoice-calculations';
+import {
+  calculateTax,
+  calculateTotal,
+  calculateDiscountAmount,
+} from '@/lib/utils/invoice-calculations';
 import type { InvoiceWithDetails } from '@/hooks/invoices/use-invoice';
-import type { Invoice, Client } from '@/lib/types';
+import type { Invoice, Client, DiscountType } from '@/lib/types';
 
 // =============================================================================
 // Types
@@ -238,7 +242,7 @@ export async function PUT(
     // Check invoice exists, belongs to user, and is draft
     const { data: existingInvoice, error: fetchError } = await supabase
       .from('invoices')
-      .select('id, status, client_id, subtotal, discount_value')
+      .select('id, status, client_id, subtotal, discount_type, discount_value, tax_rate')
       .eq('id', invoiceId)
       .is('deleted_at', null)
       .single();
@@ -255,7 +259,8 @@ export async function PUT(
       );
     }
 
-    const { clientId, invoiceNumber, dueDate, notes, terms, taxRate } = validationResult.data;
+    const { clientId, invoiceNumber, dueDate, notes, terms, taxRate, discountType, discountValue } =
+      validationResult.data;
 
     // Build update object with only provided fields
     const updates: Record<string, unknown> = {
@@ -308,14 +313,36 @@ export async function PUT(
       updates.terms = terms || null;
     }
 
-    // Recalculate amounts if tax rate changed
-    if (taxRate !== undefined) {
+    // Recalculate amounts if tax rate or discount changed
+    const taxRateChanged = taxRate !== undefined;
+    const discountChanged = discountType !== undefined || discountValue !== undefined;
+
+    if (taxRateChanged || discountChanged) {
       const subtotal = existingInvoice.subtotal ?? 0;
-      const discountAmount = existingInvoice.discount_value ?? 0;
-      const taxAmount = calculateTax(subtotal, discountAmount, taxRate);
+      const effectiveTaxRate = taxRate ?? existingInvoice.tax_rate ?? 0;
+      const effectiveDiscountType =
+        discountType !== undefined
+          ? discountType
+          : (existingInvoice.discount_type as DiscountType | null);
+      const effectiveDiscountValue = discountValue ?? 0;
+
+      // Calculate discount amount from type and input value
+      const { amount: discountAmount } = calculateDiscountAmount(
+        subtotal,
+        effectiveDiscountType,
+        effectiveDiscountValue
+      );
+
+      const taxAmount = calculateTax(subtotal, discountAmount, effectiveTaxRate);
       const total = calculateTotal(subtotal, discountAmount, taxAmount);
 
-      updates.tax_rate = taxRate;
+      if (taxRateChanged) {
+        updates.tax_rate = effectiveTaxRate;
+      }
+      if (discountChanged) {
+        updates.discount_type = effectiveDiscountType;
+        updates.discount_value = discountAmount; // Store calculated amount
+      }
       updates.tax_amount = taxAmount;
       updates.total = total;
     }

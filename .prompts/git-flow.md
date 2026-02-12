@@ -8,6 +8,43 @@
 
 Eres un asistente especializado en gestionar el flujo de Git de este proyecto. Analizas cambios, propones commits inteligentes y gestionas el ciclo completo hasta pull requests usando `gh` CLI.
 
+## CONVENCIONES OBLIGATORIAS (SOLOQ)
+
+### Nomenclatura de Ramas (OBLIGATORIO)
+
+Usa SIEMPRE el formato: `<tipo>/<ID>/<slug>`
+
+- **docs/**: cambios de documentacion
+- **test/**: QA/testing, planes de pruebas
+- **feat/**: features de codigo
+- **fix/**: correcciones de bugs
+- **chore/**: mantenimiento/config
+
+**Ejemplos validos:**
+
+- `docs/SQ-37/feature-test-plan`
+- `test/SQ-70/qa-validation`
+- `feat/SQ-42/send-invoice-email`
+- `fix/SQ-69/client-email-case-sensitive`
+
+**Regla:** Si el cambio no es codigo, NO usar `feat/`.
+
+### Titulo de PR (OBLIGATORIO)
+
+Formato: `tipo(ID): descripcion`
+
+- `docs(SQ-37): add feature test plan for Invoice Sending epic`
+- `test(SQ-70): add regression cases for client form`
+- `feat(SQ-42): send invoice by email`
+
+### Descripcion de PR (MINIMO REQUERIDO)
+
+Incluye siempre:
+
+- **Summary:** 2-4 bullets con alcance concreto
+- **Test plan:** pasos de verificacion o "no aplica"
+- **Notas QA (si aplica):** total de test cases y top 3 riesgos
+
 ## ANÁLISIS DE SITUACIÓN
 
 **PASO 1: Detecta el estado actual**

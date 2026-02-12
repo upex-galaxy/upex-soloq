@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createServer } from '@/lib/supabase/server';
 import { createInvoiceApiSchema } from '@/lib/validations/invoice';
-import { calculateTax, calculateTotal } from '@/lib/utils/invoice-calculations';
+import {
+  calculateTax,
+  calculateTotal,
+  calculateDiscountAmount,
+} from '@/lib/utils/invoice-calculations';
 import type { Invoice, Client, InvoiceStatus } from '@/lib/types';
 
 // =============================================================================
@@ -163,6 +167,8 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
       notes,
       terms,
       taxRate = 0,
+      discountType = null,
+      discountValue = 0,
     } = validationResult.data;
 
     // Verify client exists and belongs to user (RLS handles ownership)
@@ -197,10 +203,14 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
       invoiceNumber = await generateInvoiceNumber(supabase, user.id);
     }
 
-    // Calculate tax and total amounts
+    // Calculate discount, tax, and total amounts
     // At creation, subtotal is 0 (line items will be added later via SQ-22)
     const subtotal = 0;
-    const discountAmount = 0;
+    const { amount: discountAmount } = calculateDiscountAmount(
+      subtotal,
+      discountType,
+      discountValue
+    );
     const taxAmount = calculateTax(subtotal, discountAmount, taxRate);
     const total = calculateTotal(subtotal, discountAmount, taxAmount);
 
@@ -218,8 +228,8 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
         subtotal,
         tax_rate: taxRate,
         tax_amount: taxAmount,
-        discount_value: discountAmount,
-        discount_type: 'fixed',
+        discount_type: discountType,
+        discount_value: discountAmount, // Store calculated amount, not input value
         total,
       })
       .select()

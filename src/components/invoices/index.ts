@@ -3,3 +3,4 @@ export { CreateClientDialog } from './create-client-dialog';
 export { DueDatePicker } from './due-date-picker';
 export { TaxInput } from './tax-input';
 export { InvoiceSummary } from './invoice-summary';
+export { InvoiceStatusBadge } from './invoice-status-badge';

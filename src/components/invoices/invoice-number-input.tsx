@@ -25,6 +25,8 @@ interface InvoiceNumberInputProps {
   disabled?: boolean;
   /** Custom class name */
   className?: string;
+  /** Current invoice ID to exclude from uniqueness check (for editing) */
+  currentInvoiceId?: string;
 }
 
 // =============================================================================
@@ -54,9 +56,10 @@ export function InvoiceNumberInput({
   onValidate,
   disabled = false,
   className,
+  currentInvoiceId,
 }: InvoiceNumberInputProps) {
   const { nextNumber, isLoadingNext, checkAvailability, isChecking, error, clearError, refresh } =
-    useInvoiceNumber();
+    useInvoiceNumber({ currentInvoiceId });
 
   const [isValid, setIsValid] = useState<boolean | null>(null);
   const [hasInteracted, setHasInteracted] = useState(false);

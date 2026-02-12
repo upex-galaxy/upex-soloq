@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createServer } from '@/lib/supabase/server';
 import { createInvoiceApiSchema } from '@/lib/validations/invoice';
 import { calculateTax, calculateTotal } from '@/lib/utils/invoice-calculations';
-import type { Invoice, Client } from '@/lib/types';
+import type { Invoice, Client, InvoiceStatus } from '@/lib/types';
 
 // =============================================================================
 // Types
@@ -16,6 +16,17 @@ interface CreateInvoiceResponse {
   data?: InvoiceWithClient;
   error?: string;
   details?: unknown;
+}
+
+interface ListInvoicesResponse {
+  data?: InvoiceWithClient[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+  error?: string;
 }
 
 // =============================================================================
@@ -245,5 +256,99 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
       { error: 'Error al crear la factura. Intenta de nuevo.' },
       { status: 500 }
     );
+  }
+}
+
+// =============================================================================
+// GET /api/invoices - List invoices with filters and pagination
+// =============================================================================
+
+/**
+ * GET /api/invoices - List user's invoices
+ *
+ * Query params:
+ * - status: InvoiceStatus (optional) - Filter by status
+ * - page: number (default: 1) - Page number
+ * - limit: number (default: 20, max: 50) - Items per page
+ *
+ * Responses:
+ * - 200: List of invoices with pagination
+ * - 401: Unauthorized
+ * - 500: Internal server error
+ */
+export async function GET(request: Request): Promise<NextResponse<ListInvoicesResponse>> {
+  try {
+    const supabase = await createServer();
+
+    // Verify authentication
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    // Parse query params
+    const url = new URL(request.url);
+    const status = url.searchParams.get('status') as InvoiceStatus | null;
+    const page = Math.max(1, parseInt(url.searchParams.get('page') || '1', 10));
+    const limit = Math.min(50, Math.max(1, parseInt(url.searchParams.get('limit') || '20', 10)));
+    const offset = (page - 1) * limit;
+
+    // Build query
+    let query = supabase
+      .from('invoices')
+      .select(
+        `
+        *,
+        client:clients!inner (
+          id,
+          name,
+          email,
+          company,
+          tax_id
+        )
+      `,
+        { count: 'exact' }
+      )
+      .is('deleted_at', null)
+      .order('updated_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    // Apply status filter if provided
+    if (status) {
+      query = query.eq('status', status);
+    }
+
+    const { data: invoices, error: queryError, count } = await query;
+
+    if (queryError) {
+      console.error('Error fetching invoices:', queryError);
+      return NextResponse.json({ error: 'Error al cargar las facturas' }, { status: 500 });
+    }
+
+    const total = count || 0;
+    const totalPages = Math.ceil(total / limit);
+
+    // Transform data to match InvoiceWithClient type
+    const transformedInvoices: InvoiceWithClient[] = (invoices || []).map(invoice => ({
+      ...invoice,
+      client: invoice.client as Pick<Client, 'id' | 'name' | 'email' | 'company' | 'tax_id'>,
+    }));
+
+    return NextResponse.json({
+      data: transformedInvoices,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
+    });
+  } catch (error) {
+    console.error('Unexpected error in GET /api/invoices:', error);
+    return NextResponse.json({ error: 'Error al cargar las facturas' }, { status: 500 });
   }
 }

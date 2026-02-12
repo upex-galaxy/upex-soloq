@@ -18,6 +18,11 @@ interface CheckInvoiceNumberResponse {
   message?: string;
 }
 
+interface UseInvoiceNumberOptions {
+  /** Current invoice ID to exclude from uniqueness check (for editing) */
+  currentInvoiceId?: string;
+}
+
 interface UseInvoiceNumberReturn {
   /** The next auto-generated invoice number */
   nextNumber: string | undefined;
@@ -42,21 +47,22 @@ interface UseInvoiceNumberReturn {
 /**
  * Hook for managing invoice number auto-generation and validation
  *
+ * @param options - Configuration options
+ * @param options.currentInvoiceId - ID of current invoice to exclude from uniqueness check (for editing)
+ *
  * @example
- * const {
- *   nextNumber,
- *   isLoadingNext,
- *   checkAvailability,
- *   isChecking,
- *   error,
- *   refresh,
- * } = useInvoiceNumber();
+ * // For new invoices
+ * const { nextNumber, checkAvailability } = useInvoiceNumber();
+ *
+ * // For editing existing invoices
+ * const { checkAvailability } = useInvoiceNumber({ currentInvoiceId: invoice.id });
  *
  * // Use nextNumber as default value
  * // Call checkAvailability(customNumber) on blur
  * // Show error if validation fails
  */
-export function useInvoiceNumber(): UseInvoiceNumberReturn {
+export function useInvoiceNumber(options?: UseInvoiceNumberOptions): UseInvoiceNumberReturn {
+  const { currentInvoiceId } = options || {};
   const queryClient = useQueryClient();
   const [isChecking, setIsChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -86,9 +92,13 @@ export function useInvoiceNumber(): UseInvoiceNumberReturn {
       setError(null);
 
       try {
-        const response = await fetch(
-          `/api/invoices/check-number?number=${encodeURIComponent(number.trim())}`
-        );
+        // Build URL with optional excludeId for editing existing invoices
+        let url = `/api/invoices/check-number?number=${encodeURIComponent(number.trim())}`;
+        if (currentInvoiceId) {
+          url += `&excludeId=${encodeURIComponent(currentInvoiceId)}`;
+        }
+
+        const response = await fetch(url);
 
         if (!response.ok) {
           const errorData = await response.json();
@@ -110,7 +120,7 @@ export function useInvoiceNumber(): UseInvoiceNumberReturn {
         setIsChecking(false);
       }
     },
-    []
+    [currentInvoiceId]
   );
 
   // Clear error

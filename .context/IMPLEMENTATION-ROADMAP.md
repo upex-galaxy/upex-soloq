@@ -98,7 +98,7 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | SQ-15 | List All Clients                     | Ready For QA  | Medium   | Marco Antonio Camacho | #2 (MERGED)   | #25 (MERGED) |
 | SQ-16 | Edit Client Data                     | **In Test**   | Medium   | Ely                   | #14 (MERGED)  | #26 (MERGED) |
 | SQ-17 | Add Client Tax Information           | Ready For QA  | Medium   | YENNY BARBOSA         | -             | #27 (MERGED) |
-| SQ-18 | View Client Invoice History          | Shift-Left QA | Medium   | Rodrigo Godoy         | #43 (OPEN)    | -            |
+| SQ-18 | View Client Invoice History          | Ready For Dev | Medium   | Ely                   | #43 (MERGED)  | -            |
 | SQ-19 | Delete Client                        | Ready For QA  | Medium   | Ronny Toro            | -             | #28 (MERGED) |
 | SQ-68 | Validate client email deliverability | Backlog       | Medium   | -                     | -             | -            |
 
@@ -110,12 +110,12 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | SQ-22 | Add Line Items to Invoice                | Backlog       | Medium   | Carlos Arevalo                | -             | -            |
 | SQ-23 | Automatic Subtotal and Total Calculation | Estimation    | Medium   | Raúl González                 | #16 (MERGED)  | -            |
 | SQ-24 | Add Taxes to Invoice                     | Ready For QA  | Medium   | Gloria Jesely Galindez Suárez | #9 (MERGED)   | #32 (MERGED) |
-| SQ-25 | Add Discounts to Invoice                 | Shift-Left QA | Medium   | GENESIS OJOSE                 | #24 (OPEN)    | -            |
+| SQ-25 | Add Discounts to Invoice                 | Ready For Dev | Medium   | Ely                           | #24 (MERGED)  | -            |
 | SQ-26 | Preview Invoice Before Sending           | Estimation    | Medium   | Marianela Portas              | #15 (MERGED)  | -            |
 | SQ-27 | Assign Unique Invoice Number             | Ready For QA  | Medium   | Ely                           | #13 (MERGED)  | #46 (MERGED) |
 | SQ-28 | Set Invoice Due Date                     | Ready For QA  | Medium   | Yaneth Quintero               | #10 (MERGED)  | #33 (MERGED) |
 | SQ-29 | Add Notes and Terms to Invoice           | Ready For QA  | Medium   | Ximena Quintana               | #17 (MERGED)  | #34 (MERGED) |
-| SQ-30 | Save Invoice as Draft                    | Ready For Dev | Medium   | Ely                           | #30 (OPEN)    | -            |
+| SQ-30 | Save Invoice as Draft                    | Ready For Dev | Medium   | Ely                           | #30 (MERGED)  | -            |
 
 ### Epic: SQ-1 - User Authentication & Onboarding
 
@@ -215,26 +215,26 @@ SQ-31 (PDF Generation Epic)
 | 11    | SQ-35 | Download PDF to Device            | Ready For QA  | Dedwison          | #18 (MERGED)  | #37 (MERGED) |
 | 12    | SQ-34 | Include Payment Methods in PDF    | Shift-Left QA | Arkaitz           | -             | ⏳ BLOQUEADA |
 
-### FASE 4: Invoice Creation Avanzado 🔶 EN PROGRESO (1/3)
+### FASE 4: Invoice Creation Avanzado 🔶 EN PROGRESO (1/6)
 
 | Orden | Key   | Story                       | Status        | Assignee | PR Shift-Left | PR Impl      |
 | ----- | ----- | --------------------------- | ------------- | -------- | ------------- | ------------ |
 | 13    | SQ-27 | Assign Unique Invoice No.   | Ready For QA  | Ely      | #13 (MERGED)  | #46 (MERGED) |
-| 14    | SQ-30 | Save Invoice as Draft       | Ready For Dev | Ely      | #30 (OPEN)    | -            |
+| 14    | SQ-30 | Save Invoice as Draft       | Ready For Dev | Ely      | #30 (MERGED)  | -            |
 | 15    | SQ-4  | Password Recovery via Email | Ready For Dev | Ely      | #12 (MERGED)  | -            |
+| 16    | SQ-25 | Add Discounts to Invoice    | Ready For Dev | Ely      | #24 (MERGED)  | -            |
+| 17    | SQ-18 | View Client Invoice History | Ready For Dev | Ely      | #43 (MERGED)  | -            |
 
 ### OMITIDAS (No Ready For Dev o Dependencias Bloqueadas)
 
-| Key   | Story                       | Status        | Assignee         | Razon de Omision                         |
-| ----- | --------------------------- | ------------- | ---------------- | ---------------------------------------- |
-| SQ-2  | User Registration           | Ready For QA  | Samuel Amonzabel | Implementado - gaps documentados en Jira |
-| SQ-3  | User Login                  | In Test       | Ely              | Implementado - en testing                |
-| SQ-18 | View Client Invoice History | Shift-Left QA | Rodrigo Godoy    | No Ready + Depende de invoices           |
-| SQ-22 | Add Line Items              | Backlog       | Carlos Arevalo   | No Ready For Dev                         |
-| SQ-23 | Auto Calculation            | Estimation    | Raúl González    | No Ready For Dev                         |
-| SQ-25 | Add Discounts               | Shift-Left QA | GENESIS OJOSE    | No Ready For Dev                         |
-| SQ-26 | Preview Invoice             | Estimation    | Marianela Portas | No Ready For Dev                         |
-| SQ-34 | Payment Methods in PDF      | Shift-Left QA | Arkaitz          | No Ready For Dev                         |
+| Key   | Story                  | Status        | Assignee         | Razon de Omision                         |
+| ----- | ---------------------- | ------------- | ---------------- | ---------------------------------------- |
+| SQ-2  | User Registration      | Ready For QA  | Samuel Amonzabel | Implementado - gaps documentados en Jira |
+| SQ-3  | User Login             | In Test       | Ely              | Implementado - en testing                |
+| SQ-22 | Add Line Items         | Backlog       | Carlos Arevalo   | No Ready For Dev                         |
+| SQ-23 | Auto Calculation       | Estimation    | Raúl González    | No Ready For Dev                         |
+| SQ-26 | Preview Invoice        | Estimation    | Marianela Portas | No Ready For Dev                         |
+| SQ-34 | Payment Methods in PDF | Shift-Left QA | Arkaitz          | No Ready For Dev                         |
 
 ---
 
@@ -268,7 +268,7 @@ FASE 3 - PDF Generation 🔶 EN PROGRESO (3/4)
 - **US en Ready For QA:** 12 (listas para testing, incluye SQ-27)
 - **US en In Test:** 3 (SQ-3, SQ-14, SQ-16)
 - **US bloqueadas (Shift-Left QA):** 1 (SQ-34)
-- **US en Ready For Dev:** 2 (SQ-4, SQ-30)
+- **US en Ready For Dev:** 5 (SQ-4, SQ-18, SQ-25, SQ-30)
 
 ---
 
@@ -395,11 +395,15 @@ US de FASE 4 implementadas:
 - SQ-27: Assign Unique Invoice Number ✅ (PR #46)
 - SQ-30: Save Invoice as Draft ⏳ (Ready For Dev)
 - SQ-4: Password Recovery via Email ⏳ (Ready For Dev)
+- SQ-25: Add Discounts to Invoice ⏳ (Ready For Dev)
+- SQ-18: View Client Invoice History ⏳ (Ready For Dev)
 
-**Próximas US en Ready For Dev:**
+**Próximas US en Ready For Dev (5 disponibles):**
 
-1. **SQ-30** - Save Invoice as Draft (Ely)
-2. **SQ-4** - Password Recovery via Email (Ely)
+1. **SQ-30** - Save Invoice as Draft (Ely) - Invoice Creation
+2. **SQ-4** - Password Recovery via Email (Ely) - Auth
+3. **SQ-25** - Add Discounts to Invoice (Ely) - Invoice Creation
+4. **SQ-18** - View Client Invoice History (Ely) - Client Management
 
 ---
 
@@ -407,14 +411,11 @@ US de FASE 4 implementadas:
 
 > **Nota:** Todos los PRs abiertos son de documentación/Shift-Left QA (solo modifican `.context/`)
 
-| PR # | Rama                          | Estado | US    | Autor           | Archivos                      |
-| ---- | ----------------------------- | ------ | ----- | --------------- | ----------------------------- |
-| #43  | docs/SQ-18-shift-left-plan    | OPEN   | SQ-18 | RodrigoGodoyDev | Solo .context/ (test + impl)  |
-| #40  | test/SQ-43/include-pdf-attach | OPEN   | SQ-43 | yxsinell        | Solo .context/ (test plan)    |
-| #39  | feat/SQ-37/feature-test-plan  | OPEN   | SQ-37 | yxsinell        | Solo .context/ (feature plan) |
-| #38  | feature/add-new-client        | OPEN   | SQ-14 | MiguelMillan    | Solo .context/ (docs update)  |
-| #30  | test/SQ-30/save-invoice-draft | OPEN   | SQ-30 | luiseflores     | Solo .context/ (test cases)   |
-| #24  | test/SQ-25/add-discounts      | OPEN   | SQ-25 | genesisojose    | Solo .context/ (test cases)   |
+| PR # | Rama                          | Estado | US    | Autor        | Archivos                      |
+| ---- | ----------------------------- | ------ | ----- | ------------ | ----------------------------- |
+| #40  | test/SQ-43/include-pdf-attach | OPEN   | SQ-43 | yxsinell     | Solo .context/ (test plan)    |
+| #39  | feat/SQ-37/feature-test-plan  | OPEN   | SQ-37 | yxsinell     | Solo .context/ (feature plan) |
+| #38  | feature/add-new-client        | OPEN   | SQ-14 | MiguelMillan | Solo .context/ (docs update)  |
 
 ---
 
@@ -433,4 +434,4 @@ US de FASE 4 implementadas:
 
 ---
 
-_Actualizado por Claude Code - 2026-02-12 (SQ-27 completado: PR #46 MERGED, Ready For QA)_
+_Actualizado por Claude Code - 2026-02-12 (Sincronizado: PRs #30, #24, #43 MERGED → SQ-30, SQ-25, SQ-18 ahora Ready For Dev)_

@@ -115,7 +115,7 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | SQ-27 | Assign Unique Invoice Number             | Ready For QA  | Medium   | Ely                           | #13 (MERGED)  | #46 (MERGED) |
 | SQ-28 | Set Invoice Due Date                     | Ready For QA  | Medium   | Yaneth Quintero               | #10 (MERGED)  | #33 (MERGED) |
 | SQ-29 | Add Notes and Terms to Invoice           | Ready For QA  | Medium   | Ximena Quintana               | #17 (MERGED)  | #34 (MERGED) |
-| SQ-30 | Save Invoice as Draft                    | In Progress   | Medium   | Ely                           | #30 (MERGED)  | #49 (OPEN)   |
+| SQ-30 | Save Invoice as Draft                    | Ready For QA  | Medium   | Luis Eduardo Flores           | #30 (MERGED)  | #49 (MERGED) |
 
 ### Epic: SQ-1 - User Authentication & Onboarding
 
@@ -220,7 +220,7 @@ SQ-31 (PDF Generation Epic)
 | Orden | Key   | Story                       | Status        | Assignee | PR Shift-Left | PR Impl      |
 | ----- | ----- | --------------------------- | ------------- | -------- | ------------- | ------------ |
 | 13    | SQ-27 | Assign Unique Invoice No.   | Ready For QA  | Ely      | #13 (MERGED)  | #46 (MERGED) |
-| 14    | SQ-30 | Save Invoice as Draft       | In Progress   | Ely      | #30 (MERGED)  | #49 (OPEN)   |
+| 14    | SQ-30 | Save Invoice as Draft       | Ready For QA  | Luis E.  | #30 (MERGED)  | #49 (MERGED) |
 | 15    | SQ-4  | Password Recovery via Email | Ready For Dev | Ely      | #12 (MERGED)  | -            |
 | 16    | SQ-25 | Add Discounts to Invoice    | Ready For Dev | Ely      | #24 (MERGED)  | -            |
 | 17    | SQ-18 | View Client Invoice History | Ready For Dev | Ely      | #43 (MERGED)  | -            |
@@ -264,12 +264,11 @@ FASE 3 - PDF Generation 🔶 EN PROGRESO (3/4)
 
 ### Metricas
 
-- **Total US implementadas:** 14/14 del roadmap (incluye Auth + SQ-27)
-- **US en Ready For QA:** 12 (listas para testing, incluye SQ-27)
+- **Total US implementadas:** 15/15 del roadmap (incluye Auth + SQ-27 + SQ-30)
+- **US en Ready For QA:** 13 (listas para testing, incluye SQ-27 y SQ-30)
 - **US en In Test:** 3 (SQ-3, SQ-14, SQ-16)
 - **US bloqueadas (Shift-Left QA):** 1 (SQ-34)
-- **US en In Progress:** 1 (SQ-30 - PR #49 OPEN)
-- **US en Ready For Dev:** 4 (SQ-4, SQ-18, SQ-25)
+- **US en Ready For Dev:** 3 (SQ-4, SQ-18, SQ-25)
 
 ---
 
@@ -389,7 +388,7 @@ US de FASE 3 implementadas:
 
 ---
 
-### US En Progreso: SQ-30 - Save Invoice as Draft 🔶
+### US Completada: SQ-30 - Save Invoice as Draft ✅
 
 | Paso | Estado     | Notas                                       |
 | ---- | ---------- | ------------------------------------------- |
@@ -401,8 +400,8 @@ US de FASE 3 implementadas:
 | 5    | N/A        | E2E/UI testing por usuario                  |
 | 6    | Completado | Code review (self)                          |
 | 7    | Completado | Documentación actualizada                   |
-| 8    | Pendiente  | PR #49 pendiente de merge                   |
-| 9-11 | Pendiente  | Verificar transición y sincronizar          |
+| 8    | Completado | **PR #49 MERGED** ✅                        |
+| 9-11 | Completado | Ready For QA, asignado a Luis Eduardo       |
 
 **Implementación incluye:**
 
@@ -418,12 +417,12 @@ US de FASE 3 implementadas:
 US de FASE 4 implementadas:
 
 - SQ-27: Assign Unique Invoice Number ✅ (PR #46)
-- SQ-30: Save Invoice as Draft 🔶 (PR #49 - OPEN)
+- SQ-30: Save Invoice as Draft ✅ (PR #49 MERGED)
 - SQ-4: Password Recovery via Email ⏳ (Ready For Dev)
 - SQ-25: Add Discounts to Invoice ⏳ (Ready For Dev)
 - SQ-18: View Client Invoice History ⏳ (Ready For Dev)
 
-**Próximas US en Ready For Dev (4 disponibles):**
+**Próximas US en Ready For Dev (3 disponibles):**
 
 1. **SQ-4** - Password Recovery via Email (Ely) - Auth
 2. **SQ-25** - Add Discounts to Invoice (Ely) - Invoice Creation
@@ -458,4 +457,4 @@ US de FASE 4 implementadas:
 
 ---
 
-_Actualizado por Claude Code - 2026-02-12 (SQ-30: PR #49 creado - Save Invoice as Draft en progreso)_
+_Actualizado por Claude Code - 2026-02-12 (SQ-30: PR #49 MERGED - Save Invoice as Draft completado ✅)_

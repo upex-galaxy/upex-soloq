@@ -22,52 +22,126 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 
 ---
 
+## Criterios de Transición de Estados
+
+### User Stories
+
+| Estado        | Requisito PR Shift-Left | Requisito PR Impl | Asignado a          |
+| ------------- | ----------------------- | ----------------- | ------------------- |
+| Ready For Dev | MERGED (o N/A)          | NO debe existir   | Ely (Dev)           |
+| In Progress   | MERGED (o N/A)          | OPEN              | Ely (Dev)           |
+| Ready For QA  | MERGED (o N/A)          | MERGED            | Tester (Shift-Left) |
+| In Test       | MERGED (o N/A)          | MERGED            | Tester (QA)         |
+| BLOCKED       | MERGED (o N/A)          | MERGED            | Dev (para fix)      |
+
+### Defects/Bugs
+
+| Estado       | Significado            | PR Fix    |
+| ------------ | ---------------------- | --------- |
+| OPEN         | Bug reportado, sin fix | NO existe |
+| In Progress  | Fixing                 | OPEN      |
+| In Review    | PR abierto             | OPEN      |
+| Ready For QA | Fixeado y desplegado   | MERGED    |
+
+---
+
+## Auditoría de Assignees (2026-02-11) ✅ COMPLETADA
+
+### Criterios de Asignación
+
+| Status        | Debe estar asignado a         |
+| ------------- | ----------------------------- |
+| Ready For Dev | Ely (único desarrollador)     |
+| In Progress   | Ely (único desarrollador)     |
+| Ready For QA  | Tester que hizo Shift-Left    |
+| In Test       | Tester de QA                  |
+| Estimation    | Tester (status de transición) |
+| Shift-Left QA | Tester (status de transición) |
+
+### ✅ Correcciones Aplicadas
+
+| Key   | Summary                         | Assignee Anterior | Assignee Corregido               | Método de Identificación             |
+| ----- | ------------------------------- | ----------------- | -------------------------------- | ------------------------------------ |
+| SQ-15 | List All Clients                | Ely ❌            | Marco Antonio Camacho ✅         | Changelog: participó en transiciones |
+| SQ-24 | Add Taxes to Invoice            | Ely ❌            | Gloria Jesely Galindez Suárez ✅ | Changelog: participó en Shift-Left   |
+| SQ-43 | Include PDF Attachment in Email | Ely ❌            | yxsinell acosta zambrano ✅      | Changelog: hizo Shift-Left           |
+| SQ-34 | Include Payment Methods in PDF  | Sin asignar ❌    | Arkaitz ✅                       | Changelog: status anterior           |
+
+### ⚠️ Caso Especial: SQ-21
+
+| Key   | Summary                            | Assignee | Razón                                                  |
+| ----- | ---------------------------------- | -------- | ------------------------------------------------------ |
+| SQ-21 | Create Invoice by Selecting Client | Ely ✅   | Changelog muestra que Ely hizo todo (dev + Shift-Left) |
+
+### ✅ Ready For QA con Assignee Correcto
+
+| Key   | Summary                           | Assignee             | PR Shift-Left |
+| ----- | --------------------------------- | -------------------- | ------------- |
+| SQ-2  | User Registration                 | Samuel Amonzabel ✅  | #5 (MERGED)   |
+| SQ-17 | Add Client Tax Information        | YENNY BARBOSA ✅     | N/A           |
+| SQ-19 | Delete Client                     | Ronny Toro ✅        | N/A           |
+| SQ-28 | Set Invoice Due Date              | Yaneth Quintero ✅   | #10 (MERGED)  |
+| SQ-29 | Add Notes and Terms to Invoice    | Ximena Quintana ✅   | #17 (MERGED)  |
+| SQ-32 | Generate Professional PDF Invoice | Alfonso Hernandez ✅ | #8 (MERGED)   |
+| SQ-33 | Include Logo and Business Data    | Arkaitz ✅           | N/A           |
+| SQ-35 | Download PDF to Device            | Dedwison ✅          | #18 (MERGED)  |
+
+---
+
 ## Estado Actual del Tablero Jira
 
 ### Epic: SQ-13 - Client Management
 
-| Key   | Story                                | Status        | Priority | PR Shift-Left | PR Impl      |
-| ----- | ------------------------------------ | ------------- | -------- | ------------- | ------------ |
-| SQ-14 | Add New Client                       | In Test       | Medium   | -             | #21 (MERGED) |
-| SQ-15 | List All Clients                     | Ready For QA  | Medium   | #2 (MERGED)   | #25 (MERGED) |
-| SQ-16 | Edit Client Data                     | **BLOCKED**   | Medium   | #14 (MERGED)  | #26 (MERGED) |
-| SQ-17 | Add Client Tax Information           | Ready For QA  | Medium   | -             | #27 (MERGED) |
-| SQ-18 | View Client Invoice History          | Shift-Left QA | Medium   | #20 (CLOSED)  | -            |
-| SQ-19 | Delete Client                        | Ready For QA  | Medium   | -             | #28 (MERGED) |
-| SQ-68 | Validate client email deliverability | Backlog       | Medium   | -             | -            |
+| Key   | Story                                | Status        | Priority | Assignee              | PR Shift-Left | PR Impl      |
+| ----- | ------------------------------------ | ------------- | -------- | --------------------- | ------------- | ------------ |
+| SQ-14 | Add New Client                       | In Test       | Medium   | Ely                   | -             | #21 (MERGED) |
+| SQ-15 | List All Clients                     | Ready For QA  | Medium   | Marco Antonio Camacho | #2 (MERGED)   | #25 (MERGED) |
+| SQ-16 | Edit Client Data                     | **In Test**   | Medium   | Ely                   | #14 (MERGED)  | #26 (MERGED) |
+| SQ-17 | Add Client Tax Information           | Ready For QA  | Medium   | YENNY BARBOSA         | -             | #27 (MERGED) |
+| SQ-18 | View Client Invoice History          | Shift-Left QA | Medium   | Rodrigo Godoy         | #43 (OPEN)    | -            |
+| SQ-19 | Delete Client                        | Ready For QA  | Medium   | Ronny Toro            | -             | #28 (MERGED) |
+| SQ-68 | Validate client email deliverability | Backlog       | Medium   | -                     | -             | -            |
 
 ### Epic: SQ-20 - Invoice Creation
 
-| Key   | Story                                    | Status        | Priority | PR Shift-Left | PR Impl      |
-| ----- | ---------------------------------------- | ------------- | -------- | ------------- | ------------ |
-| SQ-21 | Create Invoice by Selecting Client       | Ready For QA  | Medium   | #19 (MERGED)  | #29 (MERGED) |
-| SQ-22 | Add Line Items to Invoice                | Backlog       | Medium   | -             | -            |
-| SQ-23 | Automatic Subtotal and Total Calculation | Estimation    | Medium   | #16 (MERGED)  | -            |
-| SQ-24 | Add Taxes to Invoice                     | Ready For QA  | Medium   | #9 (MERGED)   | #32 (MERGED) |
-| SQ-25 | Add Discounts to Invoice                 | Shift-Left QA | Medium   | #24 (OPEN)    | -            |
-| SQ-26 | Preview Invoice Before Sending           | Estimation    | Medium   | #15 (MERGED)  | -            |
-| SQ-27 | Assign Unique Invoice Number             | Estimation    | Medium   | #13 (MERGED)  | -            |
-| SQ-28 | Set Invoice Due Date                     | Ready For QA  | Medium   | #10 (MERGED)  | #33 (MERGED) |
-| SQ-29 | Add Notes and Terms to Invoice           | Ready For QA  | Medium   | #17 (MERGED)  | #34 (MERGED) |
-| SQ-30 | Save Invoice as Draft                    | Estimation    | Medium   | #30 (OPEN)    | -            |
+| Key   | Story                                    | Status        | Priority | Assignee                      | PR Shift-Left | PR Impl      |
+| ----- | ---------------------------------------- | ------------- | -------- | ----------------------------- | ------------- | ------------ |
+| SQ-21 | Create Invoice by Selecting Client       | Ready For QA  | Medium   | Ely                           | #19 (MERGED)  | #29 (MERGED) |
+| SQ-22 | Add Line Items to Invoice                | Backlog       | Medium   | Carlos Arevalo                | -             | -            |
+| SQ-23 | Automatic Subtotal and Total Calculation | Estimation    | Medium   | Raúl González                 | #16 (MERGED)  | -            |
+| SQ-24 | Add Taxes to Invoice                     | Ready For QA  | Medium   | Gloria Jesely Galindez Suárez | #9 (MERGED)   | #32 (MERGED) |
+| SQ-25 | Add Discounts to Invoice                 | Shift-Left QA | Medium   | GENESIS OJOSE                 | #24 (OPEN)    | -            |
+| SQ-26 | Preview Invoice Before Sending           | Estimation    | Medium   | Marianela Portas              | #15 (MERGED)  | -            |
+| SQ-27 | Assign Unique Invoice Number             | Ready For Dev | Medium   | Ely                           | #13 (MERGED)  | -            |
+| SQ-28 | Set Invoice Due Date                     | Ready For QA  | Medium   | Yaneth Quintero               | #10 (MERGED)  | #33 (MERGED) |
+| SQ-29 | Add Notes and Terms to Invoice           | Ready For QA  | Medium   | Ximena Quintana               | #17 (MERGED)  | #34 (MERGED) |
+| SQ-30 | Save Invoice as Draft                    | Ready For Dev | Medium   | Ely                           | #30 (OPEN)    | -            |
 
 ### Epic: SQ-1 - User Authentication & Onboarding
 
-| Key  | Story                                     | Status           | Priority | PR Shift-Left | PR Impl |
-| ---- | ----------------------------------------- | ---------------- | -------- | ------------- | ------- |
-| SQ-2 | User Registration with Email and Password | **Ready For QA** | Highest  | #5 (MERGED)   | -       |
-| SQ-3 | User Login with Credentials               | **BLOCKED**      | Highest  | #4 (MERGED)   | -       |
-| SQ-4 | Password Recovery via Email               | Shift-Left QA    | High     | #12 (MERGED)  | -       |
-| SQ-5 | Secure Logout                             | Shift-Left QA    | High     | -             | -       |
+| Key  | Story                                     | Status           | Priority | Assignee        | PR Shift-Left | PR Impl |
+| ---- | ----------------------------------------- | ---------------- | -------- | --------------- | ------------- | ------- |
+| SQ-2 | User Registration with Email and Password | **Ready For QA** | Highest  | Samuel Amonzabe | #5 (MERGED)   | -       |
+| SQ-3 | User Login with Credentials               | **In Test**      | Highest  | Ely             | #4 (MERGED)   | -       |
+| SQ-4 | Password Recovery via Email               | Ready For Dev    | High     | Ely             | #12 (MERGED)  | -       |
+| SQ-5 | Secure Logout                             | Shift-Left QA    | High     | German Luchesi  | -             | -       |
 
 ### Epic: SQ-31 - PDF Generation & Download
 
-| Key   | Story                                 | Status        | Priority | PR Shift-Left | PR Impl      |
-| ----- | ------------------------------------- | ------------- | -------- | ------------- | ------------ |
-| SQ-32 | Generate Professional PDF Invoice     | Ready For QA  | Medium   | #8 (MERGED)   | #35 (MERGED) |
-| SQ-33 | Include Logo and Business Data in PDF | Ready For QA  | Medium   | -             | #36 (MERGED) |
-| SQ-34 | Include Payment Methods in PDF        | Shift-Left QA | Medium   | -             | -            |
-| SQ-35 | Download PDF to Device                | Ready For QA  | Medium   | #18 (MERGED)  | #37 (MERGED) |
+| Key   | Story                                 | Status        | Priority | Assignee          | PR Shift-Left | PR Impl      |
+| ----- | ------------------------------------- | ------------- | -------- | ----------------- | ------------- | ------------ |
+| SQ-32 | Generate Professional PDF Invoice     | Ready For QA  | Medium   | Alfonso Hernandez | #8 (MERGED)   | #35 (MERGED) |
+| SQ-33 | Include Logo and Business Data in PDF | Ready For QA  | Medium   | Arkaitz           | -             | #36 (MERGED) |
+| SQ-34 | Include Payment Methods in PDF        | Shift-Left QA | Medium   | Arkaitz           | -             | -            |
+| SQ-35 | Download PDF to Device                | Ready For QA  | Medium   | Dedwison          | #18 (MERGED)  | #37 (MERGED) |
+
+### Epic: SQ-37 - Invoice Sending
+
+| Key   | Story                              | Status        | Priority | Assignee                 | PR Shift-Left | PR Impl |
+| ----- | ---------------------------------- | ------------- | -------- | ------------------------ | ------------- | ------- |
+| SQ-42 | Send Invoice by Email with 1 Click | Shift-Left QA | Medium   | Marian Sánchez           | #39 (OPEN)    | -       |
+| SQ-43 | Include PDF Attachment in Email    | Estimation    | Medium   | yxsinell acosta zambrano | #40 (OPEN)    | -       |
+| SQ-46 | View Email Send Confirmation       | Shift-Left QA | Medium   | Miguel Millan            | -             | -       |
 
 ---
 
@@ -112,49 +186,55 @@ SQ-31 (PDF Generation Epic)
 
 ### FASE 1: Client Management ✅ COMPLETADA
 
-| Orden | Key   | Story                      | Status       | PR Shift-Left | PR Impl      |
-| ----- | ----- | -------------------------- | ------------ | ------------- | ------------ |
-| 1     | SQ-15 | List All Clients           | Ready For QA | #2 (MERGED)   | #25 (MERGED) |
-| 2     | SQ-16 | Edit Client Data           | **BLOCKED**  | #14 (MERGED)  | #26 (MERGED) |
-| 3     | SQ-17 | Add Client Tax Information | Ready For QA | -             | #27 (MERGED) |
-| 4     | SQ-19 | Delete Client              | Ready For QA | -             | #28 (MERGED) |
+| Orden | Key   | Story                      | Status       | Assignee              | PR Shift-Left | PR Impl      |
+| ----- | ----- | -------------------------- | ------------ | --------------------- | ------------- | ------------ |
+| 1     | SQ-15 | List All Clients           | Ready For QA | Marco Antonio Camacho | #2 (MERGED)   | #25 (MERGED) |
+| 2     | SQ-16 | Edit Client Data           | **In Test**  | Ely                   | #14 (MERGED)  | #26 (MERGED) |
+| 3     | SQ-17 | Add Client Tax Information | Ready For QA | YENNY BARBOSA         | -             | #27 (MERGED) |
+| 4     | SQ-19 | Delete Client              | Ready For QA | Ronny Toro            | -             | #28 (MERGED) |
 
 **Nota:** SQ-18 (View Client Invoice History) esta en Shift-Left QA y ademas depende de tener facturas.
 
 ### FASE 2: Invoice Creation ✅ COMPLETADA
 
-| Orden | Key   | Story                              | Status       | PR Shift-Left | PR Impl      |
-| ----- | ----- | ---------------------------------- | ------------ | ------------- | ------------ |
-| 5     | SQ-21 | Create Invoice by Selecting Client | Ready For QA | #19 (MERGED)  | #29 (MERGED) |
-| 6     | SQ-24 | Add Taxes to Invoice               | Ready For QA | #9 (MERGED)   | #32 (MERGED) |
-| 7     | SQ-28 | Set Invoice Due Date               | Ready For QA | #10 (MERGED)  | #33 (MERGED) |
-| 8     | SQ-29 | Add Notes and Terms to Invoice     | Ready For QA | #17 (MERGED)  | #34 (MERGED) |
+| Orden | Key   | Story                              | Status       | Assignee                      | PR Shift-Left | PR Impl      |
+| ----- | ----- | ---------------------------------- | ------------ | ----------------------------- | ------------- | ------------ |
+| 5     | SQ-21 | Create Invoice by Selecting Client | Ready For QA | Ely                           | #19 (MERGED)  | #29 (MERGED) |
+| 6     | SQ-24 | Add Taxes to Invoice               | Ready For QA | Gloria Jesely Galindez Suárez | #9 (MERGED)   | #32 (MERGED) |
+| 7     | SQ-28 | Set Invoice Due Date               | Ready For QA | Yaneth Quintero               | #10 (MERGED)  | #33 (MERGED) |
+| 8     | SQ-29 | Add Notes and Terms to Invoice     | Ready For QA | Ximena Quintana               | #17 (MERGED)  | #34 (MERGED) |
 
 **Nota:** SQ-22, SQ-23, SQ-25, SQ-26, SQ-27, SQ-30 no estan en Ready For Dev.
 
 ### FASE 3: PDF Generation 🔶 EN PROGRESO (3/4)
 
-| Orden | Key   | Story                             | Status        | PR Shift-Left | PR Impl      |
-| ----- | ----- | --------------------------------- | ------------- | ------------- | ------------ |
-| 9     | SQ-32 | Generate Professional PDF Invoice | Ready For QA  | #8 (MERGED)   | #35 (MERGED) |
-| 10    | SQ-33 | Include Logo and Business Data    | Ready For QA  | -             | #36 (MERGED) |
-| 11    | SQ-35 | Download PDF to Device            | Ready For QA  | #18 (MERGED)  | #37 (MERGED) |
-| 12    | SQ-34 | Include Payment Methods in PDF    | Shift-Left QA | -             | ⏳ BLOQUEADA |
+| Orden | Key   | Story                             | Status        | Assignee          | PR Shift-Left | PR Impl      |
+| ----- | ----- | --------------------------------- | ------------- | ----------------- | ------------- | ------------ |
+| 9     | SQ-32 | Generate Professional PDF Invoice | Ready For QA  | Alfonso Hernandez | #8 (MERGED)   | #35 (MERGED) |
+| 10    | SQ-33 | Include Logo and Business Data    | Ready For QA  | Arkaitz           | -             | #36 (MERGED) |
+| 11    | SQ-35 | Download PDF to Device            | Ready For QA  | Dedwison          | #18 (MERGED)  | #37 (MERGED) |
+| 12    | SQ-34 | Include Payment Methods in PDF    | Shift-Left QA | Arkaitz           | -             | ⏳ BLOQUEADA |
+
+### FASE 4: Invoice Creation Avanzado 🟢 READY FOR DEV
+
+| Orden | Key   | Story                       | Status        | Assignee | PR Shift-Left | PR Impl |
+| ----- | ----- | --------------------------- | ------------- | -------- | ------------- | ------- |
+| 13    | SQ-27 | Assign Unique Invoice No.   | Ready For Dev | Ely      | #13 (MERGED)  | -       |
+| 14    | SQ-30 | Save Invoice as Draft       | Ready For Dev | Ely      | #30 (OPEN)    | -       |
+| 15    | SQ-4  | Password Recovery via Email | Ready For Dev | Ely      | #12 (MERGED)  | -       |
 
 ### OMITIDAS (No Ready For Dev o Dependencias Bloqueadas)
 
-| Key   | Story                       | Status        | Razon de Omision                         |
-| ----- | --------------------------- | ------------- | ---------------------------------------- |
-| SQ-2  | User Registration           | Ready For QA  | Implementado - gaps documentados en Jira |
-| SQ-3  | User Login                  | Ready For QA  | Implementado - gaps documentados en Jira |
-| SQ-18 | View Client Invoice History | Shift-Left QA | No Ready + Depende de invoices           |
-| SQ-22 | Add Line Items              | Backlog       | No Ready For Dev                         |
-| SQ-23 | Auto Calculation            | Estimation    | No Ready For Dev                         |
-| SQ-25 | Add Discounts               | Shift-Left QA | No Ready For Dev                         |
-| SQ-26 | Preview Invoice             | Estimation    | No Ready For Dev                         |
-| SQ-27 | Unique Invoice Number       | Estimation    | No Ready For Dev                         |
-| SQ-30 | Save as Draft               | Estimation    | No Ready For Dev                         |
-| SQ-34 | Payment Methods in PDF      | Shift-Left QA | No Ready For Dev                         |
+| Key   | Story                       | Status        | Assignee         | Razon de Omision                         |
+| ----- | --------------------------- | ------------- | ---------------- | ---------------------------------------- |
+| SQ-2  | User Registration           | Ready For QA  | Samuel Amonzabel | Implementado - gaps documentados en Jira |
+| SQ-3  | User Login                  | In Test       | Ely              | Implementado - en testing                |
+| SQ-18 | View Client Invoice History | Shift-Left QA | Rodrigo Godoy    | No Ready + Depende de invoices           |
+| SQ-22 | Add Line Items              | Backlog       | Carlos Arevalo   | No Ready For Dev                         |
+| SQ-23 | Auto Calculation            | Estimation    | Raúl González    | No Ready For Dev                         |
+| SQ-25 | Add Discounts               | Shift-Left QA | GENESIS OJOSE    | No Ready For Dev                         |
+| SQ-26 | Preview Invoice             | Estimation    | Marianela Portas | No Ready For Dev                         |
+| SQ-34 | Payment Methods in PDF      | Shift-Left QA | Arkaitz          | No Ready For Dev                         |
 
 ---
 
@@ -165,7 +245,7 @@ SQ-31 (PDF Generation Epic)
 ```
 FASE 1 - Client Management ✅ COMPLETADA
   1. SQ-15: List All Clients ✅
-  2. SQ-16: Edit Client Data ✅
+  2. SQ-16: Edit Client Data ✅ (In Test)
   3. SQ-17: Add Client Tax Information ✅
   4. SQ-19: Delete Client ✅
 
@@ -185,9 +265,10 @@ FASE 3 - PDF Generation 🔶 EN PROGRESO (3/4)
 ### Metricas
 
 - **Total US implementadas:** 13/13 del roadmap (incluye Auth)
-- **US en Ready For QA:** 13 (listas para testing)
+- **US en Ready For QA:** 11 (listas para testing)
+- **US en In Test:** 3 (SQ-3, SQ-14, SQ-16)
 - **US bloqueadas (Shift-Left QA):** 1 (SQ-34)
-- **US en Ready For Dev:** 0
+- **US en Ready For Dev:** 3 (SQ-4, SQ-27, SQ-30)
 
 ---
 
@@ -203,9 +284,9 @@ FASE 3 - PDF Generation 🔶 EN PROGRESO (3/4)
 
 ### US Completada: SQ-16 - Edit Client Data ✅
 
-| Paso | Estado     | Notas                       |
-| ---- | ---------- | --------------------------- |
-| 0-11 | Completado | PR #26 MERGED, Ready For QA |
+| Paso | Estado     | Notas                            |
+| ---- | ---------- | -------------------------------- |
+| 0-11 | Completado | PR #26 MERGED, In Test (re-test) |
 
 ---
 
@@ -230,7 +311,7 @@ FASE 3 - PDF Generation 🔶 EN PROGRESO (3/4)
 Todas las US de FASE 1 implementadas:
 
 - SQ-15: List All Clients ✅
-- SQ-16: Edit Client Data ✅
+- SQ-16: Edit Client Data ✅ (In Test)
 - SQ-17: Add Client Tax Information ✅
 - SQ-19: Delete Client ✅
 
@@ -290,25 +371,28 @@ US de FASE 3 implementadas:
 
 ---
 
-### ⚠️ Estado Actual: BLOQUEADO
+### ⚠️ Estado Actual: READY FOR DEV DISPONIBLES
 
-**SQ-34 (Include Payment Methods in PDF)** está en **Shift-Left QA**.
-No hay más US en "Ready For Dev" en el roadmap principal.
+**Hay 3 US en Ready For Dev disponibles para implementar:**
 
-**Opciones disponibles:**
-
-1. Esperar a que SQ-34 pase a Ready For Dev
-2. Pasar a QA manual de las 13 US en Ready For QA
+1. **SQ-27** - Assign Unique Invoice Number (Ely)
+2. **SQ-30** - Save Invoice as Draft (Ely)
+3. **SQ-4** - Password Recovery via Email (Ely)
 
 ---
 
 ## PRs Pendientes de Revisión
 
-| PR # | Rama                          | Estado | US    | Notas                                         |
-| ---- | ----------------------------- | ------ | ----- | --------------------------------------------- |
-| #38  | feature/add-new-client        | OPEN   | SQ-14 | Posible duplicado de #21, verificar si cerrar |
-| #24  | test/SQ-25/add-discounts      | OPEN   | SQ-25 | Shift-Left QA en progreso                     |
-| #30  | test/SQ-30/save-invoice-draft | OPEN   | SQ-30 | Shift-Left QA en progreso                     |
+> **Nota:** Todos los PRs abiertos son de documentación/Shift-Left QA (solo modifican `.context/`)
+
+| PR # | Rama                          | Estado | US    | Autor           | Archivos                      |
+| ---- | ----------------------------- | ------ | ----- | --------------- | ----------------------------- |
+| #43  | docs/SQ-18-shift-left-plan    | OPEN   | SQ-18 | RodrigoGodoyDev | Solo .context/ (test + impl)  |
+| #40  | test/SQ-43/include-pdf-attach | OPEN   | SQ-43 | yxsinell        | Solo .context/ (test plan)    |
+| #39  | feat/SQ-37/feature-test-plan  | OPEN   | SQ-37 | yxsinell        | Solo .context/ (feature plan) |
+| #38  | feature/add-new-client        | OPEN   | SQ-14 | MiguelMillan    | Solo .context/ (docs update)  |
+| #30  | test/SQ-30/save-invoice-draft | OPEN   | SQ-30 | luiseflores     | Solo .context/ (test cases)   |
+| #24  | test/SQ-25/add-discounts      | OPEN   | SQ-25 | genesisojose    | Solo .context/ (test cases)   |
 
 ---
 
@@ -316,18 +400,15 @@ No hay más US en "Ready For Dev" en el roadmap principal.
 
 > **Ver:** [BUGFIX-ROADMAP.md](./BUGFIX-ROADMAP.md) para tracking completo de bugs
 
-### User Stories Bloqueadas
+### User Stories Anteriormente Bloqueadas (RESUELTAS)
 
-| Story | Summary          | Bloqueada por | Defect Summary                        |
-| ----- | ---------------- | ------------- | ------------------------------------- |
-| SQ-3  | User Login       | SQ-74         | Logout no funciona después de refresh |
-| SQ-16 | Edit Client Data | SQ-71         | Breadcrumb muestra user_ID            |
+| Story | Summary          | Defect | Estado Defect | Estado US   | PR Fix       |
+| ----- | ---------------- | ------ | ------------- | ----------- | ------------ |
+| SQ-3  | User Login       | SQ-74  | Ready For QA  | **In Test** | #41 (MERGED) |
+| SQ-16 | Edit Client Data | SQ-71  | Ready For QA  | **In Test** | #41 (MERGED) |
 
-**Prioridad de Fixes:**
-
-1. SQ-74 (Highest) → Desbloquea SQ-3
-2. SQ-71 (High) → Desbloquea SQ-16
+**Nota:** Los fixes ya están mergeados y las US fueron movidas a In Test para re-testing.
 
 ---
 
-_Actualizado por Claude Code - 2026-02-09 (SQ-3 y SQ-16 bloqueados por defects, agregada sección de Bloqueos)_
+_Actualizado por Claude Code - 2026-02-11 (auditoría assignees completada: SQ-15→Marco Antonio, SQ-24→Gloria Jesely, SQ-43→yxsinell, SQ-34→Arkaitz)_

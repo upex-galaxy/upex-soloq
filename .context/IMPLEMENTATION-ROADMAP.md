@@ -119,12 +119,12 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 
 ### Epic: SQ-1 - User Authentication & Onboarding
 
-| Key  | Story                                     | Status           | Priority | Assignee        | PR Shift-Left | PR Impl |
-| ---- | ----------------------------------------- | ---------------- | -------- | --------------- | ------------- | ------- |
-| SQ-2 | User Registration with Email and Password | **Ready For QA** | Highest  | Samuel Amonzabe | #5 (MERGED)   | -       |
-| SQ-3 | User Login with Credentials               | **In Test**      | Highest  | Ely             | #4 (MERGED)   | -       |
-| SQ-4 | Password Recovery via Email               | Ready For Dev    | High     | Ely             | #12 (MERGED)  | -       |
-| SQ-5 | Secure Logout                             | Shift-Left QA    | High     | German Luchesi  | -             | -       |
+| Key  | Story                                     | Status           | Priority | Assignee        | PR Shift-Left | PR Impl      |
+| ---- | ----------------------------------------- | ---------------- | -------- | --------------- | ------------- | ------------ |
+| SQ-2 | User Registration with Email and Password | **Ready For QA** | Highest  | Samuel Amonzabe | #5 (MERGED)   | -            |
+| SQ-3 | User Login with Credentials               | **In Test**      | Highest  | Ely             | #4 (MERGED)   | -            |
+| SQ-4 | Password Recovery via Email               | **Ready For QA** | High     | Maxe Aguilera   | #12 (MERGED)  | #50 (MERGED) |
+| SQ-5 | Secure Logout                             | Shift-Left QA    | High     | German Luchesi  | -             | -            |
 
 ### Epic: SQ-31 - PDF Generation & Download
 
@@ -221,7 +221,7 @@ SQ-31 (PDF Generation Epic)
 | ----- | ----- | --------------------------- | ------------- | -------- | ------------- | ------------ |
 | 13    | SQ-27 | Assign Unique Invoice No.   | Ready For QA  | Ely      | #13 (MERGED)  | #46 (MERGED) |
 | 14    | SQ-30 | Save Invoice as Draft       | Ready For QA  | Luis E.  | #30 (MERGED)  | #49 (MERGED) |
-| 15    | SQ-4  | Password Recovery via Email | Ready For Dev | Ely      | #12 (MERGED)  | -            |
+| 15    | SQ-4  | Password Recovery via Email | Ready For QA  | Maxe A.  | #12 (MERGED)  | #50 (MERGED) |
 | 16    | SQ-25 | Add Discounts to Invoice    | Ready For Dev | Ely      | #24 (MERGED)  | -            |
 | 17    | SQ-18 | View Client Invoice History | Ready For Dev | Ely      | #43 (MERGED)  | -            |
 
@@ -268,7 +268,8 @@ FASE 3 - PDF Generation 🔶 EN PROGRESO (3/4)
 - **US en Ready For QA:** 13 (listas para testing, incluye SQ-27 y SQ-30)
 - **US en In Test:** 3 (SQ-3, SQ-14, SQ-16)
 - **US bloqueadas (Shift-Left QA):** 1 (SQ-34)
-- **US en Ready For Dev:** 3 (SQ-4, SQ-18, SQ-25)
+- **US en Ready For Dev:** 2 (SQ-18, SQ-25)
+- **US en Ready For QA:** 14 (incluye SQ-4)
 
 ---
 
@@ -418,15 +419,14 @@ US de FASE 4 implementadas:
 
 - SQ-27: Assign Unique Invoice Number ✅ (PR #46)
 - SQ-30: Save Invoice as Draft ✅ (PR #49 MERGED)
-- SQ-4: Password Recovery via Email ⏳ (Ready For Dev)
+- SQ-4: Password Recovery via Email ✅ (PR #50 MERGED)
 - SQ-25: Add Discounts to Invoice ⏳ (Ready For Dev)
 - SQ-18: View Client Invoice History ⏳ (Ready For Dev)
 
-**Próximas US en Ready For Dev (3 disponibles):**
+**Próximas US en Ready For Dev (2 disponibles):**
 
-1. **SQ-4** - Password Recovery via Email (Ely) - Auth
-2. **SQ-25** - Add Discounts to Invoice (Ely) - Invoice Creation
-3. **SQ-18** - View Client Invoice History (Ely) - Client Management
+1. **SQ-25** - Add Discounts to Invoice (Ely) - Invoice Creation
+2. **SQ-18** - View Client Invoice History (Ely) - Client Management
 
 ---
 
@@ -457,4 +457,32 @@ US de FASE 4 implementadas:
 
 ---
 
-_Actualizado por Claude Code - 2026-02-12 (SQ-30: PR #49 MERGED - Save Invoice as Draft completado ✅)_
+### US Completada: SQ-4 - Password Recovery via Email ✅
+
+| Paso | Estado     | Notas                                  |
+| ---- | ---------- | -------------------------------------- |
+| 0    | Completado | Precondiciones verificadas             |
+| 1    | Completado | Jira transitado a In Progress          |
+| 2    | Completado | Plan de implementación creado          |
+| 3    | Completado | Implementación completa (6 archivos)   |
+| 4    | Completado | PR #50 creado                          |
+| 5    | N/A        | E2E/UI testing por usuario             |
+| 6    | Completado | Code review (self)                     |
+| 7    | Completado | Documentación actualizada              |
+| 8    | Completado | **PR #50 MERGED** ✅                   |
+| 9-11 | Completado | Ready For QA, asignado a Maxe Aguilera |
+
+**Implementación incluye:**
+
+- Page: `/forgot-password` (formulario de solicitud)
+- API: `/api/auth/forgot-password` (rate limiting IP + email)
+- Page: `/reset-password` (formulario de nueva contraseña)
+- Component: `PasswordStrengthIndicator` (validación en tiempo real)
+- Update: `/login` (mensaje de éxito post-reset)
+
+**Test Cases cubiertos (19/19):**
+FT-SQ4-01 a FT-SQ4-19 (ver PR #50 para detalles)
+
+---
+
+_Actualizado por Claude Code - 2026-02-12 (SQ-4: PR #50 MERGED - Password Recovery via Email completado ✅)_

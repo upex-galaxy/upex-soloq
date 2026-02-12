@@ -19,13 +19,14 @@ interface ErrorResponse {
 // =============================================================================
 
 /**
- * GET /api/invoices/check-number?number=XXX
+ * GET /api/invoices/check-number?number=XXX&excludeId=YYY
  *
  * Checks if a given invoice number is available for the authenticated user.
  * Invoice numbers are unique per user (UNIQUE constraint on user_id, invoice_number).
  *
  * Query Parameters:
  * - number: string (required) - The invoice number to check
+ * - excludeId: string (optional) - Invoice ID to exclude (for editing existing invoices)
  *
  * Responses:
  * - 200: Check completed (available: true/false)
@@ -52,19 +53,26 @@ export async function GET(
     // Get invoice number from query params
     const { searchParams } = new URL(request.url);
     const invoiceNumber = searchParams.get('number')?.trim();
+    const excludeId = searchParams.get('excludeId')?.trim();
 
     if (!invoiceNumber) {
       return NextResponse.json({ error: 'El parámetro "number" es requerido' }, { status: 400 });
     }
 
-    // Check if invoice number exists for this user
-    const { data: existingInvoice } = await supabase
+    // Check if invoice number exists for this user (excluding current invoice if editing)
+    let query = supabase
       .from('invoices')
       .select('id')
       .eq('user_id', user.id)
       .eq('invoice_number', invoiceNumber)
-      .is('deleted_at', null)
-      .single();
+      .is('deleted_at', null);
+
+    // Exclude current invoice ID if provided (for editing)
+    if (excludeId) {
+      query = query.neq('id', excludeId);
+    }
+
+    const { data: existingInvoice } = await query.single();
 
     if (existingInvoice) {
       return NextResponse.json({

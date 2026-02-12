@@ -115,7 +115,7 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | SQ-27 | Assign Unique Invoice Number             | Ready For QA  | Medium   | Ely                           | #13 (MERGED)  | #46 (MERGED) |
 | SQ-28 | Set Invoice Due Date                     | Ready For QA  | Medium   | Yaneth Quintero               | #10 (MERGED)  | #33 (MERGED) |
 | SQ-29 | Add Notes and Terms to Invoice           | Ready For QA  | Medium   | Ximena Quintana               | #17 (MERGED)  | #34 (MERGED) |
-| SQ-30 | Save Invoice as Draft                    | Ready For Dev | Medium   | Ely                           | #30 (MERGED)  | -            |
+| SQ-30 | Save Invoice as Draft                    | In Progress   | Medium   | Ely                           | #30 (MERGED)  | #49 (OPEN)   |
 
 ### Epic: SQ-1 - User Authentication & Onboarding
 
@@ -220,7 +220,7 @@ SQ-31 (PDF Generation Epic)
 | Orden | Key   | Story                       | Status        | Assignee | PR Shift-Left | PR Impl      |
 | ----- | ----- | --------------------------- | ------------- | -------- | ------------- | ------------ |
 | 13    | SQ-27 | Assign Unique Invoice No.   | Ready For QA  | Ely      | #13 (MERGED)  | #46 (MERGED) |
-| 14    | SQ-30 | Save Invoice as Draft       | Ready For Dev | Ely      | #30 (MERGED)  | -            |
+| 14    | SQ-30 | Save Invoice as Draft       | In Progress   | Ely      | #30 (MERGED)  | #49 (OPEN)   |
 | 15    | SQ-4  | Password Recovery via Email | Ready For Dev | Ely      | #12 (MERGED)  | -            |
 | 16    | SQ-25 | Add Discounts to Invoice    | Ready For Dev | Ely      | #24 (MERGED)  | -            |
 | 17    | SQ-18 | View Client Invoice History | Ready For Dev | Ely      | #43 (MERGED)  | -            |
@@ -268,7 +268,8 @@ FASE 3 - PDF Generation 🔶 EN PROGRESO (3/4)
 - **US en Ready For QA:** 12 (listas para testing, incluye SQ-27)
 - **US en In Test:** 3 (SQ-3, SQ-14, SQ-16)
 - **US bloqueadas (Shift-Left QA):** 1 (SQ-34)
-- **US en Ready For Dev:** 5 (SQ-4, SQ-18, SQ-25, SQ-30)
+- **US en In Progress:** 1 (SQ-30 - PR #49 OPEN)
+- **US en Ready For Dev:** 4 (SQ-4, SQ-18, SQ-25)
 
 ---
 
@@ -388,22 +389,45 @@ US de FASE 3 implementadas:
 
 ---
 
-### 🎉 FASE 4 EN PROGRESO - Invoice Creation Avanzado (1/3)
+### US En Progreso: SQ-30 - Save Invoice as Draft 🔶
+
+| Paso | Estado     | Notas                                       |
+| ---- | ---------- | ------------------------------------------- |
+| 0    | Completado | Precondiciones verificadas                  |
+| 1    | Completado | Jira transitado a In Progress               |
+| 2    | Completado | Plan de implementación creado               |
+| 3    | Completado | Implementación completa (API, hooks, pages) |
+| 4    | Completado | PR #49 creado                               |
+| 5    | N/A        | E2E/UI testing por usuario                  |
+| 6    | Completado | Code review (self)                          |
+| 7    | Completado | Documentación actualizada                   |
+| 8    | Pendiente  | PR #49 pendiente de merge                   |
+| 9-11 | Pendiente  | Verificar transición y sincronizar          |
+
+**Implementación incluye:**
+
+- API: GET /api/invoices, PUT /api/invoices/[id], DELETE /api/invoices/[id]
+- Hooks: useInvoices, useUpdateInvoice, useDeleteInvoice, useAutoSave
+- Componentes: InvoiceStatusBadge, InvoiceNumberInput (updated)
+- Pages: /invoices (list con filtros), /invoices/[id]/edit (auto-save)
+
+---
+
+### 🎉 FASE 4 EN PROGRESO - Invoice Creation Avanzado (2/5)
 
 US de FASE 4 implementadas:
 
 - SQ-27: Assign Unique Invoice Number ✅ (PR #46)
-- SQ-30: Save Invoice as Draft ⏳ (Ready For Dev)
+- SQ-30: Save Invoice as Draft 🔶 (PR #49 - OPEN)
 - SQ-4: Password Recovery via Email ⏳ (Ready For Dev)
 - SQ-25: Add Discounts to Invoice ⏳ (Ready For Dev)
 - SQ-18: View Client Invoice History ⏳ (Ready For Dev)
 
-**Próximas US en Ready For Dev (5 disponibles):**
+**Próximas US en Ready For Dev (4 disponibles):**
 
-1. **SQ-30** - Save Invoice as Draft (Ely) - Invoice Creation
-2. **SQ-4** - Password Recovery via Email (Ely) - Auth
-3. **SQ-25** - Add Discounts to Invoice (Ely) - Invoice Creation
-4. **SQ-18** - View Client Invoice History (Ely) - Client Management
+1. **SQ-4** - Password Recovery via Email (Ely) - Auth
+2. **SQ-25** - Add Discounts to Invoice (Ely) - Invoice Creation
+3. **SQ-18** - View Client Invoice History (Ely) - Client Management
 
 ---
 
@@ -434,4 +458,4 @@ US de FASE 4 implementadas:
 
 ---
 
-_Actualizado por Claude Code - 2026-02-12 (Sincronizado: PRs #30, #24, #43 MERGED → SQ-30, SQ-25, SQ-18 ahora Ready For Dev)_
+_Actualizado por Claude Code - 2026-02-12 (SQ-30: PR #49 creado - Save Invoice as Draft en progreso)_

@@ -24,6 +24,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^8.4.0",
     "@hookform/resolvers": "^5.2.2",
     "@inquirer/prompts": "^8.1.0",
     "@radix-ui/react-avatar": "^1.1.11",
@@ -51,6 +52,7 @@
     "react-hook-form": "^7.71.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
+    "use-debounce": "^10.1.0",
     "zod": "^4.3.5"
   },
   "devDependencies": {

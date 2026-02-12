@@ -27,6 +27,7 @@ import {
   TaxInput,
   InvoiceSummary,
 } from '@/components/invoices';
+import { InvoiceNumberInput } from '@/components/invoices/invoice-number-input';
 import { useClients } from '@/hooks/clients';
 import { useCreateInvoice } from '@/hooks/invoices';
 import { useBusinessProfile } from '@/hooks/business-profile';
@@ -62,11 +63,15 @@ export default function CreateInvoicePage() {
   // Create invoice mutation
   const { mutate: createInvoice, isPending: isCreating } = useCreateInvoice();
 
+  // State for invoice number validation
+  const [isInvoiceNumberValid, setIsInvoiceNumberValid] = useState(true);
+
   // Form setup
   const form = useForm<CreateInvoiceFormData>({
     resolver: zodResolver(createInvoiceSchema),
     defaultValues: {
       clientId: '',
+      invoiceNumber: '',
       dueDate: getDefaultDueDate(),
       notes: '',
       terms: '',
@@ -167,6 +172,32 @@ export default function CreateInvoicePage() {
                     <FormDescription>
                       Selecciona el cliente al que se enviará esta factura.
                     </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Invoice Number */}
+              <FormField
+                control={form.control}
+                name="invoiceNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <InvoiceNumberInput
+                        value={field.value ?? ''}
+                        onChange={field.onChange}
+                        onValidate={(isValid, error) => {
+                          setIsInvoiceNumberValid(isValid);
+                          if (error) {
+                            form.setError('invoiceNumber', { message: error });
+                          } else {
+                            form.clearErrors('invoiceNumber');
+                          }
+                        }}
+                        disabled={isCreating}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -282,7 +313,7 @@ export default function CreateInvoicePage() {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isCreating || !selectedClient}
+                  disabled={isCreating || !selectedClient || !isInvoiceNumberValid}
                   data-testid="save-invoice-button"
                 >
                   {isCreating ? (

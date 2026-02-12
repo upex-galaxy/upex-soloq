@@ -37,6 +37,7 @@ next-env.d.ts
 .context/mcp/outputs
 .playwright-mcp
 .backups
+dbhub.toml
 
 # MCP catalog files (contain secrets - DO NOT COMMIT)
 *.catalog.json

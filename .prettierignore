@@ -10,3 +10,4 @@ reports/
 *.lock
 .env
 .env.*
+dbhub.toml

@@ -9,7 +9,7 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "ai": "bun scripts/mcp-builder.js",
-    "up": "bun scripts/update-prompts.js",
+    "up": "bun scripts/update-template.js",
     "kata:manifest": "bun scripts/kata-manifest.ts",
     "api:sync": "bun scripts/sync-openapi.ts",
     "email:check": "bun scripts/email-checker.js",

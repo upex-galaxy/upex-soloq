@@ -188,6 +188,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
+        // Update last_login_at in profiles table (SQ-81 fix)
+        await supabase
+          .from('profiles')
+          .update({ last_login_at: new Date().toISOString() })
+          .eq('user_id', session.user.id);
+
         const profileData = await fetchUserProfile(session.user.id);
 
         setState({

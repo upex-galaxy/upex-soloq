@@ -70,3 +70,6 @@ Thumbs.db
 .mcpservers.json
 opencode.json
 dbhub.toml
+
+# Playwright CLI artifacts
+.playwright-cli/

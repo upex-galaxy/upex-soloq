@@ -1,7 +1,7 @@
 # Acceptance Test Plan: STORY-SQ-23 - Automatic Subtotal and Total Calculation
 
 **Fecha:** 2026-02-17
-**QA Engineer:** AI-Generated (Shift-Left Analysis)
+**QA Engineer:** Raul Gonzalez Casado
 **Story Jira Key:** [SQ-23](https://upexgalaxy64.atlassian.net/browse/SQ-23)
 **Epic:** EPIC-SQ-20 - Invoice Creation
 **Status:** Draft - Pending PO/Dev Review

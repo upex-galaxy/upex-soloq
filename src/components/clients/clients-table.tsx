@@ -70,10 +70,11 @@ export function ClientsTable({
   }
 
   return (
+    <div className="rounded-lg border border-border/50 overflow-hidden">
     <Table data-testid="clients-table">
       <TableHeader>
-        <TableRow>
-          <TableHead>
+        <TableRow className="bg-muted/30 hover:bg-muted/30">
+          <TableHead className="font-semibold">
             <button
               type="button"
               className="flex items-center hover:text-foreground transition-colors"
@@ -84,7 +85,7 @@ export function ClientsTable({
               {getSortIcon('name')}
             </button>
           </TableHead>
-          <TableHead>
+          <TableHead className="font-semibold">
             <button
               type="button"
               className="flex items-center hover:text-foreground transition-colors"
@@ -95,8 +96,8 @@ export function ClientsTable({
               {getSortIcon('email')}
             </button>
           </TableHead>
-          <TableHead className="hidden md:table-cell">Empresa</TableHead>
-          <TableHead className="hidden sm:table-cell">
+          <TableHead className="hidden md:table-cell font-semibold">Empresa</TableHead>
+          <TableHead className="hidden sm:table-cell font-semibold">
             <button
               type="button"
               className="flex items-center hover:text-foreground transition-colors"
@@ -116,7 +117,7 @@ export function ClientsTable({
         {clients.map(client => (
           <TableRow
             key={client.id}
-            className="cursor-pointer"
+            className="table-row-interactive cursor-pointer"
             onClick={() => handleRowClick(client.id)}
             data-testid={`clients-row-${client.id}`}
           >
@@ -147,6 +148,7 @@ export function ClientsTable({
         ))}
       </TableBody>
     </Table>
+    </div>
   );
 }
 

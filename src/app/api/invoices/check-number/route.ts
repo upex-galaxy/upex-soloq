@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createServer } from '@/lib/supabase/server';
+import { createServerFromRequest } from '@/lib/supabase/server';
 
 // =============================================================================
 // Types
@@ -38,7 +38,7 @@ export async function GET(
   request: Request
 ): Promise<NextResponse<CheckInvoiceNumberResponse | ErrorResponse>> {
   try {
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {

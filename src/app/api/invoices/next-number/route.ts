@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createServer } from '@/lib/supabase/server';
+import { createServerFromRequest } from '@/lib/supabase/server';
 
 // =============================================================================
 // Types
@@ -31,9 +31,11 @@ interface ErrorResponse {
  * - 401: Unauthorized
  * - 500: Internal server error
  */
-export async function GET(): Promise<NextResponse<NextInvoiceNumberResponse | ErrorResponse>> {
+export async function GET(
+  request: Request
+): Promise<NextResponse<NextInvoiceNumberResponse | ErrorResponse>> {
   try {
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {

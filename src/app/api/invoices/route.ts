@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createServer } from '@/lib/supabase/server';
+import { createServerFromRequest } from '@/lib/supabase/server';
 import { createInvoiceApiSchema } from '@/lib/validations/invoice';
 import {
   calculateTax,
@@ -43,7 +43,7 @@ interface ListInvoicesResponse {
  * Uses user's configured prefix from business_profiles
  */
 async function generateInvoiceNumber(
-  supabase: Awaited<ReturnType<typeof createServer>>,
+  supabase: Awaited<ReturnType<typeof createServerFromRequest>>,
   userId: string
 ): Promise<string> {
   // Get user's invoice prefix from business_profiles
@@ -85,7 +85,7 @@ async function generateInvoiceNumber(
  * Check if invoice number is available for user
  */
 async function isInvoiceNumberAvailable(
-  supabase: Awaited<ReturnType<typeof createServer>>,
+  supabase: Awaited<ReturnType<typeof createServerFromRequest>>,
   userId: string,
   invoiceNumber: string
 ): Promise<boolean> {
@@ -134,7 +134,7 @@ function getDefaultDueDate(): string {
  */
 export async function POST(request: Request): Promise<NextResponse<CreateInvoiceResponse>> {
   try {
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {
@@ -288,7 +288,7 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
  */
 export async function GET(request: Request): Promise<NextResponse<ListInvoicesResponse>> {
   try {
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {

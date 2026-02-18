@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createServer } from '@/lib/supabase/server';
+import { createServerFromRequest } from '@/lib/supabase/server';
 import { updateInvoiceSchema } from '@/lib/validations/invoice';
 import {
   calculateTax,
@@ -57,12 +57,12 @@ interface DeleteInvoiceResponse {
  * - 500: Internal server error
  */
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<GetInvoiceResponse>> {
   try {
     const { id: invoiceId } = await params;
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {
@@ -207,7 +207,7 @@ export async function PUT(
 ): Promise<NextResponse<UpdateInvoiceResponse>> {
   try {
     const { id: invoiceId } = await params;
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {
@@ -403,12 +403,12 @@ export async function PUT(
  * - 500: Internal server error
  */
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<DeleteInvoiceResponse>> {
   try {
     const { id: invoiceId } = await params;
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {

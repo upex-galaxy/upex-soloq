@@ -1,6 +1,6 @@
 # Implementation Roadmap - SoloQ
 
-> **Documento provisional** - Generado: 2026-02-07 | **Última actualización:** 2026-02-17
+> **Documento provisional** - Generado: 2026-02-07 | **Última actualización:** 2026-02-18
 > **Proposito:** Panorama completo del estado actual y plan de implementacion ordenado por dependencias.
 
 ---
@@ -107,7 +107,7 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | Key   | Story                                    | Status        | Priority | Assignee                      | PR Shift-Left | PR Impl      |
 | ----- | ---------------------------------------- | ------------- | -------- | ----------------------------- | ------------- | ------------ |
 | SQ-21 | Create Invoice by Selecting Client       | Ready For QA  | Medium   | Ely                           | #19 (MERGED)  | #29 (MERGED) |
-| SQ-22 | Add Line Items to Invoice                | **Backlog**   | Medium   | Carlos Arevalo                | -             | -            |
+| SQ-22 | Add Line Items to Invoice                | Ready For QA  | Medium   | Ely                           | #55 (MERGED)  | #56 (MERGED) |
 | SQ-23 | Automatic Subtotal and Total Calculation | Estimation    | Medium   | Raúl González                 | #53 (OPEN)    | -            |
 | SQ-24 | Add Taxes to Invoice                     | Ready For QA  | Medium   | Gloria Jesely Galindez Suárez | #9 (MERGED)   | #32 (MERGED) |
 | SQ-25 | Add Discounts to Invoice                 | Ready For QA  | Medium   | GENESIS OJOSE                 | #24 (MERGED)  | #51 (MERGED) |
@@ -240,45 +240,45 @@ SQ-31 (PDF Generation Epic)
 | SQ-2  | User Registration      | Ready For QA  | Samuel Amonzabel | Implementado - gaps documentados en Jira |
 | SQ-3  | User Login             | **BLOCKED**   | Ely              | Bug SQ-81 (Highest priority)             |
 | SQ-16 | Edit Client Data       | **BLOCKED**   | Ely              | Bug SQ-82 (High priority)                |
-| SQ-22 | Add Line Items         | Backlog       | Carlos Arevalo   | ⚠️ Ver análisis especial abajo          |
+| SQ-22 | Add Line Items         | Ready For QA  | Ely              | ✅ Implementado - PR #56 (MERGED)       |
 | SQ-23 | Auto Calculation       | Estimation    | Raúl González    | No Ready For Dev (PR #53 Shift-Left)     |
 | SQ-34 | Payment Methods in PDF | Shift-Left QA | Arkaitz          | No Ready For Dev                         |
 
 ---
 
-## ⚠️ Análisis Especial: SQ-22 - Add Line Items to Invoice
+## ✅ SQ-22 - Add Line Items to Invoice - IMPLEMENTADO
 
 ### Estado Actual
 
 | Campo              | Valor                              |
 | ------------------ | ---------------------------------- |
-| **Status**         | Backlog (nunca avanzó)             |
-| **Assignee**       | Carlos Arevalo (Tester)            |
-| **PR Shift-Left**  | NO existe                          |
-| **PR Impl**        | NO existe                          |
-| **Última actividad** | 2026-01-27 (solo ranking/sprint) |
+| **Status**         | Ready For QA                       |
+| **Assignee**       | Ely (Dev)                          |
+| **PR Shift-Left**  | #55 (MERGED)                       |
+| **PR Impl**        | #56 (MERGED)                       |
+| **Fecha**          | 2026-02-18                         |
 
-### Análisis de Dependencias
+### Implementación Completada
 
-```
-SQ-22 (Add Line Items) ─── ¿Bloquea SQ-25 (Discounts)?
-                           │
-                           └── NO ❌ SQ-25 ya fue implementado independientemente
-                               - PR #51 MERGED el 2026-02-12
-                               - Usa campo `subtotal` manual en lugar de items
-                               - Descuentos se calculan sobre subtotal directo
-```
+**Archivos creados/modificados (8 archivos, +1186/-30 líneas):**
 
-### Conclusión
+- `src/components/invoices/line-items-table.tsx` (NEW) - Tabla editable con useFieldArray
+- `src/lib/validations/invoice.ts` - Schemas lineItemSchema, lineItemsArraySchema
+- `src/lib/utils/invoice-calculations.ts` - calculateLineTotal, calculateSubtotal
+- `src/app/api/invoices/route.ts` - POST con items
+- `src/app/api/invoices/[id]/route.ts` - PUT/GET con items
+- `src/app/(app)/invoices/create/page.tsx` - Integración LineItemsTable
+- `src/app/(app)/invoices/[id]/edit/page.tsx` - Integración LineItemsTable
 
-- **SQ-22 NO bloquea SQ-25** - La implementación de descuentos usa un campo `subtotal` que el usuario ingresa manualmente, sin depender de line items.
-- **SQ-22 está "abandonada"** - Carlos Arevalo (Tester) nunca comenzó el Shift-Left QA.
-- **Impacto técnico**: En el futuro, cuando se implemente SQ-22, los descuentos se aplicarán automáticamente sobre el subtotal calculado de los line items (ya hay lógica para esto en `invoice-calculations.ts`).
+**Test Cases cubiertos (15/15):**
 
-### Recomendación
+- TC-01 a TC-06: CRUD operations (add, edit, remove items)
+- TC-07 a TC-12: Validation rules (description, quantity, price)
+- TC-13 a TC-15: Edge cases (max 50 items, empty invoice)
 
-1. Reasignar SQ-22 a un tester activo si se quiere avanzar
-2. Alternativamente, mantener en Backlog hasta tener prioridad del PO
+### Integración con SQ-25 (Discounts)
+
+✅ **Ahora integrado**: El subtotal se calcula automáticamente desde line items y los descuentos se aplican correctamente sobre el subtotal calculado.
 
 ---
 
@@ -609,10 +609,28 @@ FT-SQ4-01 a FT-SQ4-19 (ver PR #50 para detalles)
 
 ---
 
+### US Completada: SQ-22 - Add Line Items to Invoice ✅
+
+| Paso | Estado     | Notas                                    |
+| ---- | ---------- | ---------------------------------------- |
+| 0    | Completado | Precondiciones verificadas               |
+| 1    | Completado | Jira transitado a In Progress            |
+| 2    | Completado | Plan de implementación creado            |
+| 3    | Completado | Implementación completa (8 archivos)     |
+| 4    | Completado | PR #56 creado                            |
+| 5    | N/A        | E2E/UI testing por usuario               |
+| 6    | Completado | Code review (self)                       |
+| 7    | Completado | Documentación actualizada                |
+| 8    | Completado | **PR #56 MERGED** ✅                     |
+| 9-11 | Completado | Ready For QA                             |
+
+---
+
 ## Historial de Actualizaciones
 
 | Fecha      | Cambios                                                                                     |
 | ---------- | ------------------------------------------------------------------------------------------- |
+| 2026-02-18 | SQ-22: **PR #56 MERGED** ✅ - Add Line Items to Invoice completado (8 archivos, +1186/-30) |
 | 2026-02-17 | Sincronización completa: SQ-14 QA Approved, SQ-3/SQ-16 BLOCKED, nuevos bugs SQ-81/SQ-82    |
 | 2026-02-17 | Análisis SQ-22: no bloquea SQ-25, permanece abandonada en Backlog                          |
 | 2026-02-17 | Nuevas US Ready For Dev: SQ-26, SQ-43 (además de SQ-18)                                    |

@@ -1,0 +1,9 @@
+[[sources]]
+id = "soloq"
+type = "postgres"
+host = "aws-1-us-east-2.pooler.supabase.com"
+port = 5432
+database = "postgres"
+user = "qa_team.czuusjchqpgvanvbdrnz"
+password = "QA_SoloQ_2024_Secure!"
+sslmode = "require"

@@ -125,7 +125,7 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | SQ-3 | User Login with Credentials               | **BLOCKED**     | Highest  | Ely              | #4 (MERGED)   | -            |
 | SQ-4 | Password Recovery via Email               | **In Test**     | High     | Maxe Aguilera    | #12 (MERGED)  | #50 (MERGED) |
 | SQ-5 | Secure Logout                             | Shift-Left QA   | High     | German Luchesi   | -             | -            |
-| SQ-6 | Guided Onboarding for New Users           | Ready For QA    | Medium   | Juan Leites      | -             | #59 (OPEN)   |
+| SQ-6 | Guided Onboarding for New Users           | Ready For QA    | Medium   | Juan Leites      | -             | #59 (MERGED) |
 
 ### Epic: SQ-31 - PDF Generation & Download
 
@@ -225,7 +225,7 @@ SQ-31 (PDF Generation Epic)
 | 15    | SQ-4  | Password Recovery via Email | Ready For QA  | Maxe A.  | #12 (MERGED)  | #50 (MERGED) |
 | 16    | SQ-25 | Add Discounts to Invoice    | Ready For QA  | GENESIS  | #24 (MERGED)  | #51 (MERGED) |
 | 17    | SQ-18 | View Client Invoice History | Ready For QA  | Rodrigo  | #43 (MERGED)  | #58 (MERGED) |
-| 18    | SQ-6  | Guided Onboarding for New Users | Ready For QA  | Juan L.  | -             | #59 (OPEN)   |
+| 18    | SQ-6  | Guided Onboarding for New Users | Ready For QA  | Juan L.  | -             | #59 (MERGED) |
 
 ### FASE 5: US en Ready For Dev (2026-02-25)
 
@@ -317,7 +317,7 @@ FASE 4 - Auth & Recovery ✅ COMPLETADA
 
 ### Metricas (2026-02-25)
 
-- **Total US implementadas:** 17 (PRs mergeados en staging)
+- **Total US implementadas:** 18 (PRs mergeados en staging)
 - **US en QA Approved:** 1 (SQ-14 ✅)
 - **US en In Test:** 3 (SQ-4, SQ-24, SQ-25)
 - **US en Ready For QA:** 13 (listas para testing)
@@ -479,7 +479,7 @@ US de FASE 4 implementadas:
 - SQ-30: Save Invoice as Draft ✅ (PR #49 MERGED)
 - SQ-4: Password Recovery via Email ✅ (PR #50 MERGED)
 - SQ-25: Add Discounts to Invoice ✅ (PR #51 MERGED)
-- SQ-6: Guided Onboarding for New Users ✅ (PR #59 OPEN - Ready For QA)
+- SQ-6: Guided Onboarding for New Users ✅ (PR #59 MERGED)
 
 ---
 
@@ -697,7 +697,7 @@ FT-SQ4-01 a FT-SQ4-19 (ver PR #50 para detalles)
 | 2026-02-25 | **PRs Shift-Left mergeados** - #53 (4.5/5), #52 (4/5), #48 (4/5), #40 (3.5/5) ✅           |
 | 2026-02-25 | **0 PRs pendientes** - Todos los PRs de implementación, bugs y shift-left mergeados        |
 | 2026-02-25 | **Limpieza de PRs completada** - Todos los bug fixes mergeados ✅                           |
-| 2026-02-25 | **SQ-6: PR #59 OPEN** - Guided Onboarding implementado, asignado a Juan Leites (QA)        |
+| 2026-02-25 | **SQ-6: PR #59 MERGED** - Guided Onboarding implementado, asignado a Juan Leites (QA)      |
 | 2026-02-25 | PR #44 (SQ-75 phone validation) mergeado, SQ-75 → Ready For QA                             |
 | 2026-02-25 | PR #38 cerrado con feedback (tarea no cumplida, SQ-14 ya implementado)                     |
 | 2026-02-25 | SQ-76 transitado a Ready For QA (PR #45 ya estaba mergeado)                                |

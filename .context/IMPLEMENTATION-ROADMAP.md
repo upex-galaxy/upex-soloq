@@ -125,7 +125,7 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | SQ-3 | User Login with Credentials               | **BLOCKED**     | Highest  | Ely              | #4 (MERGED)   | -            |
 | SQ-4 | Password Recovery via Email               | **In Test**     | High     | Maxe Aguilera    | #12 (MERGED)  | #50 (MERGED) |
 | SQ-5 | Secure Logout                             | Shift-Left QA   | High     | German Luchesi   | -             | -            |
-| SQ-6 | Guided Onboarding for New Users           | Ready For Dev   | Medium   | Ely              | -             | -            |
+| SQ-6 | Guided Onboarding for New Users           | Ready For QA    | Medium   | Juan Leites      | -             | #59 (OPEN)   |
 
 ### Epic: SQ-31 - PDF Generation & Download
 
@@ -225,12 +225,12 @@ SQ-31 (PDF Generation Epic)
 | 15    | SQ-4  | Password Recovery via Email | Ready For QA  | Maxe A.  | #12 (MERGED)  | #50 (MERGED) |
 | 16    | SQ-25 | Add Discounts to Invoice    | Ready For QA  | GENESIS  | #24 (MERGED)  | #51 (MERGED) |
 | 17    | SQ-18 | View Client Invoice History | Ready For QA  | Rodrigo  | #43 (MERGED)  | #58 (MERGED) |
+| 18    | SQ-6  | Guided Onboarding for New Users | Ready For QA  | Juan L.  | -             | #59 (OPEN)   |
 
 ### FASE 5: US en Ready For Dev (2026-02-25)
 
 | Orden | Key   | Story                            | Status        | Assignee      | PR Shift-Left | PR Impl |
 | ----- | ----- | -------------------------------- | ------------- | ------------- | ------------- | ------- |
-| 18    | SQ-6  | Guided Onboarding for New Users  | Ready For Dev | Ely           | -             | -       |
 | 19    | SQ-23 | Auto Subtotal/Total Calculation  | Ready For Dev | Raúl González | #53 (MERGED)  | -       |
 | 20    | SQ-26 | Preview Invoice Before Send      | Ready For Dev | Ely           | #15 (MERGED)  | -       |
 | 21    | SQ-43 | Include PDF Attachment in Email  | Ready For Dev | Ely           | #40 (MERGED)  | -       |
@@ -320,10 +320,10 @@ FASE 4 - Auth & Recovery ✅ COMPLETADA
 - **Total US implementadas:** 17 (PRs mergeados en staging)
 - **US en QA Approved:** 1 (SQ-14 ✅)
 - **US en In Test:** 3 (SQ-4, SQ-24, SQ-25)
-- **US en Ready For QA:** 12 (listas para testing)
+- **US en Ready For QA:** 13 (listas para testing)
 - **US en BLOCKED:** 2 (SQ-3, SQ-16 - pendientes re-test)
 - **US en Shift-Left QA:** 3 (SQ-5, SQ-34, SQ-46)
-- **US en Ready For Dev:** 4 (SQ-6, SQ-23, SQ-26, SQ-43)
+- **US en Ready For Dev:** 3 (SQ-23, SQ-26, SQ-43)
 - **Bugs Abiertos:** 4 (1 Highest, 2 High, 1 Medium)
 - **Bugs Ready For QA:** 4 (SQ-75, SQ-76, SQ-81, SQ-82 - todos fixeados ✅)
 - **PRs de Bug Fix:** Todos mergeados (#41, #44, #45, #54) ✅
@@ -479,15 +479,15 @@ US de FASE 4 implementadas:
 - SQ-30: Save Invoice as Draft ✅ (PR #49 MERGED)
 - SQ-4: Password Recovery via Email ✅ (PR #50 MERGED)
 - SQ-25: Add Discounts to Invoice ✅ (PR #51 MERGED)
+- SQ-6: Guided Onboarding for New Users ✅ (PR #59 OPEN - Ready For QA)
 
 ---
 
-### 🚀 PRÓXIMAS US EN READY FOR DEV (4 disponibles)
+### 🚀 PRÓXIMAS US EN READY FOR DEV (3 disponibles)
 
-1. **SQ-6** - Guided Onboarding for New Users (Ely) - Auth & Onboarding
-2. **SQ-23** - Automatic Subtotal and Total Calculation (Raúl González) - Invoice Creation
-3. **SQ-26** - Preview Invoice Before Sending (Ely) - Invoice Creation
-4. **SQ-43** - Include PDF Attachment in Email (Ely) - Invoice Sending
+1. **SQ-23** - Automatic Subtotal and Total Calculation (Raúl González) - Invoice Creation
+2. **SQ-26** - Preview Invoice Before Sending (Ely) - Invoice Creation
+3. **SQ-43** - Include PDF Attachment in Email (Ely) - Invoice Sending
 
 ---
 
@@ -697,6 +697,7 @@ FT-SQ4-01 a FT-SQ4-19 (ver PR #50 para detalles)
 | 2026-02-25 | **PRs Shift-Left mergeados** - #53 (4.5/5), #52 (4/5), #48 (4/5), #40 (3.5/5) ✅           |
 | 2026-02-25 | **0 PRs pendientes** - Todos los PRs de implementación, bugs y shift-left mergeados        |
 | 2026-02-25 | **Limpieza de PRs completada** - Todos los bug fixes mergeados ✅                           |
+| 2026-02-25 | **SQ-6: PR #59 OPEN** - Guided Onboarding implementado, asignado a Juan Leites (QA)        |
 | 2026-02-25 | PR #44 (SQ-75 phone validation) mergeado, SQ-75 → Ready For QA                             |
 | 2026-02-25 | PR #38 cerrado con feedback (tarea no cumplida, SQ-14 ya implementado)                     |
 | 2026-02-25 | SQ-76 transitado a Ready For QA (PR #45 ya estaba mergeado)                                |
@@ -715,4 +716,4 @@ FT-SQ4-01 a FT-SQ4-19 (ver PR #50 para detalles)
 
 ---
 
-_Actualizado por Claude Code - 2026-02-25 (PRs Shift-Left review completo)_
+_Actualizado por Claude Code - 2026-02-25 (SQ-6 Guided Onboarding implementado)_

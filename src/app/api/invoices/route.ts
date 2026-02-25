@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server';
-import { createServer } from '@/lib/supabase/server';
+import { createServerFromRequest } from '@/lib/supabase/server';
 import { createInvoiceApiSchema } from '@/lib/validations/invoice';
-import { calculateTax, calculateTotal } from '@/lib/utils/invoice-calculations';
-import type { Invoice, Client } from '@/lib/types';
+import {
+  calculateTax,
+  calculateTotal,
+  calculateDiscountAmount,
+  calculateLineTotal,
+  calculateSubtotal,
+} from '@/lib/utils/invoice-calculations';
+import type { Invoice, Client, InvoiceStatus, InvoiceItem } from '@/lib/types';
 
 // =============================================================================
 // Types
@@ -12,10 +18,25 @@ interface InvoiceWithClient extends Invoice {
   client: Pick<Client, 'id' | 'name' | 'email' | 'company' | 'tax_id'>;
 }
 
+interface InvoiceWithClientAndItems extends InvoiceWithClient {
+  items: Pick<InvoiceItem, 'id' | 'description' | 'quantity' | 'unit_price' | 'subtotal'>[];
+}
+
 interface CreateInvoiceResponse {
-  data?: InvoiceWithClient;
+  data?: InvoiceWithClientAndItems;
   error?: string;
   details?: unknown;
+}
+
+interface ListInvoicesResponse {
+  data?: InvoiceWithClient[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+  error?: string;
 }
 
 // =============================================================================
@@ -24,21 +45,30 @@ interface CreateInvoiceResponse {
 
 /**
  * Generate next invoice number for user
- * Format: INV-YYYY-NNNN (e.g., INV-2026-0001)
+ * Format: {PREFIX}-{YEAR}-{NNNN} (e.g., INV-2026-0001)
+ * Uses user's configured prefix from business_profiles
  */
 async function generateInvoiceNumber(
-  supabase: Awaited<ReturnType<typeof createServer>>,
+  supabase: Awaited<ReturnType<typeof createServerFromRequest>>,
   userId: string
 ): Promise<string> {
-  const year = new Date().getFullYear();
-  const prefix = `INV-${year}-`;
+  // Get user's invoice prefix from business_profiles
+  const { data: businessProfile } = await supabase
+    .from('business_profiles')
+    .select('invoice_prefix')
+    .eq('user_id', userId)
+    .single();
 
-  // Get the highest invoice number for this user this year
+  const invoicePrefix = businessProfile?.invoice_prefix || 'INV';
+  const year = new Date().getFullYear();
+  const fullPrefix = `${invoicePrefix}-${year}-`;
+
+  // Get the highest invoice number for this user with this prefix pattern
   const { data: lastInvoice } = await supabase
     .from('invoices')
     .select('invoice_number')
     .eq('user_id', userId)
-    .like('invoice_number', `${prefix}%`)
+    .like('invoice_number', `${fullPrefix}%`)
     .order('invoice_number', { ascending: false })
     .limit(1)
     .single();
@@ -46,15 +76,34 @@ async function generateInvoiceNumber(
   let nextNumber = 1;
 
   if (lastInvoice?.invoice_number) {
-    // Extract the number part (last 4 digits)
-    const match = lastInvoice.invoice_number.match(/(\d{4})$/);
+    // Extract the number part (last digits)
+    const match = lastInvoice.invoice_number.match(/(\d+)$/);
     if (match) {
       nextNumber = parseInt(match[1], 10) + 1;
     }
   }
 
   // Pad to 4 digits
-  return `${prefix}${nextNumber.toString().padStart(4, '0')}`;
+  return `${fullPrefix}${nextNumber.toString().padStart(4, '0')}`;
+}
+
+/**
+ * Check if invoice number is available for user
+ */
+async function isInvoiceNumberAvailable(
+  supabase: Awaited<ReturnType<typeof createServerFromRequest>>,
+  userId: string,
+  invoiceNumber: string
+): Promise<boolean> {
+  const { data: existingInvoice } = await supabase
+    .from('invoices')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('invoice_number', invoiceNumber)
+    .is('deleted_at', null)
+    .single();
+
+  return !existingInvoice;
 }
 
 /**
@@ -75,20 +124,23 @@ function getDefaultDueDate(): string {
  *
  * Request body:
  * - clientId: string (required) - UUID of the client
+ * - invoiceNumber: string (optional) - Custom invoice number (auto-generated if empty)
  * - dueDate: string (optional) - Due date in YYYY-MM-DD format
  * - notes: string (optional) - Invoice notes
+ * - terms: string (optional) - Invoice terms
+ * - taxRate: number (optional) - Tax rate percentage
  * - items: array (optional) - Line items (for future use)
  *
  * Responses:
  * - 201: Invoice created successfully
- * - 400: Validation error or invalid clientId
+ * - 400: Validation error, invalid clientId, or duplicate invoice number
  * - 401: Unauthorized
  * - 404: Client not found
  * - 500: Internal server error
  */
 export async function POST(request: Request): Promise<NextResponse<CreateInvoiceResponse>> {
   try {
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {
@@ -114,7 +166,17 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
       );
     }
 
-    const { clientId, dueDate, notes, terms, taxRate = 0 } = validationResult.data;
+    const {
+      clientId,
+      invoiceNumber: customInvoiceNumber,
+      dueDate,
+      notes,
+      terms,
+      taxRate = 0,
+      discountType = null,
+      discountValue = 0,
+      items = [],
+    } = validationResult.data;
 
     // Verify client exists and belongs to user (RLS handles ownership)
     const { data: client, error: clientError } = await supabase
@@ -128,13 +190,40 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
       return NextResponse.json({ error: 'Cliente no encontrado' }, { status: 404 });
     }
 
-    // Generate invoice number
-    const invoiceNumber = await generateInvoiceNumber(supabase, user.id);
+    // Determine invoice number: use custom if provided, otherwise auto-generate
+    let invoiceNumber: string;
 
-    // Calculate tax and total amounts
-    // At creation, subtotal is 0 (line items will be added later via SQ-22)
-    const subtotal = 0;
-    const discountAmount = 0;
+    if (customInvoiceNumber && customInvoiceNumber.trim()) {
+      // Validate custom invoice number is not already in use
+      const isAvailable = await isInvoiceNumberAvailable(supabase, user.id, customInvoiceNumber);
+      if (!isAvailable) {
+        return NextResponse.json(
+          {
+            error: `El número de factura "${customInvoiceNumber}" ya está en uso. Usa otro número.`,
+          },
+          { status: 400 }
+        );
+      }
+      invoiceNumber = customInvoiceNumber.trim();
+    } else {
+      // Auto-generate invoice number
+      invoiceNumber = await generateInvoiceNumber(supabase, user.id);
+    }
+
+    // Calculate subtotal from line items (SQ-22)
+    const subtotal = calculateSubtotal(
+      items.map(item => ({
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      }))
+    );
+
+    // Calculate discount, tax, and total amounts
+    const { amount: discountAmount } = calculateDiscountAmount(
+      subtotal,
+      discountType,
+      discountValue
+    );
     const taxAmount = calculateTax(subtotal, discountAmount, taxRate);
     const total = calculateTotal(subtotal, discountAmount, taxAmount);
 
@@ -152,8 +241,8 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
         subtotal,
         tax_rate: taxRate,
         tax_amount: taxAmount,
-        discount_value: discountAmount,
-        discount_type: 'fixed',
+        discount_type: discountType,
+        discount_value: discountAmount, // Store calculated amount, not input value
         total,
       })
       .select()
@@ -177,10 +266,38 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
       );
     }
 
-    // Return invoice with client data
-    const responseData: InvoiceWithClient = {
+    // Insert line items if provided (SQ-22)
+    let insertedItems: Pick<InvoiceItem, 'id' | 'description' | 'quantity' | 'unit_price' | 'subtotal'>[] = [];
+
+    if (items.length > 0) {
+      const itemsToInsert = items.map((item, index) => ({
+        invoice_id: invoice.id,
+        description: item.description,
+        quantity: item.quantity,
+        unit_price: item.unitPrice,
+        subtotal: calculateLineTotal(item.quantity, item.unitPrice),
+        sort_order: index,
+      }));
+
+      const { data: createdItems, error: itemsError } = await supabase
+        .from('invoice_items')
+        .insert(itemsToInsert)
+        .select('id, description, quantity, unit_price, subtotal');
+
+      if (itemsError) {
+        console.error('Error creating invoice items:', itemsError);
+        // Invoice was created but items failed - log but don't fail the request
+        // Items can be added later via edit
+      } else {
+        insertedItems = createdItems || [];
+      }
+    }
+
+    // Return invoice with client data and items
+    const responseData: InvoiceWithClientAndItems = {
       ...invoice,
       client,
+      items: insertedItems,
     };
 
     return NextResponse.json({ data: responseData }, { status: 201 });
@@ -190,5 +307,99 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
       { error: 'Error al crear la factura. Intenta de nuevo.' },
       { status: 500 }
     );
+  }
+}
+
+// =============================================================================
+// GET /api/invoices - List invoices with filters and pagination
+// =============================================================================
+
+/**
+ * GET /api/invoices - List user's invoices
+ *
+ * Query params:
+ * - status: InvoiceStatus (optional) - Filter by status
+ * - page: number (default: 1) - Page number
+ * - limit: number (default: 20, max: 50) - Items per page
+ *
+ * Responses:
+ * - 200: List of invoices with pagination
+ * - 401: Unauthorized
+ * - 500: Internal server error
+ */
+export async function GET(request: Request): Promise<NextResponse<ListInvoicesResponse>> {
+  try {
+    const supabase = await createServerFromRequest(request);
+
+    // Verify authentication
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    // Parse query params
+    const url = new URL(request.url);
+    const status = url.searchParams.get('status') as InvoiceStatus | null;
+    const page = Math.max(1, parseInt(url.searchParams.get('page') || '1', 10));
+    const limit = Math.min(50, Math.max(1, parseInt(url.searchParams.get('limit') || '20', 10)));
+    const offset = (page - 1) * limit;
+
+    // Build query
+    let query = supabase
+      .from('invoices')
+      .select(
+        `
+        *,
+        client:clients!inner (
+          id,
+          name,
+          email,
+          company,
+          tax_id
+        )
+      `,
+        { count: 'exact' }
+      )
+      .is('deleted_at', null)
+      .order('updated_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    // Apply status filter if provided
+    if (status) {
+      query = query.eq('status', status);
+    }
+
+    const { data: invoices, error: queryError, count } = await query;
+
+    if (queryError) {
+      console.error('Error fetching invoices:', queryError);
+      return NextResponse.json({ error: 'Error al cargar las facturas' }, { status: 500 });
+    }
+
+    const total = count || 0;
+    const totalPages = Math.ceil(total / limit);
+
+    // Transform data to match InvoiceWithClient type
+    const transformedInvoices: InvoiceWithClient[] = (invoices || []).map(invoice => ({
+      ...invoice,
+      client: invoice.client as Pick<Client, 'id' | 'name' | 'email' | 'company' | 'tax_id'>,
+    }));
+
+    return NextResponse.json({
+      data: transformedInvoices,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
+    });
+  } catch (error) {
+    console.error('Unexpected error in GET /api/invoices:', error);
+    return NextResponse.json({ error: 'Error al cargar las facturas' }, { status: 500 });
   }
 }

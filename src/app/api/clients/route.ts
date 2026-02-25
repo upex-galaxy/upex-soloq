@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServer } from '@/lib/supabase/server';
+import { createServerFromRequest } from '@/lib/supabase/server';
 import { clientFormSchema } from '@/lib/validations/client';
 import type { Client } from '@/lib/types';
 
@@ -45,7 +45,7 @@ type SortOrder = 'asc' | 'desc';
  */
 export async function GET(request: NextRequest): Promise<NextResponse<ListClientsResponse>> {
   try {
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {
@@ -136,7 +136,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<ListClient
  */
 export async function POST(request: Request): Promise<NextResponse<CreateClientResponse>> {
   try {
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {

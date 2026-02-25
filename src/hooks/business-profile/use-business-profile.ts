@@ -29,13 +29,9 @@ export function useBusinessProfile() {
         .from('business_profiles')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
-        // PGRST116 = no rows found, which is ok (user hasn't set up profile yet)
-        if (error.code === 'PGRST116') {
-          return null;
-        }
         throw error;
       }
 

@@ -38,6 +38,7 @@ import {
   InvoiceSummary,
   InvoiceStatusBadge,
 } from '@/components/invoices';
+import { LineItemsTable } from '@/components/invoices/line-items-table';
 import { InvoiceNumberInput } from '@/components/invoices/invoice-number-input';
 import { useClients } from '@/hooks/clients';
 import { useInvoice, useUpdateInvoice, useDeleteInvoice, useAutoSave } from '@/hooks/invoices';
@@ -71,6 +72,9 @@ export default function EditInvoicePage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isInvoiceNumberValid, setIsInvoiceNumberValid] = useState(true);
 
+  // State for subtotal from line items (SQ-22)
+  const [subtotal, setSubtotal] = useState(0);
+
   // Fetch invoice data (TC-04)
   const {
     data: invoice,
@@ -101,6 +105,8 @@ export default function EditInvoicePage() {
       taxRate: 0,
       discountType: null,
       discountValue: 0,
+      // SQ-22: Start with one empty line item
+      items: [{ description: '', quantity: 1, unitPrice: 0 }],
     },
   });
 
@@ -136,6 +142,20 @@ export default function EditInvoicePage() {
         setSelectedClient(invoice.client as Client);
       }
 
+      // Transform items from snake_case (DB) to camelCase (form) - SQ-22
+      const formItems =
+        invoice.items && invoice.items.length > 0
+          ? invoice.items.map(item => ({
+              id: item.id,
+              description: item.description,
+              quantity: item.quantity,
+              unitPrice: item.unit_price,
+            }))
+          : [{ description: '', quantity: 1, unitPrice: 0 }];
+
+      // Set initial subtotal from invoice
+      setSubtotal(invoice.subtotal ?? 0);
+
       // Reset form with invoice data
       form.reset({
         clientId: invoice.client?.id || '',
@@ -146,6 +166,7 @@ export default function EditInvoicePage() {
         taxRate: invoice.tax_rate ?? 0,
         discountType: invoice.discount_type as DiscountType | null,
         discountValue: invoice.discount_value ?? 0,
+        items: formItems,
       });
 
       // Mark as clean after loading
@@ -223,8 +244,7 @@ export default function EditInvoicePage() {
   const discountType = form.watch('discountType');
   const discountValue = form.watch('discountValue') ?? 0;
 
-  // Calculate discount amount for summary
-  const subtotal = invoice?.subtotal ?? 0;
+  // Calculate discount amount for summary (SQ-22: subtotal comes from line items)
   const { amount: discountAmount } = calculateDiscountAmount(subtotal, discountType, discountValue);
 
   const clients = clientsData?.clients ?? [];
@@ -427,6 +447,14 @@ export default function EditInvoicePage() {
                     <FormMessage />
                   </FormItem>
                 )}
+              />
+
+              {/* Line Items (SQ-22) */}
+              <LineItemsTable
+                control={form.control}
+                errors={form.formState.errors}
+                onSubtotalChange={setSubtotal}
+                disabled={isUpdating || isDeleting || isSaving}
               />
 
               {/* Tax Rate */}

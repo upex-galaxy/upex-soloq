@@ -1,13 +1,15 @@
 import { NextResponse } from 'next/server';
-import { createServer } from '@/lib/supabase/server';
+import { createServerFromRequest } from '@/lib/supabase/server';
 import { updateInvoiceSchema } from '@/lib/validations/invoice';
 import {
   calculateTax,
   calculateTotal,
   calculateDiscountAmount,
+  calculateLineTotal,
+  calculateSubtotal,
 } from '@/lib/utils/invoice-calculations';
 import type { InvoiceWithDetails } from '@/hooks/invoices/use-invoice';
-import type { Invoice, Client, DiscountType } from '@/lib/types';
+import type { Invoice, Client, DiscountType, InvoiceItem } from '@/lib/types';
 
 // =============================================================================
 // Types
@@ -22,8 +24,12 @@ interface InvoiceWithClient extends Invoice {
   client: Pick<Client, 'id' | 'name' | 'email' | 'company' | 'tax_id'>;
 }
 
+interface InvoiceWithClientAndItems extends InvoiceWithClient {
+  items: Pick<InvoiceItem, 'id' | 'description' | 'quantity' | 'unit_price' | 'subtotal'>[];
+}
+
 interface UpdateInvoiceResponse {
-  data?: InvoiceWithClient;
+  data?: InvoiceWithClientAndItems;
   error?: string;
   details?: unknown;
 }
@@ -57,12 +63,12 @@ interface DeleteInvoiceResponse {
  * - 500: Internal server error
  */
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<GetInvoiceResponse>> {
   try {
     const { id: invoiceId } = await params;
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {
@@ -207,7 +213,7 @@ export async function PUT(
 ): Promise<NextResponse<UpdateInvoiceResponse>> {
   try {
     const { id: invoiceId } = await params;
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {
@@ -259,7 +265,7 @@ export async function PUT(
       );
     }
 
-    const { clientId, invoiceNumber, dueDate, notes, terms, taxRate, discountType, discountValue } =
+    const { clientId, invoiceNumber, dueDate, notes, terms, taxRate, discountType, discountValue, items } =
       validationResult.data;
 
     // Build update object with only provided fields
@@ -313,12 +319,65 @@ export async function PUT(
       updates.terms = terms || null;
     }
 
-    // Recalculate amounts if tax rate or discount changed
+    // Handle items update (SQ-22)
+    const itemsChanged = items !== undefined;
+    let insertedItems: Pick<InvoiceItem, 'id' | 'description' | 'quantity' | 'unit_price' | 'subtotal'>[] = [];
+
+    if (itemsChanged && items) {
+      // Delete existing items
+      const { error: deleteItemsError } = await supabase
+        .from('invoice_items')
+        .delete()
+        .eq('invoice_id', invoiceId);
+
+      if (deleteItemsError) {
+        console.error('Error deleting invoice items:', deleteItemsError);
+        return NextResponse.json({ error: 'Error al actualizar los items' }, { status: 500 });
+      }
+
+      // Insert new items if any
+      if (items.length > 0) {
+        const itemsToInsert = items.map((item, index) => ({
+          invoice_id: invoiceId,
+          description: item.description,
+          quantity: item.quantity,
+          unit_price: item.unitPrice,
+          subtotal: calculateLineTotal(item.quantity, item.unitPrice),
+          sort_order: index,
+        }));
+
+        const { data: createdItems, error: insertItemsError } = await supabase
+          .from('invoice_items')
+          .insert(itemsToInsert)
+          .select('id, description, quantity, unit_price, subtotal');
+
+        if (insertItemsError) {
+          console.error('Error inserting invoice items:', insertItemsError);
+          return NextResponse.json({ error: 'Error al actualizar los items' }, { status: 500 });
+        }
+
+        insertedItems = createdItems || [];
+      }
+
+      // Recalculate subtotal from new items
+      const newSubtotal = calculateSubtotal(
+        items.map(item => ({
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+        }))
+      );
+      updates.subtotal = newSubtotal;
+    }
+
+    // Recalculate amounts if tax rate, discount, or items changed
     const taxRateChanged = taxRate !== undefined;
     const discountChanged = discountType !== undefined || discountValue !== undefined;
 
-    if (taxRateChanged || discountChanged) {
-      const subtotal = existingInvoice.subtotal ?? 0;
+    if (taxRateChanged || discountChanged || itemsChanged) {
+      // Use new subtotal if items changed, otherwise use existing
+      const subtotal = itemsChanged
+        ? (updates.subtotal as number)
+        : existingInvoice.subtotal ?? 0;
       const effectiveTaxRate = taxRate ?? existingInvoice.tax_rate ?? 0;
       const effectiveDiscountType =
         discountType !== undefined
@@ -371,9 +430,10 @@ export async function PUT(
       return NextResponse.json({ error: 'Error al actualizar la factura' }, { status: 500 });
     }
 
-    const responseData: InvoiceWithClient = {
+    const responseData: InvoiceWithClientAndItems = {
       ...updatedInvoice,
       client: updatedInvoice.client as Pick<Client, 'id' | 'name' | 'email' | 'company' | 'tax_id'>,
+      items: insertedItems,
     };
 
     return NextResponse.json({ data: responseData }, { status: 200 });
@@ -403,12 +463,12 @@ export async function PUT(
  * - 500: Internal server error
  */
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<DeleteInvoiceResponse>> {
   try {
     const { id: invoiceId } = await params;
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {

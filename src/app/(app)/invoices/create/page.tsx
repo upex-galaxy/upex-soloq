@@ -28,6 +28,7 @@ import {
   DiscountInput,
   InvoiceSummary,
 } from '@/components/invoices';
+import { LineItemsTable } from '@/components/invoices/line-items-table';
 import { InvoiceNumberInput } from '@/components/invoices/invoice-number-input';
 import { calculateDiscountAmount } from '@/lib/utils/invoice-calculations';
 import type { DiscountType } from '@/lib/validations/invoice';
@@ -69,6 +70,9 @@ export default function CreateInvoicePage() {
   // State for invoice number validation
   const [isInvoiceNumberValid, setIsInvoiceNumberValid] = useState(true);
 
+  // State for subtotal from line items (SQ-22)
+  const [subtotal, setSubtotal] = useState(0);
+
   // Form setup
   const form = useForm<CreateInvoiceFormData>({
     resolver: zodResolver(createInvoiceSchema),
@@ -81,6 +85,8 @@ export default function CreateInvoicePage() {
       taxRate: 0,
       discountType: null,
       discountValue: 0,
+      // SQ-22: Start with one empty line item
+      items: [{ description: '', quantity: 1, unitPrice: 0 }],
     },
   });
 
@@ -96,8 +102,7 @@ export default function CreateInvoicePage() {
   const discountType = form.watch('discountType');
   const discountValue = form.watch('discountValue') ?? 0;
 
-  // Calculate discount amount for summary (subtotal is 0 for new invoices)
-  const subtotal = 0; // Will be updated when line items are added (SQ-22)
+  // Calculate discount amount for summary (SQ-22: subtotal comes from line items)
   const { amount: discountAmount } = calculateDiscountAmount(subtotal, discountType, discountValue);
 
   // Handle client selection
@@ -233,6 +238,14 @@ export default function CreateInvoicePage() {
                     <FormMessage />
                   </FormItem>
                 )}
+              />
+
+              {/* Line Items (SQ-22) */}
+              <LineItemsTable
+                control={form.control}
+                errors={form.formState.errors}
+                onSubtotalChange={setSubtotal}
+                disabled={isCreating}
               />
 
               {/* Tax Rate */}

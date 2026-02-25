@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServer } from '@/lib/supabase/server';
+import { createServerFromRequest } from '@/lib/supabase/server';
 import { clientFormSchema } from '@/lib/validations/client';
 import type { Client } from '@/lib/types';
 
@@ -31,12 +31,12 @@ interface RouteContext {
  * - 500: Internal server error
  */
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   context: RouteContext
 ): Promise<NextResponse<ClientResponse>> {
   try {
     const { id } = await context.params;
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {
@@ -90,7 +90,7 @@ export async function PUT(
 ): Promise<NextResponse<ClientResponse>> {
   try {
     const { id } = await context.params;
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {
@@ -204,12 +204,12 @@ interface DeleteClientResponse {
  * - 500: Internal server error
  */
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   context: RouteContext
 ): Promise<NextResponse<DeleteClientResponse>> {
   try {
     const { id } = await context.params;
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {

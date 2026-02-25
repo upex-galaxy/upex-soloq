@@ -583,21 +583,37 @@ _Cambios:_
 
 ### Fase 4: Vincular a User Story
 
-**Después de crear cada Test:**
+**Después de crear cada Test, crear el link de trazabilidad:**
 
 ```
-Tool: mcp__atlassian__updateJiraIssue
+Tool: mcp__atlassian__jira_create_issue_link
 
-Agregar link:
-- Type: "is tested by" / "tests"
-- Outward: Test issue
-- Inward: User Story
+{
+  "link_type": "Test",
+  "inward_issue_key": "{TEST-XXX}",   // El Test que "tests"
+  "outward_issue_key": "{STORY-XXX}"  // La Story que "is tested by"
+}
 ```
 
-**O agregar comentario en la US:**
+**Resultado esperado en Jira:**
+
+- Desde el **Test** (SQ-90): muestra "tests SQ-14"
+- Desde la **User Story** (SQ-14): muestra "is tested by SQ-90"
+
+**⚠️ IMPORTANTE - Semántica de inward/outward:**
+
+| Parámetro | Issue | Relación que recibe |
+|-----------|-------|---------------------|
+| `inward_issue_key` | Test | "tests" (el test HACE el testing) |
+| `outward_issue_key` | User Story | "is tested by" (la story RECIBE el testing) |
+
+> **Anti-patrón:** Si intercambias los valores, la Story aparecerá como "tests" al Test,
+> lo cual es semánticamente incorrecto.
+
+**Opcionalmente, agregar comentario en la US:**
 
 ```
-Tool: mcp__atlassian__addCommentToJiraIssue
+Tool: mcp__atlassian__jira_add_comment
 
 Issue: {STORY-XXX}
 Comment: "Test case documentado: [{TEST-XXX}] - {Test Name}"

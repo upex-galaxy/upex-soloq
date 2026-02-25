@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
-import { createServer } from '@/lib/supabase/server';
+import { createServerFromRequest } from '@/lib/supabase/server';
 import { createInvoiceApiSchema } from '@/lib/validations/invoice';
 import {
   calculateTax,
   calculateTotal,
   calculateDiscountAmount,
+  calculateLineTotal,
+  calculateSubtotal,
 } from '@/lib/utils/invoice-calculations';
-import type { Invoice, Client, InvoiceStatus } from '@/lib/types';
+import type { Invoice, Client, InvoiceStatus, InvoiceItem } from '@/lib/types';
 
 // =============================================================================
 // Types
@@ -16,8 +18,12 @@ interface InvoiceWithClient extends Invoice {
   client: Pick<Client, 'id' | 'name' | 'email' | 'company' | 'tax_id'>;
 }
 
+interface InvoiceWithClientAndItems extends InvoiceWithClient {
+  items: Pick<InvoiceItem, 'id' | 'description' | 'quantity' | 'unit_price' | 'subtotal'>[];
+}
+
 interface CreateInvoiceResponse {
-  data?: InvoiceWithClient;
+  data?: InvoiceWithClientAndItems;
   error?: string;
   details?: unknown;
 }
@@ -43,7 +49,7 @@ interface ListInvoicesResponse {
  * Uses user's configured prefix from business_profiles
  */
 async function generateInvoiceNumber(
-  supabase: Awaited<ReturnType<typeof createServer>>,
+  supabase: Awaited<ReturnType<typeof createServerFromRequest>>,
   userId: string
 ): Promise<string> {
   // Get user's invoice prefix from business_profiles
@@ -85,7 +91,7 @@ async function generateInvoiceNumber(
  * Check if invoice number is available for user
  */
 async function isInvoiceNumberAvailable(
-  supabase: Awaited<ReturnType<typeof createServer>>,
+  supabase: Awaited<ReturnType<typeof createServerFromRequest>>,
   userId: string,
   invoiceNumber: string
 ): Promise<boolean> {
@@ -134,7 +140,7 @@ function getDefaultDueDate(): string {
  */
 export async function POST(request: Request): Promise<NextResponse<CreateInvoiceResponse>> {
   try {
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {
@@ -169,6 +175,7 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
       taxRate = 0,
       discountType = null,
       discountValue = 0,
+      items = [],
     } = validationResult.data;
 
     // Verify client exists and belongs to user (RLS handles ownership)
@@ -203,9 +210,15 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
       invoiceNumber = await generateInvoiceNumber(supabase, user.id);
     }
 
+    // Calculate subtotal from line items (SQ-22)
+    const subtotal = calculateSubtotal(
+      items.map(item => ({
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      }))
+    );
+
     // Calculate discount, tax, and total amounts
-    // At creation, subtotal is 0 (line items will be added later via SQ-22)
-    const subtotal = 0;
     const { amount: discountAmount } = calculateDiscountAmount(
       subtotal,
       discountType,
@@ -253,10 +266,38 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
       );
     }
 
-    // Return invoice with client data
-    const responseData: InvoiceWithClient = {
+    // Insert line items if provided (SQ-22)
+    let insertedItems: Pick<InvoiceItem, 'id' | 'description' | 'quantity' | 'unit_price' | 'subtotal'>[] = [];
+
+    if (items.length > 0) {
+      const itemsToInsert = items.map((item, index) => ({
+        invoice_id: invoice.id,
+        description: item.description,
+        quantity: item.quantity,
+        unit_price: item.unitPrice,
+        subtotal: calculateLineTotal(item.quantity, item.unitPrice),
+        sort_order: index,
+      }));
+
+      const { data: createdItems, error: itemsError } = await supabase
+        .from('invoice_items')
+        .insert(itemsToInsert)
+        .select('id, description, quantity, unit_price, subtotal');
+
+      if (itemsError) {
+        console.error('Error creating invoice items:', itemsError);
+        // Invoice was created but items failed - log but don't fail the request
+        // Items can be added later via edit
+      } else {
+        insertedItems = createdItems || [];
+      }
+    }
+
+    // Return invoice with client data and items
+    const responseData: InvoiceWithClientAndItems = {
       ...invoice,
       client,
+      items: insertedItems,
     };
 
     return NextResponse.json({ data: responseData }, { status: 201 });
@@ -288,7 +329,7 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
  */
 export async function GET(request: Request): Promise<NextResponse<ListInvoicesResponse>> {
   try {
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {

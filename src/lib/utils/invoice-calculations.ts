@@ -155,3 +155,92 @@ export const TAX_PRESETS = [
 ] as const;
 
 export type TaxPreset = (typeof TAX_PRESETS)[number];
+
+// =============================================================================
+// Line Item Calculations (SQ-22)
+// =============================================================================
+
+/**
+ * Line item input type for calculations
+ */
+export interface LineItemInput {
+  quantity: number;
+  unitPrice: number;
+}
+
+/**
+ * Calculate line item total: quantity × unit_price
+ *
+ * @param quantity - Item quantity (must be > 0)
+ * @param unitPrice - Unit price (must be >= 0)
+ * @returns Line total rounded to 2 decimals
+ *
+ * @example
+ * calculateLineTotal(1, 500) // => 500.00
+ * calculateLineTotal(2.5, 80) // => 200.00
+ * calculateLineTotal(10, 0) // => 0.00
+ */
+export function calculateLineTotal(quantity: number, unitPrice: number): number {
+  return roundCurrency(quantity * unitPrice);
+}
+
+/**
+ * Calculate subtotal from array of line items
+ *
+ * @param items - Array of line items with quantity and unitPrice
+ * @returns Subtotal (sum of all line totals) rounded to 2 decimals
+ *
+ * @example
+ * calculateSubtotal([
+ *   { quantity: 1, unitPrice: 500 },
+ *   { quantity: 2.5, unitPrice: 80 }
+ * ]) // => 700.00
+ */
+export function calculateSubtotal(items: LineItemInput[]): number {
+  if (!items || items.length === 0) {
+    return 0;
+  }
+
+  const subtotal = items.reduce((sum, item) => {
+    return sum + calculateLineTotal(item.quantity, item.unitPrice);
+  }, 0);
+
+  return roundCurrency(subtotal);
+}
+
+/**
+ * Calculate all invoice amounts from line items
+ * Combines subtotal calculation with tax and discount
+ *
+ * @param items - Array of line items
+ * @param discountType - Type of discount
+ * @param discountValue - Discount value
+ * @param taxRate - Tax rate percentage
+ * @returns Object with subtotal, discountAmount, taxableBase, taxAmount, total
+ */
+export function calculateInvoiceFromItems(
+  items: LineItemInput[],
+  discountType: 'percentage' | 'fixed' | null | undefined,
+  discountValue: number | null | undefined,
+  taxRate: number
+): {
+  subtotal: number;
+  discountAmount: number;
+  taxableBase: number;
+  taxAmount: number;
+  total: number;
+} {
+  const subtotal = calculateSubtotal(items);
+  const { amount: discountAmount } = calculateDiscountAmount(subtotal, discountType, discountValue);
+  const taxableBase = calculateTaxableBase(subtotal, discountAmount);
+  const taxAmount = calculateTax(subtotal, discountAmount, taxRate);
+  const total = calculateTotal(subtotal, discountAmount, taxAmount);
+
+  return {
+    subtotal,
+    discountAmount,
+    taxableBase,
+    taxAmount,
+    total,
+  };
+}

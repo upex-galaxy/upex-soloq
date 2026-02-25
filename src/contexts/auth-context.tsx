@@ -48,9 +48,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchUserProfile = useCallback(
     async (userId: string) => {
       const [profileResult, businessResult, subscriptionResult] = await Promise.all([
-        supabase.from('profiles').select('*').eq('user_id', userId).single(),
-        supabase.from('business_profiles').select('*').eq('user_id', userId).single(),
-        supabase.from('subscription').select('*').eq('user_id', userId).single(),
+        supabase.from('profiles').select('*').eq('user_id', userId).maybeSingle(),
+        supabase.from('business_profiles').select('*').eq('user_id', userId).maybeSingle(),
+        supabase.from('subscription').select('*').eq('user_id', userId).maybeSingle(),
       ]);
 
       return {
@@ -188,6 +188,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
+        // Update last_login_at in profiles table (SQ-81 fix)
+        await supabase
+          .from('profiles')
+          .update({ last_login_at: new Date().toISOString() })
+          .eq('user_id', session.user.id);
+
         const profileData = await fetchUserProfile(session.user.id);
 
         setState({

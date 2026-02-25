@@ -2,11 +2,36 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
+    },
+  },
+};
 import {
   ClientsTable,
   ClientsSearch,
@@ -122,10 +147,16 @@ export default function ClientsPage() {
   const showEmptyState = !isLoading && !hasClients;
 
   return (
-    <div className="space-y-8">
+    <motion.div
+      className="space-y-8"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
       <PageHeader />
 
-      <Card>
+      <motion.div variants={itemVariants}>
+      <Card className="card-elevated border-border/50">
         <CardContent className="pt-6">
           {/* Search bar - always visible if there are clients or a search is active */}
           {(total > 0 || hasSearch || hasClients) && (
@@ -168,6 +199,7 @@ export default function ClientsPage() {
           )}
         </CardContent>
       </Card>
+      </motion.div>
 
       {/* Delete confirmation dialog */}
       <DeleteClientDialog
@@ -177,25 +209,28 @@ export default function ClientsPage() {
         onConfirm={handleDeleteConfirm}
         isLoading={isDeleting}
       />
-    </div>
+    </motion.div>
   );
 }
 
 function PageHeader() {
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <motion.div
+      className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+      variants={itemVariants}
+    >
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Clientes</h1>
         <p className="text-muted-foreground">
           Administra tu base de clientes y su historial de facturación.
         </p>
       </div>
-      <Button asChild>
+      <Button asChild className="shadow-sm hover:shadow-md transition-shadow">
         <Link href="/clients/create">
           <Plus className="mr-2 h-4 w-4" />
           Nuevo Cliente
         </Link>
       </Button>
-    </div>
+    </motion.div>
   );
 }

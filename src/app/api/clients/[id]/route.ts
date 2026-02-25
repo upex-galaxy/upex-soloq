@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServer } from '@/lib/supabase/server';
+import { createServerFromRequest } from '@/lib/supabase/server';
 import { clientFormSchema } from '@/lib/validations/client';
 import type { Client } from '@/lib/types';
 
@@ -31,12 +31,12 @@ interface RouteContext {
  * - 500: Internal server error
  */
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   context: RouteContext
 ): Promise<NextResponse<ClientResponse>> {
   try {
     const { id } = await context.params;
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {
@@ -90,7 +90,7 @@ export async function PUT(
 ): Promise<NextResponse<ClientResponse>> {
   try {
     const { id } = await context.params;
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {
@@ -130,12 +130,15 @@ export async function PUT(
 
     const { name, email, company, phone, address, notes, tax_id } = validationResult.data;
 
-    // Check for duplicate email for this user (excluding current client)
+    // Normalize email to lowercase for case-insensitive comparison and storage
+    const normalizedEmail = email.toLowerCase();
+
+    // Check for duplicate email for this user (case-insensitive, excluding current client)
     const { data: duplicateClient } = await supabase
       .from('clients')
       .select('id')
       .eq('user_id', user.id)
-      .eq('email', email)
+      .ilike('email', normalizedEmail)
       .neq('id', id)
       .is('deleted_at', null)
       .single();
@@ -144,12 +147,12 @@ export async function PUT(
       return NextResponse.json({ error: 'Ya existe un cliente con este email' }, { status: 409 });
     }
 
-    // Update client
+    // Update client with normalized email
     const { data: client, error: updateError } = await supabase
       .from('clients')
       .update({
         name,
-        email,
+        email: normalizedEmail,
         company: company || null,
         phone: phone || null,
         address: address || null,
@@ -201,12 +204,12 @@ interface DeleteClientResponse {
  * - 500: Internal server error
  */
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   context: RouteContext
 ): Promise<NextResponse<DeleteClientResponse>> {
   try {
     const { id } = await context.params;
-    const supabase = await createServer();
+    const supabase = await createServerFromRequest(request);
 
     // Verify authentication
     const {

@@ -4,12 +4,17 @@ import { useMemo } from 'react';
 
 import { cn } from '@/lib/utils';
 import { calculateInvoiceAmounts } from '@/lib/utils/invoice-calculations';
+import type { DiscountType } from '@/lib/validations/invoice';
 
 export interface InvoiceSummaryProps {
   /** Invoice subtotal (sum of line items) */
   subtotal: number;
   /** Discount amount (already calculated if percentage) */
   discountAmount?: number;
+  /** Discount type for display label (optional) */
+  discountType?: DiscountType | null;
+  /** Discount input value for display label (optional, percentage 0-100 or fixed amount) */
+  discountInputValue?: number;
   /** Tax rate as percentage (0-100) */
   taxRate: number;
   /** Currency code for formatting */
@@ -49,6 +54,8 @@ function formatCurrency(value: number, currency: string = 'USD'): string {
 export function InvoiceSummary({
   subtotal,
   discountAmount = 0,
+  discountType,
+  discountInputValue,
   taxRate,
   currency = 'USD',
   className,
@@ -75,7 +82,11 @@ export function InvoiceSummary({
       {/* Discount (only show if > 0) */}
       {discountAmount > 0 && (
         <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Descuento</span>
+          <span className="text-muted-foreground">
+            {discountType === 'percentage' && discountInputValue
+              ? `Descuento (${discountInputValue}%)`
+              : 'Descuento'}
+          </span>
           <span className="text-destructive" data-testid="summary-discount">
             -{formatCurrency(discountAmount, currency)}
           </span>

@@ -17,6 +17,7 @@ export type Database = {
           created_at: string | null;
           default_terms: string | null;
           id: string;
+          invoice_prefix: string | null;
           logo_url: string | null;
           tax_id: string | null;
           updated_at: string | null;
@@ -30,6 +31,7 @@ export type Database = {
           created_at?: string | null;
           default_terms?: string | null;
           id?: string;
+          invoice_prefix?: string | null;
           logo_url?: string | null;
           tax_id?: string | null;
           updated_at?: string | null;
@@ -43,6 +45,7 @@ export type Database = {
           created_at?: string | null;
           default_terms?: string | null;
           id?: string;
+          invoice_prefix?: string | null;
           logo_url?: string | null;
           tax_id?: string | null;
           updated_at?: string | null;

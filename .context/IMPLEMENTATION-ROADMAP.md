@@ -1,6 +1,6 @@
 # Implementation Roadmap - SoloQ
 
-> **Documento provisional** - Generado: 2026-02-07 | **Última actualización:** 2026-02-24
+> **Documento provisional** - Generado: 2026-02-07 | **Última actualización:** 2026-02-25
 > **Proposito:** Panorama completo del estado actual y plan de implementacion ordenado por dependencias.
 
 ---
@@ -108,7 +108,7 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | ----- | ---------------------------------------- | --------------- | -------- | ----------------------------- | ------------- | ------------ |
 | SQ-21 | Create Invoice by Selecting Client       | Ready For QA    | Medium   | Ely                           | #19 (MERGED)  | #29 (MERGED) |
 | SQ-22 | Add Line Items to Invoice                | Ready For QA    | Medium   | Ely                           | #55 (MERGED)  | #56 (MERGED) |
-| SQ-23 | Automatic Subtotal and Total Calculation | Ready For Dev   | Medium   | Raúl González                 | #53 (OPEN)    | -            |
+| SQ-23 | Automatic Subtotal and Total Calculation | Ready For Dev   | Medium   | Raúl González                 | #53 (MERGED)  | -            |
 | SQ-24 | Add Taxes to Invoice                     | **In Test**     | Medium   | Gloria Jesely Galindez Suárez | #9 (MERGED)   | #32 (MERGED) |
 | SQ-25 | Add Discounts to Invoice                 | **In Test**     | Medium   | GENESIS OJOSE                 | #24 (MERGED)  | #51 (MERGED) |
 | SQ-26 | Preview Invoice Before Sending           | Ready For Dev   | Medium   | Ely                           | #15 (MERGED)  | -            |
@@ -141,7 +141,7 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | Key   | Story                              | Status        | Priority | Assignee       | PR Shift-Left | PR Impl |
 | ----- | ---------------------------------- | ------------- | -------- | -------------- | ------------- | ------- |
 | SQ-42 | Send Invoice by Email with 1 Click | Backlog       | Medium   | -              | -             | -       |
-| SQ-43 | Include PDF Attachment in Email    | Ready For Dev | Medium   | Ely            | #40 (OPEN)    | -       |
+| SQ-43 | Include PDF Attachment in Email    | Ready For Dev | Medium   | Ely            | #40 (MERGED)  | -       |
 | SQ-46 | View Email Send Confirmation       | Shift-Left QA | Medium   | Miguel Millan  | -             | -       |
 
 ---
@@ -232,9 +232,9 @@ SQ-31 (PDF Generation Epic)
 | ----- | ----- | -------------------------------- | ------------- | ------------- | ------------- | ------- |
 | 18    | SQ-6  | Guided Onboarding for New Users  | Ready For Dev | Ely           | -             | -       |
 | 19    | SQ-18 | View Client Invoice History      | Ready For Dev | Ely           | #43 (MERGED)  | -       |
-| 20    | SQ-23 | Auto Subtotal/Total Calculation  | Ready For Dev | Raúl González | #53 (OPEN)    | -       |
+| 20    | SQ-23 | Auto Subtotal/Total Calculation  | Ready For Dev | Raúl González | #53 (MERGED)  | -       |
 | 21    | SQ-26 | Preview Invoice Before Send      | Ready For Dev | Ely           | #15 (MERGED)  | -       |
-| 22    | SQ-43 | Include PDF Attachment in Email  | Ready For Dev | Ely           | #40 (OPEN)    | -       |
+| 22    | SQ-43 | Include PDF Attachment in Email  | Ready For Dev | Ely           | #40 (MERGED)  | -       |
 
 ### OMITIDAS (No Ready For Dev o Dependencias Bloqueadas)
 
@@ -316,7 +316,7 @@ FASE 4 - Auth & Recovery ✅ COMPLETADA
   17. SQ-4: Password Recovery via Email ✅ (In Test)
 ```
 
-### Metricas (2026-02-24)
+### Metricas (2026-02-25)
 
 - **Total US implementadas:** 16 (PRs mergeados en staging)
 - **US en QA Approved:** 1 (SQ-14 ✅)
@@ -325,9 +325,10 @@ FASE 4 - Auth & Recovery ✅ COMPLETADA
 - **US en BLOCKED:** 2 (SQ-3, SQ-16 - pendientes re-test)
 - **US en Shift-Left QA:** 3 (SQ-5, SQ-34, SQ-46)
 - **US en Ready For Dev:** 5 (SQ-6, SQ-18, SQ-23, SQ-26, SQ-43)
-- **Bugs Abiertos:** 5 (1 Highest, 2 High, 2 Medium)
-- **Bugs Ready For QA:** 2 (SQ-81, SQ-82 - fixeados)
-- **PRs de Bug Fix:** 1 pendiente (#44), 3 mergeados (#41, #45, #54)
+- **Bugs Abiertos:** 4 (1 Highest, 2 High, 1 Medium)
+- **Bugs Ready For QA:** 4 (SQ-75, SQ-76, SQ-81, SQ-82 - todos fixeados ✅)
+- **PRs de Bug Fix:** Todos mergeados (#41, #44, #45, #54) ✅
+- **PRs de Shift-Left:** ✅ Todos mergeados (#40, #48, #52, #53)
 
 ---
 
@@ -494,23 +495,22 @@ US de FASE 4 implementadas:
 
 ## PRs Pendientes de Revisión (2026-02-24)
 
-### 🔧 PRs de Bug Fixes
+### 🔧 PRs de Bug Fixes (Todos Mergeados ✅)
 
 | PR # | Rama                             | Bug   | Summary                           | Autor    | Estado |
 | ---- | -------------------------------- | ----- | --------------------------------- | -------- | ------ |
 | #54  | fix/SQ-81-SQ-82/auth-client-fixes | SQ-81, SQ-82 | Resolve auth & client blocking bugs | saiotest | MERGED ✅ |
 | #45  | fix/SQ-76/business-profiles-406  | SQ-76 | Use maybeSingle() for optional profile | saiotest | MERGED ✅ |
-| #44  | fix/SQ-75/phone-validation       | SQ-75 | Add phone field format validation | saiotest | OPEN   |
+| #44  | fix/SQ-75/phone-validation       | SQ-75 | Add phone field format validation | saiotest | MERGED ✅ |
 
-### 📝 PRs de Shift-Left QA / Documentación
+### 📝 PRs de Shift-Left QA / Documentación ✅ (Todos Mergeados)
 
-| PR # | Rama                          | US    | Tipo       | Autor          | Estado |
-| ---- | ----------------------------- | ----- | ---------- | -------------- | ------ |
-| #53  | test/SQ-23/auto-calculate     | SQ-23 | Shift-Left | GaslessQA      | OPEN   |
-| #52  | test/SQ-36/pdf-templates      | SQ-36 | Shift-Left | marian-sanchez | OPEN   |
-| #48  | docs/SQ-37/feature-test-plan  | SQ-37 | Docs       | yxsinell       | OPEN   |
-| #40  | test/SQ-43/include-pdf-attach | SQ-43 | Shift-Left | yxsinell       | OPEN   |
-| #38  | feature/add-new-client        | SQ-14 | Docs (legacy) | MiguelMillan | OPEN   |
+| PR # | Rama                          | US    | Tipo       | Autor          | Score | Estado     |
+| ---- | ----------------------------- | ----- | ---------- | -------------- | ----- | ---------- |
+| #53  | test/SQ-23/auto-calculate     | SQ-23 | Shift-Left | GaslessQA      | 4.5/5 | MERGED ✅  |
+| #52  | test/SQ-36/pdf-templates      | SQ-36 | Shift-Left | marian-sanchez | 4/5   | MERGED ✅  |
+| #48  | docs/SQ-37/feature-test-plan  | SQ-37 | Docs       | yxsinell       | 4/5   | MERGED ✅  |
+| #40  | test/SQ-43/include-pdf-attach | SQ-43 | Shift-Left | yxsinell       | 3.5/5 | MERGED ✅  |
 
 ### ✅ PRs de Implementación Recientemente Mergeados (saiotest)
 
@@ -525,11 +525,12 @@ US de FASE 4 implementadas:
 
 ### PRs Cerrados (No Mergeados)
 
-| PR # | Rama                            | Razón                      |
-| ---- | ------------------------------- | -------------------------- |
-| #47  | docs/SQ-37/git-flow-conventions | CLOSED (superseded)        |
-| #39  | feat/SQ-37/feature-test-plan    | CLOSED (superseded by #48) |
-| #31  | feature/add-new-client          | CLOSED (superseded)        |
+| PR # | Rama                            | Razón                                         |
+| ---- | ------------------------------- | --------------------------------------------- |
+| #38  | feature/add-new-client          | CLOSED - SQ-14 ya implementado, tarea no cumplida |
+| #47  | docs/SQ-37/git-flow-conventions | CLOSED (superseded)                           |
+| #39  | feat/SQ-37/feature-test-plan    | CLOSED (superseded by #48)                    |
+| #31  | feature/add-new-client          | CLOSED (superseded)                           |
 
 ---
 
@@ -552,13 +553,8 @@ US de FASE 4 implementadas:
 | ----- | ---------------------------------------- | --------- | ------------- | ------------ |
 | SQ-81 | Login: last_login_at + business_profiles | Highest   | #54 (MERGED)  | Ready For QA |
 | SQ-82 | Edit client: email case-insensitive      | High      | #54 (MERGED)  | Ready For QA |
-| SQ-76 | Business_profiles devuelve 406           | Medium    | #45 (MERGED)  | In Review    |
-
-### 🟡 Bugs en Revisión (PRs Abiertos)
-
-| Bug   | Summary                     | Prioridad | PR Fix     | Estado    |
-| ----- | --------------------------- | --------- | ---------- | --------- |
-| SQ-75 | Phone field accepts letters | Medium    | #44 (OPEN) | In Review |
+| SQ-76 | Business_profiles devuelve 406           | Medium    | #45 (MERGED)  | Ready For QA |
+| SQ-75 | Phone field accepts letters              | Medium    | #44 (MERGED)  | Ready For QA |
 
 ### 🟠 Bugs Abiertos (Sin PR)
 
@@ -665,6 +661,13 @@ FT-SQ4-01 a FT-SQ4-19 (ver PR #50 para detalles)
 
 | Fecha      | Cambios                                                                                     |
 | ---------- | ------------------------------------------------------------------------------------------- |
+| 2026-02-25 | **PRs Shift-Left mergeados** - #53 (4.5/5), #52 (4/5), #48 (4/5), #40 (3.5/5) ✅           |
+| 2026-02-25 | **0 PRs pendientes** - Todos los PRs de implementación, bugs y shift-left mergeados        |
+| 2026-02-25 | **Limpieza de PRs completada** - Todos los bug fixes mergeados ✅                           |
+| 2026-02-25 | PR #44 (SQ-75 phone validation) mergeado, SQ-75 → Ready For QA                             |
+| 2026-02-25 | PR #38 cerrado con feedback (tarea no cumplida, SQ-14 ya implementado)                     |
+| 2026-02-25 | SQ-76 transitado a Ready For QA (PR #45 ya estaba mergeado)                                |
+| 2026-02-25 | PRs de Shift-Left (#40, #48, #52, #53) quedan pendientes de revisión exhaustiva            |
 | 2026-02-24 | **Sincronización completa del tablero Jira y GitHub PRs**                                   |
 | 2026-02-24 | SQ-4, SQ-24, SQ-25: Cambiaron de Ready For QA → **In Test** (testing activo)               |
 | 2026-02-24 | SQ-23: Cambió de Estimation → **Ready For Dev** (disponible para implementar)              |
@@ -679,4 +682,4 @@ FT-SQ4-01 a FT-SQ4-19 (ver PR #50 para detalles)
 
 ---
 
-_Actualizado por Claude Code - 2026-02-24_
+_Actualizado por Claude Code - 2026-02-25 (PRs Shift-Left review completo)_

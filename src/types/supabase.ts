@@ -334,6 +334,8 @@ export type Database = {
           email_verified_at: string | null;
           id: string;
           last_login_at: string | null;
+          onboarding_completed: boolean | null;
+          onboarding_step: number | null;
           updated_at: string | null;
           user_id: string;
         };
@@ -342,6 +344,8 @@ export type Database = {
           email_verified_at?: string | null;
           id?: string;
           last_login_at?: string | null;
+          onboarding_completed?: boolean | null;
+          onboarding_step?: number | null;
           updated_at?: string | null;
           user_id: string;
         };
@@ -350,6 +354,8 @@ export type Database = {
           email_verified_at?: string | null;
           id?: string;
           last_login_at?: string | null;
+          onboarding_completed?: boolean | null;
+          onboarding_step?: number | null;
           updated_at?: string | null;
           user_id?: string;
         };

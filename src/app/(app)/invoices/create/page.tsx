@@ -25,8 +25,13 @@ import {
   CreateClientDialog,
   DueDatePicker,
   TaxInput,
+  DiscountInput,
   InvoiceSummary,
 } from '@/components/invoices';
+import { LineItemsTable } from '@/components/invoices/line-items-table';
+import { InvoiceNumberInput } from '@/components/invoices/invoice-number-input';
+import { calculateDiscountAmount } from '@/lib/utils/invoice-calculations';
+import type { DiscountType } from '@/lib/validations/invoice';
 import { useClients } from '@/hooks/clients';
 import { useCreateInvoice } from '@/hooks/invoices';
 import { useBusinessProfile } from '@/hooks/business-profile';
@@ -62,15 +67,26 @@ export default function CreateInvoicePage() {
   // Create invoice mutation
   const { mutate: createInvoice, isPending: isCreating } = useCreateInvoice();
 
+  // State for invoice number validation
+  const [isInvoiceNumberValid, setIsInvoiceNumberValid] = useState(true);
+
+  // State for subtotal from line items (SQ-22)
+  const [subtotal, setSubtotal] = useState(0);
+
   // Form setup
   const form = useForm<CreateInvoiceFormData>({
     resolver: zodResolver(createInvoiceSchema),
     defaultValues: {
       clientId: '',
+      invoiceNumber: '',
       dueDate: getDefaultDueDate(),
       notes: '',
       terms: '',
       taxRate: 0,
+      discountType: null,
+      discountValue: 0,
+      // SQ-22: Start with one empty line item
+      items: [{ description: '', quantity: 1, unitPrice: 0 }],
     },
   });
 
@@ -81,8 +97,13 @@ export default function CreateInvoicePage() {
     }
   }, [businessProfile, form]);
 
-  // Watch tax rate for reactive summary
+  // Watch values for reactive summary
   const taxRate = form.watch('taxRate') ?? 0;
+  const discountType = form.watch('discountType');
+  const discountValue = form.watch('discountValue') ?? 0;
+
+  // Calculate discount amount for summary (SQ-22: subtotal comes from line items)
+  const { amount: discountAmount } = calculateDiscountAmount(subtotal, discountType, discountValue);
 
   // Handle client selection
   const handleClientSelect = (client: Client | null) => {
@@ -172,6 +193,32 @@ export default function CreateInvoicePage() {
                 )}
               />
 
+              {/* Invoice Number */}
+              <FormField
+                control={form.control}
+                name="invoiceNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <InvoiceNumberInput
+                        value={field.value ?? ''}
+                        onChange={field.onChange}
+                        onValidate={(isValid, error) => {
+                          setIsInvoiceNumberValid(isValid);
+                          if (error) {
+                            form.setError('invoiceNumber', { message: error });
+                          } else {
+                            form.clearErrors('invoiceNumber');
+                          }
+                        }}
+                        disabled={isCreating}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               {/* Due Date */}
               <FormField
                 control={form.control}
@@ -191,6 +238,14 @@ export default function CreateInvoicePage() {
                     <FormMessage />
                   </FormItem>
                 )}
+              />
+
+              {/* Line Items (SQ-22) */}
+              <LineItemsTable
+                control={form.control}
+                errors={form.formState.errors}
+                onSubtotalChange={setSubtotal}
+                disabled={isCreating}
               />
 
               {/* Tax Rate */}
@@ -215,6 +270,28 @@ export default function CreateInvoicePage() {
                   </FormItem>
                 )}
               />
+
+              {/* Discount */}
+              <FormItem>
+                <FormLabel>Descuento (opcional)</FormLabel>
+                <FormControl>
+                  <DiscountInput
+                    subtotal={subtotal}
+                    discountType={discountType as DiscountType | null}
+                    discountValue={discountValue}
+                    onChange={(type, value) => {
+                      form.setValue('discountType', type);
+                      form.setValue('discountValue', value);
+                    }}
+                    disabled={isCreating}
+                    error={form.formState.errors.discountValue?.message}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Aplica un descuento porcentual o de monto fijo a la factura.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
 
               {/* Notes */}
               <FormField
@@ -268,7 +345,13 @@ export default function CreateInvoicePage() {
               />
 
               {/* Invoice Summary */}
-              <InvoiceSummary subtotal={0} discountAmount={0} taxRate={taxRate} />
+              <InvoiceSummary
+                subtotal={subtotal}
+                discountAmount={discountAmount}
+                discountType={discountType as DiscountType | null}
+                discountInputValue={discountValue}
+                taxRate={taxRate}
+              />
 
               {/* Actions */}
               <div className="flex justify-end gap-4">
@@ -282,7 +365,7 @@ export default function CreateInvoicePage() {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isCreating || !selectedClient}
+                  disabled={isCreating || !selectedClient || !isInvoiceNumberValid}
                   data-testid="save-invoice-button"
                 >
                   {isCreating ? (

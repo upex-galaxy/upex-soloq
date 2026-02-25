@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { FileText, Loader2 } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { FileText, Loader2, CheckCircle2 } from 'lucide-react';
 
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
@@ -15,17 +15,36 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-export default function LoginPage() {
+// Inner component that uses useSearchParams (requires Suspense boundary)
+function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const { signIn } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Check for success message from password reset (FT-SQ4-16)
+  useEffect(() => {
+    const resetSuccess = searchParams.get('reset');
+    if (resetSuccess === 'success') {
+      setSuccessMessage(
+        'Tu contraseña ha sido actualizada correctamente. Inicia sesión con tu nueva contraseña.'
+      );
+      // Clean up URL without refreshing the page
+      const url = new URL(window.location.href);
+      url.searchParams.delete('reset');
+      window.history.replaceState({}, '', url.pathname);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,6 +88,17 @@ export default function LoginPage() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Success message from password reset (FT-SQ4-16) */}
+          {successMessage && (
+            <Alert
+              className="bg-green-50 border-green-200 text-green-800"
+              data-testid="reset-success-message"
+            >
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <AlertDescription>{successMessage}</AlertDescription>
+            </Alert>
+          )}
+
           {error && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
@@ -117,6 +147,23 @@ export default function LoginPage() {
               autoComplete="current-password"
             />
           </div>
+
+          {/* Remember me checkbox */}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="remember"
+              checked={rememberMe}
+              onCheckedChange={checked => setRememberMe(checked === true)}
+              disabled={isLoading}
+            />
+            <Label
+              htmlFor="remember"
+              className="text-sm font-normal cursor-pointer text-muted-foreground"
+            >
+              Recordarme
+            </Label>
+          </div>
+
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
@@ -138,5 +185,25 @@ export default function LoginPage() {
         </p>
       </CardFooter>
     </Card>
+  );
+}
+
+// Loading fallback for Suspense
+function LoginFormFallback() {
+  return (
+    <Card className="w-full shadow-lg">
+      <CardContent className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </CardContent>
+    </Card>
+  );
+}
+
+// Main page component with Suspense boundary for useSearchParams
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginFormFallback />}>
+      <LoginForm />
+    </Suspense>
   );
 }

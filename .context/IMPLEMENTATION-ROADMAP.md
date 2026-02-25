@@ -98,7 +98,7 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | SQ-15 | List All Clients                     | Ready For QA    | Medium   | Marco Antonio Camacho | #2 (MERGED)   | #25 (MERGED) |
 | SQ-16 | Edit Client Data                     | **BLOCKED**     | Medium   | Ely                   | #14 (MERGED)  | #26 (MERGED) |
 | SQ-17 | Add Client Tax Information           | Ready For QA    | Medium   | YENNY BARBOSA         | -             | #27 (MERGED) |
-| SQ-18 | View Client Invoice History          | Ready For Dev   | Medium   | Ely                   | #43 (MERGED)  | -            |
+| SQ-18 | View Client Invoice History          | Ready For QA    | Medium   | Rodrigo Godoy         | #43 (MERGED)  | #58 (MERGED) |
 | SQ-19 | Delete Client                        | Ready For QA    | Medium   | Ronny Toro            | -             | #28 (MERGED) |
 | SQ-68 | Validate client email deliverability | Backlog         | Medium   | -                     | -             | -            |
 
@@ -224,17 +224,16 @@ SQ-31 (PDF Generation Epic)
 | 14    | SQ-30 | Save Invoice as Draft       | Ready For QA  | Luis E.  | #30 (MERGED)  | #49 (MERGED) |
 | 15    | SQ-4  | Password Recovery via Email | Ready For QA  | Maxe A.  | #12 (MERGED)  | #50 (MERGED) |
 | 16    | SQ-25 | Add Discounts to Invoice    | Ready For QA  | GENESIS  | #24 (MERGED)  | #51 (MERGED) |
-| 17    | SQ-18 | View Client Invoice History | Ready For Dev | Ely      | #43 (MERGED)  | -            |
+| 17    | SQ-18 | View Client Invoice History | Ready For QA  | Rodrigo  | #43 (MERGED)  | #58 (MERGED) |
 
-### FASE 5: US en Ready For Dev (2026-02-24)
+### FASE 5: US en Ready For Dev (2026-02-25)
 
 | Orden | Key   | Story                            | Status        | Assignee      | PR Shift-Left | PR Impl |
 | ----- | ----- | -------------------------------- | ------------- | ------------- | ------------- | ------- |
 | 18    | SQ-6  | Guided Onboarding for New Users  | Ready For Dev | Ely           | -             | -       |
-| 19    | SQ-18 | View Client Invoice History      | Ready For Dev | Ely           | #43 (MERGED)  | -       |
-| 20    | SQ-23 | Auto Subtotal/Total Calculation  | Ready For Dev | Raúl González | #53 (MERGED)  | -       |
-| 21    | SQ-26 | Preview Invoice Before Send      | Ready For Dev | Ely           | #15 (MERGED)  | -       |
-| 22    | SQ-43 | Include PDF Attachment in Email  | Ready For Dev | Ely           | #40 (MERGED)  | -       |
+| 19    | SQ-23 | Auto Subtotal/Total Calculation  | Ready For Dev | Raúl González | #53 (MERGED)  | -       |
+| 20    | SQ-26 | Preview Invoice Before Send      | Ready For Dev | Ely           | #15 (MERGED)  | -       |
+| 21    | SQ-43 | Include PDF Attachment in Email  | Ready For Dev | Ely           | #40 (MERGED)  | -       |
 
 ### OMITIDAS (No Ready For Dev o Dependencias Bloqueadas)
 
@@ -318,13 +317,13 @@ FASE 4 - Auth & Recovery ✅ COMPLETADA
 
 ### Metricas (2026-02-25)
 
-- **Total US implementadas:** 16 (PRs mergeados en staging)
+- **Total US implementadas:** 17 (PRs mergeados en staging)
 - **US en QA Approved:** 1 (SQ-14 ✅)
 - **US en In Test:** 3 (SQ-4, SQ-24, SQ-25)
-- **US en Ready For QA:** 11 (listas para testing)
+- **US en Ready For QA:** 12 (listas para testing)
 - **US en BLOCKED:** 2 (SQ-3, SQ-16 - pendientes re-test)
 - **US en Shift-Left QA:** 3 (SQ-5, SQ-34, SQ-46)
-- **US en Ready For Dev:** 5 (SQ-6, SQ-18, SQ-23, SQ-26, SQ-43)
+- **US en Ready For Dev:** 4 (SQ-6, SQ-23, SQ-26, SQ-43)
 - **Bugs Abiertos:** 4 (1 Highest, 2 High, 1 Medium)
 - **Bugs Ready For QA:** 4 (SQ-75, SQ-76, SQ-81, SQ-82 - todos fixeados ✅)
 - **PRs de Bug Fix:** Todos mergeados (#41, #44, #45, #54) ✅
@@ -483,13 +482,12 @@ US de FASE 4 implementadas:
 
 ---
 
-### 🚀 PRÓXIMAS US EN READY FOR DEV (5 disponibles)
+### 🚀 PRÓXIMAS US EN READY FOR DEV (4 disponibles)
 
 1. **SQ-6** - Guided Onboarding for New Users (Ely) - Auth & Onboarding
-2. **SQ-18** - View Client Invoice History (Ely) - Client Management
-3. **SQ-23** - Automatic Subtotal and Total Calculation (Raúl González) - Invoice Creation
-4. **SQ-26** - Preview Invoice Before Sending (Ely) - Invoice Creation
-5. **SQ-43** - Include PDF Attachment in Email (Ely) - Invoice Sending
+2. **SQ-23** - Automatic Subtotal and Total Calculation (Raúl González) - Invoice Creation
+3. **SQ-26** - Preview Invoice Before Sending (Ely) - Invoice Creation
+4. **SQ-43** - Include PDF Attachment in Email (Ely) - Invoice Sending
 
 ---
 
@@ -657,10 +655,45 @@ FT-SQ4-01 a FT-SQ4-19 (ver PR #50 para detalles)
 
 ---
 
+### US Completada: SQ-18 - View Client Invoice History ✅
+
+| Paso | Estado     | Notas                                    |
+| ---- | ---------- | ---------------------------------------- |
+| 0    | Completado | Precondiciones verificadas               |
+| 1    | Completado | Jira transitado a In Progress            |
+| 2    | Completado | Plan de implementación N/A (claro scope) |
+| 3    | Completado | Implementación completa (5 archivos)     |
+| 4    | Completado | PR #58 creado                            |
+| 5    | N/A        | E2E/UI testing por usuario               |
+| 6    | Completado | Code review (self)                       |
+| 7    | Completado | Documentación actualizada                |
+| 8    | Completado | **PR #58 MERGED** ✅                     |
+| 9-11 | Completado | Ready For QA, asignado a Rodrigo Godoy   |
+
+**Implementación incluye:**
+
+- API: `GET /api/clients/[id]/invoices` con totales calculados
+- Hook: `useClientInvoices` (React Query)
+- Component: `ClientInvoiceHistory` con TotalsSummary, InvoiceTable, EmptyState
+- Page: `/clients/[id]` con tabs (Datos + Facturas)
+
+**Test Cases cubiertos (7/15 - P0/P1):**
+
+- FTP-001: Ver historial con facturas existentes
+- FTP-002: Status badges con colores correctos
+- FTP-003: Click para navegar al detalle
+- FTP-004: Empty state con CTA
+- FTP-005: Total Invoiced (sent + paid + overdue)
+- FTP-006: Total Paid
+- FTP-007: Total Pending (sent + overdue)
+
+---
+
 ## Historial de Actualizaciones
 
 | Fecha      | Cambios                                                                                     |
 | ---------- | ------------------------------------------------------------------------------------------- |
+| 2026-02-25 | **SQ-18 implementado** - PR #58 MERGED, View Client Invoice History ✅ (5 archivos)        |
 | 2026-02-25 | **PRs Shift-Left mergeados** - #53 (4.5/5), #52 (4/5), #48 (4/5), #40 (3.5/5) ✅           |
 | 2026-02-25 | **0 PRs pendientes** - Todos los PRs de implementación, bugs y shift-left mergeados        |
 | 2026-02-25 | **Limpieza de PRs completada** - Todos los bug fixes mergeados ✅                           |

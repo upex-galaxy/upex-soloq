@@ -21,6 +21,10 @@ export const clientFormSchema = z.object({
   phone: z
     .string()
     .max(20, 'El teléfono no puede exceder 20 caracteres')
+    .regex(
+      /^[0-9+\-\s()]*$/,
+      'El teléfono solo puede contener números, +, -, espacios y paréntesis'
+    )
     .optional()
     .or(z.literal('')),
   address: z

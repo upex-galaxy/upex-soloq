@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, Loader2, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import dynamic from 'next/dynamic';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,8 +28,16 @@ import {
   TaxInput,
   DiscountInput,
   InvoiceSummary,
-  InvoicePreviewDialog,
 } from '@/components/invoices';
+
+// Dynamic import to avoid SSR issues with @react-pdf/renderer
+const InvoicePreviewDialog = dynamic(
+  () =>
+    import('@/components/invoices/invoice-preview-dialog').then(mod => ({
+      default: mod.InvoicePreviewDialog,
+    })),
+  { ssr: false }
+);
 import { LineItemsTable } from '@/components/invoices/line-items-table';
 import { InvoiceNumberInput } from '@/components/invoices/invoice-number-input';
 import { calculateDiscountAmount } from '@/lib/utils/invoice-calculations';

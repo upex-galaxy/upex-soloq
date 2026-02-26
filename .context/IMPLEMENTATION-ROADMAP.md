@@ -1,6 +1,6 @@
 # Implementation Roadmap - SoloQ
 
-> **Documento provisional** - Generado: 2026-02-07 | **Última actualización:** 2026-02-25
+> **Documento provisional** - Generado: 2026-02-07 | **Última actualización:** 2026-02-26
 > **Proposito:** Panorama completo del estado actual y plan de implementacion ordenado por dependencias.
 
 ---
@@ -111,7 +111,7 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | SQ-23 | Automatic Subtotal and Total Calculation | Ready For Dev   | Medium   | Raúl González                 | #53 (MERGED)  | -            |
 | SQ-24 | Add Taxes to Invoice                     | **In Test**     | Medium   | Gloria Jesely Galindez Suárez | #9 (MERGED)   | #32 (MERGED) |
 | SQ-25 | Add Discounts to Invoice                 | **In Test**     | Medium   | GENESIS OJOSE                 | #24 (MERGED)  | #51 (MERGED) |
-| SQ-26 | Preview Invoice Before Sending           | Ready For Dev   | Medium   | Ely                           | #15 (MERGED)  | -            |
+| SQ-26 | Preview Invoice Before Sending           | Ready For QA    | Medium   | Marianela Portas              | #15 (MERGED)  | #60 (MERGED) |
 | SQ-27 | Assign Unique Invoice Number             | Ready For QA    | Medium   | Froylan Rodriguez             | #13 (MERGED)  | #46 (MERGED) |
 | SQ-28 | Set Invoice Due Date                     | Ready For QA    | Medium   | Yaneth Quintero               | #10 (MERGED)  | #33 (MERGED) |
 | SQ-29 | Add Notes and Terms to Invoice           | Ready For QA    | Medium   | Ximena Quintana               | #17 (MERGED)  | #34 (MERGED) |
@@ -205,7 +205,7 @@ SQ-31 (PDF Generation Epic)
 | 7     | SQ-28 | Set Invoice Due Date               | Ready For QA | Yaneth Quintero               | #10 (MERGED)  | #33 (MERGED) |
 | 8     | SQ-29 | Add Notes and Terms to Invoice     | Ready For QA | Ximena Quintana               | #17 (MERGED)  | #34 (MERGED) |
 
-**Nota:** SQ-22, SQ-23, SQ-25, SQ-26, SQ-27, SQ-30 no estan en Ready For Dev.
+**Nota:** SQ-22, SQ-23, SQ-25, SQ-27, SQ-30 no estan en Ready For Dev. SQ-26 en In Review (PR #60).
 
 ### FASE 3: PDF Generation 🔶 EN PROGRESO (3/4)
 
@@ -232,7 +232,7 @@ SQ-31 (PDF Generation Epic)
 | Orden | Key   | Story                            | Status        | Assignee      | PR Shift-Left | PR Impl |
 | ----- | ----- | -------------------------------- | ------------- | ------------- | ------------- | ------- |
 | 19    | SQ-23 | Auto Subtotal/Total Calculation  | Ready For Dev | Raúl González | #53 (MERGED)  | -       |
-| 20    | SQ-26 | Preview Invoice Before Send      | Ready For Dev | Ely           | #15 (MERGED)  | -       |
+| 20    | SQ-26 | Preview Invoice Before Send      | Ready For QA  | Marianela P.  | #15 (MERGED)  | #60 ✅  |
 | 21    | SQ-43 | Include PDF Attachment in Email  | Ready For Dev | Ely           | #40 (MERGED)  | -       |
 
 ### OMITIDAS (No Ready For Dev o Dependencias Bloqueadas)
@@ -323,7 +323,7 @@ FASE 4 - Auth & Recovery ✅ COMPLETADA
 - **US en Ready For QA:** 13 (listas para testing)
 - **US en BLOCKED:** 2 (SQ-3, SQ-16 - pendientes re-test)
 - **US en Shift-Left QA:** 3 (SQ-5, SQ-34, SQ-46)
-- **US en Ready For Dev:** 3 (SQ-23, SQ-26, SQ-43)
+- **US en Ready For Dev:** 2 (SQ-23, SQ-43)
 - **Bugs Abiertos:** 4 (1 Highest, 2 High, 1 Medium)
 - **Bugs Ready For QA:** 4 (SQ-75, SQ-76, SQ-81, SQ-82 - todos fixeados ✅)
 - **PRs de Bug Fix:** Todos mergeados (#41, #44, #45, #54) ✅
@@ -486,8 +486,9 @@ US de FASE 4 implementadas:
 ### 🚀 PRÓXIMAS US EN READY FOR DEV (3 disponibles)
 
 1. **SQ-23** - Automatic Subtotal and Total Calculation (Raúl González) - Invoice Creation
-2. **SQ-26** - Preview Invoice Before Sending (Ely) - Invoice Creation
-3. **SQ-43** - Include PDF Attachment in Email (Ely) - Invoice Sending
+2. **SQ-43** - Include PDF Attachment in Email (Ely) - Invoice Sending
+
+> **SQ-26** - Preview Invoice Before Sending: ✅ PR #60 MERGED (Ready For QA)
 
 ---
 
@@ -707,9 +708,10 @@ FT-SQ4-01 a FT-SQ4-19 (ver PR #50 para detalles)
 | 2026-02-24 | SQ-23: Cambió de Estimation → **Ready For Dev** (disponible para implementar)              |
 | 2026-02-24 | SQ-42: Regresó de Shift-Left QA → **Backlog**                                              |
 | 2026-02-24 | Bugs SQ-81/SQ-82: **Fixeados** con PR #54 MERGED, ahora Ready For QA                       |
+| 2026-02-26 | SQ-26: **PR #60 MERGED** ✅ - Preview Invoice Before Sending completado                   |
 | 2026-02-24 | Bug SQ-76: **Fixeado** con PR #45 MERGED                                                   |
 | 2026-02-24 | Nuevos bugs reportados: SQ-83 (due date warning), SQ-86 (password reset UX)                |
-| 2026-02-24 | US Ready For Dev actuales: SQ-6, SQ-18, SQ-23, SQ-26, SQ-43 (5 disponibles)                |
+| 2026-02-24 | US Ready For Dev actuales: SQ-6, SQ-18, SQ-23, SQ-43 (4 disponibles, SQ-26 movido)         |
 | 2026-02-18 | SQ-22: **PR #56 MERGED** ✅ - Add Line Items to Invoice completado (8 archivos, +1186/-30) |
 | 2026-02-17 | Sincronización completa: SQ-14 QA Approved, SQ-3/SQ-16 BLOCKED, nuevos bugs SQ-81/SQ-82    |
 | 2026-02-12 | SQ-25: PR #51 MERGED - Add Discounts to Invoice completado ✅                              |

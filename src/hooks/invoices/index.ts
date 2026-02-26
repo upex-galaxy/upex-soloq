@@ -4,3 +4,4 @@ export { useInvoices, type InvoiceWithClient } from './use-invoices';
 export { useUpdateInvoice } from './use-update-invoice';
 export { useDeleteInvoice } from './use-delete-invoice';
 export { useAutoSave } from './use-auto-save';
+export { useSendInvoice } from './use-send-invoice';

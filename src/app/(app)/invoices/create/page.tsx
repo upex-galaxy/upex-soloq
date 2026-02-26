@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
@@ -27,10 +27,16 @@ import {
   TaxInput,
   DiscountInput,
   InvoiceSummary,
+  InvoicePreviewDialog,
 } from '@/components/invoices';
 import { LineItemsTable } from '@/components/invoices/line-items-table';
 import { InvoiceNumberInput } from '@/components/invoices/invoice-number-input';
 import { calculateDiscountAmount } from '@/lib/utils/invoice-calculations';
+import {
+  buildPreviewData,
+  canShowPreview,
+  getPreviewDisabledReason,
+} from '@/lib/utils/invoice-preview';
 import type { DiscountType } from '@/lib/validations/invoice';
 import { useClients } from '@/hooks/clients';
 import { useCreateInvoice } from '@/hooks/invoices';
@@ -50,9 +56,10 @@ function getDefaultDueDate(): string {
 export default function CreateInvoicePage() {
   const router = useRouter();
 
-  // State for selected client and dialog
+  // State for selected client and dialogs
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isCreateClientOpen, setIsCreateClientOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   // Fetch all clients (no pagination for selector)
   const { data: clientsData, isLoading: isLoadingClients } = useClients({
@@ -364,6 +371,17 @@ export default function CreateInvoicePage() {
                   Cancelar
                 </Button>
                 <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsPreviewOpen(true)}
+                  disabled={isCreating || !canShowPreview(form.getValues(), !!selectedClient)}
+                  title={getPreviewDisabledReason(form.getValues(), !!selectedClient) ?? undefined}
+                  data-testid="preview-button"
+                >
+                  <Eye className="mr-2 h-4 w-4" />
+                  Vista previa
+                </Button>
+                <Button
                   type="submit"
                   disabled={isCreating || !selectedClient || !isInvoiceNumberValid}
                   data-testid="save-invoice-button"
@@ -389,6 +407,15 @@ export default function CreateInvoicePage() {
         onOpenChange={setIsCreateClientOpen}
         onSuccess={handleClientCreated}
       />
+
+      {/* Invoice Preview Dialog (SQ-26) */}
+      {selectedClient && businessProfile !== undefined && (
+        <InvoicePreviewDialog
+          open={isPreviewOpen}
+          onOpenChange={setIsPreviewOpen}
+          previewData={buildPreviewData(form.getValues(), selectedClient, businessProfile ?? null)}
+        />
+      )}
     </div>
   );
 }

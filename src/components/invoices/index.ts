@@ -5,3 +5,4 @@ export { TaxInput } from './tax-input';
 export { DiscountInput } from './discount-input';
 export { InvoiceSummary } from './invoice-summary';
 export { InvoiceStatusBadge } from './invoice-status-badge';
+export { InvoicePreviewDialog } from './invoice-preview-dialog';

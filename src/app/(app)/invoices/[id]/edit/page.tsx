@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, Loader2, Trash2, Save, AlertCircle, Check, Clock } from 'lucide-react';
+import { ArrowLeft, Loader2, Trash2, Save, AlertCircle, Check, Clock, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
@@ -37,6 +37,7 @@ import {
   DiscountInput,
   InvoiceSummary,
   InvoiceStatusBadge,
+  InvoicePreviewDialog,
 } from '@/components/invoices';
 import { LineItemsTable } from '@/components/invoices/line-items-table';
 import { InvoiceNumberInput } from '@/components/invoices/invoice-number-input';
@@ -48,6 +49,12 @@ import {
   type DiscountType,
 } from '@/lib/validations/invoice';
 import { calculateDiscountAmount } from '@/lib/utils/invoice-calculations';
+import {
+  buildPreviewData,
+  canShowPreview,
+  getPreviewDisabledReason,
+} from '@/lib/utils/invoice-preview';
+import { useBusinessProfile } from '@/hooks/business-profile';
 import type { Client } from '@/lib/types';
 
 /**
@@ -70,6 +77,7 @@ export default function EditInvoicePage() {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isCreateClientOpen, setIsCreateClientOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isInvoiceNumberValid, setIsInvoiceNumberValid] = useState(true);
 
   // State for subtotal from line items (SQ-22)
@@ -88,6 +96,9 @@ export default function EditInvoicePage() {
     sortBy: 'name',
     sortOrder: 'asc',
   });
+
+  // Fetch business profile for preview (SQ-26)
+  const { data: businessProfile } = useBusinessProfile();
 
   // Mutations
   const { mutate: updateInvoice, isPending: isUpdating } = useUpdateInvoice();
@@ -584,6 +595,23 @@ export default function EditInvoicePage() {
                   >
                     Volver
                   </Button>
+                  {/* Preview button (SQ-26) */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsPreviewOpen(true)}
+                    disabled={
+                      isUpdating ||
+                      isDeleting ||
+                      isSaving ||
+                      !canShowPreview(form.getValues(), !!selectedClient)
+                    }
+                    title={getPreviewDisabledReason(form.getValues(), !!selectedClient) ?? undefined}
+                    data-testid="preview-button"
+                  >
+                    <Eye className="mr-2 h-4 w-4" />
+                    Vista previa
+                  </Button>
                   {/* Manual save button (TC-01) */}
                   <Button
                     type="button"
@@ -652,6 +680,17 @@ export default function EditInvoicePage() {
         onOpenChange={setIsCreateClientOpen}
         onSuccess={handleClientCreated}
       />
+
+      {/* Invoice Preview Dialog (SQ-26) */}
+      {selectedClient && businessProfile !== undefined && (
+        <InvoicePreviewDialog
+          open={isPreviewOpen}
+          onOpenChange={setIsPreviewOpen}
+          previewData={buildPreviewData(form.getValues(), selectedClient, businessProfile ?? null, invoiceId)}
+          invoiceId={invoiceId}
+          onSendSuccess={() => router.push('/invoices')}
+        />
+      )}
     </div>
   );
 }

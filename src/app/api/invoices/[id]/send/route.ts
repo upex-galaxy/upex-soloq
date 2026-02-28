@@ -1,6 +1,17 @@
 import { NextResponse } from 'next/server';
 import { createServerFromRequest } from '@/lib/supabase/server';
+import { renderToBuffer } from '@react-pdf/renderer';
+import { InvoiceDocument } from '@/app/(app)/invoices/[id]/components/invoice-document';
+import { sendInvoiceEmail } from '@/lib/services/email-service';
+import { formatCurrency, formatDateForPDF } from '@/lib/utils/pdf-utils';
 import type { Invoice } from '@/lib/types';
+import type { InvoiceWithDetails } from '@/hooks/invoices/use-invoice';
+
+// =============================================================================
+// Constants
+// =============================================================================
+
+const MAX_PDF_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 
 // =============================================================================
 // Types
@@ -12,29 +23,32 @@ interface SendInvoiceResponse {
     invoice_number: string;
     status: Invoice['status'];
     sent_at: string | null;
+    email_message_id?: string;
   };
   error?: string;
+  code?: string;
 }
 
 // =============================================================================
-// POST /api/invoices/[id]/send - Send an invoice (SQ-26)
+// POST /api/invoices/[id]/send - Send an invoice via email with PDF (SQ-43)
 // =============================================================================
 
 /**
- * POST /api/invoices/[id]/send - Mark invoice as sent
+ * POST /api/invoices/[id]/send - Send invoice via email with PDF attachment
  *
- * Changes invoice status from 'draft' to 'sent' and sets sent_at timestamp.
- * Also creates an invoice_event record for tracking.
+ * Generates a PDF server-side, sends it via email using Resend,
+ * and updates the invoice status to 'sent'.
  *
- * Prerequisites:
- * - Invoice must exist and belong to user
- * - Invoice must be in 'draft' status
- * - Invoice must have required data (client, items)
- *
- * Effects:
- * - Updates invoice.status to 'sent'
- * - Updates invoice.sent_at to current timestamp
- * - Creates invoice_event with type 'sent'
+ * Flow:
+ * 1. Validate auth and invoice ownership
+ * 2. Check invoice is draft with client and items
+ * 3. Fetch full invoice data (client, items, business profile)
+ * 4. Generate PDF server-side
+ * 5. Validate PDF (not empty, < 5MB)
+ * 6. Send email via Resend with PDF attachment
+ * 7. Create email_logs record
+ * 8. Update invoice status to 'sent'
+ * 9. Create invoice_event
  *
  * Security:
  * - RLS ensures users can only send their own invoices
@@ -45,7 +59,8 @@ interface SendInvoiceResponse {
  * - 400: Invoice cannot be sent (not draft, missing data)
  * - 401: Unauthorized
  * - 404: Invoice not found
- * - 500: Internal server error
+ * - 413: PDF too large (> 5MB)
+ * - 500: Internal server error or email send failed
  */
 export async function POST(
   request: Request,
@@ -71,17 +86,51 @@ export async function POST(
       return NextResponse.json({ error: 'Factura no encontrada' }, { status: 404 });
     }
 
-    // Check invoice exists, belongs to user, is draft, and has required data
-    const { data: invoice, error: fetchError } = await supabase
+    // ==========================================================================
+    // Step 1: Fetch invoice with all related data
+    // ==========================================================================
+
+    const { data: invoice, error: invoiceError } = await supabase
       .from('invoices')
-      .select('id, invoice_number, status, client_id, subtotal')
+      .select(
+        `
+        id,
+        invoice_number,
+        issue_date,
+        due_date,
+        status,
+        notes,
+        terms,
+        subtotal,
+        discount_type,
+        discount_value,
+        tax_rate,
+        tax_amount,
+        total,
+        currency,
+        client_id,
+        client:clients!inner (
+          id,
+          name,
+          email,
+          company,
+          address,
+          tax_id,
+          phone
+        )
+      `
+      )
       .eq('id', invoiceId)
       .is('deleted_at', null)
       .single();
 
-    if (fetchError || !invoice) {
+    if (invoiceError || !invoice) {
       return NextResponse.json({ error: 'Factura no encontrada' }, { status: 404 });
     }
+
+    // ==========================================================================
+    // Step 2: Validate invoice can be sent
+    // ==========================================================================
 
     // Check invoice is in draft status
     if (invoice.status !== 'draft') {
@@ -99,26 +148,163 @@ export async function POST(
       );
     }
 
-    // Check invoice has at least one item
-    const { count: itemCount, error: itemCountError } = await supabase
-      .from('invoice_items')
-      .select('id', { count: 'exact', head: true })
-      .eq('invoice_id', invoiceId);
+    // Validate client email
+    const client = invoice.client as unknown as { id: string; name: string; email: string; company?: string; address?: string; tax_id?: string; phone?: string };
+    if (!client.email) {
+      return NextResponse.json(
+        { error: 'El cliente no tiene email configurado' },
+        { status: 400 }
+      );
+    }
 
-    if (itemCountError) {
-      console.error('Error counting invoice items:', itemCountError);
+    // Fetch invoice items
+    const { data: items, error: itemsError } = await supabase
+      .from('invoice_items')
+      .select('id, description, quantity, unit_price, subtotal')
+      .eq('invoice_id', invoiceId)
+      .order('sort_order', { ascending: true });
+
+    if (itemsError) {
+      console.error('Error fetching invoice items:', itemsError);
       return NextResponse.json({ error: 'Error al verificar los items' }, { status: 500 });
     }
 
-    if (!itemCount || itemCount === 0) {
+    // Check invoice has at least one item
+    if (!items || items.length === 0) {
       return NextResponse.json(
         { error: 'La factura debe tener al menos un item' },
         { status: 400 }
       );
     }
 
-    // Update invoice status to 'sent'
+    // ==========================================================================
+    // Step 3: Fetch business profile
+    // ==========================================================================
+
+    const { data: businessProfile } = await supabase
+      .from('business_profiles')
+      .select(
+        'business_name, contact_email, contact_phone, address, tax_id, logo_url, default_terms'
+      )
+      .eq('user_id', user.id)
+      .single();
+
+    // ==========================================================================
+    // Step 4: Generate PDF server-side
+    // ==========================================================================
+
+    const invoiceData: InvoiceWithDetails = {
+      id: invoice.id,
+      invoice_number: invoice.invoice_number,
+      issue_date: invoice.issue_date,
+      due_date: invoice.due_date,
+      status: invoice.status,
+      notes: invoice.notes,
+      terms: invoice.terms,
+      subtotal: invoice.subtotal ?? 0,
+      discount_type: invoice.discount_type,
+      discount_value: invoice.discount_value ?? 0,
+      tax_rate: invoice.tax_rate ?? 0,
+      tax_amount: invoice.tax_amount ?? 0,
+      total: invoice.total ?? 0,
+      currency: invoice.currency,
+      client: client,
+      items: items,
+      business_profile: businessProfile ?? null,
+    };
+
+    let pdfBuffer: Buffer;
+    try {
+      pdfBuffer = await renderToBuffer(InvoiceDocument({ data: invoiceData }));
+    } catch (pdfError) {
+      console.error('Error generating PDF:', pdfError);
+      return NextResponse.json(
+        { error: 'Error al generar el PDF', code: 'PDF_GENERATION_FAILED' },
+        { status: 500 }
+      );
+    }
+
+    // ==========================================================================
+    // Step 5: Validate PDF
+    // ==========================================================================
+
+    if (!pdfBuffer || pdfBuffer.length === 0) {
+      console.error('Generated PDF is empty');
+      return NextResponse.json(
+        { error: 'El PDF generado esta vacio', code: 'PDF_EMPTY' },
+        { status: 500 }
+      );
+    }
+
+    if (pdfBuffer.length > MAX_PDF_SIZE_BYTES) {
+      console.error(`PDF too large: ${pdfBuffer.length} bytes`);
+      return NextResponse.json(
+        {
+          error: 'El PDF es demasiado grande (max 5MB). Intenta reducir el tamano del logo.',
+          code: 'PDF_TOO_LARGE',
+        },
+        { status: 413 }
+      );
+    }
+
+    // ==========================================================================
+    // Step 6: Send email via Resend
+    // ==========================================================================
+
+    const businessName = businessProfile?.business_name || 'Mi Negocio';
+    const formattedTotal = formatCurrency(invoice.total ?? 0);
+    const formattedDueDate = formatDateForPDF(invoice.due_date);
+
+    const emailResult = await sendInvoiceEmail({
+      to: client.email,
+      invoiceNumber: invoice.invoice_number,
+      clientName: client.name,
+      total: formattedTotal,
+      dueDate: formattedDueDate,
+      pdfBuffer,
+      businessName,
+    });
+
+    // ==========================================================================
+    // Step 7: Create email_logs record
+    // ==========================================================================
+
     const now = new Date().toISOString();
+    const attachmentName = `Invoice-${invoice.invoice_number}.pdf`;
+
+    const { error: emailLogError } = await supabase.from('email_logs').insert({
+      invoice_id: invoiceId,
+      user_id: user.id,
+      recipient_email: client.email,
+      subject: `Factura ${invoice.invoice_number} - ${businessName}`,
+      status: emailResult.success ? 'sent' : 'failed',
+      resend_message_id: emailResult.messageId || null,
+      attachment_name: attachmentName,
+      attachment_size_bytes: pdfBuffer.length,
+      error_message: emailResult.error || null,
+      sent_at: emailResult.success ? now : null,
+    });
+
+    if (emailLogError) {
+      console.error('Error creating email log:', emailLogError);
+      // Don't fail the request, email was already sent
+    }
+
+    // If email failed, return error but don't update invoice status
+    if (!emailResult.success) {
+      return NextResponse.json(
+        {
+          error: emailResult.error || 'Error al enviar el email',
+          code: emailResult.code || 'EMAIL_SEND_FAILED',
+        },
+        { status: 500 }
+      );
+    }
+
+    // ==========================================================================
+    // Step 8: Update invoice status
+    // ==========================================================================
+
     const { data: updatedInvoice, error: updateError } = await supabase
       .from('invoices')
       .update({
@@ -132,16 +318,24 @@ export async function POST(
 
     if (updateError) {
       console.error('Error updating invoice status:', updateError);
-      return NextResponse.json({ error: 'Error al enviar la factura' }, { status: 500 });
+      // Email was sent but status update failed
+      // This is a partial success - log it but return success
+      console.warn('Email sent but invoice status update failed');
     }
 
-    // Create invoice event for tracking
+    // ==========================================================================
+    // Step 9: Create invoice_event
+    // ==========================================================================
+
     const { error: eventError } = await supabase.from('invoice_events').insert({
       invoice_id: invoiceId,
       event_type: 'sent',
-      event_data: {
+      metadata: {
         sent_at: now,
         sent_by: user.id,
+        email_message_id: emailResult.messageId,
+        recipient_email: client.email,
+        attachment_size_bytes: pdfBuffer.length,
       },
     });
 
@@ -150,13 +344,18 @@ export async function POST(
       console.error('Error creating invoice event:', eventError);
     }
 
+    // ==========================================================================
+    // Return success response
+    // ==========================================================================
+
     return NextResponse.json(
       {
         data: {
-          id: updatedInvoice.id,
-          invoice_number: updatedInvoice.invoice_number,
-          status: updatedInvoice.status as Invoice['status'],
-          sent_at: updatedInvoice.sent_at,
+          id: updatedInvoice?.id ?? invoiceId,
+          invoice_number: updatedInvoice?.invoice_number ?? invoice.invoice_number,
+          status: (updatedInvoice?.status ?? 'sent') as Invoice['status'],
+          sent_at: updatedInvoice?.sent_at ?? now,
+          email_message_id: emailResult.messageId,
         },
       },
       { status: 200 }

@@ -49,7 +49,7 @@ interface PdfErrorResponse {
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
-): Promise<NextResponse<Buffer | PdfErrorResponse>> {
+): Promise<NextResponse<Uint8Array | PdfErrorResponse>> {
   try {
     const { id: invoiceId } = await params;
     const supabase = await createServerFromRequest(request);
@@ -186,7 +186,9 @@ export async function GET(
     const filename = generateInvoiceFilename(invoice.invoice_number, clientName);
 
     // Return PDF with appropriate headers
-    return new NextResponse(pdfBuffer, {
+    // Convert Buffer to Uint8Array for NextResponse compatibility
+    const pdfUint8Array = new Uint8Array(pdfBuffer);
+    return new NextResponse(pdfUint8Array, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',

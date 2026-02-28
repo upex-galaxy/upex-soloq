@@ -149,13 +149,24 @@ export async function POST(
     }
 
     // Validate client email
-    const client = invoice.client as unknown as { id: string; name: string; email: string; company?: string; address?: string; tax_id?: string; phone?: string };
-    if (!client.email) {
+    const rawClient = invoice.client as unknown as { id: string; name: string; email: string; company?: string; address?: string; tax_id?: string; phone?: string };
+    if (!rawClient.email) {
       return NextResponse.json(
         { error: 'El cliente no tiene email configurado' },
         { status: 400 }
       );
     }
+
+    // Convert optional properties to null for type compatibility with InvoiceWithDetails
+    const client = {
+      id: rawClient.id,
+      name: rawClient.name,
+      email: rawClient.email,
+      company: rawClient.company ?? null,
+      address: rawClient.address ?? null,
+      tax_id: rawClient.tax_id ?? null,
+      phone: rawClient.phone ?? null,
+    };
 
     // Fetch invoice items
     const { data: items, error: itemsError } = await supabase

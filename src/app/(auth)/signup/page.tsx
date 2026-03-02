@@ -31,11 +31,16 @@ const PASSWORD_REQUIREMENTS: PasswordRequirement[] = [
   { label: 'Al menos 1 número', test: (p: string) => /[0-9]/.test(p) },
 ];
 
+// Email validation regex (RFC 5321 compliant basic pattern)
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const isValidEmail = (email: string): boolean => EMAIL_REGEX.test(email);
+
 export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
@@ -53,9 +58,26 @@ export default function SignupPage() {
     return passwordValidation.every(req => req.met);
   }, [passwordValidation]);
 
+  // Real-time email validation
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    if (value && !isValidEmail(value)) {
+      setEmailError('Por favor ingresa un email válido');
+    } else {
+      setEmailError(null);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setEmailError(null);
+
+    // Validate email format
+    if (!email || !isValidEmail(email)) {
+      setEmailError('Por favor ingresa un email válido');
+      return;
+    }
 
     // Validate passwords match
     if (password !== confirmPassword) {
@@ -159,11 +181,18 @@ export default function SignupPage() {
               type="email"
               placeholder="tu@email.com"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={e => handleEmailChange(e.target.value)}
               required
               disabled={isLoading}
               autoComplete="email"
+              data-testid="signup-email-input"
+              className={emailError ? 'border-destructive' : ''}
             />
+            {emailError && (
+              <p className="text-xs text-destructive" data-testid="email-error">
+                {emailError}
+              </p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Contraseña</Label>
@@ -217,7 +246,7 @@ export default function SignupPage() {
           <Button
             type="submit"
             className="w-full"
-            disabled={isLoading || (password.length > 0 && !isPasswordValid)}
+            disabled={isLoading || !!emailError || (password.length > 0 && !isPasswordValid)}
             data-testid="signup-submit-button"
           >
             {isLoading ? (

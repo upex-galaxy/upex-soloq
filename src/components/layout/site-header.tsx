@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, Menu, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
 const navLinks = [
   { href: '#features', label: 'Características' },

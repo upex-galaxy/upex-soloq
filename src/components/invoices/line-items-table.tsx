@@ -12,7 +12,6 @@ import {
 import {
   MAX_LINE_ITEMS,
   LINE_ITEMS_WARNING_THRESHOLD,
-  type LineItemFormData,
 } from '@/lib/validations/invoice';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

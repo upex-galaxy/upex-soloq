@@ -202,7 +202,7 @@ export function HeroSection() {
             animate="visible"
             transition={{ delay: 0.5 }}
           >
-            {stats.map((stat, index) => (
+            {stats.map((stat) => (
               <motion.div
                 key={stat.label}
                 variants={statsVariants}

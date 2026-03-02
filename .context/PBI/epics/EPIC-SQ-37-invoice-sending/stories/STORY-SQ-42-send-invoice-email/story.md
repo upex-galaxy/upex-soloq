@@ -1,75 +1,50 @@
 # Send Invoice by Email with One Click
 
-**Jira Key:** [SQ-42](https://upexgalaxy64.atlassian.net/browse/SQ-42)
-**Epic:** [SQ-37](https://upexgalaxy64.atlassian.net/browse/SQ-37) (Invoice Sending)
-**Priority:** High
-**Story Points:** 3
+**Jira Key:** [SQ-42](https://upexgalaxy65.atlassian.net/browse/SQ-42)
+**Epic:** [SQ-37](https://upexgalaxy65.atlassian.net/browse/SQ-37) (Invoice Sending)
+**Priority:** Medium
+**Story Points:** 1
 **Status:** Backlog
 
 ---
 
 ## User Story
 
-**As a** user
-**I want to** send the invoice by email to the client with one click
-**So that** I can save time
+As a user, I want to send the invoice by email to the client with one click, so that I can save time. Story Points: 3
 
 ---
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Send invoice
+Feature:
 
-- **Given:** I have a complete invoice
-- **When:** I click "Send"
-- **Then:** The invoice is sent to the client's email
+Background:
+Given ...
 
-### Scenario 2: Quick send from list
-
-- **Given:** I am on the invoices list
-- **When:** I click the send icon on a draft invoice
-- **Then:** The invoice is sent without additional steps
-
-### Scenario 3: Status update
-
-- **Given:** I send an invoice
-- **When:** The email is sent successfully
-- **Then:** The invoice status changes to "sent"
-
-### Scenario 4: Send confirmation
-
-- **Given:** I send an invoice
-- **When:** The process completes
-- **Then:** I see a success message
-
-### Scenario 5: Error handling
-
-- **Given:** I send an invoice
-- **When:** The email fails to send
-- **Then:** I see an error message and can retry
-
----
-
-## Technical Notes
-
-- Use Resend for email delivery
-- Update invoice: status = 'sent', sent_at = now()
-- Log email in email_logs table
-- Retry logic for failed sends
+Scenario: ...
+Given ...
+When ...
+Then ...
 
 ---
 
 ## Definition of Done
 
-- [ ] Send functionality working
-- [ ] Status update working
-- [ ] Success message displayed
-- [ ] Error handling implemented
-- [ ] Email logged
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-37-invoice-sending/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 2/22/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:53:58.368Z_

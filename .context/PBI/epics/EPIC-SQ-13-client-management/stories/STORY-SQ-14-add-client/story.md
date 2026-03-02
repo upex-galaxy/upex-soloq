@@ -107,4 +107,4 @@ Then ...
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-02T19:01:58.665Z_
+_Last sync: 2026-03-02T19:53:43.593Z_

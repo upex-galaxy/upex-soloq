@@ -1,8 +1,8 @@
-# Mark Invoice as Paid
+# As a user, I want to mark an invoice as paid so that I can update its status
 
-**Jira Key:** [SQ-53](https://upexgalaxy64.atlassian.net/browse/SQ-53)
-**Epic:** [SQ-39](https://upexgalaxy64.atlassian.net/browse/SQ-39) (Payment Tracking)
-**Priority:** High
+**Jira Key:** [SQ-53](https://upexgalaxy65.atlassian.net/browse/SQ-53)
+**Epic:** [SQ-39](https://upexgalaxy65.atlassian.net/browse/SQ-39) (Payment Tracking)
+**Priority:** Medium
 **Story Points:** 2
 **Status:** Backlog
 
@@ -10,66 +10,83 @@
 
 ## User Story
 
-**As a** user
-**I want to** mark an invoice as paid
-**So that** I can update its status
+As a user, I want to mark an invoice as paid, so that I can update its status. Story Points: 2
 
 ---
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Mark as paid button
+1. 
 
-- **Given:** I have a sent invoice
-- **When:** I view it
-- **Then:** I see a "Mark as Paid" button
+- ****Given:**** I have a sent invoice
+- ****When:**** I view it
+- ****Then:**** I see a "Mark as Paid" button
 
-### Scenario 2: Quick mark from list
+1. 
 
-- **Given:** I am on the invoices list
-- **When:** I click the "paid" icon on a row
-- **Then:** A payment form opens
+- ****Given:**** I am on the invoices list
+- ****When:**** I click the "paid" icon on a row
+- ****Then:**** A payment form/modal opens
 
-### Scenario 3: Status update
+1. 
 
-- **Given:** I mark an invoice as paid
-- **When:** I confirm the action
-- **Then:** The status changes to "paid"
+- ****Given:**** I mark an invoice as paid
+- ****When:**** I confirm the action
+- ****Then:**** The status changes to "paid"
 
-### Scenario 4: Paid timestamp
+1. 
 
-- **Given:** I mark an invoice as paid
-- **When:** I view the invoice details
-- **Then:** I see when it was marked as paid
+- ****Given:**** I mark an invoice as paid
+- ****When:**** I view the invoice details
+- ****Then:**** I see the paid_at timestamp
 
-### Scenario 5: Cannot re-pay
+1. 
 
-- **Given:** An invoice is already paid
-- **When:** I view it
-- **Then:** The "Mark as Paid" button is disabled
+- ****Given:**** An invoice is already paid
+- ****When:**** I view it
+- ****Then:**** The "Mark as Paid" button is disabled or hidden
 
 ---
 
-## Technical Notes
+## Scope
 
-- Update invoice: status = 'paid', paid_at = now()
-- Create payment record in payments table
-- Trigger dashboard stats update
-- API: POST /api/invoices/:id/payments
+1. 
+
+- "Mark as Paid" button on invoice detail
+- Quick action icon on invoice list row
+- Payment form/modal with required fields
+- Status update: sent -> paid
+- paid_at timestamp recording
+- Payment record creation in payments table
+- Dashboard stats recalculation
+- Disable action for already-paid invoices
+
+1. 
+
+- Partial payment handling
+- Multiple payments per invoice
+- Payment gateway integration
+- Automated payment detection
 
 ---
 
 ## Definition of Done
 
-- [ ] Mark as paid functionality working
-- [ ] Quick action from list working
-- [ ] Status update correct
-- [ ] Timestamp recorded
-- [ ] Duplicate prevention working
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-39-payment-tracking/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 3/2/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:54:04.021Z_

@@ -1,8 +1,8 @@
-# See Total Pending Amount
+# As a user, I want to see the total pending amount so that I know my financial situation
 
-**Jira Key:** [SQ-49](https://upexgalaxy64.atlassian.net/browse/SQ-49)
-**Epic:** [SQ-38](https://upexgalaxy64.atlassian.net/browse/SQ-38) (Dashboard & Tracking)
-**Priority:** High
+**Jira Key:** [SQ-49](https://upexgalaxy65.atlassian.net/browse/SQ-49)
+**Epic:** [SQ-38](https://upexgalaxy65.atlassian.net/browse/SQ-38) (Invoice Dashboard & Tracking)
+**Priority:** Medium
 **Story Points:** 2
 **Status:** Backlog
 
@@ -10,66 +10,81 @@
 
 ## User Story
 
-**As a** user
-**I want to** see the total pending amount
-**So that** I know my financial situation
+As a user, I want to see the total pending amount, so that I know my financial situation. Story Points: 2
 
 ---
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Pending total visible
+1. 
 
-- **Given:** I am on the dashboard
-- **When:** I view the summary cards
-- **Then:** I see my total pending amount
+- ****Given:**** I am on the dashboard
+- ****When:**** I view the summary cards
+- ****Then:**** I see my total pending amount prominently displayed
 
-### Scenario 2: Calculation accuracy
+1. 
 
-- **Given:** I have pending invoices
-- **When:** I view the pending total
-- **Then:** It equals the sum of all sent (unpaid) invoices
+- ****Given:**** I have pending invoices
+- ****When:**** I view the pending total
+- ****Then:**** It equals the sum of all sent (unpaid) invoices
 
-### Scenario 3: Currency format
+1. 
 
-- **Given:** I view the pending total
-- **When:** I look at the number
-- **Then:** It's formatted with currency symbol and thousands separators
+- ****Given:**** I view the pending total
+- ****When:**** I look at the number
+- ****Then:**** It is formatted with currency symbol and thousands separators
 
-### Scenario 4: Updates on change
+1. 
 
-- **Given:** I mark an invoice as paid
-- **When:** I return to the dashboard
-- **Then:** The pending total is updated
+- ****Given:**** I mark an invoice as paid
+- ****When:**** I return to the dashboard
+- ****Then:**** The pending total is updated (decreased)
 
-### Scenario 5: Zero state
+1. 
 
-- **Given:** I have no pending invoices
-- **When:** I view the pending total
-- **Then:** It shows $0.00
+- ****Given:**** I have no pending invoices
+- ****When:**** I view the pending total
+- ****Then:**** It shows $0.00 with positive messaging
 
 ---
 
-## Technical Notes
+## Scope
 
-- Sum of invoices WHERE status = 'sent'
+1. 
+
+- Pending total card on dashboard
+- Sum calculation: WHERE status = 'sent'
+- Currency formatting with locale
 - Real-time or refresh on navigation
-- Currency formatting: user's locale
-- Dashboard stats component
+- Zero state handling
+- Summary stats component
+
+1. 
+
+- Currency conversion
+- Historical pending trends
+- Breakdown by client
+- Export pending summary
 
 ---
 
 ## Definition of Done
 
-- [ ] Pending total displayed
-- [ ] Calculation correct
-- [ ] Currency formatting correct
-- [ ] Updates on changes
-- [ ] Zero state handled
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-38-dashboard-tracking/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 3/2/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:54:02.126Z_

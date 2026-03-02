@@ -1,7 +1,7 @@
-# See Monthly Income Summary
+# As a user, I want to see a summary of monthly income so that I can track my progress
 
-**Jira Key:** [SQ-52](https://upexgalaxy64.atlassian.net/browse/SQ-52)
-**Epic:** [SQ-38](https://upexgalaxy64.atlassian.net/browse/SQ-38) (Dashboard & Tracking)
+**Jira Key:** [SQ-52](https://upexgalaxy65.atlassian.net/browse/SQ-52)
+**Epic:** [SQ-38](https://upexgalaxy65.atlassian.net/browse/SQ-38) (Invoice Dashboard & Tracking)
 **Priority:** Medium
 **Story Points:** 2
 **Status:** Backlog
@@ -10,66 +10,83 @@
 
 ## User Story
 
-**As a** user
-**I want to** see a summary of monthly income
-**So that** I can track my progress
+As a user, I want to see a summary of monthly income, so that I can track my progress. Story Points: 3
 
 ---
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Monthly total
+1. 
 
-- **Given:** I am on the dashboard
-- **When:** I view the summary
-- **Then:** I see my total income this month
+- ****Given:**** I am on the dashboard
+- ****When:**** I view the summary cards
+- ****Then:**** I see my total income this month
 
-### Scenario 2: Paid vs Pending
+1. 
 
-- **Given:** I view the monthly summary
-- **When:** I look at the breakdown
-- **Then:** I see paid amount and pending amount separately
+- ****Given:**** I view the monthly summary
+- ****When:**** I look at the breakdown
+- ****Then:**** I see paid amount and pending amount separately
 
-### Scenario 3: Comparison to last month
+1. 
 
-- **Given:** I view the monthly summary
-- **When:** I look at the trend
-- **Then:** I see a comparison (up/down) vs last month
+- ****Given:**** I view the monthly summary
+- ****When:**** I look at the trend indicator
+- ****Then:**** I see a comparison (up/down percentage) vs last month
 
-### Scenario 4: Monthly chart (optional)
+1. 
 
-- **Given:** I view the dashboard
-- **When:** I look for trends
-- **Then:** I see a simple chart of recent months
+- ****Given:**** I view the dashboard
+- ****When:**** I look for trends
+- ****Then:**** I see a simple chart of recent months (last 6)
 
-### Scenario 5: Current month updates
+1. 
 
-- **Given:** I receive a payment
-- **When:** I return to the dashboard
-- **Then:** The monthly summary is updated
+- ****Given:**** I receive a payment
+- ****When:**** I return to the dashboard
+- ****Then:**** The monthly summary is updated
 
 ---
 
-## Technical Notes
+## Scope
 
-- Monthly income = SUM(invoices WHERE paid_at in current month)
-- Comparison: (this_month - last_month) / last_month × 100
-- Simple bar chart or line chart (recharts)
-- API: GET /api/dashboard/monthly-summary
+1. 
+
+- Monthly income total card
+- Paid vs pending breakdown
+- Month-over-month comparison (percentage)
+- Simple bar/line chart (last 6 months)
+- Real-time updates on payment changes
+- Currency formatting
+
+1. 
+
+- Detailed financial reports
+- Year-over-year comparison
+- Export to spreadsheet
+- Tax calculations
+- Expense tracking
+- Profit/loss analysis
 
 ---
 
 ## Definition of Done
 
-- [ ] Monthly total displayed
-- [ ] Paid vs pending breakdown
-- [ ] Month-over-month comparison
-- [ ] Simple chart implemented
-- [ ] Real-time updates
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-38-dashboard-tracking/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 3/2/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:54:03.020Z_

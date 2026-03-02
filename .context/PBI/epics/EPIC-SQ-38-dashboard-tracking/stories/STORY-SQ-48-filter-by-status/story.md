@@ -1,8 +1,8 @@
-# Filter Invoices by Status
+# As a user, I want to filter invoices by status (draft, sent, paid, overdue) so that I can find the ones I need
 
-**Jira Key:** [SQ-48](https://upexgalaxy64.atlassian.net/browse/SQ-48)
-**Epic:** [SQ-38](https://upexgalaxy64.atlassian.net/browse/SQ-38) (Dashboard & Tracking)
-**Priority:** High
+**Jira Key:** [SQ-48](https://upexgalaxy65.atlassian.net/browse/SQ-48)
+**Epic:** [SQ-38](https://upexgalaxy65.atlassian.net/browse/SQ-38) (Invoice Dashboard & Tracking)
+**Priority:** Medium
 **Story Points:** 2
 **Status:** Backlog
 
@@ -10,72 +10,88 @@
 
 ## User Story
 
-**As a** user
-**I want to** filter invoices by status (draft, sent, paid, overdue)
-**So that** I can find the ones I need
+As a user, I want to filter invoices by status (draft, sent, paid, overdue), so that I can find the ones I need. Story Points: 2
 
 ---
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Filter tabs
+1. 
 
-- **Given:** I am on the dashboard
-- **When:** I view the filter options
-- **Then:** I see tabs for: All, Draft, Sent, Paid, Overdue
+- ****Given:**** I am on the dashboard
+- ****When:**** I view the filter options
+- ****Then:**** I see tabs for: All, Draft, Sent, Paid, Overdue
 
-### Scenario 2: Filter by draft
+1. 
 
-- **Given:** I click "Draft" filter
-- **When:** The list updates
-- **Then:** I only see invoices with status "draft"
+- ****Given:**** I click "Draft" filter
+- ****When:**** The list updates
+- ****Then:**** I only see invoices with status "draft"
 
-### Scenario 3: Filter by sent
+1. 
 
-- **Given:** I click "Sent" filter
-- **When:** The list updates
-- **Then:** I only see invoices with status "sent"
+- ****Given:**** I click "Sent" filter
+- ****When:**** The list updates
+- ****Then:**** I only see invoices with status "sent"
 
-### Scenario 4: Filter by paid
+1. 
 
-- **Given:** I click "Paid" filter
-- **When:** The list updates
-- **Then:** I only see invoices with status "paid"
+- ****Given:**** I click "Paid" filter
+- ****When:**** The list updates
+- ****Then:**** I only see invoices with status "paid"
 
-### Scenario 5: Filter by overdue
+1. 
 
-- **Given:** I click "Overdue" filter
-- **When:** The list updates
-- **Then:** I only see invoices that are past due date and unpaid
+- ****Given:**** I click "Overdue" filter
+- ****When:**** The list updates
+- ****Then:**** I only see invoices past due date and unpaid
 
-### Scenario 6: Count badges
+1. 
 
-- **Given:** I view the filter tabs
-- **When:** I look at each tab
-- **Then:** I see a count of invoices in each status
+- ****Given:**** I view the filter tabs
+- ****When:**** I look at each tab
+- ****Then:**** I see a count of invoices in each status
 
 ---
 
-## Technical Notes
+## Scope
 
-- Statuses: draft, sent, paid, overdue, cancelled
-- Overdue: status = 'sent' AND due_date < today
-- API: GET /api/invoices?status={status}
-- Update counts in real-time or on filter change
+1. 
+
+- Filter tabs: All, Draft, Sent, Paid, Overdue
+- Filter logic for each status
+- Overdue detection: status='sent' AND due_date < today
+- Count badges on each tab
+- URL state persistence for filters
+- API query parameter support
+
+1. 
+
+- Date range filters
+- Client filters
+- Amount range filters
+- Custom saved filters
+- Cancelled status filter
 
 ---
 
 ## Definition of Done
 
-- [ ] Filter tabs implemented
-- [ ] All status filters working
-- [ ] Overdue filter logic correct
-- [ ] Count badges displayed
-- [ ] URL state for filters
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-38-dashboard-tracking/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 3/2/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:54:01.842Z_

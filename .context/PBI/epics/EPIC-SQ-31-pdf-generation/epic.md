@@ -1,11 +1,13 @@
 # EPIC: PDF Generation & Download
 
-**Jira Key:** [SQ-31](https://upexgalaxy64.atlassian.net/browse/SQ-31)
-**Priority:** CRITICAL
-**Phase:** Core Features (Sprint 4-5)
-**Total Story Points:** 13
+**Jira Key:** [SQ-31](https://upexgalaxy65.atlassian.net/browse/SQ-31)
+**Priority:** Medium
+**Status:** Backlog
+**Total Story Points:** 26
 
 ---
+
+## Description
 
 ## Description
 
@@ -13,106 +15,53 @@ Generación de facturas en formato PDF profesional. Incluye diseño con logo, da
 
 ## Business Value
 
-El entregable final al cliente. Sin PDF profesional, la factura no tiene valor como documento de cobro. La calidad del PDF refleja la profesionalidad del freelancer.
+El PDF es el entregable que el cliente recibe. Debe ser profesional, completo y fácil de leer para facilitar el pago.
 
----
+## Acceptance Criteria
 
-## User Stories (5)
-
-| Key                                                      | Story                                 | Points | Priority |
-| -------------------------------------------------------- | ------------------------------------- | ------ | -------- |
-| [SQ-32](https://upexgalaxy64.atlassian.net/browse/SQ-32) | Generate Professional PDF Invoice     | 5      | High     |
-| [SQ-33](https://upexgalaxy64.atlassian.net/browse/SQ-33) | Include Logo and Business Data in PDF | 3      | High     |
-| [SQ-34](https://upexgalaxy64.atlassian.net/browse/SQ-34) | Include Payment Methods in PDF        | 2      | High     |
-| [SQ-35](https://upexgalaxy64.atlassian.net/browse/SQ-35) | Download PDF to Device                | 2      | High     |
-| [SQ-36](https://upexgalaxy64.atlassian.net/browse/SQ-36) | Choose PDF Template (Pro Feature)     | 1      | Low      |
-
----
+- Usuario puede generar PDF con diseño profesional
+- PDF incluye logo y datos del negocio
+- PDF incluye métodos de pago configurados
+- Usuario puede descargar PDF a su dispositivo
+- Usuario Pro puede elegir entre diferentes templates
 
 ## Technical Considerations
 
-### Libraries
+- Librería: @react-pdf/renderer
+- Templates en componentes React
+- Optimizado para tamaño de archivo
 
-- **@react-pdf/renderer** - PDF generation in React
-- **file-saver** - Client-side file download
+## Priority
 
-### PDF Structure
+CRITICAL
 
-```typescript
-interface InvoicePDF {
-  // Header
-  businessLogo: string;
-  businessName: string;
-  businessAddress: string;
-  businessTaxId: string;
+## Phase
 
-  // Client Info
-  clientName: string;
-  clientEmail: string;
-  clientTaxId?: string;
-
-  // Invoice Details
-  invoiceNumber: string;
-  issueDate: Date;
-  dueDate: Date;
-
-  // Line Items
-  items: {
-    description: string;
-    quantity: number;
-    unitPrice: number;
-    lineTotal: number;
-  }[];
-
-  // Totals
-  subtotal: number;
-  taxRate: number;
-  taxAmount: number;
-  discountAmount: number;
-  total: number;
-
-  // Footer
-  paymentMethods: PaymentMethod[];
-  notes?: string;
-  terms?: string;
-}
-```
-
-### Templates (Pro Feature)
-
-```typescript
-type InvoiceTemplate = 'classic' | 'modern' | 'minimal' | 'professional';
-
-interface TemplateConfig {
-  id: InvoiceTemplate;
-  name: string;
-  isPro: boolean;
-  primaryColor: string;
-  fontFamily: string;
-}
-```
+Core Features (Sprint 4-5)
 
 ---
 
-## Dependencies
+## User Stories
 
-### Blocked By
-
-- SQ-20 (Epic: Invoice Creation) - needs invoice data to generate PDF
-- SQ-7 (Epic: Business Profile) - needs business data for PDF header
-
-### Blocks
-
-- EPIC 6 (Invoice Sending) - needs PDF to attach to email
-
----
-
-## Related Documentation
-
-- **PRD:** `.context/PRD/mvp-scope.md` (EPIC 5)
-- **SRS:** `.context/SRS/functional-specs.md` (FR-028 to FR-032)
+| Key | Story | Points | Priority | Status |
+| --- | ----- | ------ | -------- | ------ |
+| [SQ-6](https://upexgalaxy65.atlassian.net/browse/SQ-6) | Guided Onboarding for New Users | 13 | Medium | Ready For QA |
+| [SQ-32](https://upexgalaxy65.atlassian.net/browse/SQ-32) | Generate Professional PDF Invoice | 5 | Medium | Ready For QA |
+| [SQ-33](https://upexgalaxy65.atlassian.net/browse/SQ-33) | Include Logo and Business Data in PDF | 3 | Medium | Ready For QA |
+| [SQ-34](https://upexgalaxy65.atlassian.net/browse/SQ-34) | Include Payment Methods in PDF | 1 | Medium | Shift-Left QA |
+| [SQ-35](https://upexgalaxy65.atlassian.net/browse/SQ-35) | Download PDF to Device | 3 | Medium | Ready For QA |
+| [SQ-36](https://upexgalaxy65.atlassian.net/browse/SQ-36) | Choose Invoice Templates (Pro Feature) | 1 | Medium | Backlog |
 
 ---
 
-_Documento parte del PBI de SoloQ_
-_Última actualización: 2026-01-20_
+## Metadata
+
+- **Created:** 1/20/2026
+- **Updated:** 1/30/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:53:54.755Z_

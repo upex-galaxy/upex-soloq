@@ -1,68 +1,92 @@
 # Add Taxes to Invoice
 
-**Jira Key:** [SQ-24](https://upexgalaxy64.atlassian.net/browse/SQ-24)
-**Epic:** [SQ-20](https://upexgalaxy64.atlassian.net/browse/SQ-20) (Invoice Creation)
-**Priority:** High
-**Story Points:** 2
-**Status:** Backlog
+**Jira Key:** [SQ-24](https://upexgalaxy65.atlassian.net/browse/SQ-24)
+**Epic:** [SQ-20](https://upexgalaxy65.atlassian.net/browse/SQ-20) (Invoice Creation)
+**Priority:** Medium
+**Story Points:** 3
+**Status:** In Test
 
 ---
 
 ## User Story
 
-**As a** user
-**I want to** add taxes (VAT/percentage)
-**So that** I can comply with tax requirements
+## User Story
 
----
+***As a*** user
+***I want to*** add taxes (VAT/percentage)
+***So that*** I can comply with tax requirements
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
 ### Scenario 1: Add tax percentage
 
-- **Given:** I am creating an invoice
-- **When:** I enter a tax percentage (e.g., 16%)
-- **Then:** The tax amount is calculated on the subtotal
+- ***Given:*** I am editing an invoice
+- ***When:*** I enter tax rate 16%
+- ***Then:*** Tax amount is calculated and added to total
 
-### Scenario 2: Tax amount display
+### Scenario 2: No tax option
 
-- **Given:** I have added tax
-- **When:** I view the invoice summary
-- **Then:** I see the tax rate and calculated amount
+- ***Given:*** I don't need to charge tax
+- ***When:*** I leave tax at 0%
+- ***Then:*** No tax is added
 
-### Scenario 3: Zero tax
+### Scenario 3: Tax appears on invoice
 
-- **Given:** I don't need to charge tax
-- **When:** I leave tax at 0%
-- **Then:** No tax is added to the total
-
-### Scenario 4: Common tax presets
-
-- **Given:** I am adding tax
-- **When:** I click on tax field
-- **Then:** I see common presets (0%, 8%, 16%, 19%, 21%)
-
----
+- ***Given:*** I added 16% tax
+- ***When:*** I view/generate the invoice
+- ***Then:*** Tax line shows "IVA 16%: $X.XX"
 
 ## Technical Notes
 
-- tax_amount = subtotal × (tax_rate / 100)
-- Store both tax_rate and tax_amount
-- Common LATAM rates: 16% (Mexico), 19% (Colombia), 21% (Argentina)
-- Tax label configurable (IVA, VAT, etc.)
+- Field: tax_rate (decimal, 0-100)
+- Common presets: 16% (MX), 19% (CO), 21% (AR)
+- Tax calculated on subtotal
+
+## Story Points
+
+2
+
+---
+
+## Acceptance Criteria
+
+Feature:
+
+Background:
+Given ...
+
+Scenario: ...
+Given ...
+When ...
+Then ...
+
+---
+
+## Traceability
+
+### Improvement (1)
+
+- [SQ-87](https://upexgalaxy65.atlassian.net/browse/SQ-87): SQ-24|[DB] Agregar constraint para impedir tasas de impuesto negativas _(OPEN)_
 
 ---
 
 ## Definition of Done
 
-- [ ] Tax input field implemented
-- [ ] Tax calculation working
-- [ ] Tax presets available
-- [ ] Tax display in summary working
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-20-invoice-creation/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 2/25/2026
+- **Reporter:** Ely
+- **Assignee:** Gloria Jesely Galindez Suárez
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:53:50.485Z_

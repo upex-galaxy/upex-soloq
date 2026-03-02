@@ -1,11 +1,13 @@
 # EPIC: Invoice Sending
 
-**Jira Key:** [SQ-37](https://upexgalaxy64.atlassian.net/browse/SQ-37)
-**Priority:** CRITICAL
-**Phase:** Core Features (Sprint 5)
-**Total Story Points:** 11
+**Jira Key:** [SQ-37](https://upexgalaxy65.atlassian.net/browse/SQ-37)
+**Priority:** Medium
+**Status:** Backlog
+**Total Story Points:** 10
 
 ---
+
+## Description
 
 ## Description
 
@@ -13,95 +15,38 @@ Envío de facturas por email. Incluye PDF adjunto, datos de pago en el email, pe
 
 ## Business Value
 
-Completa el flujo principal de facturación. Sin envío por email, el usuario tendría que descargar y enviar manualmente, reduciendo significativamente la productividad.
+Automatiza el envío de facturas, ahorrando tiempo al freelancer y asegurando que el cliente reciba la factura con toda la información necesaria para pagar.
+
+## Priority
+
+CRITICAL
+
+## Phase
+
+Core Features (Sprint 5)
 
 ---
 
-## User Stories (5)
+## User Stories
 
-| Key                                                      | Story                                | Points | Priority |
-| -------------------------------------------------------- | ------------------------------------ | ------ | -------- |
-| [SQ-42](https://upexgalaxy64.atlassian.net/browse/SQ-42) | Send Invoice by Email with One Click | 3      | High     |
-| [SQ-43](https://upexgalaxy64.atlassian.net/browse/SQ-43) | Include Attached PDF in Email        | 2      | High     |
-| [SQ-44](https://upexgalaxy64.atlassian.net/browse/SQ-44) | Include Payment Data in Email        | 2      | High     |
-| [SQ-45](https://upexgalaxy64.atlassian.net/browse/SQ-45) | Customize Email Subject and Message  | 2      | Medium   |
-| [SQ-46](https://upexgalaxy64.atlassian.net/browse/SQ-46) | See Email Delivery Confirmation      | 2      | Medium   |
-
----
-
-## Technical Considerations
-
-### Email Service
-
-- **Resend** - Transactional email service
-- React Email templates for consistent branding
-
-### Database Updates
-
-```sql
--- Add to invoices table
-ALTER TABLE invoices ADD COLUMN sent_at TIMESTAMPTZ;
-ALTER TABLE invoices ADD COLUMN email_message_id VARCHAR(255);
-
--- email_logs table for tracking
-CREATE TABLE email_logs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  invoice_id UUID REFERENCES invoices(id) ON DELETE CASCADE,
-  recipient_email VARCHAR(255) NOT NULL,
-  subject VARCHAR(255) NOT NULL,
-  status VARCHAR(20) DEFAULT 'pending', -- pending, sent, delivered, bounced, failed
-  message_id VARCHAR(255),
-  sent_at TIMESTAMPTZ,
-  delivered_at TIMESTAMPTZ,
-  error_message TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
-
-### API Endpoints
-
-| Method | Endpoint                         | Description               |
-| ------ | -------------------------------- | ------------------------- |
-| POST   | `/api/invoices/:id/send`         | Send invoice email        |
-| GET    | `/api/invoices/:id/email-status` | Get email delivery status |
-
-### Email Template
-
-```typescript
-interface InvoiceEmailData {
-  recipientName: string;
-  recipientEmail: string;
-  senderName: string;
-  invoiceNumber: string;
-  amount: string;
-  dueDate: string;
-  customMessage?: string;
-  paymentMethods: PaymentMethod[];
-  pdfAttachment: Buffer;
-}
-```
+| Key | Story | Points | Priority | Status |
+| --- | ----- | ------ | -------- | ------ |
+| [SQ-42](https://upexgalaxy65.atlassian.net/browse/SQ-42) | Send Invoice by Email with One Click | 1 | Medium | Backlog |
+| [SQ-43](https://upexgalaxy65.atlassian.net/browse/SQ-43) | Include PDF Attachment in Email | 5 | Medium | Ready For QA |
+| [SQ-44](https://upexgalaxy65.atlassian.net/browse/SQ-44) | Include Payment Data in Email | 2 | Medium | Backlog |
+| [SQ-45](https://upexgalaxy65.atlassian.net/browse/SQ-45) | Customize Email Subject and Message | 1 | Medium | Backlog |
+| [SQ-46](https://upexgalaxy65.atlassian.net/browse/SQ-46) | View Email Send Confirmation | 1 | Medium | Shift-Left QA |
 
 ---
 
-## Dependencies
+## Metadata
 
-### Blocked By
-
-- SQ-31 (Epic: PDF Generation) - needs PDF to attach to email
-- SQ-13 (Epic: Client Management) - needs client email
-
-### Blocks
-
-- EPIC 7 (Dashboard & Tracking) - sent status for filtering
+- **Created:** 1/20/2026
+- **Updated:** 2/9/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
 
 ---
 
-## Related Documentation
-
-- **PRD:** `.context/PRD/mvp-scope.md` (EPIC 6)
-- **SRS:** `.context/SRS/functional-specs.md` (FR-033 to FR-037)
-
----
-
-_Documento parte del PBI de SoloQ_
-_Última actualización: 2026-01-20_
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:53:58.367Z_

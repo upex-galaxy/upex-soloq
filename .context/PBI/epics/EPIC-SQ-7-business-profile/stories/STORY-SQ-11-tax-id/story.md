@@ -1,205 +1,144 @@
-# Configure Tax ID (RFC/NIT/CUIT)
+# As a user, I want to configure my tax ID (RFC/NIT/CUIT) so that it appears on my invoices
 
-**Jira Key:** [SQ-11](https://upexgalaxy64.atlassian.net/browse/SQ-11)
-**Epic:** [SQ-7](https://upexgalaxy64.atlassian.net/browse/SQ-7) (Business Profile Management)
-**Priority:** High
+**Jira Key:** [SQ-11](https://upexgalaxy65.atlassian.net/browse/SQ-11)
+**Epic:** [SQ-7](https://upexgalaxy65.atlassian.net/browse/SQ-7) (Business Profile Management)
+**Priority:** Medium
 **Story Points:** 3
 **Status:** Backlog
-**Assignee:** Unassigned
 
 ---
 
 ## User Story
 
-**As a** user
-**I want to** configure my tax ID (RFC/NIT/CUIT)
-**So that** it appears on my invoices
+## User Story
 
----
+***As a*** user
+***I want to*** configure my tax ID (RFC/NIT/CUIT)
+***So that*** it appears on my invoices
 
-## Description
-
-Como freelancer en LATAM, necesito poder configurar mi identificación fiscal (RFC en México, NIT en Colombia, CUIT en Argentina, etc.) para que aparezca en mis facturas. Esto es importante para la formalidad fiscal y para que mis clientes puedan deducir gastos.
-
----
-
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
 ### Scenario 1: Configure tax ID for Mexico (RFC)
 
-- **Given:** I am on the business profile settings and my country is Mexico
-- **When:** I enter my RFC
-- **Then:** The RFC format is validated (13 characters for personas físicas, 12 for morales)
+- ***Given:*** I am on the business profile settings and my country is Mexico
+- ***When:*** I enter my RFC
+- ***Then:*** The RFC format is validated (13 characters for personas físicas, 12 for morales)
 
 ### Scenario 2: Configure tax ID for Colombia (NIT)
 
-- **Given:** I am on the business profile settings and my country is Colombia
-- **When:** I enter my NIT
-- **Then:** The NIT format is validated (9 digits + verification digit)
+- ***Given:*** I am on the business profile settings and my country is Colombia
+- ***When:*** I enter my NIT
+- ***Then:*** The NIT format is validated (9 digits + verification digit)
 
 ### Scenario 3: Configure tax ID for Argentina (CUIT)
 
-- **Given:** I am on the business profile settings and my country is Argentina
-- **When:** I enter my CUIT
-- **Then:** The CUIT format is validated (11 digits with format XX-XXXXXXXX-X)
+- ***Given:*** I am on the business profile settings and my country is Argentina
+- ***When:*** I enter my CUIT
+- ***Then:*** The CUIT format is validated (11 digits)
 
 ### Scenario 4: Tax ID appears on invoice
 
-- **Given:** I have configured my tax ID
-- **When:** I generate an invoice
-- **Then:** My tax ID appears with the correct label (RFC, NIT, CUIT, etc.)
+- ***Given:*** I have configured my tax ID
+- ***When:*** I generate an invoice
+- ***Then:*** My tax ID appears in the appropriate section
 
 ### Scenario 5: Skip tax ID configuration
 
-- **Given:** I don't have a formal tax registration
-- **When:** I leave the tax ID field empty
-- **Then:** I can still create invoices (tax ID section omitted)
-
-### Scenario 6: Dynamic label based on country
-
-- **Given:** I am configuring my tax ID
-- **When:** I select my country
-- **Then:** The label changes to the appropriate term (RFC for MX, NIT for CO, etc.)
-
----
+- ***Given:*** I don't have a tax ID
+- ***When:*** I leave the field empty
+- ***Then:*** I can still create invoices without tax ID
 
 ## Technical Notes
 
-### Frontend
+- Validation regex per country
+- Dynamic label based on country (RFC, NIT, CUIT, RUT, etc.)
+- Optional field (some freelancers may not have formal registration)
+- Stored in `business*profiles.tax*id` and `business*profiles.tax*id_type`
 
-- Form fields:
-  - Country selector (determines tax ID type)
-  - Tax ID input (with dynamic validation)
-- Dynamic label based on country
-- Component: `TaxIdForm` or part of `BusinessProfileForm`
-- Route: `/settings/profile`
+## Story Points
 
-### Backend
-
-- API: `PUT /api/profile`
-- Fields in `business_profiles`:
-  - `tax_id` (optional, varchar(20))
-  - `tax_id_type` (optional, enum: RFC, NIT, CUIT, RUT, RUC, etc.)
-
-### Tax ID Validation by Country
-
-```typescript
-const taxIdValidators: Record<string, RegExp> = {
-  // Mexico - RFC
-  MX: /^[A-Z&Ñ]{3,4}\d{6}[A-Z0-9]{3}$/,
-  // Colombia - NIT
-  CO: /^\d{9}-\d$/,
-  // Argentina - CUIT
-  AR: /^\d{2}-\d{8}-\d$/,
-  // Chile - RUT
-  CL: /^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/,
-  // Peru - RUC
-  PE: /^\d{11}$/,
-};
-
-const taxIdLabels: Record<string, string> = {
-  MX: 'RFC',
-  CO: 'NIT',
-  AR: 'CUIT',
-  CL: 'RUT',
-  PE: 'RUC',
-};
-```
-
-### Database
-
-- `business_profiles.tax_id` VARCHAR(20)
-- `business_profiles.tax_id_type` VARCHAR(10)
+3
 
 ---
 
-## Dependencies
+## Acceptance Criteria
 
-### Blocked By
+1. 
 
-- SQ-10 (Contact Info) - country selection may be done there
+- ****Given:**** I am on the business profile settings and my country is Mexico
+- ****When:**** I enter my RFC
+- ****Then:**** The RFC format is validated (13 characters for personas fisicas, 12 for morales)
 
-### Blocks
+1. 
 
-- EPIC 5 (PDF Generation) - displays tax ID on invoice
+- ****Given:**** I am on the business profile settings and my country is Colombia
+- ****When:**** I enter my NIT
+- ****Then:**** The NIT format is validated (9 digits + verification digit)
 
-### Related Stories
+1. 
 
-- SQ-10: Contact Info (country selection)
-- All invoice-related stories
+- ****Given:**** I am on the business profile settings and my country is Argentina
+- ****When:**** I enter my CUIT
+- ****Then:**** The CUIT format is validated (11 digits with format XX-XXXXXXXX-X)
+
+1. 
+
+- ****Given:**** I have configured my tax ID
+- ****When:**** I generate an invoice
+- ****Then:**** My tax ID appears with the correct label (RFC, NIT, CUIT, etc.)
+
+1. 
+
+- ****Given:**** I don't have a formal tax registration
+- ****When:**** I leave the tax ID field empty
+- ****Then:**** I can still create invoices (tax ID section omitted)
+
+1. 
+
+- ****Given:**** I am configuring my tax ID
+- ****When:**** I select my country
+- ****Then:**** The label changes to the appropriate term (RFC for MX, NIT for CO, etc.)
 
 ---
 
-## UI/UX Considerations
+## Scope
 
-- Country selector updates tax ID label dynamically
-- Input mask/formatting based on country
-- Helper text showing expected format
-- "I don't have a tax ID" checkbox option
-- Validation errors specific to format
+1. 
+
+- Tax ID input with dynamic validation per country
+- Country selector that determines tax ID type
+- Dynamic label (RFC, NIT, CUIT, RUT, RUC)
+- Format validation per country regex
+- Optional field (skip allowed)
+- Display tax ID with correct label on invoice
+- Input mask/formatting by country
+
+1. 
+
+- Tax ID verification via external APIs
+- Historical tax ID tracking
+- Multiple tax IDs per user
+- Official tax registry integration
 
 ---
 
 ## Definition of Done
 
-- [ ] Tax ID form field implemented
-- [ ] Dynamic label based on country
-- [ ] Validation per country working
-- [ ] API endpoint working
-- [ ] Data persists correctly
-- [ ] Tax ID appears on invoice with label
-- [ ] Skip option working
-- [ ] Unit tests > 80% coverage
-- [ ] Integration tests for API
-- [ ] Code review approved (2 reviewers)
-- [ ] Deployed to staging
-- [ ] QA testing passed
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Testing Strategy
+## Metadata
 
-See: `test-cases.md` (Fase 5)
-
-**Test Cases Expected:** 8+ detailed test cases covering:
-
-- Valid RFC (Mexico)
-- Valid NIT (Colombia)
-- Valid CUIT (Argentina)
-- Invalid format rejection
-- Skip tax ID
-- Display on invoice
+- **Created:** 1/20/2026
+- **Updated:** 3/2/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
 
 ---
 
-## Implementation Plan
-
-See: `implementation-plan.md` (Fase 6)
-
-**Implementation Steps Expected:**
-
-1. Create TaxIdForm component
-2. Add country selector (or integrate with Contact Info)
-3. Implement dynamic label logic
-4. Create validation regex per country
-5. Create/update API route
-6. Integrate with database
-7. Update invoice templates to show tax ID
-8. Write tests
-
----
-
-## Notes
-
-- Some freelancers operate informally without tax registration
-- Tax ID format varies significantly by country
-- Consider adding "verify tax ID" API integration in v2
-- Format helpers: auto-add dashes for CUIT/NIT
-
----
-
-## Related Documentation
-
-- **Epic:** `.context/PBI/epics/EPIC-SQ-7-business-profile/epic.md`
-- **PRD:** `.context/PRD/mvp-scope.md`
-- **SRS:** `.context/SRS/functional-specs.md` (FR-007)
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:53:41.878Z_

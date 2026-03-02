@@ -1,75 +1,96 @@
 # Add Notes and Terms to Invoice
 
-**Jira Key:** [SQ-29](https://upexgalaxy64.atlassian.net/browse/SQ-29)
-**Epic:** [SQ-20](https://upexgalaxy64.atlassian.net/browse/SQ-20) (Invoice Creation)
-**Priority:** Low
-**Story Points:** 2
-**Status:** Backlog
+**Jira Key:** [SQ-29](https://upexgalaxy65.atlassian.net/browse/SQ-29)
+**Epic:** [SQ-20](https://upexgalaxy65.atlassian.net/browse/SQ-20) (Invoice Creation)
+**Priority:** Medium
+**Story Points:** 8
+**Status:** Ready For QA
 
 ---
 
 ## User Story
 
-**As a** user
-**I want to** add notes or terms and conditions
-**So that** I can communicate additional information
+## User Story
 
----
+***As a*** user
+***I want to*** add notes or terms and conditions
+***So that*** I can communicate additional information
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Add notes
+### Scenario 1: Add custom note
 
-- **Given:** I am creating an invoice
-- **When:** I enter text in the notes field
-- **Then:** The notes appear on the invoice
+- ***Given:*** I am editing an invoice
+- ***When:*** I type in the notes field
+- ***Then:*** The note is saved with the invoice
 
-### Scenario 2: Add terms
+### Scenario 2: Use default terms
 
-- **Given:** I am creating an invoice
-- **When:** I enter terms and conditions
-- **Then:** The terms appear at the bottom of the invoice
+- ***Given:*** I have default terms configured
+- ***When:*** I create a new invoice
+- ***Then:*** Default terms are pre-filled
 
-### Scenario 3: Default terms
+### Scenario 3: Notes appear on invoice
 
-- **Given:** I have saved default terms in my profile
-- **When:** I create a new invoice
-- **Then:** My default terms are pre-filled
-
-### Scenario 4: Character limit
-
-- **Given:** I am writing notes or terms
-- **When:** I reach the character limit
-- **Then:** I see a counter and cannot exceed the limit
-
-### Scenario 5: Optional fields
-
-- **Given:** I don't need notes or terms
-- **When:** I leave these fields empty
-- **Then:** These sections don't appear on the invoice
-
----
+- ***Given:*** I added notes
+- ***When:*** I view/generate the invoice
+- ***Then:*** Notes appear at the bottom of the invoice
 
 ## Technical Notes
 
-- Notes: personal message to client (500 chars max)
-- Terms: legal/payment terms (1000 chars max)
-- Default terms stored in business_profile
-- Both fields optional
+- Fields: notes (text), terms (text)
+- Default terms stored in business profile
+- Rich text or plain text (v1: plain)
+
+## Story Points
+
+2
+
+---
+
+## Acceptance Criteria
+
+Feature:
+
+Background:
+Given ...
+
+Scenario: ...
+Given ...
+When ...
+Then ...
+
+---
+
+## Traceability
+
+### Defect (1)
+
+- [SQ-76](https://upexgalaxy65.atlassian.net/browse/SQ-76): SQ-29 | Business_profiles devuelve 406 en create invoice e impide validar prefill de términos _(Ready For QA)_
+
+### Improvement (1)
+
+- [SQ-77](https://upexgalaxy65.atlassian.net/browse/SQ-77): SQ-29 | Flujo incompleto en staging: módulo Facturas/preview no disponible para validar ACs de edición y visualización _(CLOSED)_
 
 ---
 
 ## Definition of Done
 
-- [ ] Notes field implemented
-- [ ] Terms field implemented
-- [ ] Default terms pre-fill working
-- [ ] Character limits enforced
-- [ ] Conditional display on invoice
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-20-invoice-creation/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 2/10/2026
+- **Reporter:** Ely
+- **Assignee:** Ximena Quintana
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:53:52.512Z_

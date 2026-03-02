@@ -120,6 +120,7 @@ const STORY_FIELDS = [
   CUSTOM_FIELDS.workflow,
   CUSTOM_FIELDS.storyPoints,
   CUSTOM_FIELDS.webLink,
+  'issuelinks', // For traceability (tests, defects, bugs, etc.)
 ];
 
 /** Fields to request for Bugs/Defects */
@@ -526,6 +527,71 @@ function cleanMarkdown(text: string): string {
     .replace(/_([^_\n]+)_/g, '*$1*'); // Wiki italic _text_ to Markdown *text*
 }
 
+/**
+ * Generate traceability section from issue links.
+ * Groups links by issue type (Tests, Defects, Bugs, etc.) for better readability.
+ */
+function generateTraceabilitySection(
+  issuelinks: JiraIssueLink[] | undefined,
+  config: Config,
+): string | null {
+  if (!issuelinks || issuelinks.length === 0) return null;
+
+  // Group links by issue type
+  const grouped: Record<string, Array<{ key: string; summary: string; status: string; relation: string }>> = {};
+
+  for (const link of issuelinks) {
+    const issue = link.inwardIssue || link.outwardIssue;
+    if (!issue) continue;
+
+    const issueType = issue.fields.issuetype?.name || 'Other';
+    const relation = link.inwardIssue ? link.type.inward : link.type.outward;
+    const status = (issue.fields as Record<string, unknown>).status as { name: string } | undefined;
+
+    if (!grouped[issueType]) {
+      grouped[issueType] = [];
+    }
+
+    grouped[issueType].push({
+      key: issue.key,
+      summary: issue.fields.summary,
+      status: status?.name || 'Unknown',
+      relation,
+    });
+  }
+
+  // Build markdown output
+  const lines: string[] = [];
+
+  // Define preferred order for issue types
+  const typeOrder = ['Test', 'Test Execution', 'Defect', 'Bug', 'Story', 'Improvement', 'Task', 'Epic'];
+
+  // Sort types by preferred order, then alphabetically for unknown types
+  const sortedTypes = Object.keys(grouped).sort((a, b) => {
+    const aIndex = typeOrder.indexOf(a);
+    const bIndex = typeOrder.indexOf(b);
+    if (aIndex === -1 && bIndex === -1) return a.localeCompare(b);
+    if (aIndex === -1) return 1;
+    if (bIndex === -1) return -1;
+    return aIndex - bIndex;
+  });
+
+  for (const issueType of sortedTypes) {
+    const issues = grouped[issueType];
+    const pluralType = issues.length > 1 ? `${issueType}s` : issueType;
+
+    lines.push(`### ${pluralType} (${issues.length})`, '');
+
+    for (const issue of issues) {
+      lines.push(`- [${issue.key}](${config.baseUrl}/browse/${issue.key}): ${issue.summary} _(${issue.status})_`);
+    }
+
+    lines.push('');
+  }
+
+  return lines.join('\n').trim();
+}
+
 function processNode(node: AdfNode): string {
   switch (node.type) {
     case 'paragraph':
@@ -874,6 +940,12 @@ function generateStoryMarkdown(
   // WebLink (References)
   if (webLink) {
     lines.push('---', '', '## References', '', `- [External Link](${webLink})`, '');
+  }
+
+  // Traceability - Group linked issues by type
+  const traceabilitySection = generateTraceabilitySection(fields.issuelinks, config);
+  if (traceabilitySection) {
+    lines.push('---', '', '## Traceability', '', traceabilitySection, '');
   }
 
   // Definition of Done (standard checklist)

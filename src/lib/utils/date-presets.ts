@@ -65,8 +65,12 @@ export function getTodayDate(): string {
 export function isPastDate(dateString: string): boolean {
   if (!dateString) return false;
 
-  // Parse the date string and compare to today at midnight
-  const inputDate = new Date(dateString);
+  // Parse date string as local date (not UTC)
+  // Note: new Date('YYYY-MM-DD') parses as UTC, which causes timezone issues
+  // in negative UTC offsets (like LATAM), making "today" appear as "yesterday"
+  const [year, month, day] = dateString.split('-').map(Number);
+  const inputDate = new Date(year, month - 1, day); // month is 0-indexed
+
   const today = new Date();
 
   // Reset times to compare only dates

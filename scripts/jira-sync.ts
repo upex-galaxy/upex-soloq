@@ -86,6 +86,7 @@ const PROTECTED_PATTERNS = [
 
 /** Custom fields mapping for UPEX Workspace */
 const CUSTOM_FIELDS = {
+  // Story fields
   acceptanceCriteria: 'customfield_10201',
   businessRules: 'customfield_10202',
   scope: 'customfield_10401',
@@ -93,6 +94,16 @@ const CUSTOM_FIELDS = {
   workflow: 'customfield_10500',
   storyPoints: 'customfield_10028',
   webLink: 'customfield_11600',
+  // Bug/Defect fields
+  actualResult: 'customfield_10109',      // 🐞 Actual Result (Textarea)
+  expectedResult: 'customfield_10110',    // ✅ Expected Result (Textarea)
+  errorType: 'customfield_10112',         // Error Type (Dropdown)
+  severity: 'customfield_10116',          // SEVERITY (Dropdown)
+  testEnvironment: 'customfield_12210',   // Test Environment (Dropdown)
+  rootCause: 'customfield_10701',         // Root Cause🐞 (Dropdown - category only)
+  workaround: 'customfield_10111',        // 🚩 Workaround (Textarea, optional)
+  evidence: 'customfield_10607',          // 🧫 EVIDENCE (Textarea, optional)
+  fixType: 'customfield_12212',           // Fix (Radio: Bugfix/Hotfix)
 } as const;
 
 /** Fields to request for Epics */
@@ -128,6 +139,16 @@ const BUG_FIELDS = [
   ...EPIC_FIELDS,
   'issuelinks', // For defects linked to stories
   'components',
+  // Bug/Defect custom fields
+  CUSTOM_FIELDS.actualResult,
+  CUSTOM_FIELDS.expectedResult,
+  CUSTOM_FIELDS.errorType,
+  CUSTOM_FIELDS.severity,
+  CUSTOM_FIELDS.testEnvironment,
+  CUSTOM_FIELDS.rootCause,
+  CUSTOM_FIELDS.workaround,
+  CUSTOM_FIELDS.evidence,
+  CUSTOM_FIELDS.fixType,
 ];
 
 /** Fields to request for Tests */
@@ -1013,6 +1034,21 @@ function generateCommentsMarkdown(
   return lines.join('\n');
 }
 
+/**
+ * Extract value from Jira dropdown/select field.
+ * Handles both simple strings and complex {value: string} objects.
+ */
+function getDropdownValue(field: unknown): string | null {
+  if (!field) return null;
+  if (typeof field === 'string') return field;
+  if (typeof field === 'object' && field !== null) {
+    const obj = field as Record<string, unknown>;
+    if ('value' in obj && typeof obj.value === 'string') return obj.value;
+    if ('name' in obj && typeof obj.name === 'string') return obj.name;
+  }
+  return null;
+}
+
 function generateBugMarkdown(
   bug: JiraIssue,
   config: Config,
@@ -1021,6 +1057,17 @@ function generateBugMarkdown(
   const description = adfToMarkdown(fields.description);
   const components = fields.components?.map((c) => c.name).join(', ') || 'None';
 
+  // Extract custom fields
+  const actualResult = adfToMarkdown(fields[CUSTOM_FIELDS.actualResult] as AdfDocument | null);
+  const expectedResult = adfToMarkdown(fields[CUSTOM_FIELDS.expectedResult] as AdfDocument | null);
+  const errorType = getDropdownValue(fields[CUSTOM_FIELDS.errorType]);
+  const severity = getDropdownValue(fields[CUSTOM_FIELDS.severity]);
+  const testEnvironment = getDropdownValue(fields[CUSTOM_FIELDS.testEnvironment]);
+  const rootCause = getDropdownValue(fields[CUSTOM_FIELDS.rootCause]);
+  const workaround = adfToMarkdown(fields[CUSTOM_FIELDS.workaround] as AdfDocument | null);
+  const evidence = adfToMarkdown(fields[CUSTOM_FIELDS.evidence] as AdfDocument | null);
+  const fixType = getDropdownValue(fields[CUSTOM_FIELDS.fixType]);
+
   const lines: string[] = [
     `# BUG: ${fields.summary}`,
     '',
@@ -1028,14 +1075,40 @@ function generateBugMarkdown(
     `**Priority:** ${fields.priority?.name || 'Not set'}`,
     `**Status:** ${fields.status?.name || 'Unknown'}`,
     `**Components:** ${components}`,
-    '',
-    '---',
-    '',
-    '## Description',
-    '',
-    description || '_No description provided_',
-    '',
   ];
+
+  // Add severity and error type inline if available
+  if (severity) lines.push(`**Severity:** ${severity}`);
+  if (errorType) lines.push(`**Error Type:** ${errorType}`);
+  if (testEnvironment) lines.push(`**Test Environment:** ${testEnvironment}`);
+  if (fixType) lines.push(`**Fix Type:** ${fixType}`);
+
+  lines.push('', '---', '', '## Description', '', description || '_No description provided_', '');
+
+  // Actual Result section
+  if (actualResult) {
+    lines.push('---', '', '## 🐞 Actual Result', '', actualResult, '');
+  }
+
+  // Expected Result section
+  if (expectedResult) {
+    lines.push('---', '', '## ✅ Expected Result', '', expectedResult, '');
+  }
+
+  // Root Cause section (category only)
+  if (rootCause) {
+    lines.push('---', '', '## 🔍 Root Cause', '', `**Category:** ${rootCause}`, '');
+  }
+
+  // Workaround section (optional)
+  if (workaround) {
+    lines.push('---', '', '## 🚩 Workaround', '', workaround, '');
+  }
+
+  // Evidence section (optional)
+  if (evidence) {
+    lines.push('---', '', '## 🧫 Evidence', '', evidence, '');
+  }
 
   // Add issue links if any
   if (fields.issuelinks && fields.issuelinks.length > 0) {
@@ -1081,6 +1154,17 @@ function generateDefectMarkdown(
   const description = adfToMarkdown(fields.description);
   const components = fields.components?.map((c) => c.name).join(', ') || 'None';
 
+  // Extract custom fields (same as bugs)
+  const actualResult = adfToMarkdown(fields[CUSTOM_FIELDS.actualResult] as AdfDocument | null);
+  const expectedResult = adfToMarkdown(fields[CUSTOM_FIELDS.expectedResult] as AdfDocument | null);
+  const errorType = getDropdownValue(fields[CUSTOM_FIELDS.errorType]);
+  const severity = getDropdownValue(fields[CUSTOM_FIELDS.severity]);
+  const testEnvironment = getDropdownValue(fields[CUSTOM_FIELDS.testEnvironment]);
+  const rootCause = getDropdownValue(fields[CUSTOM_FIELDS.rootCause]);
+  const workaround = adfToMarkdown(fields[CUSTOM_FIELDS.workaround] as AdfDocument | null);
+  const evidence = adfToMarkdown(fields[CUSTOM_FIELDS.evidence] as AdfDocument | null);
+  const fixType = getDropdownValue(fields[CUSTOM_FIELDS.fixType]);
+
   const lines: string[] = [
     `# DEFECT: ${fields.summary}`,
     '',
@@ -1095,14 +1179,40 @@ function generateDefectMarkdown(
     `**Priority:** ${fields.priority?.name || 'Not set'}`,
     `**Status:** ${fields.status?.name || 'Unknown'}`,
     `**Components:** ${components}`,
-    '',
-    '---',
-    '',
-    '## Description',
-    '',
-    description || '_No description provided_',
-    '',
   );
+
+  // Add severity and error type inline if available
+  if (severity) lines.push(`**Severity:** ${severity}`);
+  if (errorType) lines.push(`**Error Type:** ${errorType}`);
+  if (testEnvironment) lines.push(`**Test Environment:** ${testEnvironment}`);
+  if (fixType) lines.push(`**Fix Type:** ${fixType}`);
+
+  lines.push('', '---', '', '## Description', '', description || '_No description provided_', '');
+
+  // Actual Result section
+  if (actualResult) {
+    lines.push('---', '', '## 🐞 Actual Result', '', actualResult, '');
+  }
+
+  // Expected Result section
+  if (expectedResult) {
+    lines.push('---', '', '## ✅ Expected Result', '', expectedResult, '');
+  }
+
+  // Root Cause section (category only)
+  if (rootCause) {
+    lines.push('---', '', '## 🔍 Root Cause', '', `**Category:** ${rootCause}`, '');
+  }
+
+  // Workaround section (optional)
+  if (workaround) {
+    lines.push('---', '', '## 🚩 Workaround', '', workaround, '');
+  }
+
+  // Evidence section (optional)
+  if (evidence) {
+    lines.push('---', '', '## 🧫 Evidence', '', evidence, '');
+  }
 
   // Add all issue links
   if (fields.issuelinks && fields.issuelinks.length > 0) {

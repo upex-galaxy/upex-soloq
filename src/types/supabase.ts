@@ -98,6 +98,59 @@ export type Database = {
         };
         Relationships: [];
       };
+      email_logs: {
+        Row: {
+          attachment_name: string | null;
+          attachment_size_bytes: number | null;
+          created_at: string | null;
+          error_message: string | null;
+          id: string;
+          invoice_id: string | null;
+          recipient_email: string;
+          resend_message_id: string | null;
+          sent_at: string | null;
+          status: string;
+          subject: string;
+          user_id: string | null;
+        };
+        Insert: {
+          attachment_name?: string | null;
+          attachment_size_bytes?: number | null;
+          created_at?: string | null;
+          error_message?: string | null;
+          id?: string;
+          invoice_id?: string | null;
+          recipient_email: string;
+          resend_message_id?: string | null;
+          sent_at?: string | null;
+          status?: string;
+          subject: string;
+          user_id?: string | null;
+        };
+        Update: {
+          attachment_name?: string | null;
+          attachment_size_bytes?: number | null;
+          created_at?: string | null;
+          error_message?: string | null;
+          id?: string;
+          invoice_id?: string | null;
+          recipient_email?: string;
+          resend_message_id?: string | null;
+          sent_at?: string | null;
+          status?: string;
+          subject?: string;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'email_logs_invoice_id_fkey';
+            columns: ['invoice_id'];
+            isOneToOne: false;
+            referencedRelation: 'invoices';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       invoice_events: {
         Row: {
           created_at: string | null;

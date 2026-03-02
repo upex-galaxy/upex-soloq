@@ -121,6 +121,9 @@ export default function CreateInvoicePage() {
   // Calculate discount amount for summary (SQ-22: subtotal comes from line items)
   const { amount: discountAmount } = calculateDiscountAmount(subtotal, discountType, discountValue);
 
+  // SQ-97: Validate percentage discount cannot exceed 100%
+  const isDiscountInvalid = discountType === 'percentage' && discountValue > 100;
+
   // Handle client selection
   const handleClientSelect = (client: Client | null) => {
     setSelectedClient(client);
@@ -392,7 +395,7 @@ export default function CreateInvoicePage() {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isCreating || !selectedClient || !isInvoiceNumberValid}
+                  disabled={isCreating || !selectedClient || !isInvoiceNumberValid || isDiscountInvalid}
                   data-testid="save-invoice-button"
                 >
                   {isCreating ? (

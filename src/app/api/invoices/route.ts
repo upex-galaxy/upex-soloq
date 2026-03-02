@@ -242,7 +242,7 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
         tax_rate: taxRate,
         tax_amount: taxAmount,
         discount_type: discountType,
-        discount_value: discountAmount, // Store calculated amount, not input value
+        discount_value: discountValue, // Store user input value (percentage 0-100 or fixed amount)
         total,
       })
       .select()

@@ -400,7 +400,7 @@ export async function PUT(
       }
       if (discountChanged) {
         updates.discount_type = effectiveDiscountType;
-        updates.discount_value = discountAmount; // Store calculated amount
+        updates.discount_value = effectiveDiscountValue; // Store user input value (percentage 0-100 or fixed amount)
       }
       updates.tax_amount = taxAmount;
       updates.total = total;

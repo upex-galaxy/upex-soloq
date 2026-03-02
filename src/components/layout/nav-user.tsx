@@ -26,8 +26,8 @@ export function NavUser() {
   const { isMobile } = useSidebar();
   const router = useRouter();
 
-  // Get display name and initials
-  const displayName = user?.businessProfile?.business_name || user?.email || 'Usuario';
+  // Get display name and initials - use email as reliable fallback, avoid generic "Usuario"
+  const displayName = user?.businessProfile?.business_name || user?.email || 'Cargando...';
   const email = user?.email || '';
   const initials = displayName
     .split(' ')

@@ -108,24 +108,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [supabase]
   );
 
-  // Sign out
+  // Sign out - clear state immediately for better UX, then call server
   const signOut = useCallback(async () => {
-    const { error } = await supabase.auth.signOut();
+    // Clear state immediately to ensure logout works even if server call fails
+    setState({
+      user: null,
+      session: null,
+      isLoading: false,
+      isAuthenticated: false,
+    });
 
-    if (!error) {
-      setState({
-        user: null,
-        session: null,
-        isLoading: false,
-        isAuthenticated: false,
-      });
-    }
+    // Then attempt to sign out from server (errors are logged but don't block logout)
+    const { error } = await supabase.auth.signOut();
 
     return { error };
   }, [supabase]);
 
   // Initialize auth state and listen for changes
   useEffect(() => {
+    // Track if component is still mounted to prevent state updates after unmount
+    let isMounted = true;
+
     // Get initial session - use getUser() to validate token with server
     const initializeAuth = async () => {
       try {
@@ -134,6 +137,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           data: { user: validatedUser },
           error: userError,
         } = await supabase.auth.getUser();
+
+        // Prevent state update if component unmounted during async operation
+        if (!isMounted) return;
 
         // If no valid user, clear state
         if (userError || !validatedUser) {
@@ -151,8 +157,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           data: { session },
         } = await supabase.auth.getSession();
 
+        // Prevent state update if component unmounted during async operation
+        if (!isMounted) return;
+
         if (session?.user) {
           const profileData = await fetchUserProfile(session.user.id);
+
+          // Final check before setState
+          if (!isMounted) return;
 
           setState({
             user: {
@@ -172,12 +184,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
         }
       } catch {
-        setState({
-          user: null,
-          session: null,
-          isLoading: false,
-          isAuthenticated: false,
-        });
+        if (isMounted) {
+          setState({
+            user: null,
+            session: null,
+            isLoading: false,
+            isAuthenticated: false,
+          });
+        }
       }
     };
 
@@ -213,14 +227,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           isAuthenticated: false,
         });
       } else if (event === 'TOKEN_REFRESHED' && session) {
-        setState(prev => ({
-          ...prev,
-          session,
-        }));
+        // Re-fetch profile to keep user data in sync after token refresh
+        if (session.user) {
+          const profileData = await fetchUserProfile(session.user.id);
+          setState(prev => ({
+            ...prev,
+            user: prev.user
+              ? {
+                  ...session.user,
+                  ...profileData,
+                }
+              : null,
+            session,
+          }));
+        } else {
+          setState(prev => ({
+            ...prev,
+            session,
+          }));
+        }
       }
     });
 
     return () => {
+      isMounted = false;
       subscription.unsubscribe();
     };
   }, [supabase, fetchUserProfile]);

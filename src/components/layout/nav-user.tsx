@@ -20,26 +20,59 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function NavUser() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isLoading } = useAuth();
   const { isMobile } = useSidebar();
   const router = useRouter();
 
-  // Get display name and initials - use email as reliable fallback, avoid generic "Usuario"
-  const displayName = user?.businessProfile?.business_name || user?.email || 'Cargando...';
-  const email = user?.email || '';
+  // Handle sign out - works even if user state is inconsistent (SQ-74 fix)
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/login');
+  };
+
+  // Show skeleton while loading auth state
+  if (isLoading) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="lg" className="cursor-default">
+            <Skeleton className="h-8 w-8 rounded-lg" />
+            <div className="grid flex-1 gap-1">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-3 w-32" />
+            </div>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
+
+  // If no user after loading, show minimal logout option (edge case recovery)
+  if (!user) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="lg" onClick={handleSignOut}>
+            <LogOut className="h-4 w-4" />
+            <span>Cerrar Sesión</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
+
+  // Get display name and initials - user.email should always exist after auth
+  const displayName = user.businessProfile?.business_name || user.email || 'Mi Cuenta';
+  const email = user.email || '';
   const initials = displayName
     .split(' ')
     .map(n => n[0])
     .join('')
     .toUpperCase()
     .slice(0, 2);
-
-  const handleSignOut = async () => {
-    await signOut();
-    router.push('/login');
-  };
 
   return (
     <SidebarMenu>

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import type { User, Session, AuthError } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
 import type { Tables } from '@/types/supabase';
@@ -124,10 +124,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error };
   }, [supabase]);
 
+  // Generation counter to prevent stale updates from race conditions (SQ-74 fix)
+  const initGenRef = useRef(0);
+
   // Initialize auth state and listen for changes
   useEffect(() => {
+    // Increment generation for this initialization attempt
+    const currentGen = ++initGenRef.current;
+
     // Track if component is still mounted to prevent state updates after unmount
     let isMounted = true;
+
+    // Helper to check if this is still the latest initialization attempt
+    const isStale = () => !isMounted || currentGen !== initGenRef.current;
 
     // Get initial session - use getUser() to validate token with server
     const initializeAuth = async () => {
@@ -138,8 +147,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           error: userError,
         } = await supabase.auth.getUser();
 
-        // Prevent state update if component unmounted during async operation
-        if (!isMounted) return;
+        // Prevent state update if component unmounted or newer init started (SQ-74 fix)
+        if (isStale()) return;
 
         // If no valid user, clear state
         if (userError || !validatedUser) {
@@ -157,14 +166,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           data: { session },
         } = await supabase.auth.getSession();
 
-        // Prevent state update if component unmounted during async operation
-        if (!isMounted) return;
+        // Prevent state update if stale (SQ-74 fix)
+        if (isStale()) return;
 
         if (session?.user) {
           const profileData = await fetchUserProfile(session.user.id);
 
-          // Final check before setState
-          if (!isMounted) return;
+          // Final check before setState (SQ-74 fix)
+          if (isStale()) return;
 
           setState({
             user: {
@@ -184,7 +193,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
         }
       } catch {
-        if (isMounted) {
+        if (!isStale()) {
           setState({
             user: null,
             session: null,

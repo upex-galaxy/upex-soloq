@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { FileText, Loader2, AlertTriangle, Eye, EyeOff } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { FileText, Loader2, AlertTriangle, Eye, EyeOff, Clock } from 'lucide-react';
 
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -44,7 +44,19 @@ function maskEmail(email: string): string {
 
 type TokenStatus = 'loading' | 'valid' | 'expired' | 'invalid' | 'used';
 
-export default function ResetPasswordPage() {
+// Loading fallback for Suspense
+function LoadingFallback() {
+  return (
+    <Card className="w-full shadow-lg">
+      <CardContent className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </CardContent>
+    </Card>
+  );
+}
+
+// Main content component (uses useSearchParams which requires Suspense)
+function ResetPasswordContent() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -57,12 +69,23 @@ export default function ResetPasswordPage() {
   const [isResending, setIsResending] = useState(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
 
   // Check for password recovery session on mount
   useEffect(() => {
     const checkSession = async () => {
       try {
+        // First, check URL params for Supabase error redirects
+        const errorCode = searchParams.get('error_code');
+        const error = searchParams.get('error');
+
+        // Handle expired token from Supabase redirect (SQ-86)
+        if (errorCode === 'otp_expired' || error === 'access_denied') {
+          setTokenStatus('expired');
+          return;
+        }
+
         // Get current session
         const {
           data: { session },
@@ -113,7 +136,7 @@ export default function ResetPasswordPage() {
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase]);
+  }, [supabase, searchParams]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -226,6 +249,42 @@ export default function ResetPasswordPage() {
         <CardContent className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </CardContent>
+      </Card>
+    );
+  }
+
+  // Expired token - show specific message with option to request new link (SQ-86)
+  if (tokenStatus === 'expired') {
+    return (
+      <Card className="w-full shadow-lg" data-testid="reset-password-expired">
+        <CardHeader className="space-y-1 text-center">
+          <div className="flex justify-center mb-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+              <Clock className="h-6 w-6" />
+            </div>
+          </div>
+          <CardTitle className="text-2xl font-bold">Link Expirado</CardTitle>
+          <CardDescription>
+            Este link de recuperación ha expirado. Por seguridad, los links son válidos solo por 1
+            hora.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert className="bg-amber-50 border-amber-200">
+            <Clock className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-amber-800">
+              No te preocupes, puedes solicitar un nuevo link de recuperación.
+            </AlertDescription>
+          </Alert>
+          <Button asChild className="w-full">
+            <Link href="/forgot-password">Solicitar Nuevo Link</Link>
+          </Button>
+        </CardContent>
+        <CardFooter className="flex justify-center">
+          <Link href="/login" className="text-sm text-muted-foreground hover:text-primary">
+            Volver a Iniciar Sesión
+          </Link>
+        </CardFooter>
       </Card>
     );
   }
@@ -435,5 +494,14 @@ export default function ResetPasswordPage() {
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+// Page component with Suspense boundary for useSearchParams (SQ-86)
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

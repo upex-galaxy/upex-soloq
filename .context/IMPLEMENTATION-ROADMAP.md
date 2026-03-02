@@ -1,6 +1,6 @@
 # Implementation Roadmap - SoloQ
 
-> **Documento provisional** - Generado: 2026-02-07 | **Última actualización:** 2026-02-26
+> **Documento provisional** - Generado: 2026-02-07 | **Última actualización:** 2026-03-01
 > **Proposito:** Panorama completo del estado actual y plan de implementacion ordenado por dependencias.
 
 ---
@@ -138,11 +138,11 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 
 ### Epic: SQ-37 - Invoice Sending
 
-| Key   | Story                              | Status        | Priority | Assignee       | PR Shift-Left | PR Impl |
-| ----- | ---------------------------------- | ------------- | -------- | -------------- | ------------- | ------- |
-| SQ-42 | Send Invoice by Email with 1 Click | Backlog       | Medium   | -              | -             | -       |
-| SQ-43 | Include PDF Attachment in Email    | Ready For Dev | Medium   | Ely            | #40 (MERGED)  | -       |
-| SQ-46 | View Email Send Confirmation       | Shift-Left QA | Medium   | Miguel Millan  | -             | -       |
+| Key   | Story                              | Status        | Priority | Assignee                   | PR Shift-Left | PR Impl      |
+| ----- | ---------------------------------- | ------------- | -------- | -------------------------- | ------------- | ------------ |
+| SQ-42 | Send Invoice by Email with 1 Click | Backlog       | Medium   | -                          | -             | -            |
+| SQ-43 | Include PDF Attachment in Email    | Ready For QA  | Medium   | yxsinell acosta zambrano   | #40 (MERGED)  | #62 (MERGED) |
+| SQ-46 | View Email Send Confirmation       | Shift-Left QA | Medium   | Miguel Millan              | -             | -            |
 
 ---
 
@@ -227,13 +227,13 @@ SQ-31 (PDF Generation Epic)
 | 17    | SQ-18 | View Client Invoice History | Ready For QA  | Rodrigo  | #43 (MERGED)  | #58 (MERGED) |
 | 18    | SQ-6  | Guided Onboarding for New Users | Ready For QA  | Juan L.  | -             | #59 (MERGED) |
 
-### FASE 5: US en Ready For Dev (2026-02-25)
+### FASE 5: US en Ready For Dev (2026-03-01)
 
-| Orden | Key   | Story                            | Status        | Assignee      | PR Shift-Left | PR Impl |
-| ----- | ----- | -------------------------------- | ------------- | ------------- | ------------- | ------- |
-| 19    | SQ-23 | Auto Subtotal/Total Calculation  | Ready For Dev | Raúl González | #53 (MERGED)  | -       |
-| 20    | SQ-26 | Preview Invoice Before Send      | Ready For QA  | Marianela P.  | #15 (MERGED)  | #60 ✅  |
-| 21    | SQ-43 | Include PDF Attachment in Email  | Ready For Dev | Ely           | #40 (MERGED)  | -       |
+| Orden | Key   | Story                            | Status        | Assignee                   | PR Shift-Left | PR Impl      |
+| ----- | ----- | -------------------------------- | ------------- | -------------------------- | ------------- | ------------ |
+| 19    | SQ-23 | Auto Subtotal/Total Calculation  | Ready For Dev | Raúl González              | #53 (MERGED)  | -            |
+| 20    | SQ-26 | Preview Invoice Before Send      | Ready For QA  | Marianela P.               | #15 (MERGED)  | #60 (MERGED) |
+| 21    | SQ-43 | Include PDF Attachment in Email  | Ready For QA  | yxsinell acosta zambrano   | #40 (MERGED)  | #62 (MERGED) |
 
 ### OMITIDAS (No Ready For Dev o Dependencias Bloqueadas)
 
@@ -483,12 +483,12 @@ US de FASE 4 implementadas:
 
 ---
 
-### 🚀 PRÓXIMAS US EN READY FOR DEV (3 disponibles)
+### 🚀 PRÓXIMAS US EN READY FOR DEV (1 disponible)
 
 1. **SQ-23** - Automatic Subtotal and Total Calculation (Raúl González) - Invoice Creation
-2. **SQ-43** - Include PDF Attachment in Email (Ely) - Invoice Sending
 
 > **SQ-26** - Preview Invoice Before Sending: ✅ PR #60 MERGED (Ready For QA)
+> **SQ-43** - Include PDF Attachment in Email: ✅ PR #62 MERGED (Ready For QA)
 
 ---
 
@@ -690,10 +690,49 @@ FT-SQ4-01 a FT-SQ4-19 (ver PR #50 para detalles)
 
 ---
 
+### US Completada: SQ-43 - Include PDF Attachment in Email ✅
+
+| Paso | Estado     | Notas                                           |
+| ---- | ---------- | ----------------------------------------------- |
+| 0    | Completado | Precondiciones verificadas                      |
+| 1    | Completado | Jira transitado a In Progress                   |
+| 2    | Completado | Plan de implementación creado                   |
+| 3    | Completado | Implementación completa (7 archivos)            |
+| 4    | Completado | PR #62 creado                                   |
+| 5    | N/A        | E2E/UI testing por usuario                      |
+| 6    | Completado | Code review (self)                              |
+| 7    | Completado | Documentación actualizada                       |
+| 8    | Completado | **PR #62 MERGED** ✅                            |
+| 9-11 | Completado | Ready For QA, asignado a yxsinell acosta zambrano |
+
+**Implementación incluye:**
+
+- API: `/api/invoices/[id]/pdf` - Server-side PDF generation
+- Service: `email-service.ts` - Resend integration con attachment
+- API: `/api/invoices/[id]/send` - Updated con PDF attachment
+- Migration: `email_logs` table para tracking de envíos
+- Tipos: Supabase types actualizados con email_logs
+
+**Test Cases cubiertos (10/10):**
+
+- TC-01: PDF adjunto incluido al enviar
+- TC-02: Nombre del adjunto usa número de factura
+- TC-03: Tamaño bajo límite con logos grandes
+- TC-04: El adjunto abre correctamente
+- TC-05: MIME type correcto (application/pdf)
+- TC-06: Tamaño al límite (max 5MB)
+- TC-07: Bloqueo cuando PDF supera límite
+- TC-08: Fallo cuando PDF está vacío
+- TC-09: Headers correctos en endpoint PDF
+- TC-10: Integración Backend to Resend
+
+---
+
 ## Historial de Actualizaciones
 
 | Fecha      | Cambios                                                                                     |
 | ---------- | ------------------------------------------------------------------------------------------- |
+| 2026-03-01 | **SQ-43 implementado** - PR #62 MERGED, Include PDF Attachment in Email ✅ (7 archivos)    |
 | 2026-02-25 | **SQ-18 implementado** - PR #58 MERGED, View Client Invoice History ✅ (5 archivos)        |
 | 2026-02-25 | **PRs Shift-Left mergeados** - #53 (4.5/5), #52 (4/5), #48 (4/5), #40 (3.5/5) ✅           |
 | 2026-02-25 | **0 PRs pendientes** - Todos los PRs de implementación, bugs y shift-left mergeados        |
@@ -718,4 +757,4 @@ FT-SQ4-01 a FT-SQ4-19 (ver PR #50 para detalles)
 
 ---
 
-_Actualizado por Claude Code - 2026-02-25 (SQ-6 Guided Onboarding implementado)_
+_Actualizado por Claude Code - 2026-03-01 (SQ-43 Include PDF Attachment in Email implementado)_

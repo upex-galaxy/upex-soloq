@@ -1,76 +1,72 @@
-# 🛡️ Reporte de Pruebas de Base de Datos & E2E (Final)
+# 🛡️ Reporte de Pruebas Integral: SQ-24 Add Taxes
 
-**Fecha:** 21-02-2026
+**Fecha:** 03/03/2026
 **QA Engineer:** Gloria Galindez
-**Feature:** SQ-24: Add Taxes to Invoice
-**Ambiente:** Staging & Database (PostgreSQL)
+**Environment:** Staging & Database (PostgreSQL) & API
+**Branch:** `test/SQ-24/add-taxes-to-invoice`
 
 ---
 
-## 1. Resumen Ejecutivo
+## 1. Pruebas Exploratorias (UI/UX - Playwright)
 
-Se completó el ciclo de pruebas de integración **End-to-End (UI → API → DB)** para validar la funcionalidad de impuestos.
+**Estado:** ✅ APROBADO (con observaciones)
 
-- **Integridad de Datos:** ✅ **VERIFICADO** (Precisión decimal y persistencia correcta).
-- **Flujo E2E:** ✅ **PASÓ** (Creación desde UI y validación en DB).
-- **Seguridad de Datos:** ⚠️ **OBSERVACIÓN** (Falta constraint en BD para impedir negativos).
+Se ejecutaron pruebas E2E manuales/guiadas sobre la URL: `https://staging-upexsoloq.vercel.app/invoices/create`.
 
----
+### Escenarios Validados
 
-## 2. Validación de Persistencia (Happy Path)
-
-Se creó una factura desde la UI y se verificó su representación exacta en la base de datos.
-
-**Datos de Prueba (UI):**
-
-- **Subtotal:** $100.00
-- **Impuesto:** 16%
-- **Total Esperado:** $116.00
-
-**Evidencia en Base de Datos (Query SQL):**
-
-```sql
-SELECT id, subtotal, tax_rate, tax_amount, total FROM invoices WHERE invoice_number = 'INV-2026-0001';
-```
-
-**Resultado:**
-| Campo | Valor UI | Valor DB | Estado |
-| :--- | :--- | :--- | :--- |
-| `subtotal` | 100.00 | `100.00` | ✅ Exacto |
-| `tax_rate` | 16% | `16.00` | ✅ Exacto |
-| `tax_amount` | $16.00 | `16.00` | ✅ Exacto |
-| `total` | $116.00 | `116.00` | ✅ Exacto |
-
-**Conclusión:** La lógica de cálculo y persistencia funciona correctamente. No hay pérdida de precisión decimal.
+| ID  | Escenario          | Resultado      | Notas                                                                                        |
+| --- | ------------------ | -------------- | -------------------------------------------------------------------------------------------- |
+| 01  | **Happy Path**     | ✅ PASSED      | Cálculo correcto: $100 + 16% = $116.                                                         |
+| 02  | **Impuesto 0%**    | ✅ PASSED      | Total igual a Subtotal.                                                                      |
+| 03  | **Decimales**      | ✅ PASSED      | Soporta "10.5%" correctamente ($110.50).                                                     |
+| 04  | **Reactividad**    | ✅ PASSED      | Recálculo automático al cambiar precio de ítems.                                             |
+| 05  | **Input Negativo** | ⚠️ OBSERVATION | Permite escribir "-5", el sistema lo convierte a positivo "05". No rompe, pero es mejorable. |
 
 ---
 
-## 3. Pruebas de Constraints (Integridad)
+## 2. Análisis de Base de Datos (Integridad - DBHub)
 
-Se evaluó la robustez de la base de datos ante datos inválidos (Impuestos Negativos).
+**Estado:** ✅ APROBADO (con recomendaciones)
 
-**Prueba:** Intento de actualización directa vía SQL con tasa negativa.
+### Verificación de Datos
 
-```sql
-UPDATE invoices SET tax_rate = -10 WHERE id = '...';
-```
+| Verificación     | Resultado | Detalle                                                  |
+| ---------------- | --------- | -------------------------------------------------------- |
+| **Persistencia** | ✅ PASSED | Datos guardados con precisión decimal exacta (`16.00`).  |
+| **Relaciones**   | ✅ PASSED | `invoice_items` vinculados correctamente.                |
+| **Constraints**  | ⚠️ FAILED | La BD acepta tasas negativas (falta `CHECK` constraint). |
 
-**Resultado:** ❌ **El UPDATE fue permitido.**
-La base de datos aceptó un `tax_rate` de `-10.00`.
-
-**Impacto:**
-Actualmente dependemos 100% de la validación del Frontend/API. Si esa capa falla (o se accede directo a la DB), se podrían generar facturas con impuestos negativos, afectando los reportes financieros.
+**Nota:** Aunque la BD es vulnerable, la API (ver sección 3) mitiga este riesgo.
 
 ---
 
-## 4. Recomendaciones Finales
+## 3. Pruebas de API (Backend - Postman/OpenAPI)
 
-1.  **Aprobación:** La funcionalidad está lista para despliegue (Go Live), ya que el flujo principal y los cálculos son correctos.
-2.  **Mejora Técnica (Deuda):** Agregar un **Check Constraint** en la base de datos en el próximo sprint de mantenimiento:
-    ```sql
-    ALTER TABLE invoices ADD CONSTRAINT check_tax_rate_positive CHECK (tax_rate >= 0);
-    ```
+**Estado:** ✅ APROBADO
+
+Se validó la robustez del endpoint `POST /invoices`.
+
+### Escenarios Críticos
+
+| Prueba        | Payload          | Resultado         | Análisis                                    |
+| ------------- | ---------------- | ----------------- | ------------------------------------------- |
+| **Negativos** | `taxRate: -10`   | `400 Bad Request` | ✅ **Seguro.** El backend valida y rechaza. |
+| **Tipos**     | `taxRate: "IVA"` | `400 Bad Request` | ✅ Validación de tipos correcta (Zod).      |
+
+### Hallazgos de Arquitectura
+
+1.  🔴 **Falta PATCH:** No existe endpoint para editar facturas (`PATCH /invoices/{id}`), obligando a recrearlas.
+2.  🟡 **Nomenclatura:** Inconsistencia entre API (`camelCase`) y BD (`snake_case`).
 
 ---
 
-**Estado del Ticket:** QA Verified (Ready for Release)
+## 4. Entregables Generados
+
+- **Colección Postman:** `SQ-24: Add Taxes to Invoice` (Workspace de Equipo).
+- **Reporte Jira:** Publicado en comentarios de SQ-24.
+- **Ticket Mejora:** SQ-87 (DB Constraint).
+
+---
+
+**Conclusión Final:** La historia **SQ-24** está lista para despliegue. La lógica de negocio está asegurada por la validación del Backend, aunque se recomienda abordar la deuda técnica (Constraint DB y Endpoint PATCH) en futuros sprints.

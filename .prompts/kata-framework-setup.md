@@ -1,4 +1,5 @@
 # KATA Framework Setup
+# KATA Framework Setup
 
 > **Purpose**: Set up the KATA test automation framework by cloning the boilerplate into a dedicated `qa/` directory, converting the project into a monorepo.
 > **When to Use**: When starting test automation in a new or existing project.
@@ -109,13 +110,7 @@ qa/
 Remove files that are project-specific or not needed:
 
 ```bash
-# Remove example tests (will create project-specific ones)
-rm -rf qa/tests/e2e/example
-rm -rf qa/tests/integration/example.test.ts
-
 # Remove template-specific files
-rm -rf qa/.prompts
-rm -rf qa/.books
 rm -rf qa/docs
 rm -rf qa/templates
 
@@ -128,9 +123,6 @@ rm -rf qa/.context/PBI
 # Keep TAE guidelines - they're essential
 # qa/.context/guidelines/TAE/ stays
 
-# Remove root-level duplicates
-rm -f qa/README.md
-rm -f qa/context-engineering.md
 ```
 
 ### Step 2.2: Create Environment File
@@ -525,37 +517,37 @@ cd qa && bun run type-check
 
 ### Keep from Boilerplate (Core Framework)
 
-| Directory/File | Purpose |
-|----------------|---------|
-| `tests/components/` | KATA components (TestContext, ApiBase, UiBase, Fixtures) |
-| `tests/setup/` | Authentication setup (global, api, ui) |
-| `tests/utils/` | Decorators, reporters, utilities |
-| `config/` | Environment variables configuration |
-| `scripts/` | KATA manifest, sync scripts |
-| `.context/guidelines/TAE/` | KATA documentation for AI |
-| `playwright.config.ts` | Playwright configuration |
-| `tsconfig.json` | TypeScript configuration |
-| `eslint.config.js` | ESLint configuration |
-| `.prettierrc` | Prettier configuration |
+| Directory/File             | Purpose                                                  |
+| -------------------------- | -------------------------------------------------------- |
+| `tests/components/`        | KATA components (TestContext, ApiBase, UiBase, Fixtures) |
+| `tests/setup/`             | Authentication setup (global, api, ui)                   |
+| `tests/utils/`             | Decorators, reporters, utilities                         |
+| `config/`                  | Environment variables configuration                      |
+| `scripts/`                 | KATA manifest, sync scripts                              |
+| `.context/guidelines/TAE/` | KATA documentation for AI                                |
+| `playwright.config.ts`     | Playwright configuration                                 |
+| `tsconfig.json`            | TypeScript configuration                                 |
+| `eslint.config.js`         | ESLint configuration                                     |
+| `.prettierrc`              | Prettier configuration                                   |
 
 ### Remove from Boilerplate (Not Needed)
 
-| Directory/File | Reason |
-|----------------|--------|
-| `.prompts/` | Use root project prompts |
-| `.books/` | Use root project books |
-| `docs/` | Use root project docs |
-| `.context/PRD,SRS,idea,PBI/` | Use root project context |
-| `tests/e2e/example/` | Will create project-specific tests |
-| `README.md` | Use root project README |
+| Directory/File               | Reason                             |
+| ---------------------------- | ---------------------------------- |
+| `.prompts/`                  | Use root project prompts           |
+| `.books/`                    | Use root project books             |
+| `docs/`                      | Use root project docs              |
+| `.context/PRD,SRS,idea,PBI/` | Use root project context           |
+| `tests/e2e/example/`         | Will create project-specific tests |
+| `README.md`                  | Use root project README            |
 
 ### Create Per Project
 
-| File | Purpose |
-|------|---------|
-| `tests/components/api/{Entity}Api.ts` | Domain API components |
-| `tests/components/ui/{Entity}Page.ts` | Domain UI components |
-| `tests/e2e/{feature}/*.test.ts` | E2E test files |
+| File                                  | Purpose                |
+| ------------------------------------- | ---------------------- |
+| `tests/components/api/{Entity}Api.ts` | Domain API components  |
+| `tests/components/ui/{Entity}Page.ts` | Domain UI components   |
+| `tests/e2e/{feature}/*.test.ts`       | E2E test files         |
 | `tests/integration/{feature}.test.ts` | Integration test files |
 
 ---

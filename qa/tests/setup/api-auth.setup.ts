@@ -25,9 +25,9 @@ const apiStateFile = config.auth.apiStatePath;
  */
 setup('API Setup: authenticate via API', async ({ api }) => {
   console.log('[API Setup] Starting API authentication...');
-  console.log(`[API Setup] Target: ${config.apiUrl}${config.auth.loginEndpoint}`);
+  console.log(`[API Setup] Target: ${config.supabaseUrl}${config.auth.loginEndpoint}`);
 
-  // Use AuthApi ATC (UPEX Dojo uses 'email' field)
+  // Use AuthApi ATC for Supabase authentication
   const credentials = {
     email: config.testUser.email,
     password: config.testUser.password,

@@ -19,9 +19,9 @@ test.describe('User Session API', () => {
     // This tests that token propagation works correctly
     const [_response, userData] = await api.auth.getCurrentUserSuccessfully();
 
-    // Additional assertions beyond the ATC's fixed assertions (UPEX Dojo format)
-    expect(userData.user.name).toBeDefined();
-    expect(typeof userData.user.name).toBe('string');
+    // Additional assertions beyond the ATC's fixed assertions (Supabase format)
+    expect(userData.email).toBeDefined();
+    expect(typeof userData.email).toBe('string');
   });
 
   /**

@@ -46,9 +46,10 @@ setup('UI Setup: authenticate via UI', async ({ ui, page }) => {
   };
 
   // Set up response interception BEFORE triggering login
-  // The login UI calls /api/auth/login after successful NextAuth sign-in
+  // SoloQ uses Supabase Auth - intercept the token endpoint on supabase.co
   const tokenPromise = page.waitForResponse(
     resp => resp.url().includes(config.auth.tokenEndpoint)
+      && resp.url().includes('supabase.co')
       && resp.request().method() === 'POST'
       && resp.status() === 200,
     { timeout: 30000 },

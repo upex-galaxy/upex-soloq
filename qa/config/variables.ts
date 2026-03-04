@@ -120,18 +120,26 @@ const userCredentialsMap: Record<Environment, { email: string, password: string 
 // ENV DATA Mapping (hardcoded - not secrets because these are not sensitive data like credentials)
 // ============================================
 
+// Supabase project configuration (same for all environments)
+const SUPABASE_PROJECT_ID = 'czuusjchqpgvanvbdrnz';
+const supabaseUrl = `https://${SUPABASE_PROJECT_ID}.supabase.co`;
+// Supabase anon key (public - safe to expose, RLS protects data)
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6dXVzamNocXBndmFudmJkcm56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5Mzk2MTksImV4cCI6MjA4NDUxNTYxOX0.Mw9nRvqGURfpXuZ0_5wjjI0K8X6aPWq_93ufzj8_Bjc';
+
 const envDataMap: Record<
   Environment,
-  { base: string, api: string, user: { email: string, password: string } }
+  { base: string, api: string, supabase: string, user: { email: string, password: string } }
 > = {
   local: {
     base: 'http://localhost:3000',
     api: 'http://localhost:3000/api',
+    supabase: supabaseUrl,
     user: userCredentialsMap.local,
   },
   staging: {
-    base: 'https://dojo.upexgalaxy.com',
-    api: 'https://dojo.upexgalaxy.com/api',
+    base: 'https://staging-upexsoloq.vercel.app',
+    api: 'https://staging-upexsoloq.vercel.app/api',
+    supabase: supabaseUrl,
     user: userCredentialsMap.staging,
   },
 };
@@ -145,13 +153,19 @@ export const config = {
   // URLs - selected by TEST_ENV from urlMap
   baseUrl: envData.base,
   apiUrl: envData.api,
+  supabaseUrl: envData.supabase,
+  supabaseAnonKey: SUPABASE_ANON_KEY,
 
-  // Authentication config (UPEX Dojo endpoints - relative to apiUrl)
+  // Authentication config (Supabase Auth)
   auth: {
-    loginEndpoint: '/auth/login',
-    tokenEndpoint: '/auth/login', // Endpoint to intercept for token (used by page.waitForResponse)
-    meEndpoint: '/auth/me',
-    tokenLifetimeSeconds: 86400, // 24 hours (1 day)
+    // Supabase auth endpoint (POST with grant_type=password)
+    loginEndpoint: '/auth/v1/token?grant_type=password',
+    // Endpoint to intercept for token (used by page.waitForResponse in UI auth)
+    tokenEndpoint: '/auth/v1/token',
+    // Supabase user endpoint
+    meEndpoint: '/auth/v1/user',
+    // Token lifetime (Supabase default: 7 days)
+    tokenLifetimeSeconds: 604800,
     // Storage paths for authenticated sessions
     storageStatePath: '.auth/user.json',
     apiStatePath: '.auth/api-state.json',

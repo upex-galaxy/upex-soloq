@@ -19,6 +19,39 @@ Tu trabajo es ayudar a implementar codigo, tests y documentacion siguiendo las e
 
 ---
 
+## Environments
+
+| Ambiente | URL                                    |
+| -------- | -------------------------------------- |
+| Local    | `http://localhost:3000`                |
+| Staging  | `https://staging-upexsoloq.vercel.app` |
+
+---
+
+## Test Automation (qa/)
+
+El directorio `qa/` contiene el KATA framework para test automation:
+
+```
+qa/
+├── tests/              # Tests E2E e integracion
+├── config/variables.ts # URLs y credenciales por ambiente
+├── .env                # Credenciales locales (no commitear)
+└── .context/guidelines/TAE/  # Guidelines para automatizacion
+```
+
+**Comandos:**
+
+```bash
+cd qa && bun run test              # Ejecutar todos los tests
+cd qa && bun run test:ui           # Solo tests UI
+cd qa && bun run test --project=api-setup  # Auth setup API
+```
+
+Ver `qa/.context/guidelines/TAE/kata-ai-index.md` para documentacion completa.
+
+---
+
 ## Stack Tecnico
 
 | Capa          | Tecnologia                   | Version |

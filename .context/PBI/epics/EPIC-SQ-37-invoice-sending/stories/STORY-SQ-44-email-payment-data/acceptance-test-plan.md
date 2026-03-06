@@ -36,11 +36,11 @@
 
 **Backend:**
 - `POST /api/invoices/{id}/send`: The endpoint responsible for gathering data and triggering Resend.
-- `PaymentMethod` Service: To fetch active payment methods for the user.
+- **Data Fetching:** Must query the `payment_methods` table (NOT `business_profile`) filtered by `user_id`.
 
 **Database:**
-- `payment_methods`: Table containing the types (bank_transfer, paypal, etc.), labels, and values.
-- `business_profiles`: Table containing general business info.
+- `payment_methods`: Table containing the types (bank_transfer, paypal, etc.), labels, and values. **Source of truth for this story.**
+- `business_profiles`: Table containing general business info (Name, Logo, Tax ID).
 
 **Integration Points:**
 - Backend ↔ Resend (via React Email templates).
@@ -81,10 +81,11 @@
 
 ### Ambiguities Identified
 
-**Ambiguity 1:** Data Source Mismatch
+**Ambiguity 1:** Data Source Error (RESOLVED)
 - **Location in Story:** Technical Notes.
-- **Question for PO/Dev:** The notes say "Pull payment methods from business_profile", but the schema stores them in `payment_methods`. Which one is the source of truth?
-- **Impact on Testing:** We might test the wrong data source.
+- **Issue:** The original note says "Pull payment methods from business_profile".
+- **QA Finding:** According to `src/types/supabase.ts`, payment methods are stored in the `payment_methods` table.
+- **Instruction for Dev:** Ignore the note in the original story. Fetch data from the `payment_methods` table joined by `user_id`.
 
 **Ambiguity 2:** "Format clearly"
 - **Location in Story:** Technical Notes.

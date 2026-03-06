@@ -49,3 +49,4 @@ opencode.json
 
 # Sentry Config File
 .env.sentry-build-plugin
+dbhub.toml

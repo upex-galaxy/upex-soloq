@@ -1,0 +1,13 @@
+POST /api/invoices (create)
+Request:
+{"clientId":"200251bc-9d57-4bbc-957d-155b7bafc965","invoiceNumber":"INV-2026-203783338","dueDate":"2026-03-31","notes":"","terms":"","taxRate":16,"discountType":"percentage","discountValue":60,"items":[{"description":"Servicio","quantity":1,"unitPrice":1000}]}
+
+Response (201):
+{"data":{"id":"f8794cef-0c22-4976-b420-54a17c918adc","subtotal":1000,"discount_value":600,"discount_type":"percentage","tax_rate":16,"tax_amount":64,"total":464}}
+
+PUT /api/invoices/{id} (edit autosave)
+Request:
+{"clientId":"200251bc-9d57-4bbc-957d-155b7bafc965","invoiceNumber":"INV-2026-203783338","dueDate":"2026-03-31","notes":"","terms":"","taxRate":16,"discountType":"percentage","discountValue":600,"items":[{"id":"c282b96b-d930-4e89-ad2e-cdaa528a9060","description":"Servicio","quantity":1,"unitPrice":1000}]}
+
+Response (400):
+{"error":"Datos inv?lidos","details":{"formErrors":[],"fieldErrors":{"discountValue":["El porcentaje de descuento no puede exceder 100%"]}}}

@@ -4,8 +4,9 @@ import { renderToBuffer } from '@react-pdf/renderer';
 import { InvoiceDocument } from '@/app/(app)/invoices/[id]/components/invoice-document';
 import { sendInvoiceEmail } from '@/lib/services/email-service';
 import { formatCurrency, formatDateForPDF } from '@/lib/utils/pdf-utils';
-import type { Invoice } from '@/lib/types';
+import type { Invoice, PaymentMethodType } from '@/lib/types';
 import type { InvoiceWithDetails } from '@/hooks/invoices/use-invoice';
+import type { PaymentMethodForEmail } from '@/lib/services/email-service';
 
 // =============================================================================
 // Constants
@@ -201,6 +202,25 @@ export async function POST(
       .single();
 
     // ==========================================================================
+    // Step 3.1: Fetch payment methods (SQ-44)
+    // ==========================================================================
+
+    const { data: rawPaymentMethods } = await supabase
+      .from('payment_methods')
+      .select('type, label, value, is_default')
+      .eq('user_id', user.id)
+      .order('is_default', { ascending: false })
+      .order('sort_order', { ascending: true })
+      .limit(3);
+
+    // Transform to email-friendly format
+    const paymentMethods: PaymentMethodForEmail[] = (rawPaymentMethods || []).map((pm) => ({
+      type: pm.type as PaymentMethodType,
+      label: pm.label,
+      value: pm.value,
+    }));
+
+    // ==========================================================================
     // Step 4: Generate PDF server-side
     // ==========================================================================
 
@@ -274,6 +294,7 @@ export async function POST(
       dueDate: formattedDueDate,
       pdfBuffer,
       businessName,
+      paymentMethods, // SQ-44: Include payment data in email
     });
 
     // ==========================================================================

@@ -373,9 +373,208 @@ cd qa && bun run test --grep @smoke && cd ..
 
 ---
 
-## PHASE 5: Integrate with Root Project (Optional)
+## PHASE 5: Monorepo Configuration
 
-### Step 5.1: Add Scripts to Root package.json
+Esta fase configura el repositorio como un monorepo correctamente aislado, para que VS Code, TypeScript, ESLint y otras herramientas reconozcan `qa/` como un proyecto independiente.
+
+### Step 5.1: Crear archivo .code-workspace
+
+**Crear archivo `[nombre-repo].code-workspace` en la raíz del proyecto:**
+
+1. Obtener el nombre del repositorio:
+
+```bash
+# Obtener nombre del repo
+REPO_NAME=$(basename $(git rev-parse --show-toplevel))
+echo "Nombre del repo: $REPO_NAME"
+```
+
+2. Crear el archivo con el nombre correcto:
+
+```bash
+# El archivo DEBE tener el nombre del repo como prefijo
+# Ejemplo: my-app.code-workspace
+```
+
+3. Estructura del archivo:
+
+```json
+{
+  "folders": [
+    { "path": ".", "name": "[Nombre del Proyecto] (App)" },
+    { "path": "./qa", "name": "QA (Playwright)" }
+  ]
+}
+```
+
+**Reglas importantes:**
+
+- El nombre DEBE tener prefijo del repo (ej: `my-app.code-workspace`)
+- Un archivo llamado solo `.code-workspace` NO es válido y VS Code no lo detectará
+- Usar rutas relativas, no absolutas
+- Si existen otras subcarpetas con `package.json` (frontend, backend), agregarlas como entradas separadas
+- NO agregar `settings`, `extensions` ni `tasks` si cada carpeta ya tiene su propio `.vscode/`
+- Este archivo DEBE commitearse (no va en .gitignore)
+
+**Ejemplo para un repo llamado `my-app`:**
+
+```json
+{
+  "folders": [
+    { "path": ".", "name": "App (Next.js)" },
+    { "path": "./qa", "name": "QA (Playwright)" }
+  ]
+}
+```
+
+### Step 5.2: Modificar tsconfig.json de la raíz
+
+**Editar `tsconfig.json` en la raíz (NO reemplazar, solo agregar):**
+
+1. Leer el archivo existente primero
+2. Agregar sección `references` apuntando a `./qa`
+3. Agregar o ajustar `"include"` para excluir `/qa`
+
+**Lo que agregar al tsconfig.json raíz:**
+
+```json
+{
+  "references": [
+    { "path": "./qa" }
+  ]
+}
+```
+
+**Y asegurar que `include` NO incluya qa/:**
+
+```json
+{
+  "include": ["src/**/*", "app/**/*"],
+  "exclude": ["node_modules", "qa"]
+}
+```
+
+> **IMPORTANTE:** Leer el archivo antes de modificar para no perder configuraciones existentes.
+
+### Step 5.3: Verificar tsconfig.json dentro de /qa
+
+**Verificar `qa/tsconfig.json`:**
+
+1. Confirmar que NO extiende el `tsconfig.json` de la raíz si las configuraciones son distintas
+2. Playwright requiere sus propios tipos - si hay conflicto de tipos, usar config autónomo
+3. Si extiende y genera errores, reemplazar la extensión por configuración independiente
+
+```bash
+# Verificar si extiende el tsconfig raíz
+grep -n "extends" qa/tsconfig.json
+```
+
+Si hay conflictos, el `qa/tsconfig.json` debe ser autónomo (sin `extends`).
+
+### Step 5.4: Agregar root: true a ESLint de /qa
+
+**Configurar ESLint en qa/ para que no escale al config de la raíz:**
+
+1. Buscar archivo ESLint existente:
+
+```bash
+ls qa/.eslintrc* qa/eslint.config.* 2>/dev/null
+```
+
+2. Si existe un archivo ESLint, agregar `"root": true`
+
+**Para `.eslintrc.json`:**
+
+```json
+{
+  "root": true,
+  // ... resto de la configuración
+}
+```
+
+**Para `eslint.config.js` (flat config):**
+
+```javascript
+export default [
+  {
+    // La propiedad root no aplica en flat config
+    // El flat config es root por defecto si está en la carpeta
+  },
+  // ... resto de la configuración
+];
+```
+
+3. Si NO existe archivo ESLint en qa/, crear uno mínimo:
+
+```bash
+# Crear .eslintrc.json mínimo
+echo '{ "root": true }' > qa/.eslintrc.json
+```
+
+### Step 5.5: Crear .prettierrc en /qa (si necesario)
+
+**Configurar Prettier en qa/ para aislar el contexto:**
+
+1. Si el proyecto raíz tiene Prettier y `/qa` necesita reglas distintas, crear `qa/.prettierrc`
+2. Si las reglas pueden ser las mismas, este paso es opcional pero recomendable
+
+```bash
+# Verificar si existe Prettier en la raíz
+ls .prettierrc* 2>/dev/null
+
+# Si existe y qa/ no tiene uno propio, crear uno
+cp .prettierrc qa/.prettierrc 2>/dev/null || echo "No .prettierrc in root"
+```
+
+### Step 5.6: Mover GitHub Actions a la raíz
+
+**Configurar GitHub Actions para que funcionen con el monorepo:**
+
+GitHub **SOLO** lee `.github/workflows/` desde la **RAÍZ** del repositorio. Los workflows en `qa/.github/workflows/` NO funcionarán.
+
+1. Si existen workflows en `qa/.github/workflows/`, moverlos a la raíz:
+
+```bash
+# Verificar si existen workflows en qa/
+ls qa/.github/workflows/*.yml 2>/dev/null
+```
+
+2. Crear o adaptar workflows en `.github/workflows/` con `working-directory: qa`:
+
+**Ejemplo de workflow adaptado (`.github/workflows/smoke.yml`):**
+
+```yaml
+name: Smoke Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment'
+        required: true
+        default: 'staging'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: qa  # <-- CRÍTICO: ejecutar desde qa/
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - run: bun install
+      - run: bunx playwright install chromium
+      - run: bun run test --grep @smoke
+```
+
+3. Después de migrar, eliminar o ignorar `qa/.github/`:
+
+```bash
+rm -rf qa/.github
+```
+
+### Step 5.7: Add Scripts to Root package.json
 
 Add convenience scripts to run tests from root:
 
@@ -392,7 +591,7 @@ Add convenience scripts to run tests from root:
 }
 ```
 
-### Step 5.2: Update Root .gitignore
+### Step 5.8: Update Root .gitignore
 
 Add qa-specific ignores:
 
@@ -406,7 +605,7 @@ qa/.auth/
 qa/node_modules/
 ```
 
-### Step 5.3: Link Shared Context
+### Step 5.9: Link Shared Context
 
 The `qa/` directory can reference root `.context/` for project documentation:
 
@@ -415,6 +614,57 @@ The `qa/` directory can reference root `.context/` for project documentation:
 // - Root context: ../.context/SRS/, ../.context/PRD/
 // - QA guidelines: .context/guidelines/TAE/
 ```
+
+---
+
+## ¿Qué cambia en tu editor ahora?
+
+Esta sección explica al usuario cómo trabajar con el nuevo setup de monorepo en VS Code.
+
+### 1. Cómo abrir el proyecto correctamente
+
+A partir de ahora, abre el repo con:
+
+- **File > Open Workspace from File...**
+- Selecciona `[nombre-repo].code-workspace`
+
+El archivo tiene el nombre del repo como prefijo (ej: `my-app.code-workspace`).
+Si abres con "Open Folder" como antes, pierdes el beneficio del multi-root.
+
+### 2. Qué cambia en el explorador de archivos
+
+El panel lateral mostrará **dos raíces separadas**:
+
+- La raíz del proyecto (Next.js o similar)
+- `/qa` como proyecto independiente
+
+Cada uno con su propio árbol de archivos.
+
+### 3. Por qué desaparecen los errores falsos
+
+Cada extensión (TypeScript, ESLint, Playwright) ahora resuelve:
+
+- Dependencias
+- tsconfig
+- Configuraciones
+
+...desde la raíz del folder al que pertenece el archivo abierto.
+Ya NO escala hacia la raíz del repo buscando configs incorrectos.
+
+### 4. Qué pasa con la búsqueda global
+
+El buscador global (`Ctrl+Shift+F`) sigue funcionando en todo el monorepo.
+Para buscar solo en QA, usa `./qa/` en el campo "files to include".
+
+### 5. Extensiones recomendadas
+
+Si `.code-workspace` tiene `extensions.recommendations`, VS Code sugiere instalarlas automáticamente la primera vez.
+Útil para onboarding de nuevos miembros.
+
+### 6. El archivo se commitea al repo
+
+El archivo `[nombre-repo].code-workspace` debe estar en control de versiones.
+**NO va en .gitignore.** Es el punto de entrada oficial del proyecto.
 
 ---
 

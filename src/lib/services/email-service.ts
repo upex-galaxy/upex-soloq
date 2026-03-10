@@ -12,6 +12,16 @@ const FROM_NAME = 'SoloQ';
 // Types
 // =============================================================================
 
+/**
+ * Payment method data for email template (SQ-44)
+ * Subset of PaymentMethod optimized for email rendering
+ */
+export interface PaymentMethodForEmail {
+  type: 'bank_transfer' | 'paypal' | 'mercado_pago' | 'cash' | 'other';
+  label: string;
+  value: string;
+}
+
 export interface SendInvoiceEmailParams {
   /** Recipient email address */
   to: string;
@@ -27,6 +37,8 @@ export interface SendInvoiceEmailParams {
   pdfBuffer: Buffer;
   /** Business name for sender identification */
   businessName: string;
+  /** Payment methods to display in email (SQ-44) */
+  paymentMethods?: PaymentMethodForEmail[];
 }
 
 export interface SendInvoiceEmailResult {
@@ -58,6 +70,83 @@ function getResendClient(): Resend | null {
 // =============================================================================
 
 /**
+ * Escape HTML special characters to prevent XSS
+ */
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/**
+ * Format a single payment method as HTML (SQ-44)
+ * Uses monospace font for values to enable easy copy-paste
+ */
+function formatPaymentMethodHtml(method: PaymentMethodForEmail): string {
+  const safeLabel = escapeHtml(method.label);
+  const safeValue = escapeHtml(method.value);
+
+  return `
+    <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e5e7eb;">
+      <p style="font-weight: bold; color: #374151; margin: 0 0 4px 0;">${safeLabel}</p>
+      <p style="font-family: 'Courier New', Courier, monospace; background: #f3f4f6; padding: 6px 10px; margin: 0; border-radius: 4px; color: #111827; word-break: break-all;">${safeValue}</p>
+    </div>
+  `;
+}
+
+/**
+ * Format a single payment method as plain text (SQ-44)
+ */
+function formatPaymentMethodText(method: PaymentMethodForEmail): string {
+  return `${method.label}\n${method.value}`;
+}
+
+/**
+ * Generate payment methods section HTML (SQ-44)
+ * Returns empty string if no payment methods provided
+ */
+function generatePaymentMethodsSectionHtml(paymentMethods?: PaymentMethodForEmail[]): string {
+  if (!paymentMethods || paymentMethods.length === 0) {
+    return '';
+  }
+
+  const methodsHtml = paymentMethods.map(formatPaymentMethodHtml).join('');
+
+  return `
+  <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+    <h2 style="color: #1e40af; margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">💳 Información de Pago</h2>
+    <p style="color: #3b82f6; margin: 0 0 16px 0; font-size: 14px;">Puedes realizar el pago mediante cualquiera de los siguientes métodos:</p>
+    ${methodsHtml}
+  </div>
+  `;
+}
+
+/**
+ * Generate payment methods section plain text (SQ-44)
+ * Returns empty string if no payment methods provided
+ */
+function generatePaymentMethodsSectionText(paymentMethods?: PaymentMethodForEmail[]): string {
+  if (!paymentMethods || paymentMethods.length === 0) {
+    return '';
+  }
+
+  const methodsText = paymentMethods.map(formatPaymentMethodText).join('\n\n');
+
+  return `
+---
+INFORMACIÓN DE PAGO
+
+Puedes realizar el pago mediante cualquiera de los siguientes métodos:
+
+${methodsText}
+---
+`;
+}
+
+/**
  * Generate HTML email body for invoice
  */
 function generateInvoiceEmailHtml(params: {
@@ -66,8 +155,12 @@ function generateInvoiceEmailHtml(params: {
   total: string;
   dueDate: string;
   businessName: string;
+  paymentMethods?: PaymentMethodForEmail[];
 }): string {
-  const { clientName, invoiceNumber, total, dueDate, businessName } = params;
+  const { clientName, invoiceNumber, total, dueDate, businessName, paymentMethods } = params;
+
+  // Generate payment methods section (SQ-44)
+  const paymentMethodsSection = generatePaymentMethodsSectionHtml(paymentMethods);
 
   return `
 <!DOCTYPE html>
@@ -94,6 +187,8 @@ function generateInvoiceEmailHtml(params: {
       <strong>Fecha de vencimiento:</strong> ${dueDate}
     </p>
   </div>
+
+  ${paymentMethodsSection}
 
   <p style="margin-bottom: 8px;">
     Encontraras el PDF de la factura adjunto a este correo.
@@ -122,8 +217,12 @@ function generateInvoiceEmailText(params: {
   total: string;
   dueDate: string;
   businessName: string;
+  paymentMethods?: PaymentMethodForEmail[];
 }): string {
-  const { clientName, invoiceNumber, total, dueDate, businessName } = params;
+  const { clientName, invoiceNumber, total, dueDate, businessName, paymentMethods } = params;
+
+  // Generate payment methods section (SQ-44)
+  const paymentMethodsSection = generatePaymentMethodsSectionText(paymentMethods);
 
   return `
 ${businessName}
@@ -134,7 +233,7 @@ Hola ${clientName},
 Te enviamos la factura ${invoiceNumber} por un total de ${total}.
 
 Fecha de vencimiento: ${dueDate}
-
+${paymentMethodsSection}
 Encontraras el PDF de la factura adjunto a este correo.
 
 Si tienes alguna pregunta sobre esta factura, no dudes en contactarnos.
@@ -177,7 +276,8 @@ Este correo fue enviado desde ${businessName} usando SoloQ.
 export async function sendInvoiceEmail(
   params: SendInvoiceEmailParams
 ): Promise<SendInvoiceEmailResult> {
-  const { to, invoiceNumber, clientName, total, dueDate, pdfBuffer, businessName } = params;
+  const { to, invoiceNumber, clientName, total, dueDate, pdfBuffer, businessName, paymentMethods } =
+    params;
 
   // Get Resend client
   const resend = getResendClient();
@@ -215,6 +315,7 @@ export async function sendInvoiceEmail(
     total,
     dueDate,
     businessName,
+    paymentMethods, // SQ-44
   });
   const text = generateInvoiceEmailText({
     clientName,
@@ -222,6 +323,7 @@ export async function sendInvoiceEmail(
     total,
     dueDate,
     businessName,
+    paymentMethods, // SQ-44
   });
 
   // Generate attachment filename

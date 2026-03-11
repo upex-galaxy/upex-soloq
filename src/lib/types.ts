@@ -122,6 +122,41 @@ export type ClientWithStats = Client & {
 };
 
 // =============================================================================
+// Business Address (JSONB structure for business_profiles.address)
+// =============================================================================
+
+export interface BusinessAddress {
+  street?: string;
+  city?: string;
+  state?: string;
+  postal_code?: string;
+  country?: string; // ISO 3166-1 alpha-2
+}
+
+export const LATAM_COUNTRIES = [
+  { code: 'MX', name: 'México', taxIdLabel: 'RFC', phonePre: '+52' },
+  { code: 'CO', name: 'Colombia', taxIdLabel: 'NIT', phonePre: '+57' },
+  { code: 'AR', name: 'Argentina', taxIdLabel: 'CUIT', phonePre: '+54' },
+  { code: 'CL', name: 'Chile', taxIdLabel: 'RUT', phonePre: '+56' },
+  { code: 'PE', name: 'Perú', taxIdLabel: 'RUC', phonePre: '+51' },
+  { code: 'UY', name: 'Uruguay', taxIdLabel: 'RUT', phonePre: '+598' },
+  { code: 'EC', name: 'Ecuador', taxIdLabel: 'RUC', phonePre: '+593' },
+  { code: 'CR', name: 'Costa Rica', taxIdLabel: 'Cédula Jurídica', phonePre: '+506' },
+  { code: 'PA', name: 'Panamá', taxIdLabel: 'RUC', phonePre: '+507' },
+  { code: 'DO', name: 'República Dominicana', taxIdLabel: 'RNC', phonePre: '+1' },
+  { code: 'GT', name: 'Guatemala', taxIdLabel: 'NIT', phonePre: '+502' },
+  { code: 'BO', name: 'Bolivia', taxIdLabel: 'NIT', phonePre: '+591' },
+  { code: 'PY', name: 'Paraguay', taxIdLabel: 'RUC', phonePre: '+595' },
+  { code: 'HN', name: 'Honduras', taxIdLabel: 'RTN', phonePre: '+504' },
+  { code: 'SV', name: 'El Salvador', taxIdLabel: 'NIT', phonePre: '+503' },
+  { code: 'NI', name: 'Nicaragua', taxIdLabel: 'RUC', phonePre: '+505' },
+  { code: 'VE', name: 'Venezuela', taxIdLabel: 'RIF', phonePre: '+58' },
+  { code: 'BR', name: 'Brasil', taxIdLabel: 'CNPJ', phonePre: '+55' },
+] as const;
+
+export type LatamCountryCode = (typeof LATAM_COUNTRIES)[number]['code'];
+
+// =============================================================================
 // Constants (for UI selects, filters, etc.)
 // =============================================================================
 

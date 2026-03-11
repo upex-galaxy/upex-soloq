@@ -16,7 +16,7 @@ export type Database = {
     Tables: {
       business_profiles: {
         Row: {
-          address: string | null
+          address: Json | null
           business_name: string
           contact_email: string | null
           contact_phone: string | null
@@ -30,7 +30,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          address?: string | null
+          address?: Json | null
           business_name: string
           contact_email?: string | null
           contact_phone?: string | null
@@ -44,7 +44,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          address?: string | null
+          address?: Json | null
           business_name?: string
           contact_email?: string | null
           contact_phone?: string | null

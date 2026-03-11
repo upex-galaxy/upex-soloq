@@ -3,6 +3,7 @@ import {
   formatCurrency,
   formatDateShort,
   sanitizeForPDF,
+  formatBusinessAddress,
   isValidImageUrl,
 } from '@/lib/utils/pdf-utils';
 import type { InvoiceWithDetails } from '@/hooks/invoices/use-invoice';
@@ -347,7 +348,9 @@ export function InvoiceDocument({ data }: InvoiceDocumentProps) {
               {sanitizeForPDF(business_profile?.business_name) || 'Mi Negocio'}
             </Text>
             {business_profile?.address && (
-              <Text style={styles.infoText}>{sanitizeForPDF(business_profile.address)}</Text>
+              <Text style={styles.infoText}>
+                {sanitizeForPDF(formatBusinessAddress(business_profile.address))}
+              </Text>
             )}
             {business_profile?.contact_email && (
               <Text style={styles.infoLabel}>{business_profile.contact_email}</Text>

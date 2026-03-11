@@ -79,7 +79,10 @@ export function LogoUpload({ businessProfile, onSuccess }: LogoUploadProps) {
         } = supabase.storage.from('logos').getPublicUrl(filePath);
 
         // Update business profile with logo URL
-        await updateProfile({ logo_url: publicUrl });
+        await updateProfile({
+          logo_url: publicUrl,
+          business_name: businessProfile?.business_name ?? '',
+        });
 
         toast.success('Logo actualizado');
         onSuccess?.();
@@ -110,7 +113,10 @@ export function LogoUpload({ businessProfile, onSuccess }: LogoUploadProps) {
       }
 
       // Set logo_url to null in DB
-      await updateProfile({ logo_url: null });
+      await updateProfile({
+        logo_url: null,
+        business_name: businessProfile?.business_name ?? '',
+      });
 
       toast.success('Logo eliminado');
       onSuccess?.();

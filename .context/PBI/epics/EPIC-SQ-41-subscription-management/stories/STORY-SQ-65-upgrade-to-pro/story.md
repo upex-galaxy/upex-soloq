@@ -1,75 +1,120 @@
-# Upgrade to Pro Subscription
+# As a Free user, I want to upgrade to Pro subscription so that I can access automatic reminders
 
-**Jira Key:** [SQ-65](https://upexgalaxy64.atlassian.net/browse/SQ-65)
-**Epic:** [SQ-41](https://upexgalaxy64.atlassian.net/browse/SQ-41) (Subscription Management)
-**Priority:** High
-**Story Points:** 3
+**Jira Key:** [SQ-65](https://upexgalaxy65.atlassian.net/browse/SQ-65)
+**Epic:** [SQ-41](https://upexgalaxy65.atlassian.net/browse/SQ-41) (Subscription Management)
+**Priority:** Medium
+**Story Points:** 5
 **Status:** Backlog
 
 ---
 
 ## User Story
 
-**As a** Free user
-**I want to** easily upgrade to Pro
-**So that** I can access automatic reminders
+As a Free user, I want to easily upgrade to Pro, so that I can access automatic reminders. Story Points: 5
 
 ---
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Upgrade button
+1. 
 
-- **Given:** I am a Free user
-- **When:** I view settings or hit a limit
-- **Then:** I see an "Upgrade to Pro" button
+1. 
 
-### Scenario 2: Pricing page
+- ****Given:**** I am a Free user on the subscription page
+- ****When:**** I click "Upgrade to Pro"
+- ****Then:**** I am redirected to Stripe Checkout
+- ****And:**** The checkout shows Pro plan price and billing cycle
 
-- **Given:** I click upgrade
-- **When:** The page loads
-- **Then:** I see clear pricing ($X/month)
+1. 
 
-### Scenario 3: Checkout flow
+- ****Given:**** I complete payment on Stripe Checkout
+- ****When:**** Payment is successful and Stripe webhook is received
+- ****Then:**** My subscription status changes to "Pro"
+- ****And:**** I am redirected to a success page
+- ****And:**** All Pro features are immediately accessible
 
-- **Given:** I choose to subscribe
-- **When:** I click "Subscribe"
-- **Then:** I'm taken to Stripe checkout
+1. 
 
-### Scenario 4: Successful upgrade
+- ****Given:**** I am on Stripe Checkout
+- ****When:**** I click "Back" or close the checkout
+- ****Then:**** I am redirected back to SoloQ subscription page
+- ****And:**** My status remains "Free"
+- ****And:**** No charges are made
 
-- **Given:** I complete payment
-- **When:** I return to the app
-- **Then:** I have Pro status immediately
+1. 
 
-### Scenario 5: Failed payment
+- ****Given:**** I enter invalid payment details in Stripe Checkout
+- ****When:**** Payment fails
+- ****Then:**** Stripe shows an error message
+- ****And:**** I can retry with different payment method
+- ****And:**** My status remains "Free" until successful payment
 
-- **Given:** My payment fails
-- **When:** I return to the app
-- **Then:** I see an error and remain on Free
+1. 
+
+- ****Given:**** I am a Free user viewing locked reminder settings
+- ****When:**** I click "Upgrade to Pro" in the feature prompt
+- ****Then:**** I am redirected to Stripe Checkout for Pro plan
+
+1. 
+
+- ****Given:**** I click upgrade
+- ****When:**** I see the Stripe Checkout page
+- ****Then:**** I see:
+- Plan name: "SoloQ Pro"
+- Price: "$X.XX/month" (or annual option if available)
+- Features included summary
+- Billing frequency
+
+1. 
+
+- ****Given:**** I successfully upgrade to Pro
+- ****When:**** The subscription is activated
+- ****Then:**** I receive an email confirming my Pro subscription
+- ****And:**** The email includes next billing date and receipt
 
 ---
 
-## Technical Notes
+## Scope
 
-- Use Stripe Checkout for payment
-- Price: configurable (e.g., $9.99/month)
-- Webhook: checkout.session.completed
-- Update subscriptions table: plan = 'pro'
+1. 
+
+1. 
+
+- Upgrade button on subscription page
+- Upgrade CTAs on locked Pro features
+- Stripe Checkout integration (redirect flow)
+- Webhook handling for checkout.session.completed
+- Update subscription table to 'pro' status
+- Success/cancel redirect URLs
+- Confirmation email via Stripe or custom
+
+1. 
+
+- Embedded Stripe payment form (using redirect)
+- Annual vs monthly toggle (single plan for MVP)
+- Coupon/promo codes
+- Multiple Pro tiers
+- Team/organization subscriptions
 
 ---
 
 ## Definition of Done
 
-- [ ] Upgrade button visible
-- [ ] Pricing page created
-- [ ] Stripe Checkout integration
-- [ ] Successful upgrade handling
-- [ ] Failed payment handling
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-41-subscription-management/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 3/2/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:54:11.325Z_

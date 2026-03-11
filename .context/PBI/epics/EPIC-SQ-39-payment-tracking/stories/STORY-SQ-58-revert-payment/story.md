@@ -1,8 +1,8 @@
-# Revert Payment Status
+# As a user, I want to revert an invoice from paid to pending so that I can correct errors
 
-**Jira Key:** [SQ-58](https://upexgalaxy64.atlassian.net/browse/SQ-58)
-**Epic:** [SQ-39](https://upexgalaxy64.atlassian.net/browse/SQ-39) (Payment Tracking)
-**Priority:** Low
+**Jira Key:** [SQ-58](https://upexgalaxy65.atlassian.net/browse/SQ-58)
+**Epic:** [SQ-39](https://upexgalaxy65.atlassian.net/browse/SQ-39) (Payment Tracking)
+**Priority:** Medium
 **Story Points:** 2
 **Status:** Backlog
 
@@ -10,67 +10,108 @@
 
 ## User Story
 
-**As a** user
-**I want to** revert an invoice from "paid" to "pending"
-**So that** I can correct errors
+As a user, I want to revert an invoice from paid to pending, so that I can correct errors. Story Points: 2
 
 ---
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Revert option
+1. 
 
-- **Given:** I have a paid invoice
-- **When:** I view it
-- **Then:** I see an option to revert the payment
+1. 
 
-### Scenario 2: Confirmation required
+- ****Given:**** I have invoice INV-2026-0042 marked as "paid"
+- ****When:**** I click "Revert Payment" and confirm the action
+- ****Then:**** The invoice status changes to "sent"
+- ****And:**** The payment record is soft-deleted (deleted_at timestamp set)
+- ****And:**** A success message "Payment reverted successfully" is shown
 
-- **Given:** I click revert
-- **When:** The dialog appears
-- **Then:** I must confirm before reverting
+1. 
 
-### Scenario 3: Status reverted
+- ****Given:**** I have a paid invoice with due date Feb 01, 2026 (past due)
+- ****When:**** I revert the payment on Mar 02, 2026
+- ****Then:**** The invoice status changes to "overdue" (not "sent")
+- ****And:**** The system correctly identifies it's past the due date
 
-- **Given:** I confirm the revert
-- **When:** The action completes
-- **Then:** The invoice status changes back to "sent"
+1. 
 
-### Scenario 4: Payment deleted
+- ****Given:**** I am viewing a paid invoice
+- ****When:**** I click "Revert Payment"
+- ****Then:**** A confirmation dialog appears asking "Are you sure you want to revert this payment?"
+- ****And:**** Shows warning "This will mark the invoice as unpaid and remove the payment record"
+- ****And:**** Has "Cancel" and "Confirm Revert" buttons
 
-- **Given:** I revert a payment
-- **When:** I check payment history
-- **Then:** The payment record is removed
+1. 
 
-### Scenario 5: Dashboard updated
+- ****Given:**** I am viewing an invoice with status "sent"
+- ****When:**** I look at the available actions
+- ****Then:**** The "Revert Payment" option is not shown (only available for paid invoices)
 
-- **Given:** I revert a payment
-- **When:** I view the dashboard
-- **Then:** The pending total includes this invoice again
+1. 
+
+- ****Given:**** I revert a payment on invoice INV-2026-0042
+- ****When:**** The revert is successful
+- ****Then:**** An event is recorded in invoice_events table
+- ****And:**** Event type is "updated" with metadata indicating payment revert
+- ****And:**** This appears in the invoice history/audit log
+
+1. 
+
+- ****Given:**** My dashboard shows $5,000 total paid this month
+- ****When:**** I revert a $500 payment
+- ****Then:**** The dashboard pending amount increases by $500
+- ****And:**** The paid this month amount decreases by $500
+
+1. 
+
+- ****Given:**** I am on the confirmation dialog for reverting a payment
+- ****When:**** I click "Cancel"
+- ****Then:**** The dialog closes
+- ****And:**** The invoice remains in "paid" status
+- ****And:**** No changes are made
 
 ---
 
-## Technical Notes
+## Scope
 
-- Delete payment record from payments table
-- Update invoice: status = 'sent', paid_at = null
-- Recalculate overdue if past due_date
-- Confirmation dialog required
-- Audit log (optional): record the reversion
+1. 
+
+1. 
+
+- Revert payment action on paid invoices
+- Soft delete payment record (set deleted_at)
+- Update invoice status to 'sent' or 'overdue' based on due date
+- Clear paid_at timestamp on invoice
+- Confirmation dialog with warning
+- Audit trail via invoice_events
+- Dashboard totals recalculation
+
+1. 
+
+- Hard delete of payment records
+- Undo/restore reverted payments
+- Automatic notification to client about revert
+- Batch revert multiple payments
 
 ---
 
 ## Definition of Done
 
-- [ ] Revert option visible
-- [ ] Confirmation dialog implemented
-- [ ] Status correctly reverted
-- [ ] Payment record deleted
-- [ ] Dashboard updated
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-39-payment-tracking/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 3/2/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:54:05.786Z_

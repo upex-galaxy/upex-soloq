@@ -1,75 +1,50 @@
-# See Email Delivery Confirmation
+# View Email Send Confirmation
 
-**Jira Key:** [SQ-46](https://upexgalaxy64.atlassian.net/browse/SQ-46)
-**Epic:** [SQ-37](https://upexgalaxy64.atlassian.net/browse/SQ-37) (Invoice Sending)
+**Jira Key:** [SQ-46](https://upexgalaxy65.atlassian.net/browse/SQ-46)
+**Epic:** [SQ-37](https://upexgalaxy65.atlassian.net/browse/SQ-37) (Invoice Sending)
 **Priority:** Medium
-**Story Points:** 2
-**Status:** Backlog
+**Story Points:** 1
+**Status:** Shift-Left QA
 
 ---
 
 ## User Story
 
-**As a** user
-**I want to** see if the email was sent successfully
-**So that** I have certainty it arrived
+As a user, I want to see if the email was sent successfully, so that I have certainty it arrived. Story Points: 2
 
 ---
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Sent status
+Feature:
 
-- **Given:** I send an invoice
-- **When:** The email is sent
-- **Then:** I see a "Sent" confirmation
+Background:
+Given ...
 
-### Scenario 2: Delivery tracking
-
-- **Given:** I have sent an invoice
-- **When:** I view the invoice details
-- **Then:** I see when it was sent
-
-### Scenario 3: Failed notification
-
-- **Given:** I send an invoice
-- **When:** The email fails to deliver
-- **Then:** I see a failure notification
-
-### Scenario 4: Resend option
-
-- **Given:** An email failed to send
-- **When:** I view the invoice
-- **Then:** I can click "Resend"
-
-### Scenario 5: Email history
-
-- **Given:** I have sent multiple emails for an invoice
-- **When:** I view the invoice
-- **Then:** I see a log of all email attempts
-
----
-
-## Technical Notes
-
-- Use Resend webhooks for delivery status
-- Store in email_logs: sent_at, status, message_id
-- Statuses: pending, sent, delivered, bounced, failed
-- Webhook endpoint: POST /api/webhooks/resend
+Scenario: ...
+Given ...
+When ...
+Then ...
 
 ---
 
 ## Definition of Done
 
-- [ ] Sent confirmation displayed
-- [ ] Delivery timestamp shown
-- [ ] Failure notification working
-- [ ] Resend functionality working
-- [ ] Email history visible
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-37-invoice-sending/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 2/7/2026
+- **Reporter:** Ely
+- **Assignee:** Miguel Millan
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:53:59.977Z_

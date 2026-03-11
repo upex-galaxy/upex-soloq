@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import type { User, Session, AuthError } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
 import type { Tables } from '@/types/supabase';
@@ -48,9 +48,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchUserProfile = useCallback(
     async (userId: string) => {
       const [profileResult, businessResult, subscriptionResult] = await Promise.all([
-        supabase.from('profiles').select('*').eq('user_id', userId).single(),
-        supabase.from('business_profiles').select('*').eq('user_id', userId).single(),
-        supabase.from('subscription').select('*').eq('user_id', userId).single(),
+        supabase.from('profiles').select('*').eq('user_id', userId).maybeSingle(),
+        supabase.from('business_profiles').select('*').eq('user_id', userId).maybeSingle(),
+        supabase.from('subscription').select('*').eq('user_id', userId).maybeSingle(),
       ]);
 
       return {
@@ -108,33 +108,72 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [supabase]
   );
 
-  // Sign out
+  // Sign out - clear state immediately for better UX, then call server
   const signOut = useCallback(async () => {
-    const { error } = await supabase.auth.signOut();
+    // Clear state immediately to ensure logout works even if server call fails
+    setState({
+      user: null,
+      session: null,
+      isLoading: false,
+      isAuthenticated: false,
+    });
 
-    if (!error) {
-      setState({
-        user: null,
-        session: null,
-        isLoading: false,
-        isAuthenticated: false,
-      });
-    }
+    // Then attempt to sign out from server (errors are logged but don't block logout)
+    const { error } = await supabase.auth.signOut();
 
     return { error };
   }, [supabase]);
 
+  // Generation counter to prevent stale updates from race conditions (SQ-74 fix)
+  const initGenRef = useRef(0);
+
   // Initialize auth state and listen for changes
   useEffect(() => {
-    // Get initial session
+    // Increment generation for this initialization attempt
+    const currentGen = ++initGenRef.current;
+
+    // Track if component is still mounted to prevent state updates after unmount
+    let isMounted = true;
+
+    // Helper to check if this is still the latest initialization attempt
+    const isStale = () => !isMounted || currentGen !== initGenRef.current;
+
+    // Get initial session - use getUser() to validate token with server
     const initializeAuth = async () => {
       try {
+        // First validate the user with the server (not just cached session)
+        const {
+          data: { user: validatedUser },
+          error: userError,
+        } = await supabase.auth.getUser();
+
+        // Prevent state update if component unmounted or newer init started (SQ-74 fix)
+        if (isStale()) return;
+
+        // If no valid user, clear state
+        if (userError || !validatedUser) {
+          setState({
+            user: null,
+            session: null,
+            isLoading: false,
+            isAuthenticated: false,
+          });
+          return;
+        }
+
+        // User is valid, now get the session for token info
         const {
           data: { session },
         } = await supabase.auth.getSession();
 
+        // Prevent state update if stale (SQ-74 fix)
+        if (isStale()) return;
+
         if (session?.user) {
           const profileData = await fetchUserProfile(session.user.id);
+
+          // Final check before setState (SQ-74 fix)
+          if (isStale()) return;
 
           setState({
             user: {
@@ -154,12 +193,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
         }
       } catch {
-        setState({
-          user: null,
-          session: null,
-          isLoading: false,
-          isAuthenticated: false,
-        });
+        if (!isStale()) {
+          setState({
+            user: null,
+            session: null,
+            isLoading: false,
+            isAuthenticated: false,
+          });
+        }
       }
     };
 
@@ -170,6 +211,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
+        // Update last_login_at in profiles table (SQ-81 fix)
+        await supabase
+          .from('profiles')
+          .update({ last_login_at: new Date().toISOString() })
+          .eq('user_id', session.user.id);
+
         const profileData = await fetchUserProfile(session.user.id);
 
         setState({
@@ -189,14 +236,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           isAuthenticated: false,
         });
       } else if (event === 'TOKEN_REFRESHED' && session) {
-        setState(prev => ({
-          ...prev,
-          session,
-        }));
+        // Re-fetch profile to keep user data in sync after token refresh
+        if (session.user) {
+          const profileData = await fetchUserProfile(session.user.id);
+          setState(prev => ({
+            ...prev,
+            user: prev.user
+              ? {
+                  ...session.user,
+                  ...profileData,
+                }
+              : null,
+            session,
+          }));
+        } else {
+          setState(prev => ({
+            ...prev,
+            session,
+          }));
+        }
       }
     });
 
     return () => {
+      isMounted = false;
       subscription.unsubscribe();
     };
   }, [supabase, fetchUserProfile]);

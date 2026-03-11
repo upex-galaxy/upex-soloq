@@ -29,10 +29,10 @@ Diseñar la estrategia de testing **ANTES** de escribir código. Analiza Epics y
 
 ## Prompts en Esta Fase
 
-| Orden | Prompt                 | Nivel | Propósito                       |
-| ----- | ---------------------- | ----- | ------------------------------- |
-| 1     | `feature-test-plan.md` | Epic  | Test strategy a nivel feature   |
-| 2     | `story-test-cases.md`  | Story | Test cases detallados por story |
+| Orden | Prompt                    | Nivel | Propósito                                     |
+| ----- | ------------------------- | ----- | --------------------------------------------- |
+| 1     | `feature-test-plan.md`    | Epic  | Test strategy a nivel feature                 |
+| 2     | `acceptance-test-plan.md` | Story | Acceptance test plan con test cases por story |
 
 ---
 
@@ -64,7 +64,7 @@ Epic en Jira + Local
 └───────────────────────────────────────┘
         ↓
 ┌───────────────────────────────────────┐
-│  [2] Story Test Cases (Story)          │
+│  [2] Acceptance Test Plan (Story)      │
 ├───────────────────────────────────────┤
 │                                        │
 │  Input:                                │
@@ -79,7 +79,7 @@ Epic en Jira + Local
 │  - Estados de error                    │
 │                                        │
 │  Output:                               │
-│  - test-cases.md (local)               │
+│  - acceptance-test-plan.md (local)     │
 │  - Comentario en Story (Jira)          │
 │  - Story refinada con ACs testeables   │
 │                                        │
@@ -88,27 +88,39 @@ Epic en Jira + Local
 
 ---
 
-## Niveles de Testing
+## Niveles de Testing (Jerarquía IQL)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    SHIFT-LEFT TESTING                        │
+│                    Step 1: Análisis de Requerimientos        │
 ├─────────────────────────────────────────────────────────────┤
 │                                                              │
-│   NIVEL EPIC (Feature)          NIVEL STORY                 │
-│   ────────────────────          ────────────                │
+│   [1a] NIVEL EPIC (Primero)     [1b] NIVEL STORY (Después)  │
+│   ────────────────────────      ─────────────────────────   │
 │                                                              │
-│   Test Strategy                 Test Cases                  │
-│   - Riesgos                     - Happy path                │
-│   - Escenarios críticos         - Edge cases                │
-│   - Dependencias                - Validaciones              │
+│   FTP (Feature Test Plan)       ATP (Acceptance Test Plan)  │
+│   - Riesgos                     - Escenarios por AC         │
+│   - Escenarios críticos         - Happy path                │
+│   - Dependencias                - Edge cases                │
 │   - Criterios de éxito          - Estados de error          │
 │                                                              │
-│   feature-test-plan.md          test-cases.md               │
+│   feature-test-plan.md          acceptance-test-plan.md     │
 │   (1 por Epic)                  (1 por Story)               │
+│   Provee CONTEXTO para →        ← Informado por FTP         │
+│                                                              │
+│                                        ↓                     │
+│                              ATCs (Mid-Game Step 6)          │
+│                              Documentados en Jira            │
+│                                        ↓                     │
+│                              KATA Automation (Steps 8-10)    │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+> **Orden importante:** FTP se crea PRIMERO (contexto macro), ATP se crea DESPUÉS (informado por el FTP). Ambos ocurren ANTES del sprint durante refinamiento.
+
+**Trazabilidad completa:** FTP (Epic) → ATP (Story) → ATCs (Jira) → KATA (Automation)
 
 ---
 
@@ -122,7 +134,7 @@ Epic en Jira + Local
     └── stories/
         └── STORY-{KEY}-{NUM}-{nombre}/
             ├── story.md
-            └── test-cases.md         # ← Generado por story-test-cases.md
+            └── acceptance-test-plan.md  # ← Generado por acceptance-test-plan.md
 ```
 
 ---
@@ -148,10 +160,10 @@ Epic en Jira + Local
 
 ## Roles Asumidos por la IA
 
-| Prompt                 | Rol                             |
-| ---------------------- | ------------------------------- |
-| `feature-test-plan.md` | QA Lead, Test Strategy Expert   |
-| `story-test-cases.md`  | QA Engineer, Test Case Designer |
+| Prompt                    | Rol                             |
+| ------------------------- | ------------------------------- |
+| `feature-test-plan.md`    | QA Lead, Test Strategy Expert   |
+| `acceptance-test-plan.md` | QA Engineer, Test Case Designer |
 
 ---
 
@@ -167,10 +179,24 @@ Epic en Jira + Local
 ## Output de Esta Fase
 
 - **Por Epic:** `feature-test-plan.md` con estrategia de testing
-- **Por Story:** `test-cases.md` con casos detallados
+- **Por Story:** `acceptance-test-plan.md` con acceptance test cases
 - **En Jira:** Comments con test strategy y cases
 - **Refinamiento:** ACs más específicos y testeables
 - **Base para:** Fase 12 (Test Automation)
+
+---
+
+## Conexión con Mid-Game Testing
+
+Los artefactos de esta fase alimentan directamente al **Mid-Game Testing (Steps 6-10)**:
+
+| Artefacto Fase 5    | → Mid-Game        | Propósito                          |
+| ------------------- | ----------------- | ---------------------------------- |
+| ATP (Story-level)   | → ATCs (Step 6)   | Escenarios se formalizan en Jira   |
+| Escenarios críticos | → Candidates      | Priorizados para automatización    |
+| Acceptance Criteria | → KATA decorators | Trazabilidad `@atc('PROJECT-XXX')` |
+
+**Ver:** `docs/testing/test-architecture/mid-game-testing.md`
 
 ---
 

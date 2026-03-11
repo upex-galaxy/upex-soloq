@@ -10,15 +10,17 @@ El JWT de Supabase es **el mismo token** para todo. Solo cambia como se transpor
 
 ```
 +-----------------------------------------------------------------------------+
-|                      UN TOKEN, DOS FORMAS DE USARLO                          |
+|                      UN TOKEN, MÚLTIPLES FORMAS DE USARLO                    |
 +-----------------------------------------------------------------------------+
 |                                                                             |
 |   SUPABASE REST API          |         NEXT.JS API ROUTES                  |
 |   (/rest/v1/*)               |         (/api/*)                            |
 |                              |                                             |
-|   Header:                    |         Cookie:                             |
-|   Authorization: Bearer JWT  |         sb-xxx-auth-token = base64(JWT)     |
+|   Header:                    |         Opción 1 - Header (Recomendado):    |
+|   Authorization: Bearer JWT  |         Authorization: Bearer JWT           |
 |                              |                                             |
+|                              |         Opción 2 - Cookie (Browser):        |
+|                              |         sb-xxx-auth-token = base64(JWT)     |
 |   --------------------------------------------------------------------     |
 |                              |                                             |
 |               ES EL MISMO JWT, SOLO CAMBIA EL TRANSPORTE                   |
@@ -124,7 +126,24 @@ const response = await fetch(`${SUPABASE_URL}/rest/v1/orders?user_id=eq.${userId
 
 ## Paso 3: Usar el Token en Next.js API Routes
 
-Los endpoints de Next.js (`/api/*`) esperan el token en una **cookie**, no en un header.
+Los endpoints de Next.js (`/api/*`) soportan **dos métodos** de autenticación:
+
+### Opción A: Bearer Token (Recomendado para Testing/APIs)
+
+```http
+GET http://localhost:3000/api/clients
+Authorization: Bearer {{ACCESS_TOKEN}}
+```
+
+**Ventajas:**
+
+- ✅ Simple - igual que Supabase REST API
+- ✅ Funciona en Postman, cURL, mobile apps
+- ✅ No requiere construir cookies manualmente
+
+### Opción B: Cookie (Automático en Browser)
+
+El browser envía cookies automáticamente. Para testing manual, construir la cookie:
 
 ### Estructura de la Cookie
 
@@ -203,9 +222,25 @@ curl -X GET \
    - `apikey`: `{{anon_key}}`
    - `Authorization`: `Bearer {{access_token}}`
 
-2. Usar el request de Login para obtener y guardar el token automaticamente (ver [04-testing-postman.md](./04-testing-postman.md))
+2. Usar el request de Login para obtener y guardar el token automaticamente (ver [postman-testing.md](./postman-testing.md))
 
-### Para Next.js API Routes
+### Para Next.js API Routes (Recomendado: Bearer Token)
+
+**Opción A - Bearer Token (Simple):**
+
+1. En **Headers**, agregar:
+   - `Authorization`: `Bearer {{access_token}}`
+
+2. ¡Listo! El mismo token que usas para Supabase REST funciona para Next.js API.
+
+```http
+GET http://localhost:3000/api/clients
+Authorization: Bearer {{access_token}}
+```
+
+**Opción B - Cookie (Alternativa):**
+
+Solo si necesitas simular exactamente el comportamiento del browser:
 
 1. En **Headers**, agregar:
    - `Cookie`: `sb-{{PROJECT_REF}}-auth-token={{cookie_value}}`
@@ -302,11 +337,14 @@ await page.goto('/dashboard'); // Ya estas logueado, sin pasar por /login
 
 ## Tabla Resumen
 
-| API                              | Metodo de Auth | Como Enviar                              |
-| -------------------------------- | -------------- | ---------------------------------------- |
-| **Supabase REST** (`/rest/v1/*`) | Header         | `Authorization: Bearer <access_token>`   |
-| **Next.js API** (`/api/*`)       | Cookie         | `sb-{{PROJECT_REF}}-auth-token=<base64>` |
-| **Browser (UI)**                 | Cookie         | Misma cookie, se envia automaticamente   |
+| API                              | Metodo de Auth    | Como Enviar                              |
+| -------------------------------- | ----------------- | ---------------------------------------- |
+| **Supabase REST** (`/rest/v1/*`) | Header            | `Authorization: Bearer <access_token>`   |
+| **Next.js API** (`/api/*`)       | Header (Opción A) | `Authorization: Bearer <access_token>`   |
+| **Next.js API** (`/api/*`)       | Cookie (Opción B) | `sb-{{PROJECT_REF}}-auth-token=<base64>` |
+| **Browser (UI)**                 | Cookie            | Misma cookie, se envia automaticamente   |
+
+> **Nota:** Para testing con Postman/cURL, se recomienda usar **Bearer Token** (Opción A) por simplicidad.
 
 ---
 

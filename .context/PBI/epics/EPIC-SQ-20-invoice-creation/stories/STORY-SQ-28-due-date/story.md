@@ -1,75 +1,98 @@
 # Set Invoice Due Date
 
-**Jira Key:** [SQ-28](https://upexgalaxy64.atlassian.net/browse/SQ-28)
-**Epic:** [SQ-20](https://upexgalaxy64.atlassian.net/browse/SQ-20) (Invoice Creation)
-**Priority:** High
-**Story Points:** 2
-**Status:** Backlog
+**Jira Key:** [SQ-28](https://upexgalaxy65.atlassian.net/browse/SQ-28)
+**Epic:** [SQ-20](https://upexgalaxy65.atlassian.net/browse/SQ-20) (Invoice Creation)
+**Priority:** Medium
+**Story Points:** 5
+**Status:** Ready For QA
 
 ---
 
 ## User Story
 
-**As a** user
-**I want to** set a due date
-**So that** I can define when I expect payment
+## User Story
 
----
+***As a*** user
+***I want to*** set a due date
+***So that*** I can define when I expect payment
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Default due date
+### Scenario 1: Set specific due date
 
-- **Given:** I am creating a new invoice
-- **When:** The form loads
-- **Then:** The due date defaults to 30 days from today
+- ***Given:*** I am creating an invoice
+- ***When:*** I select a due date from the calendar
+- ***Then:*** The due date is saved
 
-### Scenario 2: Select due date
+### Scenario 2: Quick presets
 
-- **Given:** I am creating an invoice
-- **When:** I click on the due date field
-- **Then:** A date picker appears
+- ***Given:*** I am setting a due date
+- ***When:*** I click "Net 15" or "Net 30"
+- ***Then:*** Due date is set to 15/30 days from today
 
-### Scenario 3: Quick presets
+### Scenario 3: Due date appears on invoice
 
-- **Given:** I am selecting a due date
-- **When:** I see the options
-- **Then:** I can choose: Today, 15 days, 30 days, 45 days, 60 days
+- ***Given:*** I set a due date
+- ***When:*** I view/generate the invoice
+- ***Then:*** Due date is clearly displayed
 
-### Scenario 4: Custom date
+### Scenario 4: Overdue detection
 
-- **Given:** I need a specific due date
-- **When:** I use the date picker
-- **Then:** I can select any future date
-
-### Scenario 5: Past date warning
-
-- **Given:** I select a date in the past
-- **When:** I try to save
-- **Then:** I see a warning but can still proceed
-
----
+- ***Given:*** Due date has passed and invoice is unpaid
+- ***When:*** System checks invoices
+- ***Then:*** Invoice status changes to "overdue"
 
 ## Technical Notes
 
-- Issue date: auto-set to current date
-- Due date: user-configurable
-- Date picker with presets
-- Timezone handling: user's local timezone
+- Field: due_date (date)
+- Presets: Net 7, Net 15, Net 30, Net 60
+- Cron job to mark overdue invoices
+
+## Story Points
+
+2
+
+---
+
+## Acceptance Criteria
+
+Feature:
+
+Background:
+Given ...
+
+Scenario: ...
+Given ...
+When ...
+Then ...
+
+---
+
+## Traceability
+
+### Defect (1)
+
+- [SQ-83](https://upexgalaxy65.atlassian.net/browse/SQ-83): INV | Shows due date warning when today's date is selected _(Ready For QA)_
 
 ---
 
 ## Definition of Done
 
-- [ ] Date picker implemented
-- [ ] Default 30-day due date working
-- [ ] Quick presets available
-- [ ] Custom date selection working
-- [ ] Past date warning implemented
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-20-invoice-creation/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 2/17/2026
+- **Reporter:** Ely
+- **Assignee:** Yaneth Quintero
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:53:52.177Z_

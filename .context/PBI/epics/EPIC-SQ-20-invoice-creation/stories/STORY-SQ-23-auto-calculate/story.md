@@ -1,75 +1,91 @@
 # Automatic Subtotal and Total Calculation
 
-**Jira Key:** [SQ-23](https://upexgalaxy64.atlassian.net/browse/SQ-23)
-**Epic:** [SQ-20](https://upexgalaxy64.atlassian.net/browse/SQ-20) (Invoice Creation)
-**Priority:** High
-**Story Points:** 3
-**Status:** Backlog
+**Jira Key:** [SQ-23](https://upexgalaxy65.atlassian.net/browse/SQ-23)
+**Epic:** [SQ-20](https://upexgalaxy65.atlassian.net/browse/SQ-20) (Invoice Creation)
+**Priority:** Medium
+**Story Points:** 8
+**Status:** QA Approved
 
 ---
 
 ## User Story
 
-**As a** user
-**I want to** have the system automatically calculate subtotal and total
-**So that** I avoid calculation errors
+## User Story
 
----
+***As a*** user
+***I want to*** the system to automatically calculate subtotal and total
+***So that*** I avoid calculation errors
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Subtotal calculation
+### Scenario 1: Calculate line totals
 
-- **Given:** I have multiple line items
-- **When:** I view the invoice summary
-- **Then:** The subtotal is the sum of all line totals
+- ***Given:*** I enter qty=2 and price=100
+- ***When:*** I move to next field
+- ***Then:*** Line total shows 200
 
-### Scenario 2: Total with tax
+### Scenario 2: Calculate subtotal
 
-- **Given:** I have a subtotal and tax rate
-- **When:** I view the total
-- **Then:** Total = subtotal + tax amount
+- ***Given:*** I have multiple line items
+- ***When:*** I look at the subtotal
+- ***Then:*** It shows the sum of all line totals
 
-### Scenario 3: Total with discount
+### Scenario 3: Calculate grand total
 
-- **Given:** I have a subtotal and discount
-- **When:** I view the total
-- **Then:** Total = subtotal - discount + tax
+- ***Given:*** I have subtotal, tax, and discount
+- ***When:*** I look at the total
+- ***Then:*** It shows subtotal + tax - discount
 
-### Scenario 4: Real-time updates
+### Scenario 4: Handle decimals correctly
 
-- **Given:** I modify any value (item, tax, discount)
-- **When:** The value changes
-- **Then:** All calculations update in real-time
-
-### Scenario 5: Precision handling
-
-- **Given:** I have calculations with decimals
-- **When:** I view the totals
-- **Then:** Values are rounded to 2 decimal places
-
----
+- ***Given:*** I enter price=99.99 and qty=3
+- ***When:*** Calculation runs
+- ***Then:*** Total is 299.97 (not floating point errors)
 
 ## Technical Notes
 
-- Formula: total = (subtotal - discount_amount) + tax_amount
-- Tax calculated on: subtotal (before discount) OR subtotal - discount (configurable)
-- Currency formatting based on locale
-- All calculations client-side for responsiveness
+- Use decimal arithmetic (not float)
+- Round to 2 decimal places
+- Real-time updates
+- Formula: total = (subtotal * (1 + tax_rate)) - discount
+
+## Story Points
+
+3
+
+---
+
+## Acceptance Criteria
+
+Feature:
+
+Background:
+Given ...
+
+Scenario: ...
+Given ...
+When ...
+Then ...
 
 ---
 
 ## Definition of Done
 
-- [ ] Subtotal calculation working
-- [ ] Tax calculation working
-- [ ] Discount calculation working
-- [ ] Real-time updates working
-- [ ] Precision handling correct
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-20-invoice-creation/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 2/26/2026
+- **Reporter:** Ely
+- **Assignee:** Raúl González
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:53:50.166Z_

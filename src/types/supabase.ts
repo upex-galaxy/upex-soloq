@@ -15,7 +15,9 @@ export type Database = {
           contact_email: string | null;
           contact_phone: string | null;
           created_at: string | null;
+          default_terms: string | null;
           id: string;
+          invoice_prefix: string | null;
           logo_url: string | null;
           tax_id: string | null;
           updated_at: string | null;
@@ -27,7 +29,9 @@ export type Database = {
           contact_email?: string | null;
           contact_phone?: string | null;
           created_at?: string | null;
+          default_terms?: string | null;
           id?: string;
+          invoice_prefix?: string | null;
           logo_url?: string | null;
           tax_id?: string | null;
           updated_at?: string | null;
@@ -39,7 +43,9 @@ export type Database = {
           contact_email?: string | null;
           contact_phone?: string | null;
           created_at?: string | null;
+          default_terms?: string | null;
           id?: string;
+          invoice_prefix?: string | null;
           logo_url?: string | null;
           tax_id?: string | null;
           updated_at?: string | null;
@@ -91,6 +97,59 @@ export type Database = {
           user_id?: string;
         };
         Relationships: [];
+      };
+      email_logs: {
+        Row: {
+          attachment_name: string | null;
+          attachment_size_bytes: number | null;
+          created_at: string | null;
+          error_message: string | null;
+          id: string;
+          invoice_id: string | null;
+          recipient_email: string;
+          resend_message_id: string | null;
+          sent_at: string | null;
+          status: string;
+          subject: string;
+          user_id: string | null;
+        };
+        Insert: {
+          attachment_name?: string | null;
+          attachment_size_bytes?: number | null;
+          created_at?: string | null;
+          error_message?: string | null;
+          id?: string;
+          invoice_id?: string | null;
+          recipient_email: string;
+          resend_message_id?: string | null;
+          sent_at?: string | null;
+          status?: string;
+          subject: string;
+          user_id?: string | null;
+        };
+        Update: {
+          attachment_name?: string | null;
+          attachment_size_bytes?: number | null;
+          created_at?: string | null;
+          error_message?: string | null;
+          id?: string;
+          invoice_id?: string | null;
+          recipient_email?: string;
+          resend_message_id?: string | null;
+          sent_at?: string | null;
+          status?: string;
+          subject?: string;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'email_logs_invoice_id_fkey';
+            columns: ['invoice_id'];
+            isOneToOne: false;
+            referencedRelation: 'invoices';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       invoice_events: {
         Row: {
@@ -182,6 +241,7 @@ export type Database = {
           subtotal: number | null;
           tax_amount: number | null;
           tax_rate: number | null;
+          terms: string | null;
           total: number | null;
           updated_at: string | null;
           user_id: string;
@@ -205,6 +265,7 @@ export type Database = {
           subtotal?: number | null;
           tax_amount?: number | null;
           tax_rate?: number | null;
+          terms?: string | null;
           total?: number | null;
           updated_at?: string | null;
           user_id: string;
@@ -228,6 +289,7 @@ export type Database = {
           subtotal?: number | null;
           tax_amount?: number | null;
           tax_rate?: number | null;
+          terms?: string | null;
           total?: number | null;
           updated_at?: string | null;
           user_id?: string;
@@ -325,6 +387,8 @@ export type Database = {
           email_verified_at: string | null;
           id: string;
           last_login_at: string | null;
+          onboarding_completed: boolean | null;
+          onboarding_step: number | null;
           updated_at: string | null;
           user_id: string;
         };
@@ -333,6 +397,8 @@ export type Database = {
           email_verified_at?: string | null;
           id?: string;
           last_login_at?: string | null;
+          onboarding_completed?: boolean | null;
+          onboarding_step?: number | null;
           updated_at?: string | null;
           user_id: string;
         };
@@ -341,6 +407,8 @@ export type Database = {
           email_verified_at?: string | null;
           id?: string;
           last_login_at?: string | null;
+          onboarding_completed?: boolean | null;
+          onboarding_step?: number | null;
           updated_at?: string | null;
           user_id?: string;
         };

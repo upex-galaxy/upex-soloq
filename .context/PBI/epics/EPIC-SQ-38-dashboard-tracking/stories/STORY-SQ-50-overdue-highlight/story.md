@@ -1,8 +1,8 @@
-# See Overdue Invoices Highlighted
+# As a user, I want to see overdue invoices highlighted so that I can prioritize follow-up
 
-**Jira Key:** [SQ-50](https://upexgalaxy64.atlassian.net/browse/SQ-50)
-**Epic:** [SQ-38](https://upexgalaxy64.atlassian.net/browse/SQ-38) (Dashboard & Tracking)
-**Priority:** High
+**Jira Key:** [SQ-50](https://upexgalaxy65.atlassian.net/browse/SQ-50)
+**Epic:** [SQ-38](https://upexgalaxy65.atlassian.net/browse/SQ-38) (Invoice Dashboard & Tracking)
+**Priority:** Medium
 **Story Points:** 2
 **Status:** Backlog
 
@@ -10,66 +10,81 @@
 
 ## User Story
 
-**As a** user
-**I want to** see overdue invoices highlighted
-**So that** I can prioritize follow-up
+As a user, I want to see overdue invoices highlighted, so that I can prioritize follow-up. Story Points: 2
 
 ---
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Visual highlight
+1. 
 
-- **Given:** I have overdue invoices
-- **When:** I view the invoice list
-- **Then:** Overdue invoices have a visual indicator (red badge/row)
+- ****Given:**** I have overdue invoices
+- ****When:**** I view the invoice list
+- ****Then:**** Overdue invoices have a visual indicator (red badge/row)
 
-### Scenario 2: Overdue badge
+1. 
 
-- **Given:** An invoice is past due
-- **When:** I view its status
-- **Then:** I see "Overdue" instead of "Sent"
+- ****Given:**** An invoice is past due
+- ****When:**** I view its status
+- ****Then:**** I see "Overdue" badge instead of "Sent"
 
-### Scenario 3: Days overdue
+1. 
 
-- **Given:** An invoice is overdue
-- **When:** I view the row
-- **Then:** I see how many days overdue it is
+- ****Given:**** An invoice is overdue
+- ****When:**** I view the row
+- ****Then:**** I see how many days overdue it is (e.g., "7 days overdue")
 
-### Scenario 4: Dashboard alert
+1. 
 
-- **Given:** I have overdue invoices
-- **When:** I view the dashboard
-- **Then:** I see an alert banner or count
+- ****Given:**** I have overdue invoices
+- ****When:**** I view the dashboard
+- ****Then:**** I see an alert banner or count of overdue invoices
 
-### Scenario 5: Sort overdue first
+1. 
 
-- **Given:** I have mixed invoices
-- **When:** I sort by urgency
-- **Then:** Overdue invoices appear first
+- ****Given:**** I have mixed status invoices
+- ****When:**** I sort by urgency
+- ****Then:**** Overdue invoices appear at the top
 
 ---
 
-## Technical Notes
+## Scope
 
-- Overdue: status = 'sent' AND due_date < CURRENT_DATE
-- Calculate days_overdue = CURRENT_DATE - due_date
-- Visual: red/orange indicator
-- Consider auto-updating status to 'overdue' via cron
+1. 
+
+- Visual highlight for overdue rows (red/orange)
+- "Overdue" status badge
+- Days overdue calculation and display
+- Dashboard alert/count for overdue
+- Sort by urgency option
+- Overdue detection: status='sent' AND due*date < CURRENT*DATE
+
+1. 
+
+- Automatic status change to 'overdue'
+- Push notifications for overdue
+- Severity levels (1-7 days vs 30+ days)
+- Automatic escalation actions
 
 ---
 
 ## Definition of Done
 
-- [ ] Visual highlight implemented
-- [ ] Overdue badge displayed
-- [ ] Days overdue calculated
-- [ ] Dashboard alert shown
-- [ ] Sort by urgency working
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-38-dashboard-tracking/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 3/2/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:54:02.398Z_

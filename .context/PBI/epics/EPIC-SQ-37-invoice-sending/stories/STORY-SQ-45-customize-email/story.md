@@ -1,75 +1,50 @@
 # Customize Email Subject and Message
 
-**Jira Key:** [SQ-45](https://upexgalaxy64.atlassian.net/browse/SQ-45)
-**Epic:** [SQ-37](https://upexgalaxy64.atlassian.net/browse/SQ-37) (Invoice Sending)
+**Jira Key:** [SQ-45](https://upexgalaxy65.atlassian.net/browse/SQ-45)
+**Epic:** [SQ-37](https://upexgalaxy65.atlassian.net/browse/SQ-37) (Invoice Sending)
 **Priority:** Medium
-**Story Points:** 2
+**Story Points:** 1
 **Status:** Backlog
 
 ---
 
 ## User Story
 
-**As a** user
-**I want to** customize the subject and message of the email
-**So that** I can communicate better with my client
+As a user, I want to customize the subject and message of the email, so that I can communicate better with my client. Story Points: 2
 
 ---
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Default subject
+Feature:
 
-- **Given:** I am sending an invoice
-- **When:** I don't modify the subject
-- **Then:** A default subject is used: "Invoice {number} from {business}"
+Background:
+Given ...
 
-### Scenario 2: Custom subject
-
-- **Given:** I am sending an invoice
-- **When:** I edit the subject
-- **Then:** My custom subject is used
-
-### Scenario 3: Default message
-
-- **Given:** I am sending an invoice
-- **When:** I don't modify the message
-- **Then:** A default professional message is sent
-
-### Scenario 4: Custom message
-
-- **Given:** I am sending an invoice
-- **When:** I write a custom message
-- **Then:** My message appears in the email body
-
-### Scenario 5: Variables in message
-
-- **Given:** I am writing a message
-- **When:** I use variables like {client_name}
-- **Then:** Variables are replaced with actual values
-
----
-
-## Technical Notes
-
-- Subject: max 100 chars
-- Message: max 1000 chars
-- Variables: {client_name}, {invoice_number}, {amount}, {due_date}
-- Save last used message as suggestion
+Scenario: ...
+Given ...
+When ...
+Then ...
 
 ---
 
 ## Definition of Done
 
-- [ ] Default subject working
-- [ ] Custom subject working
-- [ ] Default message working
-- [ ] Custom message working
-- [ ] Variable replacement working
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-37-invoice-sending/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 2/22/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:53:59.682Z_

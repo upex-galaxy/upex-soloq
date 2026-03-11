@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { AuthProvider } from '@/contexts/auth-context';
+import { QueryProvider } from '@/components/providers/query-provider';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Toaster } from '@/components/ui/sonner';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -18,7 +20,10 @@ export default function RootLayout({
     <html lang="es">
       <body>
         <AuthProvider>
-          <TooltipProvider>{children}</TooltipProvider>
+          <QueryProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+            <Toaster richColors position="top-right" />
+          </QueryProvider>
         </AuthProvider>
       </body>
     </html>

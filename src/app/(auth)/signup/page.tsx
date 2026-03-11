@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { FileText, Loader2, CheckCircle2 } from 'lucide-react';
+import { FileText, Loader2, CheckCircle2, XCircle } from 'lucide-react';
 
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
@@ -18,20 +17,67 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { cn } from '@/lib/utils';
+
+interface PasswordRequirement {
+  label: string;
+  test: (password: string) => boolean;
+}
+
+const PASSWORD_REQUIREMENTS: PasswordRequirement[] = [
+  { label: 'Mínimo 8 caracteres', test: (p: string) => p.length >= 8 },
+  { label: 'Al menos 1 mayúscula', test: (p: string) => /[A-Z]/.test(p) },
+  { label: 'Al menos 1 minúscula', test: (p: string) => /[a-z]/.test(p) },
+  { label: 'Al menos 1 número', test: (p: string) => /[0-9]/.test(p) },
+];
+
+// Email validation regex (RFC 5321 compliant basic pattern)
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const isValidEmail = (email: string): boolean => EMAIL_REGEX.test(email);
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
   const { signUp } = useAuth();
-  const router = useRouter();
+
+  // Check password requirements in real-time
+  const passwordValidation = useMemo(() => {
+    return PASSWORD_REQUIREMENTS.map(req => ({
+      ...req,
+      met: req.test(password),
+    }));
+  }, [password]);
+
+  const isPasswordValid = useMemo(() => {
+    return passwordValidation.every(req => req.met);
+  }, [passwordValidation]);
+
+  // Real-time email validation
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    if (value && !isValidEmail(value)) {
+      setEmailError('Por favor ingresa un email válido');
+    } else {
+      setEmailError(null);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setEmailError(null);
+
+    // Validate email format
+    if (!email || !isValidEmail(email)) {
+      setEmailError('Por favor ingresa un email válido');
+      return;
+    }
 
     // Validate passwords match
     if (password !== confirmPassword) {
@@ -39,9 +85,10 @@ export default function SignupPage() {
       return;
     }
 
-    // Validate password strength
-    if (password.length < 8) {
-      setError('La contraseña debe tener al menos 8 caracteres.');
+    // Validate password strength (all requirements must be met)
+    if (!isPasswordValid) {
+      const missing = passwordValidation.filter(req => !req.met).map(req => req.label);
+      setError(`La contraseña no cumple los requisitos: ${missing.join(', ')}`);
       return;
     }
 
@@ -134,11 +181,18 @@ export default function SignupPage() {
               type="email"
               placeholder="tu@email.com"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={e => handleEmailChange(e.target.value)}
               required
               disabled={isLoading}
               autoComplete="email"
+              data-testid="signup-email-input"
+              className={emailError ? 'border-destructive' : ''}
             />
+            {emailError && (
+              <p className="text-xs text-destructive" data-testid="email-error">
+                {emailError}
+              </p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Contraseña</Label>
@@ -148,10 +202,33 @@ export default function SignupPage() {
               placeholder="Mínimo 8 caracteres"
               value={password}
               onChange={e => setPassword(e.target.value)}
+              onFocus={() => setShowPasswordRequirements(true)}
               required
               disabled={isLoading}
               autoComplete="new-password"
+              data-testid="signup-password-input"
             />
+            {/* Real-time password requirements indicator */}
+            {showPasswordRequirements && password.length > 0 && (
+              <div className="mt-2 space-y-1 text-xs" data-testid="password-requirements">
+                {passwordValidation.map((req, index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      'flex items-center gap-1.5',
+                      req.met ? 'text-green-600' : 'text-muted-foreground'
+                    )}
+                  >
+                    {req.met ? (
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                    ) : (
+                      <XCircle className="h-3.5 w-3.5" />
+                    )}
+                    <span>{req.label}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
@@ -166,7 +243,12 @@ export default function SignupPage() {
               autoComplete="new-password"
             />
           </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isLoading || !!emailError || (password.length > 0 && !isPasswordValid)}
+            data-testid="signup-submit-button"
+          >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

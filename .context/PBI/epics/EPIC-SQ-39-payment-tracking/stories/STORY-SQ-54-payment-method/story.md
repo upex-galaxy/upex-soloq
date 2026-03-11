@@ -1,7 +1,7 @@
-# Record Payment Method Used
+# As a user, I want to record the payment method used so that I have a record
 
-**Jira Key:** [SQ-54](https://upexgalaxy64.atlassian.net/browse/SQ-54)
-**Epic:** [SQ-39](https://upexgalaxy64.atlassian.net/browse/SQ-39) (Payment Tracking)
+**Jira Key:** [SQ-54](https://upexgalaxy65.atlassian.net/browse/SQ-54)
+**Epic:** [SQ-39](https://upexgalaxy65.atlassian.net/browse/SQ-39) (Payment Tracking)
 **Priority:** Medium
 **Story Points:** 2
 **Status:** Backlog
@@ -10,66 +10,81 @@
 
 ## User Story
 
-**As a** user
-**I want to** record the payment method used
-**So that** I have a record
+As a user, I want to record the payment method used, so that I have a record. Story Points: 2
 
 ---
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Method selection
+1. 
 
-- **Given:** I am recording a payment
-- **When:** I fill the form
-- **Then:** I can select a payment method
+- ****Given:**** I am recording a payment
+- ****When:**** I fill the form
+- ****Then:**** I can select a payment method from a dropdown
 
-### Scenario 2: Method options
+1. 
 
-- **Given:** I view the method dropdown
-- **When:** I see the options
-- **Then:** I see: Bank Transfer, PayPal, Cash, Crypto, Other
+- ****Given:**** I view the method dropdown
+- ****When:**** I see the options
+- ****Then:**** I see: Bank Transfer, PayPal, MercadoPago, Cash, Other
 
-### Scenario 3: Default to configured methods
+1. 
 
-- **Given:** I have payment methods configured
-- **When:** I see the dropdown
-- **Then:** My configured methods appear first
+- ****Given:**** I have payment methods configured in my profile
+- ****When:**** I see the dropdown
+- ****Then:**** My configured methods appear first
 
-### Scenario 4: Method recorded
+1. 
 
-- **Given:** I select a payment method
-- **When:** I save the payment
-- **Then:** The method is stored with the payment
+- ****Given:**** I select a payment method
+- ****When:**** I save the payment
+- ****Then:**** The method is stored in payments.payment_method
 
-### Scenario 5: View method in history
+1. 
 
-- **Given:** I view a payment record
-- **When:** I check the details
-- **Then:** I see which method was used
+- ****Given:**** I view a payment record
+- ****When:**** I check the details
+- ****Then:**** I see which method was used
 
 ---
 
-## Technical Notes
+## Scope
 
-- Methods: bank_transfer, paypal, cash, crypto, other
-- Optional field (can be null)
-- Store in payments.payment_method
-- Suggest user's configured methods first
+1. 
+
+- Payment method dropdown selector
+- Options: bank*transfer, paypal, mercado*pago, cash, other
+- User's configured methods shown first
+- Method stored in payments table
+- Method displayed in payment history
+- Optional field (can save without selecting)
+
+1. 
+
+- Add new payment method during payment recording
+- Payment method analytics/reports
+- Method-specific fields (account numbers)
+- Custom method types
 
 ---
 
 ## Definition of Done
 
-- [ ] Method selector implemented
-- [ ] All method options available
-- [ ] Configured methods prioritized
-- [ ] Method stored correctly
-- [ ] Method displayed in history
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-39-payment-tracking/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 3/2/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:54:04.290Z_

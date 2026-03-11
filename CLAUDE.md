@@ -10,6 +10,48 @@ Tu trabajo es ayudar a implementar codigo, tests y documentacion siguiendo las e
 
 ---
 
+## Project IDs
+
+| Servicio | ID / Key               | Uso                             |
+| -------- | ---------------------- | ------------------------------- |
+| Supabase | `czuusjchqpgvanvbdrnz` | Database, Auth, Storage         |
+| Jira     | `SQ`                   | Project key para issues (SQ-XX) |
+
+---
+
+## Environments
+
+| Ambiente | URL                                    |
+| -------- | -------------------------------------- |
+| Local    | `http://localhost:3000`                |
+| Staging  | `https://staging-upexsoloq.vercel.app` |
+
+---
+
+## Test Automation (qa/)
+
+El directorio `qa/` contiene el KATA framework para test automation:
+
+```
+qa/
+├── tests/              # Tests E2E e integracion
+├── config/variables.ts # URLs y credenciales por ambiente
+├── .env                # Credenciales locales (no commitear)
+└── .context/guidelines/TAE/  # Guidelines para automatizacion
+```
+
+**Comandos:**
+
+```bash
+cd qa && bun run test              # Ejecutar todos los tests
+cd qa && bun run test:ui           # Solo tests UI
+cd qa && bun run test --project=api-setup  # Auth setup API
+```
+
+Ver `qa/.context/guidelines/TAE/kata-ai-index.md` para documentacion completa.
+
+---
+
 ## Stack Tecnico
 
 | Capa          | Tecnologia                   | Version |
@@ -296,6 +338,104 @@ Ver `.context/guidelines/MCP/` para detalles de cada uno.
 
 ---
 
+## Reglas de Git (IMPORTANTE)
+
+> **ATENCION:** Este proyecto usa `staging` como rama principal de desarrollo, NO `main`.
+
+### Rama Principal: `staging`
+
+| Accion                | Rama correcta | NUNCA usar |
+| --------------------- | ------------- | ---------- |
+| Crear feature branch  | `staging`     | `main`     |
+| Base para PRs         | `staging`     | `main`     |
+| Sincronizar cambios   | `staging`     | `main`     |
+| Pull despues de merge | `staging`     | `main`     |
+
+### Comandos Correctos
+
+```bash
+# Sincronizar despues de merge de PR
+git checkout staging && git pull origin staging
+
+# Crear nueva rama de feature
+git checkout staging && git checkout -b feat/SQ-XX/nombre
+
+# NUNCA hacer esto:
+# git checkout main        ❌ PROHIBIDO
+# git pull origin main     ❌ PROHIBIDO
+```
+
+### Por que?
+
+- Los PRs se mergean a `staging` (deploy automatico a staging environment)
+- `main` es solo para releases a produccion
+- Hacer checkout a `main` puede causar perdida de cambios locales no commiteados
+
+### Estrategia de Roadmaps (IMPLEMENTATION-ROADMAP.md, BUGFIX-ROADMAP.md)
+
+> **IMPORTANTE:** Los archivos de roadmap se comitean **directamente a staging**, NO en feature branches.
+
+**Flujo recomendado:**
+
+```bash
+# 1. Durante el workflow, editar roadmaps normalmente
+# 2. Antes de crear feature branch, hacer stash
+git stash push -m "roadmap updates for SQ-XX" -- .context/IMPLEMENTATION-ROADMAP.md .context/BUGFIX-ROADMAP.md
+
+# 3. Trabajar en feature branch normalmente
+git checkout -b feat/SQ-XX/nombre
+# ... implementar, commit, push, PR, merge ...
+
+# 4. Volver a staging y sincronizar
+git checkout staging && git pull origin staging
+
+# 5. Recuperar cambios de roadmap
+git stash pop
+
+# 6. Si hay conflicto, resolver (nuestros cambios son mas recientes)
+# 7. Commit y push directamente a staging
+git add .context/IMPLEMENTATION-ROADMAP.md .context/BUGFIX-ROADMAP.md
+git commit -m "docs: update roadmap - SQ-XX completed"
+git push origin staging
+```
+
+**Por que esta estrategia?**
+
+- Los roadmaps son documentacion de tracking, no codigo
+- Evita conflictos en PRs (solo nosotros editamos estos archivos)
+- `git stash` aísla los cambios del `git pull`, evitando conflictos
+- Mantiene el history de PRs limpio (solo cambios de implementacion)
+
+---
+
+## Workflow de Asignacion de Testers (IMPORTANTE)
+
+> **AL INICIO de cada User Story**, identificar al tester que hizo Shift-Left QA.
+
+**Como encontrar al tester:**
+
+```
+1. Usar Jira MCP: jira_batch_get_changelogs con fields ["status", "assignee"]
+2. Buscar quien movio la US de "Backlog" → "Shift-Left QA" → "Estimation"
+3. Esa persona es el tester responsable
+4. Al completar la implementacion (Ready For QA), asignar la US a ese tester
+```
+
+**Ejemplo de changelog:**
+
+```
+FECHA       | AUTOR              | CAMBIO
+2026-02-03  | Froylan Rodriguez  | Backlog → Shift-Left QA     ← TESTER
+2026-02-03  | Froylan Rodriguez  | Shift-Left QA → Estimation
+2026-02-09  | Froylan Rodriguez  | Estimation → Ready For Dev
+2026-02-10  | Ely                | Cambio assignee a Ely (Dev)
+2026-02-12  | Ely                | Ready For QA → asignar a Froylan
+```
+
+**Accion requerida:** Al transitar a Ready For QA, **siempre** asignar al tester identificado.
+
+---
+
 ## Comandos Utiles
 
 ```bash
@@ -319,5 +459,5 @@ bun api:sync         # Sincronizar OpenAPI spec
 
 ---
 
-**Ultima actualizacion**: 2026-01-29
+**Ultima actualizacion**: 2026-02-12
 **Ver tambien**: `.context/guidelines/` para guidelines detallados por rol

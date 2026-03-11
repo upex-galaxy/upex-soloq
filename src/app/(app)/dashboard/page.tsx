@@ -1,12 +1,50 @@
 'use client';
 
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { DollarSign, FileText, AlertTriangle, Users, Plus, ArrowUpRight } from 'lucide-react';
 
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+
+// Animation variants for staggered entrance
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20, scale: 0.98 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.4,
+      ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
+    },
+  },
+};
 import {
   Table,
   TableBody,
@@ -83,138 +121,196 @@ function formatDate(date: string): string {
 }
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+
+  // Show skeleton while loading auth state (SQ-74 fix)
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-2">
+            <div className="h-9 w-64 animate-pulse rounded bg-muted" />
+            <div className="h-5 w-80 animate-pulse rounded bg-muted" />
+          </div>
+          <div className="h-10 w-36 animate-pulse rounded bg-muted" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="h-32 animate-pulse rounded-lg border bg-card" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Get display name - use email as reliable fallback (SQ-74 fix: avoid "Usuario")
   const displayName =
-    user?.businessProfile?.business_name || user?.email?.split('@')[0] || 'Usuario';
+    user?.businessProfile?.business_name || user?.email?.split('@')[0] || 'Mi Cuenta';
 
   return (
-    <div className="space-y-8">
+    <motion.div
+      className="space-y-8"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <motion.div
+        className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        variants={itemVariants}
+      >
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Bienvenido, {displayName}</h1>
           <p className="text-muted-foreground">
             Aquí está el resumen de tu actividad de facturación.
           </p>
         </div>
-        <Button asChild>
+        <Button asChild className="shadow-sm hover:shadow-md transition-shadow">
           <Link href="/invoices/create">
             <Plus className="mr-2 h-4 w-4" />
             Nueva Factura
           </Link>
         </Button>
-      </div>
+      </motion.div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Pendiente</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(mockStats.totalPending)}</div>
-            <p className="text-xs text-muted-foreground">Facturas enviadas sin pagar</p>
-          </CardContent>
-        </Card>
+      <motion.div
+        className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
+        variants={containerVariants}
+      >
+        <motion.div variants={cardVariants}>
+          <Card className="card-interactive border-border/50 hover:border-border">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Pendiente</CardTitle>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                <DollarSign className="h-4 w-4 text-primary" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{formatCurrency(mockStats.totalPending)}</div>
+              <p className="text-xs text-muted-foreground mt-1">Facturas enviadas sin pagar</p>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Facturas Vencidas</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-destructive" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-destructive">{mockStats.overdueCount}</div>
-            <p className="text-xs text-muted-foreground">Requieren seguimiento</p>
-          </CardContent>
-        </Card>
+        <motion.div variants={cardVariants}>
+          <Card className="card-interactive border-border/50 hover:border-border">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Facturas Vencidas</CardTitle>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-destructive/10">
+                <AlertTriangle className="h-4 w-4 text-destructive" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-destructive">{mockStats.overdueCount}</div>
+              <p className="text-xs text-muted-foreground mt-1">Requieren seguimiento</p>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Cobrado este Mes</CardTitle>
-            <DollarSign className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {formatCurrency(mockStats.paidThisMonth)}
-            </div>
-            <p className="text-xs text-muted-foreground">+12% vs mes anterior</p>
-          </CardContent>
-        </Card>
+        <motion.div variants={cardVariants}>
+          <Card className="card-interactive border-border/50 hover:border-border">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Cobrado este Mes</CardTitle>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-500/10">
+                <DollarSign className="h-4 w-4 text-green-600" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">
+                {formatCurrency(mockStats.paidThisMonth)}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">+12% vs mes anterior</p>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Clientes Activos</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{mockStats.activeClients}</div>
-            <p className="text-xs text-muted-foreground">Con facturas este trimestre</p>
-          </CardContent>
-        </Card>
-      </div>
+        <motion.div variants={cardVariants}>
+          <Card className="card-interactive border-border/50 hover:border-border">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Clientes Activos</CardTitle>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                <Users className="h-4 w-4 text-primary" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{mockStats.activeClients}</div>
+              <p className="text-xs text-muted-foreground mt-1">Con facturas este trimestre</p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
 
       {/* Recent Invoices */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>Facturas Recientes</CardTitle>
-            <CardDescription>Últimas facturas creadas y su estado actual</CardDescription>
-          </div>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/invoices">
-              Ver todas
-              <ArrowUpRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {mockInvoices.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <FileText className="h-12 w-12 text-muted-foreground/50 mb-4" />
-              <h3 className="text-lg font-medium">No hay facturas aún</h3>
-              <p className="text-muted-foreground mb-4">
-                Crea tu primera factura para comenzar a facturar profesionalmente.
-              </p>
-              <Button asChild>
-                <Link href="/invoices/create">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Crear Primera Factura
-                </Link>
-              </Button>
+      <motion.div variants={cardVariants}>
+        <Card className="card-elevated border-border/50">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Facturas Recientes</CardTitle>
+              <CardDescription>Últimas facturas creadas y su estado actual</CardDescription>
             </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Número</TableHead>
-                  <TableHead>Monto</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead>Vencimiento</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {mockInvoices.map(invoice => (
-                  <TableRow key={invoice.id}>
-                    <TableCell className="font-medium">{invoice.client_name}</TableCell>
-                    <TableCell className="font-mono text-sm">{invoice.invoice_number}</TableCell>
-                    <TableCell>{formatCurrency(invoice.total)}</TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className={statusConfig[invoice.status].className}>
-                        {statusConfig[invoice.status].label}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {formatDate(invoice.due_date)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+            <Button variant="outline" size="sm" asChild className="shadow-sm hover:shadow transition-shadow">
+              <Link href="/invoices">
+                Ver todas
+                <ArrowUpRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {mockInvoices.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
+                  <FileText className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-medium">No hay facturas aún</h3>
+                <p className="text-muted-foreground mb-4 max-w-sm">
+                  Crea tu primera factura para comenzar a facturar profesionalmente.
+                </p>
+                <Button asChild className="shadow-sm hover:shadow-md transition-shadow">
+                  <Link href="/invoices/create">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Crear Primera Factura
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="rounded-lg border border-border/50 overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/30 hover:bg-muted/30">
+                      <TableHead className="font-semibold">Cliente</TableHead>
+                      <TableHead className="font-semibold">Número</TableHead>
+                      <TableHead className="font-semibold">Monto</TableHead>
+                      <TableHead className="font-semibold">Estado</TableHead>
+                      <TableHead className="font-semibold">Vencimiento</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {mockInvoices.map(invoice => (
+                      <TableRow
+                        key={invoice.id}
+                        className="table-row-interactive cursor-pointer"
+                      >
+                        <TableCell className="font-medium">{invoice.client_name}</TableCell>
+                        <TableCell className="font-mono text-sm text-muted-foreground">{invoice.invoice_number}</TableCell>
+                        <TableCell className="font-medium">{formatCurrency(invoice.total)}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className={statusConfig[invoice.status].className}>
+                            {statusConfig[invoice.status].label}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {formatDate(invoice.due_date)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+    </motion.div>
   );
 }

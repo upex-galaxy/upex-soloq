@@ -1,75 +1,72 @@
 # Include Logo and Business Data in PDF
 
-**Jira Key:** [SQ-33](https://upexgalaxy64.atlassian.net/browse/SQ-33)
-**Epic:** [SQ-31](https://upexgalaxy64.atlassian.net/browse/SQ-31) (PDF Generation)
-**Priority:** High
+**Jira Key:** [SQ-33](https://upexgalaxy65.atlassian.net/browse/SQ-33)
+**Epic:** [SQ-31](https://upexgalaxy65.atlassian.net/browse/SQ-31) (PDF Generation & Download)
+**Priority:** Medium
 **Story Points:** 3
-**Status:** Backlog
+**Status:** Ready For QA
 
 ---
 
 ## User Story
 
-**As a** user
-**I want to** have the PDF include my logo and business data
-**So that** I project professionalism
+## User Story
+
+***As a*** user
+***I want to*** the PDF to include my logo and business data
+***So that*** I project professionalism
+
+## Acceptance Criteria
+
+### Scenario 1: Logo in PDF header
+
+- ***Given:*** I have a logo configured
+- ***When:*** I generate a PDF
+- ***Then:*** My logo appears in the header
+
+### Scenario 2: Business info in PDF
+
+- ***Given:*** I have business profile configured
+- ***When:*** I generate a PDF
+- ***Then:*** Business name, address, tax ID appear correctly
+
+## Story Points
+
+3
 
 ---
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Logo display
+Feature:
 
-- **Given:** I have uploaded a logo
-- **When:** I view the PDF
-- **Then:** My logo appears in the header
+Background:
+Given ...
 
-### Scenario 2: Business name
-
-- **Given:** I have configured my business name
-- **When:** I view the PDF
-- **Then:** My business name appears prominently
-
-### Scenario 3: Contact information
-
-- **Given:** I have configured my contact info
-- **When:** I view the PDF
-- **Then:** My email, phone, and address appear
-
-### Scenario 4: Tax ID
-
-- **Given:** I have configured my tax ID
-- **When:** I view the PDF
-- **Then:** My tax ID (RFC/NIT/CUIT) appears
-
-### Scenario 5: No logo fallback
-
-- **Given:** I haven't uploaded a logo
-- **When:** I view the PDF
-- **Then:** The layout adjusts gracefully without a logo
-
----
-
-## Technical Notes
-
-- Logo: max dimensions, proper scaling
-- Business data from business_profiles table
-- Fallback layout when logo is missing
-- Logo format: PNG, JPG (with transparency support)
+Scenario: ...
+Given ...
+When ...
+Then ...
 
 ---
 
 ## Definition of Done
 
-- [ ] Logo rendering working
-- [ ] Business name displayed
-- [ ] Contact info displayed
-- [ ] Tax ID displayed
-- [ ] No-logo fallback working
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-31-pdf-generation/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 2/19/2026
+- **Reporter:** Ely
+- **Assignee:** Arkaitz
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:53:55.464Z_

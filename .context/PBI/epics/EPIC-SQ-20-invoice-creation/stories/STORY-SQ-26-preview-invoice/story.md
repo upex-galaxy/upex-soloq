@@ -1,75 +1,84 @@
 # Preview Invoice Before Sending
 
-**Jira Key:** [SQ-26](https://upexgalaxy64.atlassian.net/browse/SQ-26)
-**Epic:** [SQ-20](https://upexgalaxy64.atlassian.net/browse/SQ-20) (Invoice Creation)
-**Priority:** High
-**Story Points:** 3
-**Status:** Backlog
+**Jira Key:** [SQ-26](https://upexgalaxy65.atlassian.net/browse/SQ-26)
+**Epic:** [SQ-20](https://upexgalaxy65.atlassian.net/browse/SQ-20) (Invoice Creation)
+**Priority:** Medium
+**Story Points:** 8
+**Status:** Ready For QA
 
 ---
 
 ## User Story
 
-**As a** user
-**I want to** preview the invoice before sending
-**So that** I can verify everything is correct
+## User Story
 
----
+***As a*** user
+***I want to*** preview the invoice before sending
+***So that*** I can verify everything is correct
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Open preview
+### Scenario 1: View invoice preview
 
-- **Given:** I am creating/editing an invoice
-- **When:** I click "Preview"
-- **Then:** I see a preview of how the invoice will look
+- ***Given:*** I have filled in invoice details
+- ***When:*** I click "Preview"
+- ***Then:*** I see the invoice as it will appear to the client
 
-### Scenario 2: Preview shows all data
+### Scenario 2: Edit from preview
 
-- **Given:** I am viewing the preview
-- **When:** I review the content
-- **Then:** I see business data, client data, items, totals, and payment methods
+- ***Given:*** I am viewing a preview
+- ***When:*** I notice an error
+- ***Then:*** I can go back and edit
 
-### Scenario 3: Return to edit
+### Scenario 3: Send from preview
 
-- **Given:** I am viewing the preview
-- **When:** I click "Edit" or close
-- **Then:** I return to the invoice form with my data intact
-
-### Scenario 4: Send from preview
-
-- **Given:** I am viewing the preview
-- **When:** I click "Send"
-- **Then:** The invoice is sent to the client
-
-### Scenario 5: Download from preview
-
-- **Given:** I am viewing the preview
-- **When:** I click "Download PDF"
-- **Then:** The invoice PDF is downloaded
-
----
+- ***Given:*** I am viewing a preview and everything is correct
+- ***When:*** I click "Send"
+- ***Then:*** The invoice is sent to the client
 
 ## Technical Notes
 
-- Preview renders same template as PDF
-- Modal or full-page preview
-- Includes all invoice sections
-- Quick actions: Edit, Send, Download
+- Real-time preview component
+- Same layout as PDF
+- Edit/Send buttons in preview mode
+
+## Story Points
+
+3
+
+---
+
+## Acceptance Criteria
+
+Feature:
+
+Background:
+Given ...
+
+Scenario: ...
+Given ...
+When ...
+Then ...
 
 ---
 
 ## Definition of Done
 
-- [ ] Preview modal/page implemented
-- [ ] All invoice data displayed correctly
-- [ ] Edit navigation working
-- [ ] Send from preview working
-- [ ] Download from preview working
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-20-invoice-creation/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 2/26/2026
+- **Reporter:** Ely
+- **Assignee:** Marianela Portas
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:53:51.575Z_

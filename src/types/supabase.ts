@@ -26,6 +26,7 @@ export type Database = {
           invoice_prefix: string | null
           logo_url: string | null
           tax_id: string | null
+          tax_id_type: string | null
           updated_at: string | null
           user_id: string
         }
@@ -40,6 +41,7 @@ export type Database = {
           invoice_prefix?: string | null
           logo_url?: string | null
           tax_id?: string | null
+          tax_id_type?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -54,6 +56,7 @@ export type Database = {
           invoice_prefix?: string | null
           logo_url?: string | null
           tax_id?: string | null
+          tax_id_type?: string | null
           updated_at?: string | null
           user_id?: string
         }

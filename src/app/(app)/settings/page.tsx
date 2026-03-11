@@ -9,6 +9,7 @@ import { useBusinessProfile } from '@/hooks/business-profile';
 import { BusinessNameForm } from '@/components/settings/business-name-form';
 import { LogoUpload } from '@/components/settings/logo-upload';
 import { ContactInfoForm } from '@/components/settings/contact-info-form';
+import { TaxIdForm } from '@/components/settings/tax-id-form';
 import { useAuth } from '@/contexts/auth-context';
 
 export default function SettingsPage() {
@@ -97,10 +98,21 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="tax" className="mt-6">
-          <ComingSoonCard
-            title="Datos Fiscales"
-            description="Configura tu identificación fiscal (RFC, NIT, CUIT)."
-          />
+          {isLoading ? (
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-5 w-48" />
+                <Skeleton className="h-4 w-72" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-32" />
+              </CardContent>
+            </Card>
+          ) : (
+            <TaxIdForm businessProfile={profile ?? null} />
+          )}
         </TabsContent>
 
         <TabsContent value="payment" className="mt-6">

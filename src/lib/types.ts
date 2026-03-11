@@ -122,6 +122,12 @@ export type ClientWithStats = Client & {
 };
 
 // =============================================================================
+// Tax ID Type (stored in business_profiles.tax_id_type)
+// =============================================================================
+
+export type TaxIdType = 'RFC' | 'NIT' | 'CUIT' | 'RUT' | 'RUC' | 'Tax ID';
+
+// =============================================================================
 // Business Address (JSONB structure for business_profiles.address)
 // =============================================================================
 

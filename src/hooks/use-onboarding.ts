@@ -96,7 +96,9 @@ export function useOnboarding(): UseOnboardingReturn {
             businessName: businessProfile.business_name || '',
             contactEmail: businessProfile.contact_email || user.email || '',
             contactPhone: businessProfile.contact_phone || '',
-            address: businessProfile.address || '',
+            address: typeof businessProfile.address === 'string'
+              ? businessProfile.address
+              : (businessProfile.address as Record<string, string> | null)?.street || '',
             logoUrl: businessProfile.logo_url || null,
           }));
         } else {

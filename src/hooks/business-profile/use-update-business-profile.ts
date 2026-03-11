@@ -19,10 +19,21 @@ async function updateBusinessProfile(data: BusinessProfileUpdate): Promise<Busin
     throw new Error('No autorizado');
   }
 
+  // If business_name is not provided, fetch it from existing profile for the upsert
+  let businessName = data.business_name;
+  if (!businessName) {
+    const { data: existing } = await supabase
+      .from('business_profiles')
+      .select('business_name')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    businessName = existing?.business_name ?? '';
+  }
+
   const { data: profile, error } = await supabase
     .from('business_profiles')
     .upsert(
-      { ...data, user_id: user.id, business_name: data.business_name! } satisfies BusinessProfileInsert,
+      { ...data, user_id: user.id, business_name: businessName } satisfies BusinessProfileInsert,
       { onConflict: 'user_id' }
     )
     .select()

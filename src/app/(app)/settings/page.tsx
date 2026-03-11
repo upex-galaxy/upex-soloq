@@ -8,8 +8,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useBusinessProfile } from '@/hooks/business-profile';
 import { BusinessNameForm } from '@/components/settings/business-name-form';
 import { LogoUpload } from '@/components/settings/logo-upload';
+import { ContactInfoForm } from '@/components/settings/contact-info-form';
+import { useAuth } from '@/contexts/auth-context';
 
 export default function SettingsPage() {
+  const { user } = useAuth();
   const { data: profile, isLoading } = useBusinessProfile();
 
   return (
@@ -63,10 +66,34 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="contact" className="mt-6">
-          <ComingSoonCard
-            title="Información de Contacto"
-            description="Configura tu email, teléfono y dirección de contacto."
-          />
+          {isLoading ? (
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-5 w-48" />
+                <Skeleton className="h-4 w-72" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-px w-full" />
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <div className="grid grid-cols-2 gap-4">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <Skeleton className="h-10 w-32" />
+              </CardContent>
+            </Card>
+          ) : (
+            <ContactInfoForm
+              businessProfile={profile ?? null}
+              userEmail={user?.email ?? undefined}
+            />
+          )}
         </TabsContent>
 
         <TabsContent value="tax" className="mt-6">

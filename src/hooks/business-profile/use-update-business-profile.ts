@@ -6,7 +6,7 @@ import type { BusinessProfile, BusinessProfileUpdate } from '@/lib/types';
 
 /**
  * Updates the current user's business profile via Supabase client
- * Uses upsert to handle both first-time setup and updates
+ * Profile must already exist (created during onboarding)
  */
 async function updateBusinessProfile(data: BusinessProfileUpdate): Promise<BusinessProfile> {
   const supabase = createClient();

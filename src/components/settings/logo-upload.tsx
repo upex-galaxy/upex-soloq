@@ -96,7 +96,7 @@ export function LogoUpload({ businessProfile, onSuccess }: LogoUploadProps) {
         }
       }
     },
-    [businessProfile?.logo_url, updateProfile, onSuccess]
+    [businessProfile?.logo_url, businessProfile?.business_name, updateProfile, onSuccess]
   );
 
   const handleRemove = useCallback(async () => {
@@ -125,7 +125,7 @@ export function LogoUpload({ businessProfile, onSuccess }: LogoUploadProps) {
     } finally {
       setIsRemoving(false);
     }
-  }, [businessProfile?.logo_url, updateProfile, onSuccess]);
+  }, [businessProfile?.logo_url, businessProfile?.business_name, updateProfile, onSuccess]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

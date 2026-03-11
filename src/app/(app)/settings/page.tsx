@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton';
 import { useBusinessProfile } from '@/hooks/business-profile';
 import { BusinessNameForm } from '@/components/settings/business-name-form';
+import { LogoUpload } from '@/components/settings/logo-upload';
 
 export default function SettingsPage() {
   const { data: profile, isLoading } = useBusinessProfile();
@@ -54,7 +55,10 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
           ) : (
-            <BusinessNameForm businessProfile={profile ?? null} />
+            <>
+              <BusinessNameForm businessProfile={profile ?? null} />
+              <LogoUpload businessProfile={profile ?? null} />
+            </>
           )}
         </TabsContent>
 

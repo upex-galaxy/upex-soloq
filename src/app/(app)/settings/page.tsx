@@ -19,22 +19,24 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="profile" data-testid="settings_tabs">
-        <TabsList>
+        <TabsList className="w-full lg:w-fit">
           <TabsTrigger value="profile" data-testid="tab_profile">
-            <Building2 className="mr-2 h-4 w-4" />
+            <Building2 className="mr-2 h-4 w-4 hidden lg:block" />
             Perfil
           </TabsTrigger>
           <TabsTrigger value="contact" data-testid="tab_contact">
-            <Mail className="mr-2 h-4 w-4" />
+            <Mail className="mr-2 h-4 w-4 hidden lg:block" />
             Contacto
           </TabsTrigger>
           <TabsTrigger value="tax" data-testid="tab_tax">
-            <Settings className="mr-2 h-4 w-4" />
-            Datos Fiscales
+            <Settings className="mr-2 h-4 w-4 hidden lg:block" />
+            <span className="lg:hidden">Fiscal</span>
+            <span className="hidden lg:inline">Datos Fiscales</span>
           </TabsTrigger>
           <TabsTrigger value="payment" data-testid="tab_payment">
-            <CreditCard className="mr-2 h-4 w-4" />
-            Métodos de Pago
+            <CreditCard className="mr-2 h-4 w-4 hidden lg:block" />
+            <span className="lg:hidden">Pagos</span>
+            <span className="hidden lg:inline">Métodos de Pago</span>
           </TabsTrigger>
         </TabsList>
 

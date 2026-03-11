@@ -2,11 +2,11 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
-import type { BusinessProfile, BusinessProfileUpdate } from '@/lib/types';
+import type { BusinessProfile, BusinessProfileInsert, BusinessProfileUpdate } from '@/lib/types';
 
 /**
- * Updates the current user's business profile via Supabase client
- * Profile must already exist (created during onboarding)
+ * Updates or creates the current user's business profile via Supabase client
+ * Uses upsert to handle both first-time setup and updates
  */
 async function updateBusinessProfile(data: BusinessProfileUpdate): Promise<BusinessProfile> {
   const supabase = createClient();
@@ -21,8 +21,10 @@ async function updateBusinessProfile(data: BusinessProfileUpdate): Promise<Busin
 
   const { data: profile, error } = await supabase
     .from('business_profiles')
-    .update(data)
-    .eq('user_id', user.id)
+    .upsert(
+      { ...data, user_id: user.id, business_name: data.business_name! } satisfies BusinessProfileInsert,
+      { onConflict: 'user_id' }
+    )
     .select()
     .single();
 

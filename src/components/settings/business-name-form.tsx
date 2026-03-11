@@ -80,6 +80,7 @@ export function BusinessNameForm({ businessProfile, onSuccess }: BusinessNameFor
                     <div className="relative">
                       <Input
                         {...field}
+                        className="pr-16"
                         maxLength={100}
                         placeholder="Ej: Diseño Creativo García"
                         data-testid="business-name-input"

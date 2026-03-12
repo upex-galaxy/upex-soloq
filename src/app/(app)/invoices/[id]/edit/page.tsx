@@ -201,7 +201,7 @@ export default function EditInvoicePage() {
     }
   }, [invoice, clientsData?.clients, form, markClean]);
 
-  // Unsaved changes warning (TC-11)
+  // Unsaved changes warning (TC-11) - browser navigation (refresh, close tab)
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isDirty) {
@@ -213,6 +213,24 @@ export default function EditInvoicePage() {
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
+
+  // Unsaved changes warning (TC-11) - client-side navigation (SQ-122 fix)
+  // Next.js App Router uses history.pushState for <Link> clicks;
+  // intercept it to show a confirmation dialog when there are pending changes
+  useEffect(() => {
+    if (!isDirty) return;
+
+    const originalPushState = history.pushState.bind(history);
+    history.pushState = function (state, title, url) {
+      if (window.confirm('Tienes cambios sin guardar. ¿Deseas salir de todas formas?')) {
+        originalPushState(state, title, url);
+      }
+    };
+
+    return () => {
+      history.pushState = originalPushState;
+    };
   }, [isDirty]);
 
   // Handle client selection

@@ -135,6 +135,11 @@ export function InvoicePreviewDialog({
   const [previewState, setPreviewState] = useState<PreviewState>('loading');
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
 
+  // Capture previewData snapshot when dialog opens to prevent BlobProvider
+  // from restarting PDF generation on every parent re-render (form.getValues()
+  // creates a new object reference each time the form re-renders)
+  const [capturedData, setCapturedData] = useState<InvoiceWithDetails | null>(null);
+
   // Lazy load InvoiceDocument to ensure it's ready before BlobProvider renders
   const [DocComponent, setDocComponent] = useState<InvoiceDocumentType | null>(null);
   useEffect(() => {
@@ -153,12 +158,15 @@ export function InvoicePreviewDialog({
   // Ref for tracking blob URL to cleanup
   const previousBlobUrlRef = useRef<string | null>(null);
 
-  // Reset state when dialog opens
+  // Reset state and capture data snapshot when dialog opens
   useEffect(() => {
     if (open) {
+      setCapturedData(previewData);
       setPreviewState('loading');
       setDownloadSuccess(false);
     }
+  // NOTE: previewData intentionally excluded from deps — we capture a snapshot
+  // only when the dialog opens to prevent BlobProvider restart loops
   }, [open]);
 
   // Cleanup blob URLs
@@ -197,6 +205,9 @@ export function InvoicePreviewDialog({
     }
   }, []);
 
+  // Stable reference for rendering — use captured snapshot, fall back to live prop
+  const stableData = capturedData ?? previewData;
+
   // Handle download (TC-005)
   const handleDownload = useCallback(() => {
     if (!blobUrl || isDownloading) return;
@@ -206,8 +217,8 @@ export function InvoicePreviewDialog({
 
     try {
       const filename = generateInvoiceFilename(
-        previewData.invoice_number,
-        previewData.client.name
+        stableData.invoice_number,
+        stableData.client.name
       );
 
       const link = document.createElement('a');
@@ -222,7 +233,7 @@ export function InvoicePreviewDialog({
     } finally {
       setIsDownloading(false);
     }
-  }, [blobUrl, isDownloading, previewData.invoice_number, previewData.client.name]);
+  }, [blobUrl, isDownloading, stableData.invoice_number, stableData.client.name]);
 
   // Handle edit (TC-003)
   const handleEdit = useCallback(() => {
@@ -257,9 +268,9 @@ export function InvoicePreviewDialog({
             Vista previa de factura
           </DialogTitle>
           <DialogDescription>
-            {previewData.invoice_number !== 'BORRADOR'
-              ? `Factura ${previewData.invoice_number} para ${previewData.client.name}`
-              : `Borrador de factura para ${previewData.client.name}`}
+            {stableData.invoice_number !== 'BORRADOR'
+              ? `Factura ${stableData.invoice_number} para ${stableData.client.name}`
+              : `Borrador de factura para ${stableData.client.name}`}
           </DialogDescription>
         </DialogHeader>
 
@@ -287,7 +298,7 @@ export function InvoicePreviewDialog({
               <p className="text-muted-foreground">Generando vista previa...</p>
             </div>
           ) : (
-            <BlobProvider document={<DocComponent data={previewData} />}>
+            <BlobProvider document={<DocComponent data={stableData} />}>
               {({ blob, loading, error }) => (
                 <>
                   <BlobProviderBridge
@@ -313,7 +324,7 @@ export function InvoicePreviewDialog({
                       <iframe
                         src={blobUrl}
                         className="w-full h-[500px] border-0"
-                        title={`Vista previa de factura ${previewData.invoice_number}`}
+                        title={`Vista previa de factura ${stableData.invoice_number}`}
                         data-testid="pdf-preview-iframe"
                       />
                     </div>

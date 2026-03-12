@@ -64,7 +64,12 @@ function buildFormSchema(type: PaymentMethodType, country?: string) {
     case 'bank_transfer': {
       const bankSchema = z.object({
         bank_name: z.string().min(1, 'Nombre del banco requerido'),
-        account_number: z.string().optional().or(z.literal('')),
+        account_number: z
+          .string()
+          .regex(/^[a-zA-Z0-9]*$/, 'Solo caracteres alfanuméricos')
+          .max(34, 'Máximo 34 caracteres')
+          .optional()
+          .or(z.literal('')),
         clabe: country === 'MX'
           ? z.string().regex(/^\d{18}$/, 'CLABE debe tener 18 dígitos')
           : z.string().optional().or(z.literal('')),
@@ -365,7 +370,7 @@ function DynamicValueFields({
                 <FormItem>
                   <FormLabel>Número de cuenta</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Número de cuenta bancaria" />
+                    <Input {...field} placeholder="Número de cuenta bancaria" maxLength={34} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

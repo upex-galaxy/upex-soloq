@@ -7,7 +7,12 @@ import type { PaymentMethodType, PaymentMethodValue } from '@/lib/types';
 
 export const bankTransferValueSchema = z.object({
   bank_name: z.string().min(1, 'Nombre del banco requerido'),
-  account_number: z.string().optional().or(z.literal('')),
+  account_number: z
+    .string()
+    .regex(/^[a-zA-Z0-9]*$/, 'Solo caracteres alfanuméricos')
+    .max(34, 'Máximo 34 caracteres')
+    .optional()
+    .or(z.literal('')),
   clabe: z
     .string()
     .regex(/^\d{18}$/, 'CLABE debe tener 18 dígitos')

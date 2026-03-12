@@ -363,52 +363,54 @@ export default function EditInvoicePage() {
   return (
     <div className="space-y-6" data-testid="edit-invoice-page">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" className="shrink-0" asChild>
             <Link href="/invoices">
               <ArrowLeft className="h-4 w-4" />
               <span className="sr-only">Volver</span>
             </Link>
           </Button>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold tracking-tight">{invoice.invoice_number}</h1>
-              <InvoiceStatusBadge status={invoice.status} />
-            </div>
-            <p className="text-muted-foreground">Editando borrador de factura</p>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight truncate">
+              {invoice.invoice_number}
+            </h1>
+            <p className="text-sm text-muted-foreground">Editando borrador de factura</p>
           </div>
         </div>
 
-        {/* Auto-save indicator (TC-02, TC-09) */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          {isSaving && (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Guardando...</span>
-            </>
-          )}
-          {!isSaving && isSaveError && (
-            <>
-              <AlertCircle className="h-4 w-4 text-destructive" />
-              <span className="text-destructive">Error al guardar</span>
-              <Button variant="ghost" size="sm" onClick={resetError}>
-                Reintentar
-              </Button>
-            </>
-          )}
-          {!isSaving && !isSaveError && lastSaved && (
-            <>
-              <Check className="h-4 w-4 text-green-500" />
-              <span>Guardado a las {lastSaved.toLocaleTimeString()}</span>
-            </>
-          )}
-          {!isSaving && !isSaveError && isDirty && (
-            <>
-              <Clock className="h-4 w-4" />
-              <span>Cambios sin guardar</span>
-            </>
-          )}
+        {/* Status + Auto-save indicator row */}
+        <div className="flex items-center justify-between gap-3 pl-12">
+          <InvoiceStatusBadge status={invoice.status} />
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            {isSaving && (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <span>Guardando...</span>
+              </>
+            )}
+            {!isSaving && isSaveError && (
+              <>
+                <AlertCircle className="h-3.5 w-3.5 text-destructive" />
+                <span className="text-destructive">Error al guardar</span>
+                <Button variant="ghost" size="sm" onClick={resetError}>
+                  Reintentar
+                </Button>
+              </>
+            )}
+            {!isSaving && !isSaveError && lastSaved && (
+              <>
+                <Check className="h-3.5 w-3.5 text-green-500" />
+                <span>Guardado a las {lastSaved.toLocaleTimeString()}</span>
+              </>
+            )}
+            {!isSaving && !isSaveError && isDirty && (
+              <>
+                <Clock className="h-3.5 w-3.5" />
+                <span>Cambios sin guardar</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
 

@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
-import dynamic from 'next/dynamic';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Loader2, Download, Pencil, Send, FileText, Check, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -15,33 +14,16 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useSendInvoice } from '@/hooks/invoices';
+import { usePdfGenerator } from '@/hooks/use-pdf-generator';
 import { generateInvoiceFilename } from '@/lib/utils/pdf-utils';
 import type { InvoiceWithDetails } from '@/hooks/invoices/use-invoice';
 
 // =============================================================================
-// Dynamic Imports - Avoid SSR issues with react-pdf
-// =============================================================================
-
-const BlobProvider = dynamic(() => import('@react-pdf/renderer').then(mod => mod.BlobProvider), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center h-[500px]">
-      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-    </div>
-  ),
-});
-
-const InvoiceDocument = dynamic(
-  () =>
-    import('@/app/(app)/invoices/[id]/components/invoice-document').then(mod => ({
-      default: mod.InvoiceDocument,
-    })),
-  { ssr: false }
-);
-
-// =============================================================================
 // Types
 // =============================================================================
+
+// InvoiceDocument type for lazy loading
+type InvoiceDocumentType = React.ComponentType<{ data: InvoiceWithDetails }>;
 
 interface InvoicePreviewDialogProps {
   /** Whether the dialog is open */
@@ -56,44 +38,17 @@ interface InvoicePreviewDialogProps {
   onSendSuccess?: () => void;
 }
 
-type PreviewState = 'loading' | 'ready' | 'error';
-
 // =============================================================================
-// InvoicePreviewDialog Component (SQ-26)
+// InvoicePreviewDialog Component (SQ-26, SQ-126 refactor)
 // =============================================================================
 
 /**
- * Dialog component for previewing an invoice before sending
+ * Dialog component for previewing an invoice before sending.
  *
- * Features:
- * - PDF preview using react-pdf
- * - Edit button (closes dialog to return to form)
- * - Download PDF button
- * - Send button (only when invoiceId is provided)
+ * Uses pdf().toBlob() API instead of BlobProvider to avoid render loops.
+ * PDF is generated once when the dialog opens using a data snapshot.
  *
- * Test Cases covered:
- * - TC-001: Open preview from form
- * - TC-002: Preview shows all data
- * - TC-003: Return to edit from preview
- * - TC-004: Send invoice from preview
- * - TC-005: Download PDF from preview
- *
- * @example
- * // In create page (no Send button)
- * <InvoicePreviewDialog
- *   open={isPreviewOpen}
- *   onOpenChange={setIsPreviewOpen}
- *   previewData={buildPreviewData(formValues, client, businessProfile)}
- * />
- *
- * // In edit page (with Send button)
- * <InvoicePreviewDialog
- *   open={isPreviewOpen}
- *   onOpenChange={setIsPreviewOpen}
- *   previewData={buildPreviewData(formValues, client, businessProfile, invoiceId)}
- *   invoiceId={invoiceId}
- *   onSendSuccess={() => router.push('/invoices')}
- * />
+ * @see .context/PRD/pdf-live-preview-documentation.md
  */
 export function InvoicePreviewDialog({
   open,
@@ -102,9 +57,15 @@ export function InvoicePreviewDialog({
   invoiceId,
   onSendSuccess,
 }: InvoicePreviewDialogProps) {
-  // PDF generation state
-  const [previewState, setPreviewState] = useState<PreviewState>('loading');
-  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  // PDF generation via stable pdf().toBlob() API
+  const { state, pdfUrl, pdfBlob, generatePdf, reset } = usePdfGenerator();
+
+  // Lazy-loaded InvoiceDocument component
+  const docComponentRef = useRef<InvoiceDocumentType | null>(null);
+  const [docReady, setDocReady] = useState(false);
+
+  // Snapshot of previewData captured when dialog opens
+  const capturedDataRef = useRef<InvoiceWithDetails | null>(null);
 
   // Download state
   const [isDownloading, setIsDownloading] = useState(false);
@@ -113,79 +74,72 @@ export function InvoicePreviewDialog({
   // Send invoice mutation
   const { mutate: sendInvoice, isPending: isSending } = useSendInvoice();
 
-  // Ref for tracking blob URL to cleanup
-  const previousBlobUrlRef = useRef<string | null>(null);
-
-  // Reset state when dialog opens
+  // Lazy load InvoiceDocument on mount
   useEffect(() => {
-    if (open) {
-      setPreviewState('loading');
-      setDownloadSuccess(false);
-    }
-  }, [open]);
-
-  // Cleanup blob URLs
-  useEffect(() => {
-    return () => {
-      if (previousBlobUrlRef.current) {
-        URL.revokeObjectURL(previousBlobUrlRef.current);
-      }
-      if (blobUrl) {
-        URL.revokeObjectURL(blobUrl);
-      }
-    };
+    import('@/app/(app)/invoices/[id]/components/invoice-document')
+      .then(mod => {
+        docComponentRef.current = mod.InvoiceDocument;
+        setDocReady(true);
+      })
+      .catch(err => {
+        console.error('Failed to load InvoiceDocument:', err);
+      });
   }, []);
 
-  // Track blob URL changes for cleanup
+  // Generate PDF when dialog opens and DocComponent is ready
   useEffect(() => {
-    if (previousBlobUrlRef.current && previousBlobUrlRef.current !== blobUrl) {
-      URL.revokeObjectURL(previousBlobUrlRef.current);
-    }
-    previousBlobUrlRef.current = blobUrl;
-  }, [blobUrl]);
+    if (!open) return;
 
-  // Handle PDF blob generation
-  const handleBlobUpdate = useCallback((blob: Blob | null, error: Error | null) => {
-    if (error) {
-      console.error('PDF generation error:', error);
-      setPreviewState('error');
-      setBlobUrl(null);
-      return;
-    }
+    // Capture data snapshot to prevent re-generation from parent re-renders
+    capturedDataRef.current = previewData;
+    setDownloadSuccess(false);
 
-    if (blob) {
-      const url = URL.createObjectURL(blob);
-      setBlobUrl(url);
-      setPreviewState('ready');
+    if (docReady && docComponentRef.current) {
+      const DocComponent = docComponentRef.current;
+      const element = <DocComponent data={previewData} />;
+      generatePdf(element);
     }
-  }, []);
+    // previewData intentionally excluded from deps - we snapshot on open only
+  }, [open, docReady, generatePdf]);
+
+  // Reset PDF state when dialog closes
+  useEffect(() => {
+    if (!open) {
+      reset();
+    }
+  }, [open, reset]);
+
+  // Stable data reference for UI labels
+  const stableData = capturedDataRef.current ?? previewData;
 
   // Handle download (TC-005)
   const handleDownload = useCallback(() => {
-    if (!blobUrl || isDownloading) return;
+    if (!pdfBlob || isDownloading) return;
 
     setIsDownloading(true);
     setDownloadSuccess(false);
 
     try {
       const filename = generateInvoiceFilename(
-        previewData.invoice_number,
-        previewData.client.name
+        stableData.invoice_number,
+        stableData.client.name
       );
 
+      const url = URL.createObjectURL(pdfBlob);
       const link = document.createElement('a');
-      link.href = blobUrl;
+      link.href = url;
       link.download = filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
       setDownloadSuccess(true);
       setTimeout(() => setDownloadSuccess(false), 2000);
     } finally {
       setIsDownloading(false);
     }
-  }, [blobUrl, isDownloading, previewData.invoice_number, previewData.client.name]);
+  }, [pdfBlob, isDownloading, stableData.invoice_number, stableData.client.name]);
 
   // Handle edit (TC-003)
   const handleEdit = useCallback(() => {
@@ -208,6 +162,10 @@ export function InvoicePreviewDialog({
     });
   }, [invoiceId, isSending, sendInvoice, onOpenChange, onSendSuccess]);
 
+  const isReady = state === 'ready';
+  const isError = state === 'error';
+  const isLoading = state === 'idle' || state === 'generating';
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -220,15 +178,15 @@ export function InvoicePreviewDialog({
             Vista previa de factura
           </DialogTitle>
           <DialogDescription>
-            {previewData.invoice_number !== 'BORRADOR'
-              ? `Factura ${previewData.invoice_number} para ${previewData.client.name}`
-              : `Borrador de factura para ${previewData.client.name}`}
+            {stableData.invoice_number !== 'BORRADOR'
+              ? `Factura ${stableData.invoice_number} para ${stableData.client.name}`
+              : `Borrador de factura para ${stableData.client.name}`}
           </DialogDescription>
         </DialogHeader>
 
         {/* Preview content */}
         <div className="flex-1 overflow-auto bg-muted/50 rounded-lg min-h-[400px]">
-          {previewState === 'error' ? (
+          {isError && (
             <div
               className="flex flex-col items-center justify-center h-full gap-4 p-8"
               data-testid="preview-error-state"
@@ -240,61 +198,41 @@ export function InvoicePreviewDialog({
                 Por favor, verifica los datos e intenta de nuevo.
               </p>
             </div>
-          ) : (
-            <BlobProvider document={<InvoiceDocument data={previewData} />}>
-              {({ blob, loading, error }) => {
-                // Update state based on BlobProvider results
-                if (loading && previewState !== 'loading') {
-                  setPreviewState('loading');
-                }
+          )}
 
-                if (!loading && (blob || error)) {
-                  handleBlobUpdate(blob, error);
-                }
+          {isLoading && (
+            <div
+              className="flex flex-col items-center justify-center h-[500px] gap-4"
+              data-testid="preview-loading-state"
+            >
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-muted-foreground">Generando vista previa...</p>
+            </div>
+          )}
 
-                // Loading indicator
-                if (loading || previewState === 'loading') {
-                  return (
-                    <div
-                      className="flex flex-col items-center justify-center h-[500px] gap-4"
-                      data-testid="preview-loading-state"
-                    >
-                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                      <p className="text-muted-foreground">Generando vista previa...</p>
-                    </div>
-                  );
-                }
-
-                // PDF iframe preview
-                if (blobUrl && previewState === 'ready') {
-                  return (
-                    <div
-                      className="bg-white rounded-lg shadow-sm overflow-hidden"
-                      data-testid="preview-ready-state"
-                    >
-                      <iframe
-                        src={blobUrl}
-                        className="w-full h-[500px] border-0"
-                        title={`Vista previa de factura ${previewData.invoice_number}`}
-                        data-testid="pdf-preview-iframe"
-                      />
-                    </div>
-                  );
-                }
-
-                return null;
-              }}
-            </BlobProvider>
+          {isReady && pdfUrl && (
+            <div
+              className="bg-white rounded-lg shadow-sm overflow-hidden"
+              data-testid="preview-ready-state"
+            >
+              <iframe
+                src={pdfUrl}
+                className="w-full h-[500px] border-0"
+                title={`Vista previa de factura ${stableData.invoice_number}`}
+                data-testid="pdf-preview-iframe"
+              />
+            </div>
           )}
         </div>
 
         {/* Actions */}
-        <DialogFooter className="flex-row justify-between sm:justify-between gap-2">
+        <DialogFooter className="flex-col sm:flex-row sm:justify-between gap-2">
           {/* Edit button - left side */}
           <Button
             variant="outline"
             onClick={handleEdit}
             disabled={isSending}
+            className="w-full sm:w-auto"
             data-testid="preview-edit-button"
           >
             <Pencil className="h-4 w-4 mr-2" />
@@ -302,11 +240,12 @@ export function InvoicePreviewDialog({
           </Button>
 
           {/* Download and Send buttons - right side */}
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button
               variant="outline"
               onClick={handleDownload}
-              disabled={previewState !== 'ready' || isDownloading}
+              disabled={!isReady || isDownloading}
+              className="w-full sm:w-auto"
               data-testid="preview-download-button"
             >
               {isDownloading ? (
@@ -323,7 +262,8 @@ export function InvoicePreviewDialog({
             {invoiceId && (
               <Button
                 onClick={handleSend}
-                disabled={previewState !== 'ready' || isSending}
+                disabled={!isReady || isSending}
+                className="w-full sm:w-auto"
                 data-testid="preview-send-button"
               >
                 {isSending ? (

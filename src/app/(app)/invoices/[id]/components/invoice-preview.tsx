@@ -75,6 +75,9 @@ export function InvoicePreview({ invoice, InvoiceDocument }: InvoicePreviewProps
   // Ref for tracking previous blob URL to cleanup
   const previousBlobUrlRef = useRef<string | null>(null);
 
+  // Ref to track the last processed blob to prevent infinite re-render loop
+  const lastProcessedBlobRef = useRef<Blob | null>(null);
+
   // Cleanup blob URLs on unmount or when URL changes
   useEffect(() => {
     return () => {
@@ -114,6 +117,7 @@ export function InvoicePreview({ invoice, InvoiceDocument }: InvoicePreviewProps
   // Handle retry
   const handleRetry = useCallback(() => {
     setPreviewState('loading');
+    lastProcessedBlobRef.current = null;
     setRetryKey(prev => prev + 1);
   }, []);
 
@@ -196,13 +200,15 @@ export function InvoicePreview({ invoice, InvoiceDocument }: InvoicePreviewProps
         {previewState !== 'error' && (
           <BlobProvider key={retryKey} document={<InvoiceDocument data={debouncedInvoice} />}>
             {({ blob, loading, error }) => {
-              // Update state based on BlobProvider results
-              if (loading && previewState !== 'loading') {
-                setPreviewState('loading');
-              }
-
-              if (!loading && (blob || error)) {
-                handleBlobUpdate(blob, error);
+              // Guard: only process state transitions once per blob instance
+              if (!loading && error) {
+                handleBlobUpdate(null, error);
+              } else if (!loading && blob && blob !== lastProcessedBlobRef.current) {
+                lastProcessedBlobRef.current = blob;
+                handleBlobUpdate(blob, null);
+              } else if (!loading && !blob && !error && previewState === 'loading') {
+                // Edge case: BlobProvider finished but returned nothing
+                handleBlobUpdate(null, new Error('PDF generation returned empty result'));
               }
 
               // Loading indicator

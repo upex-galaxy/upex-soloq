@@ -116,11 +116,15 @@ export function InvoicePreviewDialog({
   // Ref for tracking blob URL to cleanup
   const previousBlobUrlRef = useRef<string | null>(null);
 
+  // Ref to track the last processed blob to prevent infinite re-render loop
+  const lastProcessedBlobRef = useRef<Blob | null>(null);
+
   // Reset state when dialog opens
   useEffect(() => {
     if (open) {
       setPreviewState('loading');
       setDownloadSuccess(false);
+      lastProcessedBlobRef.current = null;
     }
   }, [open]);
 
@@ -243,13 +247,15 @@ export function InvoicePreviewDialog({
           ) : (
             <BlobProvider document={<InvoiceDocument data={previewData} />}>
               {({ blob, loading, error }) => {
-                // Update state based on BlobProvider results
-                if (loading && previewState !== 'loading') {
-                  setPreviewState('loading');
-                }
-
-                if (!loading && (blob || error)) {
-                  handleBlobUpdate(blob, error);
+                // Guard: only process state transitions once per blob instance
+                if (!loading && error) {
+                  handleBlobUpdate(null, error);
+                } else if (!loading && blob && blob !== lastProcessedBlobRef.current) {
+                  lastProcessedBlobRef.current = blob;
+                  handleBlobUpdate(blob, null);
+                } else if (!loading && !blob && !error && previewState === 'loading') {
+                  // Edge case: BlobProvider finished but returned nothing
+                  handleBlobUpdate(null, new Error('PDF generation returned empty result'));
                 }
 
                 // Loading indicator

@@ -147,8 +147,10 @@ export function PaymentMethodFormDialog({
     }
   }, [selectedType, isEditing, form]);
 
-  // Sync form when editing method changes
+  // Reset form when dialog opens or editing method changes
   useEffect(() => {
+    if (!open) return;
+
     if (method) {
       const parsed = parsePaymentValue(method.value, method.type);
       form.reset({
@@ -165,7 +167,7 @@ export function PaymentMethodFormDialog({
         value: getDefaultValueForType('bank_transfer') as Record<string, string>,
       });
     }
-  }, [method, form]);
+  }, [method, open, form]);
 
   async function handleSubmit(data: FormValues) {
     // Validate value with the type-specific schema

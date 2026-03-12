@@ -3,13 +3,14 @@
 import { Building2, CreditCard, Mail, Settings } from 'lucide-react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useBusinessProfile } from '@/hooks/business-profile';
 import { BusinessNameForm } from '@/components/settings/business-name-form';
 import { LogoUpload } from '@/components/settings/logo-upload';
 import { ContactInfoForm } from '@/components/settings/contact-info-form';
 import { TaxIdForm } from '@/components/settings/tax-id-form';
+import { PaymentMethodsSection } from '@/components/settings/payment-methods-section';
 import { useAuth } from '@/contexts/auth-context';
 
 export default function SettingsPage() {
@@ -116,32 +117,30 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="payment" className="mt-6">
-          <ComingSoonCard
-            title="Métodos de Pago"
-            description="Configura tus métodos de pago para incluir en las facturas."
-          />
+          {isLoading ? (
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-5 w-48" />
+                <Skeleton className="h-4 w-72" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center gap-4 py-4">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-4 w-40" />
+                      <Skeleton className="h-3 w-60" />
+                    </div>
+                    <Skeleton className="h-6 w-12" />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          ) : (
+            <PaymentMethodsSection businessProfile={profile ?? null} />
+          )}
         </TabsContent>
       </Tabs>
     </div>
-  );
-}
-
-function ComingSoonCard({ title, description }: { title: string; description: string }) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <Settings className="h-12 w-12 text-muted-foreground/50 mb-4" />
-          <h3 className="text-lg font-medium">Próximamente</h3>
-          <p className="text-muted-foreground max-w-md">
-            Esta sección será implementada en una próxima actualización.
-          </p>
-        </div>
-      </CardContent>
-    </Card>
   );
 }

@@ -163,6 +163,42 @@ export const LATAM_COUNTRIES = [
 export type LatamCountryCode = (typeof LATAM_COUNTRIES)[number]['code'];
 
 // =============================================================================
+// Payment Method Value Types (JSON stored in payment_methods.value)
+// =============================================================================
+
+export interface BankTransferValue {
+  bank_name: string;
+  account_number?: string;
+  clabe?: string; // MX - 18 digits
+  cbu?: string; // AR - 22 digits
+}
+
+export interface PaypalValue {
+  email: string;
+}
+
+export interface MercadoPagoValue {
+  alias?: string;
+  cvu?: string;
+}
+
+export interface CashPaymentValue {
+  instructions?: string;
+}
+
+export interface OtherPaymentValue {
+  name: string;
+  instructions?: string;
+}
+
+export type PaymentMethodValue =
+  | BankTransferValue
+  | PaypalValue
+  | MercadoPagoValue
+  | CashPaymentValue
+  | OtherPaymentValue;
+
+// =============================================================================
 // Constants (for UI selects, filters, etc.)
 // =============================================================================
 

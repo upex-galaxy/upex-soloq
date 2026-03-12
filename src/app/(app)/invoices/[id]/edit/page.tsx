@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -92,6 +92,9 @@ export default function EditInvoicePage() {
   // State for subtotal from line items (SQ-22)
   const [subtotal, setSubtotal] = useState(0);
 
+  // Track if invoice data has been loaded into form (prevents auto-save loop)
+  const hasLoadedInvoiceRef = useRef(false);
+
   // Fetch invoice data (TC-04)
   const {
     data: invoice,
@@ -151,8 +154,12 @@ export default function EditInvoicePage() {
   });
 
   // Load invoice data into form when available (TC-04)
+  // Only runs on initial load to prevent auto-save loop:
+  // auto-save PUT → invalidates query → invoice ref changes → form.reset → auto-save detects "change" → loop
   useEffect(() => {
-    if (invoice) {
+    if (invoice && !hasLoadedInvoiceRef.current) {
+      hasLoadedInvoiceRef.current = true;
+
       // Find the client object
       const client = clientsData?.clients?.find(c => c.id === invoice.client?.id);
       if (client) {

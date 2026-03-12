@@ -31,13 +31,42 @@ const BlobProvider = dynamic(() => import('@react-pdf/renderer').then(mod => mod
   ),
 });
 
-const InvoiceDocument = dynamic(
-  () =>
-    import('@/app/(app)/invoices/[id]/components/invoice-document').then(mod => ({
-      default: mod.InvoiceDocument,
-    })),
-  { ssr: false }
-);
+// InvoiceDocument type for lazy loading
+type InvoiceDocumentType = React.ComponentType<{ data: InvoiceWithDetails }>;
+
+// =============================================================================
+// BlobProviderBridge - Defers state updates to useEffect to avoid
+// calling setState during BlobProvider's render cycle (React anti-pattern)
+// =============================================================================
+
+function BlobProviderBridge({
+  blob,
+  loading,
+  error,
+  onUpdate,
+}: {
+  blob: Blob | null;
+  loading: boolean;
+  error: Error | null;
+  onUpdate: (blob: Blob | null, error: Error | null) => void;
+}) {
+  const lastProcessedBlobRef = useRef<Blob | null>(null);
+
+  useEffect(() => {
+    if (loading) return;
+
+    if (error) {
+      onUpdate(null, error);
+    } else if (blob && blob !== lastProcessedBlobRef.current) {
+      lastProcessedBlobRef.current = blob;
+      onUpdate(blob, null);
+    }
+    // If loading=false, blob=null, error=null: BlobProvider is in an
+    // intermediate state. Stay in loading and wait for blob or error.
+  }, [blob, loading, error, onUpdate]);
+
+  return null;
+}
 
 // =============================================================================
 // Types
@@ -106,6 +135,14 @@ export function InvoicePreviewDialog({
   const [previewState, setPreviewState] = useState<PreviewState>('loading');
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
 
+  // Lazy load InvoiceDocument to ensure it's ready before BlobProvider renders
+  const [DocComponent, setDocComponent] = useState<InvoiceDocumentType | null>(null);
+  useEffect(() => {
+    import('@/app/(app)/invoices/[id]/components/invoice-document')
+      .then(mod => setDocComponent(() => mod.InvoiceDocument))
+      .catch(() => setPreviewState('error'));
+  }, []);
+
   // Download state
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
@@ -116,15 +153,11 @@ export function InvoicePreviewDialog({
   // Ref for tracking blob URL to cleanup
   const previousBlobUrlRef = useRef<string | null>(null);
 
-  // Ref to track the last processed blob to prevent infinite re-render loop
-  const lastProcessedBlobRef = useRef<Blob | null>(null);
-
   // Reset state when dialog opens
   useEffect(() => {
     if (open) {
       setPreviewState('loading');
       setDownloadSuccess(false);
-      lastProcessedBlobRef.current = null;
     }
   }, [open]);
 
@@ -230,7 +263,8 @@ export function InvoicePreviewDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {/* Preview content */}
+        {/* Preview content - Only render BlobProvider when dialog is open to prevent
+            unnecessary PDF generation and flickering from previewData prop changes */}
         <div className="flex-1 overflow-auto bg-muted/50 rounded-lg min-h-[400px]">
           {previewState === 'error' ? (
             <div
@@ -244,23 +278,25 @@ export function InvoicePreviewDialog({
                 Por favor, verifica los datos e intenta de nuevo.
               </p>
             </div>
+          ) : !open || !DocComponent ? (
+            <div
+              className="flex flex-col items-center justify-center h-[500px] gap-4"
+              data-testid="preview-loading-state"
+            >
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-muted-foreground">Generando vista previa...</p>
+            </div>
           ) : (
-            <BlobProvider document={<InvoiceDocument data={previewData} />}>
-              {({ blob, loading, error }) => {
-                // Guard: only process state transitions once per blob instance
-                if (!loading && error) {
-                  handleBlobUpdate(null, error);
-                } else if (!loading && blob && blob !== lastProcessedBlobRef.current) {
-                  lastProcessedBlobRef.current = blob;
-                  handleBlobUpdate(blob, null);
-                } else if (!loading && !blob && !error && previewState === 'loading') {
-                  // Edge case: BlobProvider finished but returned nothing
-                  handleBlobUpdate(null, new Error('PDF generation returned empty result'));
-                }
-
-                // Loading indicator
-                if (loading || previewState === 'loading') {
-                  return (
+            <BlobProvider document={<DocComponent data={previewData} />}>
+              {({ blob, loading, error }) => (
+                <>
+                  <BlobProviderBridge
+                    blob={blob}
+                    loading={loading}
+                    error={error}
+                    onUpdate={handleBlobUpdate}
+                  />
+                  {(loading || previewState === 'loading') && (
                     <div
                       className="flex flex-col items-center justify-center h-[500px] gap-4"
                       data-testid="preview-loading-state"
@@ -268,12 +304,8 @@ export function InvoicePreviewDialog({
                       <Loader2 className="h-8 w-8 animate-spin text-primary" />
                       <p className="text-muted-foreground">Generando vista previa...</p>
                     </div>
-                  );
-                }
-
-                // PDF iframe preview
-                if (blobUrl && previewState === 'ready') {
-                  return (
+                  )}
+                  {blobUrl && previewState === 'ready' && (
                     <div
                       className="bg-white rounded-lg shadow-sm overflow-hidden"
                       data-testid="preview-ready-state"
@@ -285,22 +317,21 @@ export function InvoicePreviewDialog({
                         data-testid="pdf-preview-iframe"
                       />
                     </div>
-                  );
-                }
-
-                return null;
-              }}
+                  )}
+                </>
+              )}
             </BlobProvider>
           )}
         </div>
 
         {/* Actions */}
-        <DialogFooter className="flex-row justify-between sm:justify-between gap-2">
+        <DialogFooter className="flex-col sm:flex-row sm:justify-between gap-2">
           {/* Edit button - left side */}
           <Button
             variant="outline"
             onClick={handleEdit}
             disabled={isSending}
+            className="w-full sm:w-auto"
             data-testid="preview-edit-button"
           >
             <Pencil className="h-4 w-4 mr-2" />
@@ -308,11 +339,12 @@ export function InvoicePreviewDialog({
           </Button>
 
           {/* Download and Send buttons - right side */}
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button
               variant="outline"
               onClick={handleDownload}
               disabled={previewState !== 'ready' || isDownloading}
+              className="w-full sm:w-auto"
               data-testid="preview-download-button"
             >
               {isDownloading ? (
@@ -330,6 +362,7 @@ export function InvoicePreviewDialog({
               <Button
                 onClick={handleSend}
                 disabled={previewState !== 'ready' || isSending}
+                className="w-full sm:w-auto"
                 data-testid="preview-send-button"
               >
                 {isSending ? (

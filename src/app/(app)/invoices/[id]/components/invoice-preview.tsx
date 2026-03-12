@@ -23,6 +23,40 @@ const BlobProvider = dynamic(() => import('@react-pdf/renderer').then(mod => mod
 });
 
 // =============================================================================
+// BlobProviderBridge - Defers state updates to useEffect to avoid
+// calling setState during BlobProvider's render cycle (React anti-pattern)
+// =============================================================================
+
+function BlobProviderBridge({
+  blob,
+  loading,
+  error,
+  onUpdate,
+}: {
+  blob: Blob | null;
+  loading: boolean;
+  error: Error | null;
+  onUpdate: (blob: Blob | null, error: Error | null) => void;
+}) {
+  const lastProcessedBlobRef = useRef<Blob | null>(null);
+
+  useEffect(() => {
+    if (loading) return;
+
+    if (error) {
+      onUpdate(null, error);
+    } else if (blob && blob !== lastProcessedBlobRef.current) {
+      lastProcessedBlobRef.current = blob;
+      onUpdate(blob, null);
+    }
+    // If loading=false, blob=null, error=null: BlobProvider is in an
+    // intermediate state. Stay in loading and wait for blob or error.
+  }, [blob, loading, error, onUpdate]);
+
+  return null;
+}
+
+// =============================================================================
 // Types
 // =============================================================================
 
@@ -75,9 +109,6 @@ export function InvoicePreview({ invoice, InvoiceDocument }: InvoicePreviewProps
   // Ref for tracking previous blob URL to cleanup
   const previousBlobUrlRef = useRef<string | null>(null);
 
-  // Ref to track the last processed blob to prevent infinite re-render loop
-  const lastProcessedBlobRef = useRef<Blob | null>(null);
-
   // Cleanup blob URLs on unmount or when URL changes
   useEffect(() => {
     return () => {
@@ -117,7 +148,6 @@ export function InvoicePreview({ invoice, InvoiceDocument }: InvoicePreviewProps
   // Handle retry
   const handleRetry = useCallback(() => {
     setPreviewState('loading');
-    lastProcessedBlobRef.current = null;
     setRetryKey(prev => prev + 1);
   }, []);
 
@@ -199,21 +229,15 @@ export function InvoicePreview({ invoice, InvoiceDocument }: InvoicePreviewProps
         {/* Loading / Ready State - BlobProvider handles both */}
         {previewState !== 'error' && (
           <BlobProvider key={retryKey} document={<InvoiceDocument data={debouncedInvoice} />}>
-            {({ blob, loading, error }) => {
-              // Guard: only process state transitions once per blob instance
-              if (!loading && error) {
-                handleBlobUpdate(null, error);
-              } else if (!loading && blob && blob !== lastProcessedBlobRef.current) {
-                lastProcessedBlobRef.current = blob;
-                handleBlobUpdate(blob, null);
-              } else if (!loading && !blob && !error && previewState === 'loading') {
-                // Edge case: BlobProvider finished but returned nothing
-                handleBlobUpdate(null, new Error('PDF generation returned empty result'));
-              }
-
-              // Loading indicator
-              if (loading || previewState === 'loading') {
-                return (
+            {({ blob, loading, error }) => (
+              <>
+                <BlobProviderBridge
+                  blob={blob}
+                  loading={loading}
+                  error={error}
+                  onUpdate={handleBlobUpdate}
+                />
+                {(loading || previewState === 'loading') && (
                   <div
                     className="flex flex-col items-center justify-center h-[600px] gap-4"
                     data-testid="preview-loading-state"
@@ -221,12 +245,8 @@ export function InvoicePreview({ invoice, InvoiceDocument }: InvoicePreviewProps
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     <p className="text-muted-foreground">Generando PDF...</p>
                   </div>
-                );
-              }
-
-              // PDF iframe preview
-              if (blobUrl && previewState === 'ready') {
-                return (
+                )}
+                {blobUrl && previewState === 'ready' && (
                   <div
                     className="bg-white rounded-lg shadow-lg overflow-hidden"
                     data-testid="preview-ready-state"
@@ -238,11 +258,9 @@ export function InvoicePreview({ invoice, InvoiceDocument }: InvoicePreviewProps
                       data-testid="pdf-preview-iframe"
                     />
                   </div>
-                );
-              }
-
-              return null;
-            }}
+                )}
+              </>
+            )}
           </BlobProvider>
         )}
       </div>

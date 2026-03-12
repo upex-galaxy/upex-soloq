@@ -98,10 +98,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Sign in
   const signIn = useCallback(
     async (email: string, password: string) => {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+
+      // Update last_login_at only on actual login, not on session restoration (SQ-81 fix)
+      if (!error && data.user) {
+        supabase
+          .from('profiles')
+          .update({ last_login_at: new Date().toISOString() })
+          .eq('user_id', data.user.id)
+          .then();
+      }
 
       return { error };
     },
@@ -138,6 +147,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Helper to check if this is still the latest initialization attempt
     const isStale = () => !isMounted || currentGen !== initGenRef.current;
 
+    const clearAuthState = () => {
+      setState({
+        user: null,
+        session: null,
+        isLoading: false,
+        isAuthenticated: false,
+      });
+    };
+
+    // Safety timeout: if initialization hangs, force isLoading to false (SQ-74 fix)
+    // This prevents the skeleton from showing forever after rapid refreshes
+    const safetyTimeout = setTimeout(() => {
+      if (!isStale()) {
+        setState(prev => {
+          if (prev.isLoading) {
+            return { ...prev, isLoading: false };
+          }
+          return prev;
+        });
+      }
+    }, 8000);
+
     // Get initial session - use getUser() to validate token with server
     const initializeAuth = async () => {
       try {
@@ -147,59 +178,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           error: userError,
         } = await supabase.auth.getUser();
 
-        // Prevent state update if component unmounted or newer init started (SQ-74 fix)
         if (isStale()) return;
 
-        // If no valid user, clear state
         if (userError || !validatedUser) {
-          setState({
-            user: null,
-            session: null,
-            isLoading: false,
-            isAuthenticated: false,
-          });
+          clearAuthState();
           return;
         }
 
-        // User is valid, now get the session for token info
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+        // Parallelize getSession + fetchUserProfile to reduce init time (SQ-74 fix)
+        const [sessionResult, profileData] = await Promise.all([
+          supabase.auth.getSession(),
+          fetchUserProfile(validatedUser.id),
+        ]);
 
-        // Prevent state update if stale (SQ-74 fix)
         if (isStale()) return;
 
-        if (session?.user) {
-          const profileData = await fetchUserProfile(session.user.id);
-
-          // Final check before setState (SQ-74 fix)
-          if (isStale()) return;
-
-          setState({
-            user: {
-              ...session.user,
-              ...profileData,
-            },
-            session,
-            isLoading: false,
-            isAuthenticated: true,
-          });
-        } else {
-          setState({
-            user: null,
-            session: null,
-            isLoading: false,
-            isAuthenticated: false,
-          });
-        }
+        const session = sessionResult.data.session;
+        setState({
+          user: {
+            ...validatedUser,
+            ...profileData,
+          },
+          session,
+          isLoading: false,
+          isAuthenticated: true,
+        });
       } catch {
         if (!isStale()) {
-          setState({
-            user: null,
-            session: null,
-            isLoading: false,
-            isAuthenticated: false,
-          });
+          clearAuthState();
         }
       }
     };
@@ -210,14 +216,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        // Update last_login_at in profiles table (SQ-81 fix)
-        await supabase
-          .from('profiles')
-          .update({ last_login_at: new Date().toISOString() })
-          .eq('user_id', session.user.id);
+      // Prevent stale event handlers from setting state (SQ-74 fix)
+      if (isStale()) return;
 
+      if (event === 'SIGNED_IN' && session?.user) {
+        // Note: last_login_at is updated in signIn() function, not here (SQ-81 fix)
         const profileData = await fetchUserProfile(session.user.id);
+
+        if (isStale()) return;
 
         setState({
           user: {
@@ -229,37 +235,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           isAuthenticated: true,
         });
       } else if (event === 'SIGNED_OUT') {
-        setState({
-          user: null,
-          session: null,
-          isLoading: false,
-          isAuthenticated: false,
-        });
-      } else if (event === 'TOKEN_REFRESHED' && session) {
+        clearAuthState();
+      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
         // Re-fetch profile to keep user data in sync after token refresh
-        if (session.user) {
-          const profileData = await fetchUserProfile(session.user.id);
-          setState(prev => ({
-            ...prev,
-            user: prev.user
-              ? {
-                  ...session.user,
-                  ...profileData,
-                }
-              : null,
-            session,
-          }));
-        } else {
-          setState(prev => ({
-            ...prev,
-            session,
-          }));
-        }
+        const profileData = await fetchUserProfile(session.user.id);
+
+        if (isStale()) return;
+
+        setState(prev => ({
+          ...prev,
+          user: prev.user
+            ? {
+                ...session.user,
+                ...profileData,
+              }
+            : null,
+          session,
+        }));
       }
     });
 
     return () => {
       isMounted = false;
+      clearTimeout(safetyTimeout);
       subscription.unsubscribe();
     };
   }, [supabase, fetchUserProfile]);

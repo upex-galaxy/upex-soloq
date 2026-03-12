@@ -107,7 +107,7 @@ export default function EditInvoicePage() {
   });
 
   // Fetch business profile for preview (SQ-26)
-  const { data: businessProfile } = useBusinessProfile();
+  const { data: businessProfile, isLoading: isLoadingBusinessProfile } = useBusinessProfile();
 
   // Mutations
   const { mutate: updateInvoice, isPending: isUpdating } = useUpdateInvoice();
@@ -607,7 +607,7 @@ export default function EditInvoicePage() {
                   >
                     Volver
                   </Button>
-                  {/* Preview button (SQ-26) */}
+                  {/* Preview button (SQ-26, SQ-121 fix) */}
                   <Button
                     type="button"
                     variant="outline"
@@ -616,9 +616,14 @@ export default function EditInvoicePage() {
                       isUpdating ||
                       isDeleting ||
                       isSaving ||
+                      isLoadingBusinessProfile ||
                       !canShowPreview(form.getValues(), !!selectedClient)
                     }
-                    title={getPreviewDisabledReason(form.getValues(), !!selectedClient) ?? undefined}
+                    title={
+                      isLoadingBusinessProfile
+                        ? 'Cargando perfil de negocio...'
+                        : (getPreviewDisabledReason(form.getValues(), !!selectedClient) ?? undefined)
+                    }
                     data-testid="preview-button"
                   >
                     <Eye className="mr-2 h-4 w-4" />
@@ -693,8 +698,8 @@ export default function EditInvoicePage() {
         onSuccess={handleClientCreated}
       />
 
-      {/* Invoice Preview Dialog (SQ-26) */}
-      {selectedClient && businessProfile !== undefined && (
+      {/* Invoice Preview Dialog (SQ-26, SQ-121 fix: render when selectedClient exists, handle null businessProfile) */}
+      {selectedClient && !isLoadingBusinessProfile && (
         <InvoicePreviewDialog
           open={isPreviewOpen}
           onOpenChange={setIsPreviewOpen}

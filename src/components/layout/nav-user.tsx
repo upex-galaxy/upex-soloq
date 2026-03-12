@@ -33,7 +33,7 @@ export function NavUser() {
     router.push('/login');
   };
 
-  // Show skeleton while loading auth state
+  // Show skeleton while loading, but always include logout button (SQ-74 fix)
   if (isLoading) {
     return (
       <SidebarMenu>
@@ -44,6 +44,12 @@ export function NavUser() {
               <Skeleton className="h-4 w-24" />
               <Skeleton className="h-3 w-32" />
             </div>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+        <SidebarMenuItem>
+          <SidebarMenuButton size="sm" onClick={handleSignOut} data-testid="logout-button-loading">
+            <LogOut className="h-4 w-4" />
+            <span>Cerrar Sesión</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

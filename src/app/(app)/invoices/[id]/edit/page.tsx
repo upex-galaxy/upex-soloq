@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -92,6 +92,9 @@ export default function EditInvoicePage() {
   // State for subtotal from line items (SQ-22)
   const [subtotal, setSubtotal] = useState(0);
 
+  // Track if invoice data has been loaded into form (prevents auto-save loop)
+  const hasLoadedInvoiceRef = useRef(false);
+
   // Fetch invoice data (TC-04)
   const {
     data: invoice,
@@ -107,7 +110,7 @@ export default function EditInvoicePage() {
   });
 
   // Fetch business profile for preview (SQ-26)
-  const { data: businessProfile } = useBusinessProfile();
+  const { data: businessProfile, isLoading: isLoadingBusinessProfile } = useBusinessProfile();
 
   // Mutations
   const { mutate: updateInvoice, isPending: isUpdating } = useUpdateInvoice();
@@ -151,8 +154,12 @@ export default function EditInvoicePage() {
   });
 
   // Load invoice data into form when available (TC-04)
+  // Only runs on initial load to prevent auto-save loop:
+  // auto-save PUT → invalidates query → invoice ref changes → form.reset → auto-save detects "change" → loop
   useEffect(() => {
-    if (invoice) {
+    if (invoice && !hasLoadedInvoiceRef.current) {
+      hasLoadedInvoiceRef.current = true;
+
       // Find the client object
       const client = clientsData?.clients?.find(c => c.id === invoice.client?.id);
       if (client) {
@@ -194,7 +201,7 @@ export default function EditInvoicePage() {
     }
   }, [invoice, clientsData?.clients, form, markClean]);
 
-  // Unsaved changes warning (TC-11)
+  // Unsaved changes warning (TC-11) - browser navigation (refresh, close tab)
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isDirty) {
@@ -206,6 +213,24 @@ export default function EditInvoicePage() {
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
+
+  // Unsaved changes warning (TC-11) - client-side navigation (SQ-122 fix)
+  // Next.js App Router uses history.pushState for <Link> clicks;
+  // intercept it to show a confirmation dialog when there are pending changes
+  useEffect(() => {
+    if (!isDirty) return;
+
+    const originalPushState = history.pushState.bind(history);
+    history.pushState = function (state, title, url) {
+      if (window.confirm('Tienes cambios sin guardar. ¿Deseas salir de todas formas?')) {
+        originalPushState(state, title, url);
+      }
+    };
+
+    return () => {
+      history.pushState = originalPushState;
+    };
   }, [isDirty]);
 
   // Handle client selection
@@ -607,7 +632,7 @@ export default function EditInvoicePage() {
                   >
                     Volver
                   </Button>
-                  {/* Preview button (SQ-26) */}
+                  {/* Preview button (SQ-26, SQ-121 fix) */}
                   <Button
                     type="button"
                     variant="outline"
@@ -616,9 +641,14 @@ export default function EditInvoicePage() {
                       isUpdating ||
                       isDeleting ||
                       isSaving ||
+                      isLoadingBusinessProfile ||
                       !canShowPreview(form.getValues(), !!selectedClient)
                     }
-                    title={getPreviewDisabledReason(form.getValues(), !!selectedClient) ?? undefined}
+                    title={
+                      isLoadingBusinessProfile
+                        ? 'Cargando perfil de negocio...'
+                        : (getPreviewDisabledReason(form.getValues(), !!selectedClient) ?? undefined)
+                    }
                     data-testid="preview-button"
                   >
                     <Eye className="mr-2 h-4 w-4" />
@@ -693,8 +723,8 @@ export default function EditInvoicePage() {
         onSuccess={handleClientCreated}
       />
 
-      {/* Invoice Preview Dialog (SQ-26) */}
-      {selectedClient && businessProfile !== undefined && (
+      {/* Invoice Preview Dialog (SQ-26, SQ-121 fix: render when selectedClient exists, handle null businessProfile) */}
+      {selectedClient && !isLoadingBusinessProfile && (
         <InvoicePreviewDialog
           open={isPreviewOpen}
           onOpenChange={setIsPreviewOpen}

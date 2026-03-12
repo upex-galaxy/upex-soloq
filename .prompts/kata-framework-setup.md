@@ -119,17 +119,10 @@ rm -rf qa/.books
 rm -rf qa/docs
 rm -rf qa/templates
 
-# Remove duplicate context (use root .context/)
-rm -rf qa/.context/PRD
-rm -rf qa/.context/SRS
-rm -rf qa/.context/idea
-rm -rf qa/.context/PBI
-
-# Keep TAE guidelines - they're essential
-# qa/.context/guidelines/TAE/ stays
+# Remove duplicate context (already exists in root .context/)
+rm -rf qa/.context
 
 # Remove root-level duplicates
-rm -f qa/README.md
 rm -f qa/context-engineering.md
 ```
 
@@ -185,12 +178,14 @@ cd qa && bunx playwright install chromium && cd ..
 **Read these files to understand KATA patterns (MANDATORY):**
 
 ```
-qa/.context/guidelines/TAE/
+.context/guidelines/TAE/
 ├── KATA-AI-GUIDE.md              # Entry point - concepts overview
 ├── kata-architecture.md          # 4-layer architecture
 ├── automation-standards.md       # ATC rules, naming conventions
 └── playwright-automation-system.md  # DI, fixtures, session reuse
 ```
+
+> **Note:** Las guías TAE se leen desde la raíz del proyecto (`.context/guidelines/TAE/`), no desde `qa/`. El directorio `qa/.context/` se elimina durante la limpieza porque es duplicado.
 
 ### Step 3.3: Update Configuration
 
@@ -427,34 +422,26 @@ echo "Nombre del repo: $REPO_NAME"
 }
 ```
 
-### Step 5.2: Modificar tsconfig.json de la raíz
+### Step 5.2: Excluir qa/ del tsconfig.json de la raíz
 
-**Editar `tsconfig.json` en la raíz (NO reemplazar, solo agregar):**
+**Editar `tsconfig.json` en la raíz para que ignore `qa/`:**
 
 1. Leer el archivo existente primero
-2. Agregar sección `references` apuntando a `./qa`
-3. Agregar o ajustar `"include"` para excluir `/qa`
+2. Agregar `"qa"` al array `"exclude"`
 
-**Lo que agregar al tsconfig.json raíz:**
-
-```json
-{
-  "references": [
-    { "path": "./qa" }
-  ]
-}
-```
-
-**Y asegurar que `include` NO incluya qa/:**
+**Asegurar que `exclude` incluya qa/:**
 
 ```json
 {
-  "include": ["src/**/*", "app/**/*"],
   "exclude": ["node_modules", "qa"]
 }
 ```
 
-> **IMPORTANTE:** Leer el archivo antes de modificar para no perder configuraciones existentes.
+> **IMPORTANTE:**
+>
+> - Leer el archivo antes de modificar para no perder configuraciones existentes.
+> - **NO agregar `references`** apuntando a `./qa`. Son proyectos completamente independientes con sus propias dependencias y tipos (Playwright vs React/Next.js). El acoplamiento vía `references` causa más problemas de los que resuelve.
+> - `qa/` tiene su propio `tsconfig.json` autónomo — solo necesitamos que el tsconfig raíz lo ignore.
 
 ### Step 5.3: Verificar tsconfig.json dentro de /qa
 
@@ -591,28 +578,27 @@ Add convenience scripts to run tests from root:
 }
 ```
 
-### Step 5.8: Update Root .gitignore
+### Step 5.8: Verificar .gitignore de qa/
 
-Add qa-specific ignores:
+El boilerplate ya incluye su propio `qa/.gitignore` con los ignores necesarios (test-results, node_modules, .auth, etc.). Git respeta `.gitignore` en subdirectorios de forma jerárquica, por lo que **NO es necesario modificar el `.gitignore` de la raíz**.
 
-```gitignore
-# QA Test Automation
-qa/test-results/
-qa/playwright-report/
-qa/allure-results/
-qa/allure-report/
-qa/.auth/
-qa/node_modules/
+```bash
+# Verificar que qa/.gitignore existe y tiene los ignores correctos
+cat qa/.gitignore
 ```
 
-### Step 5.9: Link Shared Context
+> **Nota:** Si por alguna razón el boilerplate no trae `.gitignore`, crear uno en `qa/` con los ignores necesarios en lugar de contaminar el `.gitignore` de la raíz.
 
-The `qa/` directory can reference root `.context/` for project documentation:
+### Step 5.9: Shared Context
 
-```typescript
-// In qa tests, you can reference:
-// - Root context: ../.context/SRS/, ../.context/PRD/
-// - QA guidelines: .context/guidelines/TAE/
+El directorio `qa/` no tiene su propio `.context/` — usa el de la raíz del proyecto. Toda la documentación del proyecto y las guías KATA están centralizadas:
+
+```
+.context/
+├── SRS/                        # Architecture, API contracts
+├── PRD/                        # Features, user journeys
+├── idea/                       # Domain glossary
+└── guidelines/TAE/             # KATA guidelines (shared)
 ```
 
 ---
@@ -691,8 +677,8 @@ gh api repos/upex-galaxy/ai-driven-test-automation-boilerplate/tarball \
 echo "🧹 Cleaning up..."
 rm -rf qa/tests/e2e/example qa/tests/integration/example.test.ts
 rm -rf qa/.prompts qa/.books qa/docs qa/templates
-rm -rf qa/.context/PRD qa/.context/SRS qa/.context/idea qa/.context/PBI
-rm -f qa/README.md qa/context-engineering.md
+rm -rf qa/.context
+rm -f qa/context-engineering.md
 
 # Phase 3: Install
 echo "📥 Installing dependencies..."
@@ -733,7 +719,7 @@ echo "5. Run: cd qa && bun run test --project=api-setup"
 - [ ] First domain component created
 - [ ] Fixtures updated with new components
 - [ ] Root `package.json` has qa scripts (optional)
-- [ ] Root `.gitignore` updated (optional)
+- [ ] `qa/.gitignore` verified (should come from boilerplate)
 
 ---
 
@@ -782,7 +768,7 @@ cd qa && bun run type-check
 | `tests/utils/` | Decorators, reporters, utilities |
 | `config/` | Environment variables configuration |
 | `scripts/` | KATA manifest, sync scripts |
-| `.context/guidelines/TAE/` | KATA documentation for AI |
+| `README.md` | QA framework documentation |
 | `playwright.config.ts` | Playwright configuration |
 | `tsconfig.json` | TypeScript configuration |
 | `eslint.config.js` | ESLint configuration |
@@ -795,9 +781,8 @@ cd qa && bun run type-check
 | `.prompts/` | Use root project prompts |
 | `.books/` | Use root project books |
 | `docs/` | Use root project docs |
-| `.context/PRD,SRS,idea,PBI/` | Use root project context |
+| `.context/` | Duplicate of root `.context/` (includes TAE guidelines) |
 | `tests/e2e/example/` | Will create project-specific tests |
-| `README.md` | Use root project README |
 
 ### Create Per Project
 
@@ -810,5 +795,5 @@ cd qa && bun run type-check
 
 ---
 
-**Version**: 2.0
-**Last Updated**: 2025-02-16
+**Version**: 2.1
+**Last Updated**: 2025-03-12

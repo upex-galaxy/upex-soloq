@@ -120,7 +120,7 @@ export function BenefitsSection() {
               whileInView="visible"
               viewport={{ once: true }}
             >
-              {benefits.map((benefit, index) => (
+              {benefits.map((benefit) => (
                 <motion.li
                   key={benefit}
                   variants={itemVariants}

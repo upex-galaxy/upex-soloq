@@ -3,6 +3,7 @@ import {
   formatCurrency,
   formatDateShort,
   sanitizeForPDF,
+  formatBusinessAddress,
   isValidImageUrl,
 } from '@/lib/utils/pdf-utils';
 import type { InvoiceWithDetails } from '@/hooks/invoices/use-invoice';
@@ -49,7 +50,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.primary,
   },
   invoiceTitle: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
     color: colors.primary,
   },
@@ -259,9 +260,16 @@ const styles = StyleSheet.create({
   headerWithLogo: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+    maxWidth: '65%',
   },
   headerBusinessInfo: {
     flex: 1,
+  },
+  headerRight: {
+    alignItems: 'flex-end' as const,
+    flexShrink: 0,
+    minWidth: 150,
   },
 });
 
@@ -331,7 +339,7 @@ export function InvoiceDocument({ data }: InvoiceDocumentProps) {
               )}
             </View>
           </View>
-          <View style={{ alignItems: 'flex-end' }}>
+          <View style={styles.headerRight}>
             <Text style={styles.invoiceNumber}>N {data.invoice_number}</Text>
             <Text style={styles.invoiceDate}>Emision: {formatDateShort(data.issue_date)}</Text>
             <Text style={styles.invoiceDate}>Vencimiento: {formatDateShort(data.due_date)}</Text>
@@ -347,7 +355,9 @@ export function InvoiceDocument({ data }: InvoiceDocumentProps) {
               {sanitizeForPDF(business_profile?.business_name) || 'Mi Negocio'}
             </Text>
             {business_profile?.address && (
-              <Text style={styles.infoText}>{sanitizeForPDF(business_profile.address)}</Text>
+              <Text style={styles.infoText}>
+                {sanitizeForPDF(formatBusinessAddress(business_profile.address))}
+              </Text>
             )}
             {business_profile?.contact_email && (
               <Text style={styles.infoLabel}>{business_profile.contact_email}</Text>

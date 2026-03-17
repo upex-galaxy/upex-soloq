@@ -1,82 +1,90 @@
 # Save Invoice as Draft
 
-**Jira Key:** [SQ-30](https://upexgalaxy64.atlassian.net/browse/SQ-30)
-**Epic:** [SQ-20](https://upexgalaxy64.atlassian.net/browse/SQ-20) (Invoice Creation)
+**Jira Key:** [SQ-30](https://upexgalaxy65.atlassian.net/browse/SQ-30)
+**Epic:** [SQ-20](https://upexgalaxy65.atlassian.net/browse/SQ-20) (Invoice Creation)
 **Priority:** Medium
-**Story Points:** 2
-**Status:** Backlog
+**Story Points:** 5
+**Status:** Ready For QA
 
 ---
 
 ## User Story
 
-**As a** user
-**I want to** save an invoice as draft
-**So that** I can finish it later
+## User Story
 
----
+***As a*** user
+***I want to*** save an invoice as draft
+***So that*** I can finish it later
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
 ### Scenario 1: Save as draft
 
-- **Given:** I am creating an invoice
-- **When:** I click "Save Draft"
-- **Then:** The invoice is saved with status "draft"
+- ***Given:*** I am creating an invoice
+- ***When:*** I click "Save Draft"
+- ***Then:*** Invoice is saved with status "draft"
 
-### Scenario 2: Auto-save
+### Scenario 2: Resume draft
 
-- **Given:** I am editing an invoice
-- **When:** I make changes
-- **Then:** Changes are auto-saved periodically (every 30s)
+- ***Given:*** I have a draft invoice
+- ***When:*** I click on it from my list
+- ***Then:*** I can continue editing
 
-### Scenario 3: Find drafts
+### Scenario 3: Draft not sent to client
 
-- **Given:** I have saved drafts
-- **When:** I go to my invoices list
-- **Then:** I can filter to see only drafts
+- ***Given:*** I have a draft invoice
+- ***When:*** I look at my dashboard
+- ***Then:*** Draft is clearly marked and not counted as sent
 
-### Scenario 4: Continue editing
+### Scenario 4: Delete draft
 
-- **Given:** I have a draft invoice
-- **When:** I click on it
-- **Then:** I can continue editing where I left off
-
-### Scenario 5: Delete draft
-
-- **Given:** I have a draft I don't need
-- **When:** I click delete
-- **Then:** The draft is permanently deleted
-
-### Scenario 6: Convert to sent
-
-- **Given:** I have a complete draft
-- **When:** I click "Send"
-- **Then:** The status changes from "draft" to "sent"
-
----
+- ***Given:*** I have a draft I no longer need
+- ***When:*** I delete it
+- ***Then:*** Draft is removed
 
 ## Technical Notes
 
-- Status: 'draft' until sent
-- Auto-save with debounce
-- Drafts editable, sent invoices read-only
-- Soft delete for drafts (or hard delete since no history needed)
+- Status: draft, sent, paid, overdue, cancelled
+- Drafts don't send emails
+- Drafts can be edited freely
+
+## Story Points
+
+2
+
+---
+
+## Acceptance Criteria
+
+Feature:
+
+Background:
+Given ...
+
+Scenario: ...
+Given ...
+When ...
+Then ...
 
 ---
 
 ## Definition of Done
 
-- [ ] Save draft functionality working
-- [ ] Auto-save implemented
-- [ ] Draft filtering working
-- [ ] Continue editing working
-- [ ] Delete draft working
-- [ ] Status transition to sent working
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-20-invoice-creation/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 2/12/2026
+- **Reporter:** Ely
+- **Assignee:** Luis Eduardo Flores Villarroel
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:53:52.856Z_

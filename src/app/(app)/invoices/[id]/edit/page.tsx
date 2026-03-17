@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -92,6 +92,9 @@ export default function EditInvoicePage() {
   // State for subtotal from line items (SQ-22)
   const [subtotal, setSubtotal] = useState(0);
 
+  // Track if invoice data has been loaded into form (prevents auto-save loop)
+  const hasLoadedInvoiceRef = useRef(false);
+
   // Fetch invoice data (TC-04)
   const {
     data: invoice,
@@ -107,7 +110,7 @@ export default function EditInvoicePage() {
   });
 
   // Fetch business profile for preview (SQ-26)
-  const { data: businessProfile } = useBusinessProfile();
+  const { data: businessProfile, isLoading: isLoadingBusinessProfile } = useBusinessProfile();
 
   // Mutations
   const { mutate: updateInvoice, isPending: isUpdating } = useUpdateInvoice();
@@ -151,8 +154,12 @@ export default function EditInvoicePage() {
   });
 
   // Load invoice data into form when available (TC-04)
+  // Only runs on initial load to prevent auto-save loop:
+  // auto-save PUT → invalidates query → invoice ref changes → form.reset → auto-save detects "change" → loop
   useEffect(() => {
-    if (invoice) {
+    if (invoice && !hasLoadedInvoiceRef.current) {
+      hasLoadedInvoiceRef.current = true;
+
       // Find the client object
       const client = clientsData?.clients?.find(c => c.id === invoice.client?.id);
       if (client) {
@@ -194,7 +201,7 @@ export default function EditInvoicePage() {
     }
   }, [invoice, clientsData?.clients, form, markClean]);
 
-  // Unsaved changes warning (TC-11)
+  // Unsaved changes warning (TC-11) - browser navigation (refresh, close tab)
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isDirty) {
@@ -206,6 +213,24 @@ export default function EditInvoicePage() {
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
+
+  // Unsaved changes warning (TC-11) - client-side navigation (SQ-122 fix)
+  // Next.js App Router uses history.pushState for <Link> clicks;
+  // intercept it to show a confirmation dialog when there are pending changes
+  useEffect(() => {
+    if (!isDirty) return;
+
+    const originalPushState = history.pushState.bind(history);
+    history.pushState = function (state, title, url) {
+      if (window.confirm('Tienes cambios sin guardar. ¿Deseas salir de todas formas?')) {
+        originalPushState(state, title, url);
+      }
+    };
+
+    return () => {
+      history.pushState = originalPushState;
+    };
   }, [isDirty]);
 
   // Handle client selection
@@ -266,6 +291,9 @@ export default function EditInvoicePage() {
 
   // Calculate discount amount for summary (SQ-22: subtotal comes from line items)
   const { amount: discountAmount } = calculateDiscountAmount(subtotal, discountType, discountValue);
+
+  // SQ-97: Validate percentage discount cannot exceed 100%
+  const isDiscountInvalid = discountType === 'percentage' && discountValue > 100;
 
   const clients = clientsData?.clients ?? [];
 
@@ -335,52 +363,54 @@ export default function EditInvoicePage() {
   return (
     <div className="space-y-6" data-testid="edit-invoice-page">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" className="shrink-0" asChild>
             <Link href="/invoices">
               <ArrowLeft className="h-4 w-4" />
               <span className="sr-only">Volver</span>
             </Link>
           </Button>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold tracking-tight">{invoice.invoice_number}</h1>
-              <InvoiceStatusBadge status={invoice.status} />
-            </div>
-            <p className="text-muted-foreground">Editando borrador de factura</p>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight truncate">
+              {invoice.invoice_number}
+            </h1>
+            <p className="text-sm text-muted-foreground">Editando borrador de factura</p>
           </div>
         </div>
 
-        {/* Auto-save indicator (TC-02, TC-09) */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          {isSaving && (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Guardando...</span>
-            </>
-          )}
-          {!isSaving && isSaveError && (
-            <>
-              <AlertCircle className="h-4 w-4 text-destructive" />
-              <span className="text-destructive">Error al guardar</span>
-              <Button variant="ghost" size="sm" onClick={resetError}>
-                Reintentar
-              </Button>
-            </>
-          )}
-          {!isSaving && !isSaveError && lastSaved && (
-            <>
-              <Check className="h-4 w-4 text-green-500" />
-              <span>Guardado a las {lastSaved.toLocaleTimeString()}</span>
-            </>
-          )}
-          {!isSaving && !isSaveError && isDirty && (
-            <>
-              <Clock className="h-4 w-4" />
-              <span>Cambios sin guardar</span>
-            </>
-          )}
+        {/* Status + Auto-save indicator row */}
+        <div className="flex items-center justify-between gap-3 pl-12">
+          <InvoiceStatusBadge status={invoice.status} />
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            {isSaving && (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <span>Guardando...</span>
+              </>
+            )}
+            {!isSaving && isSaveError && (
+              <>
+                <AlertCircle className="h-3.5 w-3.5 text-destructive" />
+                <span className="text-destructive">Error al guardar</span>
+                <Button variant="ghost" size="sm" onClick={resetError}>
+                  Reintentar
+                </Button>
+              </>
+            )}
+            {!isSaving && !isSaveError && lastSaved && (
+              <>
+                <Check className="h-3.5 w-3.5 text-green-500" />
+                <span>Guardado a las {lastSaved.toLocaleTimeString()}</span>
+              </>
+            )}
+            {!isSaving && !isSaveError && isDirty && (
+              <>
+                <Clock className="h-3.5 w-3.5" />
+                <span>Cambios sin guardar</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -604,7 +634,7 @@ export default function EditInvoicePage() {
                   >
                     Volver
                   </Button>
-                  {/* Preview button (SQ-26) */}
+                  {/* Preview button (SQ-26, SQ-121 fix) */}
                   <Button
                     type="button"
                     variant="outline"
@@ -613,9 +643,14 @@ export default function EditInvoicePage() {
                       isUpdating ||
                       isDeleting ||
                       isSaving ||
+                      isLoadingBusinessProfile ||
                       !canShowPreview(form.getValues(), !!selectedClient)
                     }
-                    title={getPreviewDisabledReason(form.getValues(), !!selectedClient) ?? undefined}
+                    title={
+                      isLoadingBusinessProfile
+                        ? 'Cargando perfil de negocio...'
+                        : (getPreviewDisabledReason(form.getValues(), !!selectedClient) ?? undefined)
+                    }
                     data-testid="preview-button"
                   >
                     <Eye className="mr-2 h-4 w-4" />
@@ -625,7 +660,7 @@ export default function EditInvoicePage() {
                   <Button
                     type="button"
                     onClick={handleManualSave}
-                    disabled={isUpdating || isDeleting || isSaving || !isInvoiceNumberValid}
+                    disabled={isUpdating || isDeleting || isSaving || !isInvoiceNumberValid || isDiscountInvalid}
                     data-testid="save-draft-button"
                   >
                     {isUpdating || isSaving ? (
@@ -690,8 +725,8 @@ export default function EditInvoicePage() {
         onSuccess={handleClientCreated}
       />
 
-      {/* Invoice Preview Dialog (SQ-26) */}
-      {selectedClient && businessProfile !== undefined && (
+      {/* Invoice Preview Dialog (SQ-26, SQ-121 fix: render when selectedClient exists, handle null businessProfile) */}
+      {selectedClient && !isLoadingBusinessProfile && (
         <InvoicePreviewDialog
           open={isPreviewOpen}
           onOpenChange={setIsPreviewOpen}

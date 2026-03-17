@@ -1,11 +1,13 @@
 # EPIC: Invoice Creation
 
-**Jira Key:** [SQ-20](https://upexgalaxy64.atlassian.net/browse/SQ-20)
-**Priority:** CRITICAL
-**Phase:** Core Features (Sprint 3-4)
-**Total Story Points:** 26
+**Jira Key:** [SQ-20](https://upexgalaxy65.atlassian.net/browse/SQ-20)
+**Priority:** Medium
+**Status:** Backlog
+**Total Story Points:** 55
 
 ---
+
+## Description
 
 ## Description
 
@@ -15,105 +17,97 @@ Creación y gestión de facturas. Incluye selección de cliente, líneas de item
 
 El core del producto. Sin la capacidad de crear facturas, SoloQ no tiene valor. Esta funcionalidad debe ser intuitiva, rápida y libre de errores de cálculo.
 
----
+## Acceptance Criteria
 
-## User Stories (10)
-
-| Key                                                      | Story                                    | Points | Priority |
-| -------------------------------------------------------- | ---------------------------------------- | ------ | -------- |
-| [SQ-21](https://upexgalaxy64.atlassian.net/browse/SQ-21) | Create Invoice by Selecting Client       | 3      | High     |
-| [SQ-22](https://upexgalaxy64.atlassian.net/browse/SQ-22) | Add Line Items to Invoice                | 5      | High     |
-| [SQ-23](https://upexgalaxy64.atlassian.net/browse/SQ-23) | Automatic Subtotal and Total Calculation | 3      | High     |
-| [SQ-24](https://upexgalaxy64.atlassian.net/browse/SQ-24) | Add Taxes to Invoice                     | 2      | High     |
-| [SQ-25](https://upexgalaxy64.atlassian.net/browse/SQ-25) | Add Discounts to Invoice                 | 2      | Medium   |
-| [SQ-26](https://upexgalaxy64.atlassian.net/browse/SQ-26) | Preview Invoice Before Sending           | 3      | High     |
-| [SQ-27](https://upexgalaxy64.atlassian.net/browse/SQ-27) | Assign Unique Invoice Number             | 2      | High     |
-| [SQ-28](https://upexgalaxy64.atlassian.net/browse/SQ-28) | Set Invoice Due Date                     | 2      | High     |
-| [SQ-29](https://upexgalaxy64.atlassian.net/browse/SQ-29) | Add Notes and Terms to Invoice           | 2      | Low      |
-| [SQ-30](https://upexgalaxy64.atlassian.net/browse/SQ-30) | Save Invoice as Draft                    | 2      | Medium   |
-
----
+- Usuario puede crear factura seleccionando cliente
+- Usuario puede agregar líneas de items (descripción, cantidad, precio)
+- Sistema calcula subtotal y total automáticamente
+- Usuario puede agregar impuestos (IVA/porcentaje)
+- Usuario puede agregar descuentos
+- Usuario puede previsualizar factura antes de enviar
+- Sistema asigna número único de factura
+- Usuario puede establecer fecha de vencimiento
+- Usuario puede agregar notas o términos
+- Usuario puede guardar factura como borrador
 
 ## Technical Considerations
 
-### Database Tables
+- Tabla invoices con estado (draft, sent, paid, overdue)
+- Tabla invoice_items para líneas
+- Cálculos precisos con decimales
+- Numeración secuencial por usuario
+- Detección automática de vencimiento
 
-```sql
--- invoices table
-CREATE TABLE invoices (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  client_id UUID REFERENCES clients(id),
-  invoice_number VARCHAR(20) NOT NULL,
-  status VARCHAR(20) DEFAULT 'draft', -- draft, sent, paid, overdue, cancelled
-  issue_date DATE DEFAULT CURRENT_DATE,
-  due_date DATE,
-  subtotal DECIMAL(10,2) DEFAULT 0,
-  tax_rate DECIMAL(5,2) DEFAULT 0,
-  tax_amount DECIMAL(10,2) DEFAULT 0,
-  discount_type VARCHAR(10), -- percentage, fixed
-  discount_value DECIMAL(10,2) DEFAULT 0,
-  discount_amount DECIMAL(10,2) DEFAULT 0,
-  total DECIMAL(10,2) DEFAULT 0,
-  notes TEXT,
-  terms TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  sent_at TIMESTAMPTZ,
-  paid_at TIMESTAMPTZ,
-  UNIQUE(user_id, invoice_number)
-);
+## Priority
 
--- invoice_items table
-CREATE TABLE invoice_items (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  invoice_id UUID REFERENCES invoices(id) ON DELETE CASCADE,
-  description TEXT NOT NULL,
-  quantity DECIMAL(10,2) DEFAULT 1,
-  unit_price DECIMAL(10,2) NOT NULL,
-  line_total DECIMAL(10,2) NOT NULL,
-  sort_order INTEGER DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
+CRITICAL
 
-### API Endpoints
+## Phase
 
-| Method | Endpoint                          | Description           |
-| ------ | --------------------------------- | --------------------- |
-| GET    | `/api/invoices`                   | List all invoices     |
-| POST   | `/api/invoices`                   | Create invoice        |
-| GET    | `/api/invoices/:id`               | Get invoice details   |
-| PUT    | `/api/invoices/:id`               | Update invoice        |
-| DELETE | `/api/invoices/:id`               | Delete/cancel invoice |
-| POST   | `/api/invoices/:id/items`         | Add line item         |
-| PUT    | `/api/invoices/:id/items/:itemId` | Update line item      |
-| DELETE | `/api/invoices/:id/items/:itemId` | Remove line item      |
+Core Features (Sprint 3-4)
+
+## 
+
+## 🧪 QA Test Strategy - Shift-Left Analysis
+
+**Analysis Date:** 2026-02-03
+**Status:** Test Plan Ready
+
+### Critical Risks Identified
+
+- ***Risk 1 (High):*** Errores de cálculo en totales - Cálculos duplicados client/server side, precision testing
+- ***Risk 2 (High):*** Condiciones de carrera en numeración - UNIQUE constraint, retry logic
+- ***Risk 3 (Medium):*** UX confusa en selección de cliente - Selector con búsqueda, creación inline
+
+### Test Coverage Summary
+
+- ***Total Estimated Test Cases:*** 99
+- ***Integration Points:*** 5 (Invoice↔Client, Invoice↔BusinessProfile, Invoice↔PaymentMethods, Frontend↔API, API↔DB)
+- ***Critical User Journeys:*** 2 (First Invoice, Edit Flow)
+- ***Test Complexity:*** High
+
+### Critical Questions for Team
+
+Ver comentario con test plan completo para detalles sobre:
+
+- Orden de aplicación descuento vs impuesto
+- Formato de número de factura configurable
+- Comportamiento de auto-save con errores
+
+### Test Strategy
+
+- ***Levels:*** Unit, Integration, E2E, API
+- ***Tools:*** Playwright, Vitest, Faker.js
+- ***Timeline:*** 2 sprints (4 weeks) estimated
 
 ---
 
-## Dependencies
+## User Stories
 
-### Blocked By
-
-- SQ-13 (Epic: Client Management) - needs clients to create invoices
-- SQ-7 (Epic: Business Profile) - needs business data for invoice header
-
-### Blocks
-
-- EPIC 5 (PDF Generation)
-- EPIC 6 (Invoice Sending)
-- EPIC 7 (Dashboard & Tracking)
-- EPIC 8 (Payment Tracking)
-
----
-
-## Related Documentation
-
-- **PRD:** `.context/PRD/mvp-scope.md` (EPIC 4)
-- **SRS:** `.context/SRS/functional-specs.md` (FR-018 to FR-027)
+| Key | Story | Points | Priority | Status |
+| --- | ----- | ------ | -------- | ------ |
+| [SQ-21](https://upexgalaxy65.atlassian.net/browse/SQ-21) | Create Invoice by Selecting Client | 8 | Medium | Ready For QA |
+| [SQ-22](https://upexgalaxy65.atlassian.net/browse/SQ-22) | Add Line Items to Invoice | 1 | Medium | Ready For QA |
+| [SQ-23](https://upexgalaxy65.atlassian.net/browse/SQ-23) | Automatic Subtotal and Total Calculation | 8 | Medium | QA Approved |
+| [SQ-24](https://upexgalaxy65.atlassian.net/browse/SQ-24) | Add Taxes to Invoice | 3 | Medium | In Test |
+| [SQ-25](https://upexgalaxy65.atlassian.net/browse/SQ-25) | Add Discounts to Invoice | 2 | Medium | In Test |
+| [SQ-26](https://upexgalaxy65.atlassian.net/browse/SQ-26) | Preview Invoice Before Sending | 8 | Medium | Ready For QA |
+| [SQ-27](https://upexgalaxy65.atlassian.net/browse/SQ-27) | Assign Unique Invoice Number | 7 | Medium | Ready For QA |
+| [SQ-28](https://upexgalaxy65.atlassian.net/browse/SQ-28) | Set Invoice Due Date | 5 | Medium | Ready For QA |
+| [SQ-29](https://upexgalaxy65.atlassian.net/browse/SQ-29) | Add Notes and Terms to Invoice | 8 | Medium | Ready For QA |
+| [SQ-30](https://upexgalaxy65.atlassian.net/browse/SQ-30) | Save Invoice as Draft | 5 | Medium | Ready For QA |
 
 ---
 
-_Documento parte del PBI de SoloQ_
-_Última actualización: 2026-01-20_
+## Metadata
+
+- **Created:** 1/20/2026
+- **Updated:** 2/7/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
+- **Labels:** test-plan-ready
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:53:49.011Z_

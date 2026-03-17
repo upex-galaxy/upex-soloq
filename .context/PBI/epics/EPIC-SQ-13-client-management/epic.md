@@ -1,11 +1,13 @@
 # EPIC: Client Management
 
-**Jira Key:** [SQ-13](https://upexgalaxy64.atlassian.net/browse/SQ-13)
-**Priority:** HIGH
-**Phase:** Core Features (Sprint 2-3)
-**Total Story Points:** 15
+**Jira Key:** [SQ-13](https://upexgalaxy65.atlassian.net/browse/SQ-13)
+**Priority:** Medium
+**Status:** Backlog
+**Total Story Points:** 51
 
 ---
+
+## Description
 
 ## Description
 
@@ -14,8 +16,6 @@ Gestión de la base de datos de clientes del freelancer. Permite agregar, listar
 ## Business Value
 
 Una base de clientes organizada es fundamental para el flujo de facturación. El freelancer necesita poder acceder rápidamente a la información de sus clientes para crear facturas y dar seguimiento a pagos.
-
----
 
 ## Acceptance Criteria
 
@@ -26,84 +26,82 @@ Una base de clientes organizada es fundamental para el flujo de facturación. El
 - Usuario puede ver historial de facturas por cliente
 - Usuario puede eliminar clientes (soft delete)
 
----
-
-## User Stories (6)
-
-| Key                                                      | Story                       | Points | Priority |
-| -------------------------------------------------------- | --------------------------- | ------ | -------- |
-| [SQ-14](https://upexgalaxy64.atlassian.net/browse/SQ-14) | Add New Client              | 3      | High     |
-| [SQ-15](https://upexgalaxy64.atlassian.net/browse/SQ-15) | List All Clients            | 3      | High     |
-| [SQ-16](https://upexgalaxy64.atlassian.net/browse/SQ-16) | Edit Client Data            | 2      | Medium   |
-| [SQ-17](https://upexgalaxy64.atlassian.net/browse/SQ-17) | Add Client Tax Information  | 2      | Medium   |
-| [SQ-18](https://upexgalaxy64.atlassian.net/browse/SQ-18) | View Client Invoice History | 3      | Medium   |
-| [SQ-19](https://upexgalaxy64.atlassian.net/browse/SQ-19) | Delete Client               | 2      | Low      |
-
----
-
 ## Technical Considerations
 
-### Database Tables
+- CRUD completo para clientes
+- Soft delete para mantener historial de facturas
+- Búsqueda y filtrado de clientes
+- RLS policies para acceso solo a propios clientes
 
-```sql
-CREATE TABLE clients (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  name VARCHAR(100) NOT NULL,
-  email VARCHAR(255) NOT NULL,
-  company_name VARCHAR(100),
-  phone VARCHAR(20),
-  address TEXT,
-  tax_id VARCHAR(20),
-  tax_id_type VARCHAR(10),
-  is_deleted BOOLEAN DEFAULT false,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(user_id, email)
-);
-```
+## Priority
 
-### RLS Policies
+HIGH
 
-```sql
-ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
+## Phase
 
-CREATE POLICY "Users can manage own clients"
-  ON clients FOR ALL
-  USING (auth.uid() = user_id);
-```
+Core Features (Sprint 2-3)
 
-### API Endpoints
+## 
 
-| Method | Endpoint                    | Description                  |
-| ------ | --------------------------- | ---------------------------- |
-| GET    | `/api/clients`              | List all clients             |
-| POST   | `/api/clients`              | Add new client               |
-| GET    | `/api/clients/:id`          | Get client details           |
-| PUT    | `/api/clients/:id`          | Update client                |
-| DELETE | `/api/clients/:id`          | Soft delete client           |
-| GET    | `/api/clients/:id/invoices` | Get client's invoice history |
+## QA Test Strategy - Shift-Left Analysis
 
----
+**Analysis Date:** 2026-01-27
+**Status:** Test Plan Ready
 
-## Dependencies
+### Critical Risks Identified
 
-### Blocked By
+| ***Risk**** | ****Impact**** | ****Area*** |
+| --- | --- | --- |
+| RLS Policies - Data Isolation Failure | HIGH | Security |
+| Unique Constraint per User (email duplicates) | MEDIUM | Database/Validation |
+| Soft Delete Integrity (client-invoice relationship) | MEDIUM | Business Logic |
 
-- SQ-1 (Epic: User Auth) - needs authenticated users
+### Test Coverage Summary
 
-### Blocks
+- ***Total Estimated Test Cases:*** 53
+- ***Integration Points:*** 6 API endpoints + DB + Auth
+- ***Critical User Journeys:*** Add client from invoice flow, Client CRUD
+- ***Test Complexity:*** Medium
 
-- EPIC 4 (Invoice Creation) - needs clients to create invoices
+### Critical Questions for Team
+
+- Tax ID validation format per country?
+- Client limits for Free vs Pro?
+- Search behavior (case-insensitive, partial match)?
+
+See detailed test plan in comments below.
+
+### Test Strategy
+
+- ***Levels:*** Unit, Integration, E2E, API
+- ***Tools:*** Playwright, Vitest, Postman
+- ***Timeline:*** ~1.5 sprints (3 weeks estimated)
 
 ---
 
-## Related Documentation
+## User Stories
 
-- **PRD:** `.context/PRD/mvp-scope.md` (EPIC 3)
-- **SRS:** `.context/SRS/functional-specs.md` (FR-012 to FR-017)
+| Key | Story | Points | Priority | Status |
+| --- | ----- | ------ | -------- | ------ |
+| [SQ-14](https://upexgalaxy65.atlassian.net/browse/SQ-14) | Add New Client | 13 | Medium | QA Approved |
+| [SQ-15](https://upexgalaxy65.atlassian.net/browse/SQ-15) | List All Clients | 5 | Medium | Ready For QA |
+| [SQ-16](https://upexgalaxy65.atlassian.net/browse/SQ-16) | Edit Client Data | 5 | Medium | QA Approved |
+| [SQ-17](https://upexgalaxy65.atlassian.net/browse/SQ-17) | Add Client Tax Information | 13 | Medium | Ready For QA |
+| [SQ-18](https://upexgalaxy65.atlassian.net/browse/SQ-18) | View Client Invoice History | 2 | Medium | Ready For QA |
+| [SQ-19](https://upexgalaxy65.atlassian.net/browse/SQ-19) | Delete Client | 10 | Medium | Ready For QA |
+| [SQ-68](https://upexgalaxy65.atlassian.net/browse/SQ-68) | As a user, I want the system to validate client email deliverability so that I avoid sending invoices to invalid addresses | 3 | Medium | Backlog |
 
 ---
 
-_Documento parte del PBI de SoloQ_
-_Última actualización: 2026-01-20_
+## Metadata
+
+- **Created:** 1/20/2026
+- **Updated:** 1/27/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
+- **Labels:** test-plan-ready
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:53:43.593Z_

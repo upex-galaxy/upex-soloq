@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import type { User, Session, AuthError } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
 import type { Tables } from '@/types/supabase';
@@ -98,34 +98,77 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Sign in
   const signIn = useCallback(
     async (email: string, password: string) => {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+
+      // Update last_login_at only on actual login, not on session restoration (SQ-81 fix)
+      if (!error && data.user) {
+        supabase
+          .from('profiles')
+          .update({ last_login_at: new Date().toISOString() })
+          .eq('user_id', data.user.id)
+          .then();
+      }
 
       return { error };
     },
     [supabase]
   );
 
-  // Sign out
+  // Sign out - clear state immediately for better UX, then call server
   const signOut = useCallback(async () => {
+    // Clear state immediately to ensure logout works even if server call fails
+    setState({
+      user: null,
+      session: null,
+      isLoading: false,
+      isAuthenticated: false,
+    });
+
+    // Then attempt to sign out from server (errors are logged but don't block logout)
     const { error } = await supabase.auth.signOut();
 
-    if (!error) {
+    return { error };
+  }, [supabase]);
+
+  // Generation counter to prevent stale updates from race conditions (SQ-74 fix)
+  const initGenRef = useRef(0);
+
+  // Initialize auth state and listen for changes
+  useEffect(() => {
+    // Increment generation for this initialization attempt
+    const currentGen = ++initGenRef.current;
+
+    // Track if component is still mounted to prevent state updates after unmount
+    let isMounted = true;
+
+    // Helper to check if this is still the latest initialization attempt
+    const isStale = () => !isMounted || currentGen !== initGenRef.current;
+
+    const clearAuthState = () => {
       setState({
         user: null,
         session: null,
         isLoading: false,
         isAuthenticated: false,
       });
-    }
+    };
 
-    return { error };
-  }, [supabase]);
+    // Safety timeout: if initialization hangs, force isLoading to false (SQ-74 fix)
+    // This prevents the skeleton from showing forever after rapid refreshes
+    const safetyTimeout = setTimeout(() => {
+      if (!isStale()) {
+        setState(prev => {
+          if (prev.isLoading) {
+            return { ...prev, isLoading: false };
+          }
+          return prev;
+        });
+      }
+    }, 8000);
 
-  // Initialize auth state and listen for changes
-  useEffect(() => {
     // Get initial session - use getUser() to validate token with server
     const initializeAuth = async () => {
       try {
@@ -135,49 +178,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           error: userError,
         } = await supabase.auth.getUser();
 
-        // If no valid user, clear state
+        if (isStale()) return;
+
         if (userError || !validatedUser) {
-          setState({
-            user: null,
-            session: null,
-            isLoading: false,
-            isAuthenticated: false,
-          });
+          clearAuthState();
           return;
         }
 
-        // User is valid, now get the session for token info
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+        // Parallelize getSession + fetchUserProfile to reduce init time (SQ-74 fix)
+        const [sessionResult, profileData] = await Promise.all([
+          supabase.auth.getSession(),
+          fetchUserProfile(validatedUser.id),
+        ]);
 
-        if (session?.user) {
-          const profileData = await fetchUserProfile(session.user.id);
+        if (isStale()) return;
 
-          setState({
-            user: {
-              ...session.user,
-              ...profileData,
-            },
-            session,
-            isLoading: false,
-            isAuthenticated: true,
-          });
-        } else {
-          setState({
-            user: null,
-            session: null,
-            isLoading: false,
-            isAuthenticated: false,
-          });
-        }
-      } catch {
+        const session = sessionResult.data.session;
         setState({
-          user: null,
-          session: null,
+          user: {
+            ...validatedUser,
+            ...profileData,
+          },
+          session,
           isLoading: false,
-          isAuthenticated: false,
+          isAuthenticated: true,
         });
+      } catch {
+        if (!isStale()) {
+          clearAuthState();
+        }
       }
     };
 
@@ -187,14 +216,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        // Update last_login_at in profiles table (SQ-81 fix)
-        await supabase
-          .from('profiles')
-          .update({ last_login_at: new Date().toISOString() })
-          .eq('user_id', session.user.id);
+      // Prevent stale event handlers from setting state (SQ-74 fix)
+      if (isStale()) return;
 
+      if (event === 'SIGNED_IN' && session?.user) {
+        // Note: last_login_at is updated in signIn() function, not here (SQ-81 fix)
         const profileData = await fetchUserProfile(session.user.id);
+
+        if (isStale()) return;
 
         setState({
           user: {
@@ -206,21 +235,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           isAuthenticated: true,
         });
       } else if (event === 'SIGNED_OUT') {
-        setState({
-          user: null,
-          session: null,
-          isLoading: false,
-          isAuthenticated: false,
-        });
-      } else if (event === 'TOKEN_REFRESHED' && session) {
+        clearAuthState();
+      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+        // Re-fetch profile to keep user data in sync after token refresh
+        const profileData = await fetchUserProfile(session.user.id);
+
+        if (isStale()) return;
+
         setState(prev => ({
           ...prev,
+          user: prev.user
+            ? {
+                ...session.user,
+                ...profileData,
+              }
+            : null,
           session,
         }));
       }
     });
 
     return () => {
+      isMounted = false;
+      clearTimeout(safetyTimeout);
       subscription.unsubscribe();
     };
   }, [supabase, fetchUserProfile]);

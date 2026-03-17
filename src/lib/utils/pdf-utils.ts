@@ -108,6 +108,21 @@ export function sanitizeForPDF(text: string | null | undefined): string {
 }
 
 /**
+ * Formats a JSONB business address into a single-line display string for PDF.
+ * Handles both the new JSONB format and legacy string format.
+ */
+export function formatBusinessAddress(address: unknown): string {
+  if (!address) return '';
+  if (typeof address === 'string') return address;
+  if (typeof address === 'object') {
+    const addr = address as Record<string, string | undefined>;
+    const parts = [addr.street, addr.city, addr.state, addr.postal_code].filter(Boolean);
+    return parts.join(', ');
+  }
+  return '';
+}
+
+/**
  * Check if a URL is valid for image loading in PDF
  *
  * Validates that the URL is properly formatted and uses http/https protocol.

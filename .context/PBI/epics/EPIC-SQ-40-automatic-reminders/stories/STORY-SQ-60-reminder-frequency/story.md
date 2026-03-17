@@ -1,75 +1,114 @@
-# Configure Reminder Frequency
+# As a Pro user, I want to configure the reminder frequency so that I can adjust it to my collection needs
 
-**Jira Key:** [SQ-60](https://upexgalaxy64.atlassian.net/browse/SQ-60)
-**Epic:** [SQ-40](https://upexgalaxy64.atlassian.net/browse/SQ-40) (Automatic Reminders)
-**Priority:** High
-**Story Points:** 2
+**Jira Key:** [SQ-60](https://upexgalaxy65.atlassian.net/browse/SQ-60)
+**Epic:** [SQ-40](https://upexgalaxy65.atlassian.net/browse/SQ-40) (Automatic Reminders (Pro Feature))
+**Priority:** Medium
+**Story Points:** 3
 **Status:** Backlog
 
 ---
 
 ## User Story
 
-**As a** Pro user
-**I want to** configure reminder frequency (every X days)
-**So that** I can adjust to my needs
+As a Pro user, I want to configure reminder frequency (every X days), so that I can adjust to my needs. Story Points: 2
 
 ---
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Frequency setting
+1. 
 
-- **Given:** I am configuring reminders
-- **When:** I view the settings
-- **Then:** I can set how often to send reminders
+1. 
 
-### Scenario 2: Frequency options
+- ****Given:**** I am a Pro user on the reminder settings page
+- ****When:**** I set frequency to 7 days
+- ****Then:**** The system saves the frequency setting
+- ****And:**** Reminders will be sent every 7 days for overdue invoices
 
-- **Given:** I view frequency options
-- **When:** I see the choices
-- **Then:** I can choose: 3, 5, 7, 14, or 30 days
+1. 
 
-### Scenario 3: Custom frequency
+- ****Given:**** I am on the reminder settings page
+- ****When:**** I try to set frequency to 0 days
+- ****Then:**** The system shows error "Frequency must be at least 1 day"
+- ****When:**** I try to set frequency to 45 days
+- ****Then:**** The system shows error "Frequency cannot exceed 30 days"
 
-- **Given:** I need a specific frequency
-- **When:** I enter a custom value
-- **Then:** The system accepts 1-30 days
+1. 
 
-### Scenario 4: Frequency applied
+- ****Given:**** I am on the reminder settings page
+- ****When:**** I set max reminders to 5
+- ****Then:**** The system saves the setting
+- ****And:**** Each overdue invoice will receive at most 5 reminders
 
-- **Given:** I set frequency to 7 days
-- **When:** A reminder is sent
-- **Then:** The next reminder waits 7 days
+1. 
 
-### Scenario 5: Max reminders
+- ****Given:**** I am on the reminder settings page
+- ****When:**** I try to set max reminders to 0
+- ****Then:**** The system shows error "Must send at least 1 reminder"
+- ****When:**** I try to set max reminders to 15
+- ****Then:**** The system shows error "Cannot exceed 10 reminders"
 
-- **Given:** I configure reminders
-- **When:** I set max reminders
-- **Then:** The system stops after that many attempts
+1. 
+
+- ****Given:**** I am a Pro user with reminders disabled
+- ****When:**** I toggle reminders to "Enabled"
+- ****Then:**** The system activates automatic reminders
+- ****And:**** Shows the frequency and max reminders options
+
+1. 
+
+- ****Given:**** I just upgraded to Pro subscription
+- ****When:**** I visit the reminder settings page for the first time
+- ****Then:**** I see default values: enabled=false, frequency=7 days, max=3
+
+1. 
+
+- ****Given:**** I have set frequency=5 and max=4
+- ****When:**** I navigate away and return to settings
+- ****Then:**** My previously saved settings are displayed correctly
 
 ---
 
-## Technical Notes
+## Scope
 
-- Store in reminder_settings.frequency_days
-- Default: 7 days
-- Max reminders: default 3 (configurable 1-10)
-- Check: last_reminder_date + frequency_days <= today
+1. 
+
+1. 
+
+- Enable/disable toggle for automatic reminders
+- Frequency input (1-30 days)
+- Max reminders input (1-10)
+- Default values: enabled=false, frequency=7, max=3
+- Validation for all input ranges
+- Save to reminder_settings table
+- Pro subscription check before allowing access
+
+1. 
+
+- Per-invoice frequency override
+- Different frequencies for different clients
+- Schedule specific days/times for reminders
+- Preview of next scheduled reminder
 
 ---
 
 ## Definition of Done
 
-- [ ] Frequency selector implemented
-- [ ] Preset options available
-- [ ] Custom frequency working
-- [ ] Frequency logic correct
-- [ ] Max reminders setting working
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-40-automatic-reminders/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 3/2/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:54:07.543Z_

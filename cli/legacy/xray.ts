@@ -584,6 +584,7 @@ async function getValidToken(): Promise<string> {
 // GRAPHQL CLIENT
 // ============================================================================
 
+// eslint-disable-next-line ts/no-explicit-any
 async function graphql<T = any>(query: string, variables?: Record<string, unknown>): Promise<T> {
   const token = await getValidToken();
 
@@ -615,6 +616,7 @@ async function graphql<T = any>(query: string, variables?: Record<string, unknow
 // REST API CLIENT (for imports)
 // ============================================================================
 
+// eslint-disable-next-line ts/no-explicit-any
 async function restApi<T = any>(
   endpoint: string,
   options: {

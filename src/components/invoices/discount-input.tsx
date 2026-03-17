@@ -55,6 +55,18 @@ export const DiscountInput = forwardRef<HTMLInputElement, DiscountInputProps>(
       [subtotal, discountType, discountValue]
     );
 
+    // Validate percentage > 100 (SQ-97: must show error and block submit)
+    const percentageError = useMemo(() => {
+      if (discountType === 'percentage' && discountValue > 100) {
+        return 'El porcentaje de descuento no puede exceder 100%';
+      }
+      return null;
+    }, [discountType, discountValue]);
+
+    // Combined error: external error prop or internal percentage validation
+    const displayError = error || percentageError;
+    const hasPercentageError = percentageError !== null;
+
     // Handle type toggle
     const handleTypeChange = useCallback(
       (newType: DiscountType | null) => {
@@ -158,9 +170,9 @@ export const DiscountInput = forwardRef<HTMLInputElement, DiscountInputProps>(
                 aria-label={
                   discountType === 'percentage' ? 'Porcentaje de descuento' : 'Monto de descuento'
                 }
-                aria-describedby={error ? 'discount-input-error' : undefined}
-                aria-invalid={!!error || capped}
-                className={cn('pr-8', (error || capped) && 'border-destructive')}
+                aria-describedby={displayError ? 'discount-input-error' : undefined}
+                aria-invalid={!!displayError || capped}
+                className={cn('pr-8', (displayError || capped) && 'border-destructive')}
                 data-testid="discount-value-input"
               />
               <span
@@ -181,8 +193,8 @@ export const DiscountInput = forwardRef<HTMLInputElement, DiscountInputProps>(
               </p>
             )}
 
-            {/* Warning when discount exceeds subtotal */}
-            {capped && (
+            {/* Warning when discount exceeds subtotal (only show if no percentage error) */}
+            {capped && !hasPercentageError && (
               <div
                 className="bg-destructive/10 text-destructive flex items-center gap-2 rounded-md px-3 py-2 text-sm"
                 role="alert"
@@ -202,10 +214,10 @@ export const DiscountInput = forwardRef<HTMLInputElement, DiscountInputProps>(
           </p>
         )}
 
-        {/* Error message */}
-        {error && (
+        {/* Error message (external or percentage validation) */}
+        {displayError && (
           <p id="discount-input-error" className="text-destructive text-sm" role="alert">
-            {error}
+            {displayError}
           </p>
         )}
       </div>

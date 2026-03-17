@@ -1,69 +1,79 @@
-# Include Attached PDF in Email
+# Include PDF Attachment in Email
 
-**Jira Key:** [SQ-43](https://upexgalaxy64.atlassian.net/browse/SQ-43)
-**Epic:** [SQ-37](https://upexgalaxy64.atlassian.net/browse/SQ-37) (Invoice Sending)
-**Priority:** High
-**Story Points:** 2
-**Status:** Backlog
+**Jira Key:** [SQ-43](https://upexgalaxy65.atlassian.net/browse/SQ-43)
+**Epic:** [SQ-37](https://upexgalaxy65.atlassian.net/browse/SQ-37) (Invoice Sending)
+**Priority:** Medium
+**Story Points:** 5
+**Status:** Ready For QA
 
 ---
 
 ## User Story
 
-**As a** user
-**I want to** have the email include the attached PDF
-**So that** the client has the invoice
+Como usuario, quiero que el email incluya el PDF adjunto, para que el cliente tenga la factura. Story Points: 2
+
+## 
+
+## Refinamientos QA (Shift-Left Analysis)
+
+**Fecha de analisis:** 2026-02-09
+**Estado:** Refinado por QA
+
+### Acceptance Criteria refinados
+
+- Escenario 1: PDF adjunto incluido al enviar
+- Escenario 2: Nombre del adjunto usa numero de factura
+- Escenario 3: Tamano del adjunto dentro del limite
+- Escenario 4: El adjunto abre correctamente
+- Escenario 5: Falla la generacion de PDF
+- Escenario 6: PDF supera el limite
+
+### Edge Cases identificados
+
+- Logo grande + muchos items genera PDF mayor a 5MB
+- Generador de PDF retorna archivo vacio/0 bytes
+- Numero de factura con caracteres especiales (requiere confirmacion)
+
+### Reglas de negocio por definir
+
+- Confirmar patron de nombre (Invoice-{invoiceNumber}.pdf vs {invoiceNumber}.pdf)
+- Definir enforcement del limite y error response
+- Confirmar generacion de PDF server-side para envio
 
 ---
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: PDF attachment
+Feature:
 
-- **Given:** I send an invoice
-- **When:** The client receives the email
-- **Then:** The email has the invoice PDF attached
+Background:
+Given ...
 
-### Scenario 2: Attachment name
-
-- **Given:** The client receives the email
-- **When:** They view the attachment
-- **Then:** The file is named Invoice-{number}.pdf
-
-### Scenario 3: Attachment size
-
-- **Given:** I send an invoice with a logo
-- **When:** The PDF is attached
-- **Then:** The file size is reasonable (< 5MB)
-
-### Scenario 4: Attachment opens correctly
-
-- **Given:** The client downloads the attachment
-- **When:** They open the PDF
-- **Then:** It displays correctly with all data
-
----
-
-## Technical Notes
-
-- Generate PDF server-side or client-side before sending
-- Attach as base64 or buffer to email
-- Optimize images to keep file size down
-- Use proper MIME type: application/pdf
+Scenario: ...
+Given ...
+When ...
+Then ...
 
 ---
 
 ## Definition of Done
 
-- [ ] PDF attachment working
-- [ ] Correct file naming
-- [ ] File size optimized
-- [ ] PDF opens correctly
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-37-invoice-sending/epic.md`
-- **Related:** SQ-32 (Generate PDF)
+- **Created:** 1/20/2026
+- **Updated:** 3/1/2026
+- **Reporter:** Ely
+- **Assignee:** yxsinell acosta zambrano
+- **Labels:** shift-left-reviewed, test-plan-ready
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:53:58.643Z_

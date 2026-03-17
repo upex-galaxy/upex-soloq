@@ -1,7 +1,7 @@
-# Search Invoices by Client or Number
+# As a user, I want to search invoices by client or number so that I can find a specific one
 
-**Jira Key:** [SQ-51](https://upexgalaxy64.atlassian.net/browse/SQ-51)
-**Epic:** [SQ-38](https://upexgalaxy64.atlassian.net/browse/SQ-38) (Dashboard & Tracking)
+**Jira Key:** [SQ-51](https://upexgalaxy65.atlassian.net/browse/SQ-51)
+**Epic:** [SQ-38](https://upexgalaxy65.atlassian.net/browse/SQ-38) (Invoice Dashboard & Tracking)
 **Priority:** Medium
 **Story Points:** 3
 **Status:** Backlog
@@ -10,73 +10,90 @@
 
 ## User Story
 
-**As a** user
-**I want to** search invoices by client or number
-**So that** I can find a specific one
+As a user, I want to search invoices by client or number, so that I can find a specific one. Story Points: 2
 
 ---
 
-## Acceptance Criteria (Gherkin format)
+## Acceptance Criteria
 
-### Scenario 1: Search box
+1. 
 
-- **Given:** I am on the dashboard
-- **When:** I look at the header
-- **Then:** I see a search box
+- ****Given:**** I am on the dashboard
+- ****When:**** I look at the header
+- ****Then:**** I see a search box
 
-### Scenario 2: Search by invoice number
+1. 
 
-- **Given:** I type an invoice number
-- **When:** I submit the search
-- **Then:** I see invoices matching that number
+- ****Given:**** I type an invoice number (e.g., "INV-2026-0042")
+- ****When:**** I submit the search
+- ****Then:**** I see invoices matching that number
 
-### Scenario 3: Search by client name
+1. 
 
-- **Given:** I type a client's name
-- **When:** I submit the search
-- **Then:** I see invoices for that client
+- ****Given:**** I type a client's name
+- ****When:**** I submit the search
+- ****Then:**** I see all invoices for that client
 
-### Scenario 4: Partial match
+1. 
 
-- **Given:** I type partial text
-- **When:** I search
-- **Then:** I see results that contain the search term
+- ****Given:**** I type partial text (e.g., "John")
+- ****When:**** I search
+- ****Then:**** I see results that contain the search term
 
-### Scenario 5: No results
+1. 
 
-- **Given:** I search for something that doesn't exist
-- **When:** I view the results
-- **Then:** I see a "No results" message
+- ****Given:**** I search for something that doesn't exist
+- ****When:**** I view the results
+- ****Then:**** I see a "No results found" message
 
-### Scenario 6: Clear search
+1. 
 
-- **Given:** I have an active search
-- **When:** I clear the search
-- **Then:** I see all invoices again
+- ****Given:**** I have an active search
+- ****When:**** I clear the search box
+- ****Then:**** I see all invoices again
 
 ---
 
-## Technical Notes
+## Scope
 
-- Search fields: invoice_number, client.name, client.email
+1. 
+
+- Search input box on dashboard
+- Search by invoice_number
+- Search by client.name and client.email
 - Case-insensitive, partial match
-- Debounce search input (300ms)
-- API: GET /api/invoices?search={query}
+- Debounced input (300ms)
+- No results state
+- Clear search functionality
+- API query parameter: ?search={query}
+
+1. 
+
+- Advanced search syntax
+- Search by amount
+- Search by date range
+- Save recent searches
+- Full-text search indexing
 
 ---
 
 ## Definition of Done
 
-- [ ] Search box implemented
-- [ ] Invoice number search working
-- [ ] Client name search working
-- [ ] Partial match working
-- [ ] No results state shown
-- [ ] Clear search working
-- [ ] Unit tests > 80% coverage
+- [ ] Implementation complete
+- [ ] Unit tests written
+- [ ] Code reviewed
+- [ ] Documentation updated
 
 ---
 
-## Related Documentation
+## Metadata
 
-- **Epic:** `.context/PBI/epics/EPIC-SQ-38-dashboard-tracking/epic.md`
+- **Created:** 1/20/2026
+- **Updated:** 3/2/2026
+- **Reporter:** Ely
+- **Assignee:** Unassigned
+
+---
+
+_Synced from Jira by jira-sync_
+_Last sync: 2026-03-02T19:54:02.732Z_

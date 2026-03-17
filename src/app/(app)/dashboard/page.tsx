@@ -121,9 +121,31 @@ function formatDate(date: string): string {
 }
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+
+  // Show skeleton while loading auth state (SQ-74 fix)
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-2">
+            <div className="h-9 w-64 animate-pulse rounded bg-muted" />
+            <div className="h-5 w-80 animate-pulse rounded bg-muted" />
+          </div>
+          <div className="h-10 w-36 animate-pulse rounded bg-muted" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="h-32 animate-pulse rounded-lg border bg-card" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Get display name - use email as reliable fallback (SQ-74 fix: avoid "Usuario")
   const displayName =
-    user?.businessProfile?.business_name || user?.email?.split('@')[0] || 'Usuario';
+    user?.businessProfile?.business_name || user?.email?.split('@')[0] || 'Mi Cuenta';
 
   return (
     <motion.div

@@ -73,3 +73,9 @@ dbhub.toml
 
 # Playwright CLI artifacts
 .playwright-cli/
+
+# Playwright CLI session config (keep cli.config.json tracked)
+# .playwright/ is committed for cli.config.json
+
+# Testing session artifacts (snapshots, screenshots, console logs)
+.context/PBI/testing-session/

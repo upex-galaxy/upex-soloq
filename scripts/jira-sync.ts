@@ -95,15 +95,15 @@ const CUSTOM_FIELDS = {
   storyPoints: 'customfield_10028',
   webLink: 'customfield_11600',
   // Bug/Defect fields
-  actualResult: 'customfield_10109',      // 🐞 Actual Result (Textarea)
-  expectedResult: 'customfield_10110',    // ✅ Expected Result (Textarea)
-  errorType: 'customfield_10112',         // Error Type (Dropdown)
-  severity: 'customfield_10116',          // SEVERITY (Dropdown)
-  testEnvironment: 'customfield_12210',   // Test Environment (Dropdown)
-  rootCause: 'customfield_10701',         // Root Cause🐞 (Dropdown - category only)
-  workaround: 'customfield_10111',        // 🚩 Workaround (Textarea, optional)
-  evidence: 'customfield_10607',          // 🧫 EVIDENCE (Textarea, optional)
-  fixType: 'customfield_12212',           // Fix (Radio: Bugfix/Hotfix)
+  actualResult: 'customfield_10109', // 🐞 Actual Result (Textarea)
+  expectedResult: 'customfield_10110', // ✅ Expected Result (Textarea)
+  errorType: 'customfield_10112', // Error Type (Dropdown)
+  severity: 'customfield_10116', // SEVERITY (Dropdown)
+  testEnvironment: 'customfield_12210', // Test Environment (Dropdown)
+  rootCause: 'customfield_10701', // Root Cause🐞 (Dropdown - category only)
+  workaround: 'customfield_10111', // 🚩 Workaround (Textarea, optional)
+  evidence: 'customfield_10607', // 🧫 EVIDENCE (Textarea, optional)
+  fixType: 'customfield_12212', // Fix (Radio: Bugfix/Hotfix)
 } as const;
 
 /** Fields to request for Epics */
@@ -170,156 +170,156 @@ const IMPROVEMENT_FIELDS = [
 // ============================================================================
 
 interface Config {
-  baseUrl: string;
-  email: string;
-  apiToken: string;
-  project: string;
-  outputDir: string;
+  baseUrl: string
+  email: string
+  apiToken: string
+  project: string
+  outputDir: string
 }
 
 interface JiraUser {
-  accountId: string;
-  displayName: string;
-  emailAddress?: string;
+  accountId: string
+  displayName: string
+  emailAddress?: string
 }
 
 interface JiraStatus {
-  name: string;
+  name: string
   statusCategory: {
-    name: string;
-    colorName: string;
-  };
+    name: string
+    colorName: string
+  }
 }
 
 interface JiraPriority {
-  name: string;
-  id: string;
+  name: string
+  id: string
 }
 
 interface JiraIssueType {
-  name: string;
-  subtask: boolean;
+  name: string
+  subtask: boolean
 }
 
 interface JiraIssueLink {
-  id: string;
+  id: string
   type: {
-    id: string;
-    name: string;
-    inward: string;
-    outward: string;
-  };
-  inwardIssue?: { key: string; fields: { summary: string; issuetype: JiraIssueType } };
-  outwardIssue?: { key: string; fields: { summary: string; issuetype: JiraIssueType } };
+    id: string
+    name: string
+    inward: string
+    outward: string
+  }
+  inwardIssue?: { key: string, fields: { summary: string, issuetype: JiraIssueType } }
+  outwardIssue?: { key: string, fields: { summary: string, issuetype: JiraIssueType } }
 }
 
 interface JiraComponent {
-  id: string;
-  name: string;
+  id: string
+  name: string
 }
 
 interface JiraIssueFields {
-  summary: string;
-  description: AdfDocument | string | null;
-  status: JiraStatus;
-  priority: JiraPriority;
-  labels: string[];
-  created: string;
-  updated: string;
-  reporter: JiraUser | null;
-  assignee: JiraUser | null;
-  parent?: { key: string; fields: { summary: string } };
-  issuetype: JiraIssueType;
-  issuelinks?: JiraIssueLink[];
-  components?: JiraComponent[];
-  [key: string]: unknown;
+  summary: string
+  description: AdfDocument | string | null
+  status: JiraStatus
+  priority: JiraPriority
+  labels: string[]
+  created: string
+  updated: string
+  reporter: JiraUser | null
+  assignee: JiraUser | null
+  parent?: { key: string, fields: { summary: string } }
+  issuetype: JiraIssueType
+  issuelinks?: JiraIssueLink[]
+  components?: JiraComponent[]
+  [key: string]: unknown
 }
 
 interface JiraIssue {
-  id: string;
-  key: string;
-  self: string;
-  fields: JiraIssueFields;
+  id: string
+  key: string
+  self: string
+  fields: JiraIssueFields
 }
 
 interface JiraComment {
-  id: string;
-  author: JiraUser;
-  body: AdfDocument | string;
-  created: string;
-  updated: string;
+  id: string
+  author: JiraUser
+  body: AdfDocument | string
+  created: string
+  updated: string
 }
 
 interface JiraSearchResponse {
-  issues: JiraIssue[];
-  total: number;
-  isLast?: boolean;
-  nextPageToken?: string;
+  issues: JiraIssue[]
+  total: number
+  isLast?: boolean
+  nextPageToken?: string
 }
 
 interface JiraCommentsResponse {
-  comments: JiraComment[];
-  total: number;
+  comments: JiraComment[]
+  total: number
 }
 
 // Atlassian Document Format types
 interface AdfMark {
-  type: 'strong' | 'em' | 'code' | 'link' | 'strike' | 'underline' | 'textColor' | 'subsup';
-  attrs?: { href?: string; [key: string]: unknown };
+  type: 'strong' | 'em' | 'code' | 'link' | 'strike' | 'underline' | 'textColor' | 'subsup'
+  attrs?: { href?: string, [key: string]: unknown }
 }
 
 interface AdfNode {
-  type: string;
-  content?: AdfNode[];
-  text?: string;
-  marks?: AdfMark[];
-  attrs?: { level?: number; language?: string; [key: string]: unknown };
+  type: string
+  content?: AdfNode[]
+  text?: string
+  marks?: AdfMark[]
+  attrs?: { level?: number, language?: string, [key: string]: unknown }
 }
 
 interface AdfDocument {
-  type: 'doc';
-  version: 1;
-  content: AdfNode[];
+  type: 'doc'
+  version: 1
+  content: AdfNode[]
 }
 
 type IssueTypeFilter = 'stories' | 'bugs' | 'defects' | 'improvements' | 'tests';
 
 interface SyncOptions {
-  epicKey?: string;
-  storyKey?: string;
-  issueType: IssueTypeFilter;
-  includeComments: boolean;
-  dryRun: boolean;
-  json: boolean;
+  epicKey?: string
+  storyKey?: string
+  issueType: IssueTypeFilter
+  includeComments: boolean
+  dryRun: boolean
+  json: boolean
 }
 
 interface SyncResult {
-  success: boolean;
+  success: boolean
   synced: {
-    epics: number;
-    stories: number;
-    bugs: number;
-    defects: number;
-    improvements: number;
-    tests: number;
-  };
-  warnings: string[];
+    epics: number
+    stories: number
+    bugs: number
+    defects: number
+    improvements: number
+    tests: number
+  }
+  warnings: string[]
   files: {
-    created: number;
-    updated: number;
-    skipped: number;
-  };
-  duration_ms: number;
+    created: number
+    updated: number
+    skipped: number
+  }
+  duration_ms: number
 }
 
 interface ParsedArgs {
-  command: string;
-  subcommand?: IssueTypeFilter;
-  epic?: string;
-  story?: string;
-  includeComments: boolean;
-  dryRun: boolean;
-  json: boolean;
+  command: string
+  subcommand?: IssueTypeFilter
+  epic?: string
+  story?: string
+  includeComments: boolean
+  dryRun: boolean
+  json: boolean
 }
 
 // ============================================================================
@@ -418,9 +418,9 @@ function getConfig(): Config {
   const apiToken = process.env.ATLASSIAN_API_TOKEN;
 
   const missing: string[] = [];
-  if (!baseUrl) missing.push('ATLASSIAN_URL');
-  if (!email) missing.push('ATLASSIAN_EMAIL');
-  if (!apiToken) missing.push('ATLASSIAN_API_TOKEN');
+  if (!baseUrl) { missing.push('ATLASSIAN_URL'); }
+  if (!email) { missing.push('ATLASSIAN_EMAIL'); }
+  if (!apiToken) { missing.push('ATLASSIAN_API_TOKEN'); }
 
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
@@ -494,7 +494,8 @@ async function searchIssues(
 
     if (response.isLast || !response.nextPageToken) {
       hasMorePages = false;
-    } else {
+    }
+    else {
       nextPageToken = response.nextPageToken;
     }
   }
@@ -522,11 +523,11 @@ async function fetchComments(config: Config, key: string): Promise<JiraComment[]
 // ============================================================================
 
 function adfToMarkdown(adf: AdfDocument | string | null | undefined): string {
-  if (!adf) return '';
-  if (typeof adf === 'string') return cleanMarkdown(adf);
-  if (!adf.content) return '';
+  if (!adf) { return ''; }
+  if (typeof adf === 'string') { return cleanMarkdown(adf); }
+  if (!adf.content) { return ''; }
 
-  const markdown = adf.content.map((node) => processNode(node)).join('\n\n');
+  const markdown = adf.content.map(node => processNode(node)).join('\n\n');
   return cleanMarkdown(markdown);
 }
 
@@ -543,7 +544,7 @@ function cleanMarkdown(text: string): string {
     .replace(/^h5\.\s*/gm, '##### ')
     .replace(/^h6\.\s*/gm, '###### ')
     .replace(/\{noformat\}/g, '```')
-    .replace(/\{code(:.*?)?\}/g, '```')
+    .replace(/\{code(?::.*?)?\}/g, '```')
     .replace(/\*([^*\n]+)\*/g, '**$1**') // Wiki bold *text* to Markdown **text**
     .replace(/_([^_\n]+)_/g, '*$1*'); // Wiki italic _text_ to Markdown *text*
 }
@@ -556,14 +557,14 @@ function generateTraceabilitySection(
   issuelinks: JiraIssueLink[] | undefined,
   config: Config,
 ): string | null {
-  if (!issuelinks || issuelinks.length === 0) return null;
+  if (!issuelinks || issuelinks.length === 0) { return null; }
 
   // Group links by issue type
-  const grouped: Record<string, Array<{ key: string; summary: string; status: string; relation: string }>> = {};
+  const grouped: Record<string, Array<{ key: string, summary: string, status: string, relation: string }>> = {};
 
   for (const link of issuelinks) {
     const issue = link.inwardIssue || link.outwardIssue;
-    if (!issue) continue;
+    if (!issue) { continue; }
 
     const issueType = issue.fields.issuetype?.name || 'Other';
     const relation = link.inwardIssue ? link.type.inward : link.type.outward;
@@ -591,9 +592,9 @@ function generateTraceabilitySection(
   const sortedTypes = Object.keys(grouped).sort((a, b) => {
     const aIndex = typeOrder.indexOf(a);
     const bIndex = typeOrder.indexOf(b);
-    if (aIndex === -1 && bIndex === -1) return a.localeCompare(b);
-    if (aIndex === -1) return 1;
-    if (bIndex === -1) return -1;
+    if (aIndex === -1 && bIndex === -1) { return a.localeCompare(b); }
+    if (aIndex === -1) { return 1; }
+    if (bIndex === -1) { return -1; }
     return aIndex - bIndex;
   });
 
@@ -645,14 +646,14 @@ function processNode(node: AdfNode): string {
 
     case 'codeBlock': {
       const lang = node.attrs?.language || '';
-      const code = node.content?.map((n) => n.text || '').join('') || '';
+      const code = node.content?.map(n => n.text || '').join('') || '';
       return `\`\`\`${lang}\n${code}\n\`\`\``;
     }
 
     case 'blockquote':
       return (
         node.content
-          ?.map((p) => `> ${processNode(p)}`)
+          ?.map(p => `> ${processNode(p)}`)
           .join('\n') || ''
       );
 
@@ -660,17 +661,17 @@ function processNode(node: AdfNode): string {
       return '---';
 
     case 'table': {
-      if (!node.content) return '';
+      if (!node.content) { return ''; }
       const rows = node.content.map((row) => {
-        const cells =
-          row.content?.map((cell) => processInlineContent(cell.content?.[0]?.content)) || [];
+        const cells
+          = row.content?.map(cell => processInlineContent(cell.content?.[0]?.content)) || [];
         return `| ${cells.join(' | ')} |`;
       });
       if (rows.length > 0) {
         // Add header separator after first row
         const headerSep = `| ${rows[0]
           .split('|')
-          .filter((c) => c.trim())
+          .filter(c => c.trim())
           .map(() => '---')
           .join(' | ')} |`;
         rows.splice(1, 0, headerSep);
@@ -685,7 +686,7 @@ function processNode(node: AdfNode): string {
 
     case 'panel': {
       const panelType = String(node.attrs?.panelType || 'info').toUpperCase();
-      const content = node.content?.map((n) => processNode(n)).join('\n') || '';
+      const content = node.content?.map(n => processNode(n)).join('\n') || '';
       return `> **${panelType}:** ${content}`;
     }
 
@@ -695,7 +696,7 @@ function processNode(node: AdfNode): string {
 }
 
 function processInlineContent(content: AdfNode[] | undefined): string {
-  if (!content) return '';
+  if (!content) { return ''; }
 
   return content
     .map((item) => {
@@ -724,10 +725,10 @@ function processInlineContent(content: AdfNode[] | undefined): string {
         }
         return text;
       }
-      if (item.type === 'hardBreak') return '\n';
-      if (item.type === 'mention') return `@${item.attrs?.text || 'user'}`;
-      if (item.type === 'emoji') return item.attrs?.shortName || '';
-      if (item.type === 'inlineCard') return `[${item.attrs?.url || 'link'}](${item.attrs?.url})`;
+      if (item.type === 'hardBreak') { return '\n'; }
+      if (item.type === 'mention') { return `@${String(item.attrs?.text || 'user')}`; }
+      if (item.type === 'emoji') { return String(item.attrs?.shortName || ''); }
+      if (item.type === 'inlineCard') { return `[${String(item.attrs?.url || 'link')}](${String(item.attrs?.url || '')})`; }
       return '';
     })
     .join('');
@@ -756,15 +757,15 @@ function generateSlug(summary: string): string {
 // ============================================================================
 
 function isProtectedFile(filename: string): boolean {
-  if (PROTECTED_FILES.has(filename)) return true;
-  return PROTECTED_PATTERNS.some((pattern) => pattern.test(filename));
+  if (PROTECTED_FILES.has(filename)) { return true; }
+  return PROTECTED_PATTERNS.some(pattern => pattern.test(filename));
 }
 
 function findExistingFolder(baseDir: string, key: string, type: 'epic' | 'story'): string | null {
   const prefix = type === 'epic' ? `EPIC-${key}` : `STORY-${key}`;
   const searchDir = type === 'epic' ? join(baseDir, 'epics') : baseDir;
 
-  if (!existsSync(searchDir)) return null;
+  if (!existsSync(searchDir)) { return null; }
 
   try {
     const entries = readdirSync(searchDir, { withFileTypes: true });
@@ -773,7 +774,8 @@ function findExistingFolder(baseDir: string, key: string, type: 'epic' | 'story'
         return join(searchDir, entry.name);
       }
     }
-  } catch {
+  }
+  catch {
     // Directory doesn't exist or can't be read
   }
 
@@ -796,7 +798,7 @@ function writeIfNotProtected(
   filePath: string,
   content: string,
   dryRun: boolean,
-): { written: boolean; status: 'created' | 'updated' | 'skipped' } {
+): { written: boolean, status: 'created' | 'updated' | 'skipped' } {
   const filename = filePath.split('/').pop() || '';
 
   if (isProtectedFile(filename)) {
@@ -855,9 +857,9 @@ function generateEpicMarkdown(
 
     for (const story of stories) {
       const storyFields = story.fields;
-      const points = storyFields[CUSTOM_FIELDS.storyPoints];
+      const points = storyFields[CUSTOM_FIELDS.storyPoints] as number | undefined;
       lines.push(
-        `| [${story.key}](${config.baseUrl}/browse/${story.key}) | ${storyFields.summary} | ${points || '-'} | ${storyFields.priority?.name || '-'} | ${storyFields.status?.name || '-'} |`,
+        `| [${story.key}](${config.baseUrl}/browse/${story.key}) | ${String(storyFields.summary)} | ${points ?? '-'} | ${String(storyFields.priority?.name || '-')} | ${String(storyFields.status?.name || '-')} |`,
       );
     }
 
@@ -903,7 +905,7 @@ function generateStoryMarkdown(
   const scope = adfToMarkdown(fields[CUSTOM_FIELDS.scope] as AdfDocument | null);
   const mockup = adfToMarkdown(fields[CUSTOM_FIELDS.mockup] as AdfDocument | null);
   const workflow = adfToMarkdown(fields[CUSTOM_FIELDS.workflow] as AdfDocument | null);
-  const storyPoints = fields[CUSTOM_FIELDS.storyPoints];
+  const storyPoints = fields[CUSTOM_FIELDS.storyPoints] as number | undefined;
   const webLink = fields[CUSTOM_FIELDS.webLink] as string | null;
 
   const lines: string[] = [
@@ -917,9 +919,9 @@ function generateStoryMarkdown(
   }
 
   lines.push(
-    `**Priority:** ${fields.priority?.name || 'Not set'}`,
-    `**Story Points:** ${storyPoints || '-'}`,
-    `**Status:** ${fields.status?.name || 'Unknown'}`,
+    `**Priority:** ${String(fields.priority?.name || 'Not set')}`,
+    `**Story Points:** ${storyPoints ?? '-'}`,
+    `**Status:** ${String(fields.status?.name || 'Unknown')}`,
     '',
     '---',
     '',
@@ -929,7 +931,8 @@ function generateStoryMarkdown(
 
   if (description) {
     lines.push(description, '');
-  } else {
+  }
+  else {
     lines.push('_No description provided_', '');
   }
 
@@ -1019,7 +1022,8 @@ function generateCommentsMarkdown(
 
   if (comments.length === 0) {
     lines.push('_No comments_');
-  } else {
+  }
+  else {
     for (const comment of comments) {
       const author = comment.author?.displayName || 'Unknown';
       const date = new Date(comment.created).toLocaleString();
@@ -1039,12 +1043,12 @@ function generateCommentsMarkdown(
  * Handles both simple strings and complex {value: string} objects.
  */
 function getDropdownValue(field: unknown): string | null {
-  if (!field) return null;
-  if (typeof field === 'string') return field;
+  if (!field) { return null; }
+  if (typeof field === 'string') { return field; }
   if (typeof field === 'object' && field !== null) {
     const obj = field as Record<string, unknown>;
-    if ('value' in obj && typeof obj.value === 'string') return obj.value;
-    if ('name' in obj && typeof obj.name === 'string') return obj.name;
+    if ('value' in obj && typeof obj.value === 'string') { return obj.value; }
+    if ('name' in obj && typeof obj.name === 'string') { return obj.name; }
   }
   return null;
 }
@@ -1055,7 +1059,7 @@ function generateBugMarkdown(
 ): string {
   const fields = bug.fields;
   const description = adfToMarkdown(fields.description);
-  const components = fields.components?.map((c) => c.name).join(', ') || 'None';
+  const components = fields.components?.map(c => c.name).join(', ') || 'None';
 
   // Extract custom fields
   const actualResult = adfToMarkdown(fields[CUSTOM_FIELDS.actualResult] as AdfDocument | null);
@@ -1078,10 +1082,10 @@ function generateBugMarkdown(
   ];
 
   // Add severity and error type inline if available
-  if (severity) lines.push(`**Severity:** ${severity}`);
-  if (errorType) lines.push(`**Error Type:** ${errorType}`);
-  if (testEnvironment) lines.push(`**Test Environment:** ${testEnvironment}`);
-  if (fixType) lines.push(`**Fix Type:** ${fixType}`);
+  if (severity) { lines.push(`**Severity:** ${severity}`); }
+  if (errorType) { lines.push(`**Error Type:** ${errorType}`); }
+  if (testEnvironment) { lines.push(`**Test Environment:** ${testEnvironment}`); }
+  if (fixType) { lines.push(`**Fix Type:** ${fixType}`); }
 
   lines.push('', '---', '', '## Description', '', description || '_No description provided_', '');
 
@@ -1147,12 +1151,12 @@ function generateBugMarkdown(
 
 function generateDefectMarkdown(
   defect: JiraIssue,
-  linkedStory: { key: string; summary: string } | null,
+  linkedStory: { key: string, summary: string } | null,
   config: Config,
 ): string {
   const fields = defect.fields;
   const description = adfToMarkdown(fields.description);
-  const components = fields.components?.map((c) => c.name).join(', ') || 'None';
+  const components = fields.components?.map(c => c.name).join(', ') || 'None';
 
   // Extract custom fields (same as bugs)
   const actualResult = adfToMarkdown(fields[CUSTOM_FIELDS.actualResult] as AdfDocument | null);
@@ -1182,10 +1186,10 @@ function generateDefectMarkdown(
   );
 
   // Add severity and error type inline if available
-  if (severity) lines.push(`**Severity:** ${severity}`);
-  if (errorType) lines.push(`**Error Type:** ${errorType}`);
-  if (testEnvironment) lines.push(`**Test Environment:** ${testEnvironment}`);
-  if (fixType) lines.push(`**Fix Type:** ${fixType}`);
+  if (severity) { lines.push(`**Severity:** ${severity}`); }
+  if (errorType) { lines.push(`**Error Type:** ${errorType}`); }
+  if (testEnvironment) { lines.push(`**Test Environment:** ${testEnvironment}`); }
+  if (fixType) { lines.push(`**Fix Type:** ${fixType}`); }
 
   lines.push('', '---', '', '## Description', '', description || '_No description provided_', '');
 
@@ -1255,7 +1259,7 @@ function generateImprovementMarkdown(
 ): string {
   const fields = improvement.fields;
   const description = adfToMarkdown(fields.description);
-  const components = fields.components?.map((c) => c.name).join(', ') || 'None';
+  const components = fields.components?.map(c => c.name).join(', ') || 'None';
 
   const lines: string[] = [
     `# IMPROVEMENT: ${fields.summary}`,
@@ -1314,7 +1318,7 @@ function generateTestMarkdown(
 ): string {
   const fields = test.fields;
   const description = adfToMarkdown(fields.description);
-  const components = fields.components?.map((c) => c.name).join(', ') || 'None';
+  const components = fields.components?.map(c => c.name).join(', ') || 'None';
 
   const lines: string[] = [
     `# TEST: ${fields.summary}`,
@@ -1367,7 +1371,7 @@ function generateTestMarkdown(
 }
 
 function generateEpicTreeMarkdown(
-  epics: Array<{ epic: JiraIssue; stories: JiraIssue[] }>,
+  epics: Array<{ epic: JiraIssue, stories: JiraIssue[] }>,
   config: Config,
 ): string {
   const lines: string[] = [
@@ -1394,9 +1398,9 @@ function generateEpicTreeMarkdown(
 
     if (stories.length > 0) {
       for (const story of stories) {
-        const points = story.fields[CUSTOM_FIELDS.storyPoints];
-        const status = story.fields.status?.name || 'Unknown';
-        lines.push(`- [${story.key}](${config.baseUrl}/browse/${story.key}) ${story.fields.summary} _(${points || '-'} pts, ${status})_`);
+        const points = story.fields[CUSTOM_FIELDS.storyPoints] as number | undefined;
+        const status = String(story.fields.status?.name || 'Unknown');
+        lines.push(`- [${story.key}](${config.baseUrl}/browse/${story.key}) ${String(story.fields.summary)} _(${points ?? '-'} pts, ${status})_`);
       }
       lines.push('');
     }
@@ -1437,9 +1441,9 @@ async function syncStory(
   const storyPath = join(storyFolder, 'story.md');
   const storyResult = writeIfNotProtected(storyPath, storyContent, options.dryRun);
 
-  if (storyResult.status === 'created') result.files.created++;
-  else if (storyResult.status === 'updated') result.files.updated++;
-  else result.files.skipped++;
+  if (storyResult.status === 'created') { result.files.created++; }
+  else if (storyResult.status === 'updated') { result.files.updated++; }
+  else { result.files.skipped++; }
 
   // Write comments.md if requested
   if (options.includeComments) {
@@ -1448,9 +1452,9 @@ async function syncStory(
     const commentsPath = join(storyFolder, 'comments.md');
     const commentsResult = writeIfNotProtected(commentsPath, commentsContent, options.dryRun);
 
-    if (commentsResult.status === 'created') result.files.created++;
-    else if (commentsResult.status === 'updated') result.files.updated++;
-    else result.files.skipped++;
+    if (commentsResult.status === 'created') { result.files.created++; }
+    else if (commentsResult.status === 'updated') { result.files.updated++; }
+    else { result.files.skipped++; }
   }
 
   result.synced.stories++;
@@ -1461,7 +1465,7 @@ async function syncEpic(
   epicKey: string,
   options: SyncOptions,
   result: SyncResult,
-): Promise<{ epic: JiraIssue; stories: JiraIssue[] } | null> {
+): Promise<{ epic: JiraIssue, stories: JiraIssue[] } | null> {
   // Fetch epic
   const epic = await fetchIssue(config, epicKey, EPIC_FIELDS);
 
@@ -1499,9 +1503,9 @@ async function syncEpic(
   const epicPath = join(epicFolder, 'epic.md');
   const epicResult = writeIfNotProtected(epicPath, epicContent, options.dryRun);
 
-  if (epicResult.status === 'created') result.files.created++;
-  else if (epicResult.status === 'updated') result.files.updated++;
-  else result.files.skipped++;
+  if (epicResult.status === 'created') { result.files.created++; }
+  else if (epicResult.status === 'updated') { result.files.updated++; }
+  else { result.files.skipped++; }
 
   result.synced.epics++;
 
@@ -1542,7 +1546,7 @@ async function syncAll(config: Config, options: SyncOptions): Promise<SyncResult
       ensureDir(join(config.outputDir, 'epics'));
     }
 
-    const allEpicData: Array<{ epic: JiraIssue; stories: JiraIssue[] }> = [];
+    const allEpicData: Array<{ epic: JiraIssue, stories: JiraIssue[] }> = [];
 
     if (options.storyKey) {
       // Sync single story
@@ -1578,7 +1582,8 @@ async function syncAll(config: Config, options: SyncOptions): Promise<SyncResult
       }
 
       await syncStory(config, story, epic, epicFolder, options, result);
-    } else if (options.epicKey) {
+    }
+    else if (options.epicKey) {
       // Sync single epic
       if (!options.json) {
         log.info(`Fetching epic ${options.epicKey}...`);
@@ -1588,7 +1593,8 @@ async function syncAll(config: Config, options: SyncOptions): Promise<SyncResult
       if (epicData) {
         allEpicData.push(epicData);
       }
-    } else {
+    }
+    else {
       // Sync all epics
       if (!options.json) {
         log.info('Fetching epics from Jira...');
@@ -1632,10 +1638,11 @@ async function syncAll(config: Config, options: SyncOptions): Promise<SyncResult
       const treePath = join(config.outputDir, 'epic-tree.md');
       const treeResult = writeIfNotProtected(treePath, treeContent, options.dryRun);
 
-      if (treeResult.status === 'created') result.files.created++;
-      else if (treeResult.status === 'updated') result.files.updated++;
+      if (treeResult.status === 'created') { result.files.created++; }
+      else if (treeResult.status === 'updated') { result.files.updated++; }
     }
-  } catch (error) {
+  }
+  catch (error) {
     result.success = false;
     const errorMessage = error instanceof Error ? error.message : String(error);
     result.warnings.push(`Error: ${errorMessage}`);
@@ -1688,13 +1695,14 @@ async function syncBugs(config: Config, options: SyncOptions): Promise<SyncResul
       const content = generateBugMarkdown(bug, config);
       const writeResult = writeIfNotProtected(filePath, content, options.dryRun);
 
-      if (writeResult.status === 'created') result.files.created++;
-      else if (writeResult.status === 'updated') result.files.updated++;
-      else result.files.skipped++;
+      if (writeResult.status === 'created') { result.files.created++; }
+      else if (writeResult.status === 'updated') { result.files.updated++; }
+      else { result.files.skipped++; }
 
       result.synced.bugs++;
     }
-  } catch (error) {
+  }
+  catch (error) {
     result.success = false;
     const errorMessage = error instanceof Error ? error.message : String(error);
     result.warnings.push(`Error: ${errorMessage}`);
@@ -1708,7 +1716,7 @@ async function syncBugs(config: Config, options: SyncOptions): Promise<SyncResul
  * Find the Story linked to a Defect through issuelinks.
  * Returns the first Story found in the links.
  */
-function findLinkedStory(defect: JiraIssue): { key: string; summary: string } | null {
+function findLinkedStory(defect: JiraIssue): { key: string, summary: string } | null {
   const links = defect.fields.issuelinks || [];
 
   for (const link of links) {
@@ -1769,8 +1777,8 @@ async function syncDefects(config: Config, options: SyncOptions): Promise<SyncRe
         // Search for the story folder in all epic folders
         if (existsSync(epicsDir)) {
           const epicFolders = readdirSync(epicsDir, { withFileTypes: true })
-            .filter((d) => d.isDirectory())
-            .map((d) => join(epicsDir, d.name));
+            .filter(d => d.isDirectory())
+            .map(d => join(epicsDir, d.name));
 
           for (const epicFolder of epicFolders) {
             const storiesDir = join(epicFolder, 'stories');
@@ -1784,12 +1792,14 @@ async function syncDefects(config: Config, options: SyncOptions): Promise<SyncRe
 
         if (storyFolder) {
           defectDir = join(storyFolder, 'defects');
-        } else {
+        }
+        else {
           // Story folder not found, put in orphan defects folder
           result.warnings.push(`${defect.key}: Linked story ${linkedStory.key} folder not found, placing in defects/`);
           defectDir = join(config.outputDir, 'defects');
         }
-      } else {
+      }
+      else {
         // No linked story, put in orphan defects folder
         result.warnings.push(`${defect.key}: No linked Story found, placing in defects/`);
         defectDir = join(config.outputDir, 'defects');
@@ -1811,13 +1821,14 @@ async function syncDefects(config: Config, options: SyncOptions): Promise<SyncRe
       const content = generateDefectMarkdown(defect, linkedStory, config);
       const writeResult = writeIfNotProtected(filePath, content, options.dryRun);
 
-      if (writeResult.status === 'created') result.files.created++;
-      else if (writeResult.status === 'updated') result.files.updated++;
-      else result.files.skipped++;
+      if (writeResult.status === 'created') { result.files.created++; }
+      else if (writeResult.status === 'updated') { result.files.updated++; }
+      else { result.files.skipped++; }
 
       result.synced.defects++;
     }
-  } catch (error) {
+  }
+  catch (error) {
     result.success = false;
     const errorMessage = error instanceof Error ? error.message : String(error);
     result.warnings.push(`Error: ${errorMessage}`);
@@ -1870,13 +1881,14 @@ async function syncImprovements(config: Config, options: SyncOptions): Promise<S
       const content = generateImprovementMarkdown(improvement, config);
       const writeResult = writeIfNotProtected(filePath, content, options.dryRun);
 
-      if (writeResult.status === 'created') result.files.created++;
-      else if (writeResult.status === 'updated') result.files.updated++;
-      else result.files.skipped++;
+      if (writeResult.status === 'created') { result.files.created++; }
+      else if (writeResult.status === 'updated') { result.files.updated++; }
+      else { result.files.skipped++; }
 
       result.synced.improvements++;
     }
-  } catch (error) {
+  }
+  catch (error) {
     result.success = false;
     const errorMessage = error instanceof Error ? error.message : String(error);
     result.warnings.push(`Error: ${errorMessage}`);
@@ -1929,13 +1941,14 @@ async function syncTests(config: Config, options: SyncOptions): Promise<SyncResu
       const content = generateTestMarkdown(test, config);
       const writeResult = writeIfNotProtected(filePath, content, options.dryRun);
 
-      if (writeResult.status === 'created') result.files.created++;
-      else if (writeResult.status === 'updated') result.files.updated++;
-      else result.files.skipped++;
+      if (writeResult.status === 'created') { result.files.created++; }
+      else if (writeResult.status === 'updated') { result.files.updated++; }
+      else { result.files.skipped++; }
 
       result.synced.tests++;
     }
-  } catch (error) {
+  }
+  catch (error) {
     result.success = false;
     const errorMessage = error instanceof Error ? error.message : String(error);
     result.warnings.push(`Error: ${errorMessage}`);
@@ -1969,16 +1982,20 @@ async function cmdStatus(): Promise<void> {
     await jiraFetch(config, `/rest/api/3/project/${config.project}`);
 
     log.success(`Connected to project ${config.project}`);
-  } catch (error) {
+  }
+  catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
 
     if (errorMessage.includes('Missing required environment')) {
       log.error(errorMessage);
-    } else if (errorMessage.includes('401')) {
+    }
+    else if (errorMessage.includes('401')) {
       log.error('Authentication failed. Check ATLASSIAN_EMAIL and ATLASSIAN_API_TOKEN');
-    } else if (errorMessage.includes('404')) {
+    }
+    else if (errorMessage.includes('404')) {
       log.error('Project not found. Check JIRA_PROJECT environment variable');
-    } else {
+    }
+    else {
       log.error(`Connection failed: ${errorMessage}`);
     }
 
@@ -2030,7 +2047,8 @@ async function cmdPull(options: SyncOptions): Promise<void> {
 
     if (options.json) {
       log.json(result);
-    } else {
+    }
+    else {
       // Print warnings
       if (result.warnings.length > 0) {
         log.line('');
@@ -2049,13 +2067,17 @@ async function cmdPull(options: SyncOptions): Promise<void> {
       if (options.issueType === 'stories') {
         log.line(`Epics synced:   ${result.synced.epics}`);
         log.line(`Stories synced: ${result.synced.stories}`);
-      } else if (options.issueType === 'bugs') {
+      }
+      else if (options.issueType === 'bugs') {
         log.line(`Bugs synced:    ${result.synced.bugs}`);
-      } else if (options.issueType === 'defects') {
+      }
+      else if (options.issueType === 'defects') {
         log.line(`Defects synced: ${result.synced.defects}`);
-      } else if (options.issueType === 'improvements') {
+      }
+      else if (options.issueType === 'improvements') {
         log.line(`Improvements synced: ${result.synced.improvements}`);
-      } else if (options.issueType === 'tests') {
+      }
+      else if (options.issueType === 'tests') {
         log.line(`Tests synced:   ${result.synced.tests}`);
       }
 
@@ -2067,17 +2089,20 @@ async function cmdPull(options: SyncOptions): Promise<void> {
 
       if (result.success) {
         log.success('Sync completed');
-      } else {
+      }
+      else {
         log.error('Sync completed with errors');
         process.exit(1);
       }
     }
-  } catch (error) {
+  }
+  catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
 
     if (options.json) {
       log.json({ success: false, error: errorMessage });
-    } else {
+    }
+    else {
       log.error(errorMessage);
     }
 

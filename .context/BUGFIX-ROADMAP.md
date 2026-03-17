@@ -1,6 +1,6 @@
 # Bugfix & Improvements Roadmap - SoloQ
 
-> **Documento provisional** - Generado: 2026-02-09
+> **Documento actualizado**: 2026-03-09
 > **Propósito:** Tracking de defects, bugs e improvements encontrados durante QA
 
 ---
@@ -38,225 +38,257 @@ Continúa con el BUGFIX-ROADMAP.md - trabaja en SQ-XX
 | In Review    | PR creado, en revisión | OPEN      | Revisar y aprobar   |
 | Ready For QA | Fixeado y desplegado   | MERGED    | Re-testear          |
 | CLOSED       | Verificado y cerrado   | MERGED    | N/A                 |
+| Enhancement  | Movido a mejora futura | N/A       | Backlog             |
+
+---
+
+## Resumen Ejecutivo
+
+| Categoría                    | Cantidad |
+| ---------------------------- | -------- |
+| **Bugs/Defects OPEN**        | 6        |
+| **Ready For QA**             | 6        |
+| **CLOSED (Resueltos)**       | 8        |
+| **Enhancement (Diferidos)**  | 7        |
+| **Total Issues**             | 27       |
 
 ---
 
 ## Estado Actual de Defects
 
-### Defects Resueltos (Ready For QA)
+### 🔴 OPEN - Requieren Fix (Prioridad)
 
-| Key   | Summary                                       | Priority | Status       | Assignee         | Bloquea | PR Fix |
-| ----- | --------------------------------------------- | -------- | ------------ | ---------------- | ------- | ------ |
-| SQ-74 | Logout no funciona después de refresh         | Highest  | Ready For QA | Joel Ramirez     | SQ-3    | #41    |
-| SQ-71 | Breadcrumb muestra user_ID en edición cliente | High     | Ready For QA | Joel Ramirez     | SQ-16   | #41    |
-| SQ-69 | Email duplicado case-sensitive permitido      | High     | Ready For QA | Ely              | SQ-14   | #41    |
-| SQ-70 | Campos desalineados al validar email          | Lowest   | Ready For QA | Marianela Portas | -       | #41    |
+| Key    | Tipo   | Summary                                                            | Priority | Assignee                     | Bloquea     |
+| ------ | ------ | ------------------------------------------------------------------ | -------- | ---------------------------- | ----------- |
+| SQ-74  | Defect | Logout no funciona después de refresh                              | Highest  | Ely                          | SQ-3        |
+| SQ-121 | Bug    | Vista previa no ejecuta ninguna acción en /invoices/{id}/edit      | High     | Luis Eduardo Flores          | SQ-30       |
+| SQ-123 | Bug    | Dashboard: Skeleton permanente tras crash de Vista previa          | High     | Luis Eduardo Flores          | SQ-121      |
+| SQ-122 | Bug    | Draft Edit: Sin advertencia al navegar con cambios no guardados    | Medium   | Luis Eduardo Flores          | -           |
+| SQ-111 | Bug    | Autosave: Estado Guardado/Cambios sin guardar alterna sin editar   | Medium   | Ely                          | -           |
 
-### Defects En Revisión (PR Abierto)
+### 🟡 Ready For QA - Esperando Re-Test
 
-| Key   | Summary                                          | Priority | Status    | Assignee | Bloquea | PR Fix |
-| ----- | ------------------------------------------------ | -------- | --------- | -------- | ------- | ------ |
-| SQ-75 | Phone field acepta letras y permite guardar      | Medium   | In Review | Ely      | -       | #44    |
-| SQ-76 | Business_profiles devuelve 406 en create invoice | Medium   | In Review | Ely      | SQ-29   | #45    |
+| Key   | Tipo   | Summary                                                                   | Priority | Assignee              | Bloquea |
+| ----- | ------ | ------------------------------------------------------------------------- | -------- | --------------------- | ------- |
+| SQ-81 | Defect | Login inconsistencias DB/UI: last_login_at, business_profiles 406         | Highest  | Joel Ramirez          | SQ-3    |
+| SQ-82 | Defect | Edit client: unicidad email case-insensitive y validaciones DB parciales  | High     | Joel Ramirez          | SQ-16   |
+| SQ-99 | Bug    | Signup: Email inválido no muestra error                                   | High     | Samuel Amonzabel      | SQ-2    |
+| SQ-98 | Bug    | Signup: Password débil permite registro                                   | High     | Samuel Amonzabel      | SQ-2    |
+| SQ-86 | Bug    | Password Reset: Suboptimal UI/UX for expired/used tokens                  | High     | Maxe Aguilera         | SQ-4    |
+| SQ-76 | Defect | Business_profiles devuelve 406 en create invoice                          | Medium   | Ximena Quintana       | SQ-29   |
 
-### Improvements Resueltos
+### ✅ CLOSED - Resueltos y Verificados
 
-| Key   | Summary                | Priority | Status | Assignee     | Relacionado | PR Impl |
-| ----- | ---------------------- | -------- | ------ | ------------ | ----------- | ------- |
-| SQ-73 | "Remember me" en Login | Medium   | CLOSED | Joel Ramirez | SQ-3        | #42     |
+| Key   | Tipo   | Summary                                               | Priority | Assignee         | Cerrado    |
+| ----- | ------ | ----------------------------------------------------- | -------- | ---------------- | ---------- |
+| SQ-71 | Defect | Breadcrumb muestra user_ID en edición cliente         | High     | Joel Ramirez     | 2026-03-02 |
+| SQ-69 | Defect | Email duplicado case-sensitive permitido              | High     | Ely              | 2026-02-10 |
+| SQ-97 | Bug    | Discounts: Porcentaje >100 no bloquea                 | High     | GENESIS OJOSE    | 2026-03-06 |
+| SQ-96 | Bug    | Discounts: Porcentaje 60% se convierte en 600%        | High     | GENESIS OJOSE    | 2026-03-06 |
+| SQ-83 | Defect | Due date warning cuando se selecciona fecha de hoy    | Medium   | Yaneth Quintero  | 2026-03-08 |
+| SQ-75 | Defect | Phone field acepta letras y permite guardar           | Medium   | Joel Ramirez     | 2026-03-01 |
+| SQ-70 | Defect | Campos desalineados al validar email                  | Lowest   | Marianela Portas | 2026-02-10 |
 
-### Issues Externos (No son del código)
+### 📦 Enhancement - Movidos a Mejoras Futuras
 
-| Key   | Summary                          | Razón                      | Status | Acción          |
-| ----- | -------------------------------- | -------------------------- | ------ | --------------- |
-| SQ-72 | Jira API bloquea update de Epics | Bug de Jira, no del código | OPEN   | Escalar a Admin |
-| SQ-77 | Flujo incompleto en staging      | No es bug, falta feature   | CLOSED | N/A             |
+| Key    | Tipo | Summary                                            | Priority | Assignee         | Razón                          |
+| ------ | ---- | -------------------------------------------------- | -------- | ---------------- | ------------------------------ |
+| SQ-109 | Bug  | Schema: Faltan Foreign Key constraints críticas    | High     | Arkaitz          | Mejora de arquitectura DB      |
+| SQ-102 | Bug  | Signup: Validaciones solo frontend sin backend     | Medium   | Samuel Amonzabel | Mejora de seguridad            |
+| SQ-100 | Bug  | Signup: Email 254 chars sin feedback               | Medium   | Samuel Amonzabel | Edge case, baja frecuencia     |
+| SQ-84  | Bug  | Forgot Password: No indica rate limit exceeded     | Medium   | Maxe Aguilera    | UX improvement                 |
+| SQ-72  | Bug  | Jira bloquea actualización de Epics (externo)      | Medium   | yxsinell acosta  | Bug de Jira, no del código     |
+| SQ-101 | Bug  | Signup: No hay icono para ver contraseña           | Low      | Samuel Amonzabel | UX improvement                 |
+| SQ-85  | Bug  | Password Reset: No real-time password strength     | Low      | Maxe Aguilera    | UX improvement                 |
 
 ---
 
 ## User Stories Afectadas por Defects
 
-### Anteriormente Bloqueadas (RESUELTAS)
+### Bloqueadas Activamente
 
-| Story | Summary          | Defect | Estado Defect | Estado US   | PR Fix |
-| ----- | ---------------- | ------ | ------------- | ----------- | ------ |
-| SQ-3  | User Login       | SQ-74  | Ready For QA  | **In Test** | #41    |
-| SQ-16 | Edit Client Data | SQ-71  | Ready For QA  | **In Test** | #41    |
+| Story | Summary            | Defect        | Estado Defect | Impacto                       |
+| ----- | ------------------ | ------------- | ------------- | ----------------------------- |
+| SQ-3  | User Login         | SQ-74, SQ-81  | OPEN/Ready    | Logout no funciona + DB gaps  |
+| SQ-30 | Save Invoice Draft | SQ-121, SQ-123| OPEN          | Vista previa crashea          |
 
-**Nota:** Los fixes ya están mergeados. Las US fueron movidas a In Test para re-testing por QA.
+### Con Defects en Ready For QA
 
-### Con Defects Relacionados (No Bloqueantes)
-
-| Story | Summary             | Defect | Estado Defect | Impacto                     |
-| ----- | ------------------- | ------ | ------------- | --------------------------- |
-| SQ-14 | Add New Client      | SQ-69  | Ready For QA  | Email duplicado (corregido) |
-| SQ-29 | Add Notes and Terms | SQ-76  | OPEN          | Business_profiles 406       |
+| Story | Summary             | Defect | Estado Defect | Acción Requerida           |
+| ----- | ------------------- | ------ | ------------- | -------------------------- |
+| SQ-2  | User Signup         | SQ-98, SQ-99 | Ready For QA | Re-testear validaciones |
+| SQ-4  | Password Recovery   | SQ-86  | Ready For QA  | Re-testear expired tokens  |
+| SQ-16 | Edit Client Data    | SQ-82  | Ready For QA  | Re-testear unicidad email  |
+| SQ-29 | Add Notes and Terms | SQ-76  | Ready For QA  | Re-testear business_profiles |
 
 ---
 
 ## Orden de Prioridad para Fixes
 
-### Prioridad 1 - Bloqueantes (RESUELTOS ✅)
+### Prioridad 1 - Bloqueantes Críticos (OPEN)
 
-1. **SQ-74** (Highest) - Logout crítico ✅
+1. **SQ-74** (Highest) - Logout crítico 🔴
    - **Problema:** Después de refrescar la página varias veces, el username cambia a "Usuario" y el logout no funciona
    - **Impacto:** Funcionalidad crítica de autenticación
    - **Desbloquea:** SQ-3 (User Login)
-   - **Estado:** Ready For QA (PR #41 MERGED)
+   - **Assignee:** Ely
+   - **Estado:** OPEN
 
-2. **SQ-71** (High) - Breadcrumb UX ✅
-   - **Problema:** Al editar un cliente, el breadcrumb muestra el UUID en lugar del nombre
-   - **Impacto:** Información técnica expuesta al usuario
-   - **Desbloquea:** SQ-16 (Edit Client Data)
-   - **Estado:** Ready For QA (PR #41 MERGED)
+2. **SQ-121** (High) - Vista previa no funciona 🔴
+   - **Problema:** El botón "Vista previa" en /invoices/{id}/edit no ejecuta ninguna acción
+   - **Impacto:** Bloquea flujo Draft → Vista previa → Enviar
+   - **Desbloquea:** SQ-30 (Save Invoice as Draft)
+   - **Assignee:** Luis Eduardo Flores
+   - **Estado:** OPEN
 
-### Prioridad 2 - Resueltos Sin Bloqueo
+3. **SQ-123** (High) - Dashboard skeleton permanente 🔴
+   - **Problema:** Tras el crash de Vista previa, el Dashboard muestra skeleton indefinidamente
+   - **Impacto:** Dashboard inutilizable sin recargar
+   - **Bloqueado por:** SQ-121
+   - **Assignee:** Luis Eduardo Flores
+   - **Estado:** OPEN
 
-3. **SQ-69** (High) - Validación email duplicado ✅
-   - **Problema:** Se permite crear clientes con emails duplicados si difieren en mayúsculas/minúsculas
-   - **Impacto:** Datos inconsistentes en la base de datos
-   - **Estado:** Ready For QA (PR #41 MERGED)
+### Prioridad 2 - Ready For QA (Requieren Re-Test)
 
-4. **SQ-70** (Lowest) - Visual menor ✅
-   - **Problema:** Campos name/email se desalinean al mostrar mensaje de validación
-   - **Impacto:** Visual, bajo impacto funcional
-   - **Estado:** Ready For QA (PR #41 MERGED)
+4. **SQ-81** (Highest) - Login inconsistencias DB/UI 🟡
+   - **Problema:** last_login_at no actualiza, business_profiles 406, gap onboarding
+   - **Impacto:** Trazabilidad de login incompleta
+   - **Assignee:** Joel Ramirez
+   - **Estado:** Ready For QA
 
-### Prioridad 3 - Nuevos Defects (En Revisión)
+5. **SQ-82** (High) - Edit client unicidad email 🟡
+   - **Problema:** Email duplicado case-insensitive permitido en edición
+   - **Impacto:** Datos inconsistentes
+   - **Assignee:** Joel Ramirez
+   - **Estado:** Ready For QA
 
-5. **SQ-75** (Medium) - Phone acepta letras 🟡 EN REVISIÓN
-   - **Problema:** El campo "Phone" acepta letras y permite guardar sin errores
-   - **Impacto:** Datos inválidos en la base de datos
-   - **Fix:** Regex validation en Zod schema
-   - **PR:** [#44](https://github.com/upex-galaxy/upex-soloq/pull/44)
+6. **SQ-98** (High) - Password débil permite registro 🟡
+   - **Problema:** Signup acepta contraseña sin mayúscula
+   - **Impacto:** Seguridad debilitada
+   - **Assignee:** Samuel Amonzabel
+   - **Estado:** Ready For QA
 
-6. **SQ-76** (Medium) - Business_profiles 406 🟡 EN REVISIÓN
-   - **Problema:** Business_profiles devuelve 406 en create invoice e impide validar prefill de términos
-   - **Impacto:** Afecta validación de SQ-29
-   - **Fix:** Cambiar .single() por .maybeSingle()
-   - **PR:** [#45](https://github.com/upex-galaxy/upex-soloq/pull/45)
+7. **SQ-99** (High) - Email inválido sin error 🟡
+   - **Problema:** Signup no muestra error con email inválido
+   - **Impacto:** UX confusa
+   - **Assignee:** Samuel Amonzabel
+   - **Estado:** Ready For QA
 
----
+8. **SQ-86** (High) - Password Reset UX 🟡
+   - **Problema:** Suboptimal UI/UX para tokens expirados
+   - **Impacto:** UX confusa en recuperación
+   - **Assignee:** Maxe Aguilera
+   - **Estado:** Ready For QA
 
-## Tracking de Fixes
+### Prioridad 3 - Medios (OPEN)
 
-### SQ-74 - Logout no funciona después de refresh ✅ RESUELTO
+9. **SQ-122** (Medium) - Sin advertencia de cambios no guardados 🔴
+   - **Problema:** Al navegar desde edit draft, no hay diálogo de confirmación
+   - **Impacto:** Pérdida de datos potencial
+   - **Assignee:** Luis Eduardo Flores
+   - **Estado:** OPEN
 
-| Paso | Estado     | Notas                                                       |
-| ---- | ---------- | ----------------------------------------------------------- |
-| 1    | Completado | Causa: getSession() retorna datos cacheados sin validar     |
-| 2    | Completado | Fix: Cambiar getSession() por getUser() en auth-context     |
-| 3    | Completado | PR [#41](https://github.com/upex-galaxy/upex-soloq/pull/41) |
-| 4    | Completado | **PR MERGED - 2026-02-10**                                  |
-| 5    | Completado | Transicionado a Ready For QA                                |
+10. **SQ-111** (Medium) - Autosave estado alternante 🔴
+    - **Problema:** Estado Guardado/Cambios sin guardar alterna sin editar
+    - **Impacto:** UX confuso
+    - **Assignee:** Ely
+    - **Estado:** OPEN
 
----
-
-### SQ-71 - Breadcrumb muestra user_ID ✅ RESUELTO
-
-| Paso | Estado     | Notas                                                       |
-| ---- | ---------- | ----------------------------------------------------------- |
-| 1    | Completado | Causa: Layout solo usa pathname, no tiene acceso a datos    |
-| 2    | Completado | Fix: BreadcrumbContext + DynamicBreadcrumb component        |
-| 3    | Completado | PR [#41](https://github.com/upex-galaxy/upex-soloq/pull/41) |
-| 4    | Completado | **PR MERGED - 2026-02-10**                                  |
-| 5    | Completado | Transicionado a Ready For QA                                |
-
----
-
-### SQ-69 - Email duplicado case-sensitive ✅ RESUELTO
-
-| Paso | Estado     | Notas                                                       |
-| ---- | ---------- | ----------------------------------------------------------- |
-| 1    | Completado | Causa: .eq() es case-sensitive en Supabase                  |
-| 2    | Completado | Fix: Normalizar a lowercase + usar .ilike()                 |
-| 3    | Completado | Migración SQL aplicada para normalizar emails existentes    |
-| 4    | Completado | PR [#41](https://github.com/upex-galaxy/upex-soloq/pull/41) |
-| 5    | Completado | **PR MERGED - 2026-02-10**                                  |
-| 6    | Completado | Transicionado a Ready For QA                                |
+11. **SQ-76** (Medium) - Business_profiles 406 🟡
+    - **Problema:** API retorna 406 al consultar business_profiles
+    - **Impacto:** Afecta prefill de términos
+    - **Assignee:** Ximena Quintana
+    - **Estado:** Ready For QA
 
 ---
 
-### SQ-70 - Campos desalineados ✅ RESUELTO
+## Tracking de Fixes Activos
+
+### SQ-74 - Logout no funciona después de refresh 🔴 OPEN
 
 | Paso | Estado     | Notas                                                       |
 | ---- | ---------- | ----------------------------------------------------------- |
-| 1    | Completado | Causa: FormMessage retorna null cuando no hay error         |
-| 2    | Completado | Fix: Siempre renderizar con min-height, usar invisible      |
-| 3    | Completado | PR [#41](https://github.com/upex-galaxy/upex-soloq/pull/41) |
-| 4    | Completado | **PR MERGED - 2026-02-10**                                  |
-| 5    | Completado | Transicionado a Ready For QA                                |
+| 1    | Pendiente  | Investigar causa: getSession() vs getUser() en auth-context |
+| 2    | Pendiente  | Implementar fix                                             |
+| 3    | Pendiente  | Crear PR                                                    |
+| 4    | Pendiente  | Merge y deploy                                              |
+| 5    | Pendiente  | Transicionar a Ready For QA                                 |
 
 ---
 
-### SQ-75 - Phone acepta letras 🟡 EN REVISIÓN
+### SQ-121 - Vista previa no ejecuta ninguna acción 🔴 OPEN
 
 | Paso | Estado     | Notas                                                       |
 | ---- | ---------- | ----------------------------------------------------------- |
-| 1    | Completado | Causa: Zod schema solo valida max length, no formato        |
-| 2    | Completado | Fix: Regex `/^[0-9+\-\s()]*$/` para validar formato         |
-| 3    | Completado | PR [#44](https://github.com/upex-galaxy/upex-soloq/pull/44) |
-| 4    | Pendiente  | **Esperando code review y merge**                           |
+| 1    | Pendiente  | Investigar InvoicePreview / InvoiceEditForm                 |
+| 2    | Pendiente  | El bug mutó: anteriormente crasheaba, ahora no hace nada    |
+| 3    | Pendiente  | Crear PR con fix                                            |
+| 4    | Pendiente  | Merge y deploy                                              |
 
 ---
 
-### SQ-76 - Business_profiles 406 🟡 EN REVISIÓN
+### SQ-123 - Dashboard skeleton permanente 🔴 OPEN
 
 | Paso | Estado     | Notas                                                       |
 | ---- | ---------- | ----------------------------------------------------------- |
-| 1    | Completado | Causa: `.single()` retorna 406 cuando hay 0 filas           |
-| 2    | Completado | Fix: Cambiar a `.maybeSingle()` que retorna null            |
-| 3    | Completado | PR [#45](https://github.com/upex-galaxy/upex-soloq/pull/45) |
-| 4    | Pendiente  | **Esperando code review y merge**                           |
+| 1    | Pendiente  | Bloqueado por SQ-121 - verificar si persiste tras fix       |
+| 2    | Pendiente  | Posible fix: Error Boundary en InvoicePreview               |
+| 3    | Pendiente  | Crear PR si necesario                                       |
 
 ---
 
-## Tracking de Improvements
-
-### SQ-73 - "Remember me" en Login ✅ CERRADO
+### SQ-81 - Login inconsistencias DB/UI 🟡 Ready For QA
 
 | Paso | Estado     | Notas                                                       |
 | ---- | ---------- | ----------------------------------------------------------- |
-| 1    | Completado | Revisado flujo de autenticación con Supabase SSR            |
-| 2    | Completado | Checkbox "Recordarme" agregado al login form                |
-| 3    | N/A        | Supabase SSR usa cookies persistentes por defecto           |
-| 4    | Completado | PR [#42](https://github.com/upex-galaxy/upex-soloq/pull/42) |
-| 5    | Completado | **PR MERGED - 2026-02-10**                                  |
-| 6    | Completado | Issue CLOSED                                                |
+| 1    | Completado | Diagnóstico: last_login_at NULL, business_profiles 406      |
+| 2    | Completado | Fix implementado                                            |
+| 3    | Completado | PR merged                                                   |
+| 4    | Pendiente  | **Esperando re-test de QA**                                 |
+
+---
+
+### SQ-82 - Edit client unicidad email 🟡 Ready For QA
+
+| Paso | Estado     | Notas                                                       |
+| ---- | ---------- | ----------------------------------------------------------- |
+| 1    | Completado | Diagnóstico: case-sensitive en unique constraint            |
+| 2    | Completado | Fix implementado                                            |
+| 3    | Completado | PR merged                                                   |
+| 4    | Pendiente  | **Esperando re-test de QA**                                 |
 
 ---
 
 ## Métricas
 
-- **Total Defects en revisión:** 2 (SQ-75 PR#44, SQ-76 PR#45)
-- **Defects resueltos (Ready For QA):** 4 (SQ-74, SQ-71, SQ-69, SQ-70)
-- **Defects bloqueantes resueltos:** 2 (SQ-74, SQ-71)
-- **User Stories desbloqueadas:** 2 (SQ-3 → In Test, SQ-16 → In Test)
-- **Total Improvements:** 1 (SQ-73)
-- **Improvements cerrados:** 1 (SQ-73 - CLOSED)
-- **PRs de Bugfix mergeados:** 1 ([#41](https://github.com/upex-galaxy/upex-soloq/pull/41))
-- **PRs de Bugfix abiertos:** 2 ([#44](https://github.com/upex-galaxy/upex-soloq/pull/44), [#45](https://github.com/upex-galaxy/upex-soloq/pull/45))
-- **PRs de Improvements mergeados:** 1 ([#42](https://github.com/upex-galaxy/upex-soloq/pull/42))
+- **Total Bugs/Defects:** 27
+- **OPEN (requieren fix):** 5
+- **Ready For QA (re-test):** 6
+- **CLOSED (verificados):** 8
+- **Enhancement (diferidos):** 7
+- **Bloqueantes críticos OPEN:** 3 (SQ-74, SQ-121, SQ-123)
+- **User Stories bloqueadas:** 2 (SQ-3, SQ-30)
 
 ---
 
 ## Próximos Pasos
 
-1. **Code Review pendiente:**
-   - PR #44 (SQ-75 - phone validation)
-   - PR #45 (SQ-76 - business_profiles 406)
+1. **Prioridad Inmediata - Fixes OPEN:**
+   - [ ] SQ-74: Logout crítico - Ely
+   - [ ] SQ-121: Vista previa - Luis Eduardo
+   - [ ] SQ-123: Dashboard skeleton - Luis Eduardo (después de SQ-121)
 
-2. **QA debe re-testear (cuando PRs se mergeen):**
-   - SQ-74 (logout fix) ✅ Ready For QA
-   - SQ-71 (breadcrumb fix) ✅ Ready For QA
-   - SQ-69 (email duplicado fix) ✅ Ready For QA
-   - SQ-70 (campos desalineados fix) ✅ Ready For QA
-   - SQ-75 (phone validation) ⏳ Esperando merge
-   - SQ-76 (business_profiles 406) ⏳ Esperando merge
+2. **QA debe re-testear:**
+   - [ ] SQ-81 (login DB gaps)
+   - [ ] SQ-82 (email unicidad)
+   - [ ] SQ-98 (password débil)
+   - [ ] SQ-99 (email inválido)
+   - [ ] SQ-86 (password reset UX)
+   - [ ] SQ-76 (business_profiles 406)
 
-3. **Una vez QA valide los fixes:**
-   - SQ-3 puede pasar a QA Sign-Off
-   - SQ-16 puede pasar a QA Sign-Off
+3. **Bugs Medium pendientes:**
+   - [ ] SQ-122 (unsaved changes warning)
+   - [ ] SQ-111 (autosave estado)
 
 ---
 
@@ -267,4 +299,4 @@ Continúa con el BUGFIX-ROADMAP.md - trabaja en SQ-XX
 
 ---
 
-_Actualizado por Claude Code - 2026-02-11 (SQ-75 PR#44, SQ-76 PR#45 creados y en revisión)_
+_Actualizado por Claude Code - 2026-03-09 (Sincronizado con Jira via MCP Atlassian)_

@@ -136,15 +136,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Generation counter to prevent stale updates from race conditions (SQ-74 fix)
   const initGenRef = useRef(0);
 
-  // Initialize auth state and listen for changes
+  // Initialize auth state via onAuthStateChange only (SQ-74 fix #5)
+  // Previous attempts used a separate getUser() call that competed with Supabase's
+  // internal token refresh, causing hangs on rapid page refreshes.
+  // Now we rely solely on onAuthStateChange which handles INITIAL_SESSION internally.
   useEffect(() => {
-    // Increment generation for this initialization attempt
     const currentGen = ++initGenRef.current;
-
-    // Track if component is still mounted to prevent state updates after unmount
     let isMounted = true;
-
-    // Helper to check if this is still the latest initialization attempt
     const isStale = () => !isMounted || currentGen !== initGenRef.current;
 
     const clearAuthState = () => {
@@ -156,102 +154,70 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
     };
 
-    // Safety timeout: if initialization hangs, force isLoading to false (SQ-74 fix)
-    // This prevents the skeleton from showing forever after rapid refreshes
+    // Safety timeout: force isLoading false if auth events never fire (SQ-74)
     const safetyTimeout = setTimeout(() => {
       if (!isStale()) {
-        setState(prev => {
-          if (prev.isLoading) {
-            return { ...prev, isLoading: false };
-          }
-          return prev;
-        });
+        setState(prev => (prev.isLoading ? { ...prev, isLoading: false } : prev));
       }
-    }, 8000);
+    }, 5000);
 
-    // Get initial session - use getUser() to validate token with server
-    const initializeAuth = async () => {
+    // Helper: set authenticated state with profile data, with timeout protection
+    const setAuthenticatedState = async (authUser: User, session: Session) => {
       try {
-        // First validate the user with the server (not just cached session)
-        const {
-          data: { user: validatedUser },
-          error: userError,
-        } = await supabase.auth.getUser();
-
-        if (isStale()) return;
-
-        if (userError || !validatedUser) {
-          clearAuthState();
-          return;
-        }
-
-        // Parallelize getSession + fetchUserProfile to reduce init time (SQ-74 fix)
-        const [sessionResult, profileData] = await Promise.all([
-          supabase.auth.getSession(),
-          fetchUserProfile(validatedUser.id),
+        const profileData = await Promise.race([
+          fetchUserProfile(authUser.id),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('profile_timeout')), 4000)
+          ),
         ]);
 
         if (isStale()) return;
 
-        const session = sessionResult.data.session;
         setState({
-          user: {
-            ...validatedUser,
-            ...profileData,
-          },
+          user: { ...authUser, ...profileData },
           session,
           isLoading: false,
           isAuthenticated: true,
         });
       } catch {
+        // Profile fetch failed or timed out - still set user from session data
         if (!isStale()) {
-          clearAuthState();
+          setState({
+            user: { ...authUser, profile: null, businessProfile: null, subscription: null },
+            session,
+            isLoading: false,
+            isAuthenticated: true,
+          });
         }
       }
     };
 
-    initializeAuth();
-
-    // Listen for auth state changes
+    // Use onAuthStateChange as the SOLE source of auth state (no separate getUser call)
+    // INITIAL_SESSION fires immediately when listener is set up, providing the current session
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      // Prevent stale event handlers from setting state (SQ-74 fix)
       if (isStale()) return;
 
-      if (event === 'SIGNED_IN' && session?.user) {
-        // Note: last_login_at is updated in signIn() function, not here (SQ-81 fix)
-        const profileData = await fetchUserProfile(session.user.id);
-
-        if (isStale()) return;
-
-        setState({
-          user: {
-            ...session.user,
-            ...profileData,
-          },
-          session,
-          isLoading: false,
-          isAuthenticated: true,
-        });
+      if (
+        (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') &&
+        session?.user
+      ) {
+        await setAuthenticatedState(session.user, session);
+      } else if (event === 'INITIAL_SESSION' && !session) {
+        // No session on initial load - user is not authenticated
+        clearAuthState();
       } else if (event === 'SIGNED_OUT') {
         clearAuthState();
-      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
-        // Re-fetch profile to keep user data in sync after token refresh
-        const profileData = await fetchUserProfile(session.user.id);
-
-        if (isStale()) return;
-
-        setState(prev => ({
-          ...prev,
-          user: prev.user
-            ? {
-                ...session.user,
-                ...profileData,
-              }
-            : null,
-          session,
-        }));
+      } else if (event === 'TOKEN_REFRESHED' && session) {
+        // Just update the session reference, don't re-fetch profile (SQ-81)
+        if (!isStale()) {
+          setState(prev => ({
+            ...prev,
+            session,
+            user: prev.user ? { ...prev.user, ...session.user } : null,
+          }));
+        }
       }
     });
 

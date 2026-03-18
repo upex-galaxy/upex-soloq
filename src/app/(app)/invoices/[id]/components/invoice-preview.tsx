@@ -14,7 +14,6 @@ import type { InvoiceWithDetails } from '@/hooks/invoices/use-invoice';
 
 interface InvoicePreviewProps {
   invoice: InvoiceWithDetails;
-  InvoiceDocument: React.ComponentType<{ data: InvoiceWithDetails }>;
 }
 
 // =============================================================================
@@ -35,7 +34,7 @@ const DEBOUNCE_DELAY = 1500; // 1.5 seconds as per spec
  *
  * @see .context/PRD/pdf-live-preview-documentation.md
  */
-export function InvoicePreview({ invoice, InvoiceDocument }: InvoicePreviewProps) {
+export function InvoicePreview({ invoice }: InvoicePreviewProps) {
   // Debounce invoice data to prevent excessive PDF regeneration
   const debouncedInvoice = useDebounce(invoice, DEBOUNCE_DELAY);
 
@@ -47,17 +46,23 @@ export function InvoicePreview({ invoice, InvoiceDocument }: InvoicePreviewProps
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
   // Generate PDF when debounced data changes
+  // SQ-133 fix: Import InvoiceDocument directly instead of using next/dynamic wrapper,
+  // because @react-pdf/renderer's reconciler cannot process dynamic wrapper components
   useEffect(() => {
-    const element = <InvoiceDocument data={debouncedInvoice} />;
-    generatePdf(element);
-  }, [debouncedInvoice, InvoiceDocument, generatePdf]);
+    import('./invoice-document').then(mod => {
+      const element = <mod.InvoiceDocument data={debouncedInvoice} />;
+      generatePdf(element);
+    });
+  }, [debouncedInvoice, generatePdf]);
 
   // Handle retry
   const handleRetry = useCallback(() => {
     reset();
-    const element = <InvoiceDocument data={debouncedInvoice} />;
-    generatePdf(element);
-  }, [debouncedInvoice, InvoiceDocument, generatePdf, reset]);
+    import('./invoice-document').then(mod => {
+      const element = <mod.InvoiceDocument data={debouncedInvoice} />;
+      generatePdf(element);
+    });
+  }, [debouncedInvoice, generatePdf, reset]);
 
   // Handle download (SQ-35)
   const handleDownload = useCallback(() => {

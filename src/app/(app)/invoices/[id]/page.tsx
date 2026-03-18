@@ -25,11 +25,6 @@ const InvoicePreview = dynamic(
   }
 );
 
-const InvoiceDocument = dynamic(
-  () => import('./components/invoice-document').then(mod => ({ default: mod.InvoiceDocument })),
-  { ssr: false }
-);
-
 // =============================================================================
 // Types
 // =============================================================================
@@ -154,7 +149,7 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
       {/* PDF Preview Card */}
       <Card>
         <CardContent className="p-0">
-          <InvoicePreview invoice={invoice} InvoiceDocument={InvoiceDocument} />
+          <InvoicePreview invoice={invoice} />
         </CardContent>
       </Card>
     </div>

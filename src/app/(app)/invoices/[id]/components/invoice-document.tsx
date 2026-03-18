@@ -25,7 +25,7 @@ const colors = {
 };
 
 // =============================================================================
-// Styles
+// Styles (SQ-132: restructured to match mockup from QA comments)
 // =============================================================================
 
 // CRITICAL: Use Helvetica (built-in font) to avoid font loading issues
@@ -40,45 +40,89 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
 
-  // Header
+  // =========================================================================
+  // Section A: Header - Logo (A1) + Business Info (A2)
+  // =========================================================================
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 30,
-    paddingBottom: 20,
+    marginBottom: 25,
+    paddingBottom: 15,
     borderBottomWidth: 2,
     borderBottomColor: colors.primary,
   },
-  invoiceTitle: {
-    fontSize: 18,
+  // A1: Logo area (left)
+  headerLogoArea: {
+    width: '40%',
+    justifyContent: 'center',
+  },
+  logoContainer: {
+    width: 140,
+    height: 70,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  logo: {
+    maxWidth: 140,
+    maxHeight: 70,
+    objectFit: 'contain',
+  },
+  headerFallbackTitle: {
+    fontSize: 24,
     fontWeight: 'bold',
     color: colors.primary,
   },
-  invoiceNumber: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    marginTop: 4,
+  // A2: Business info (right)
+  headerBusinessInfo: {
+    width: '55%',
+    alignItems: 'flex-end',
   },
-  invoiceDate: {
-    fontSize: 10,
+  businessName: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: colors.textPrimary,
+    marginBottom: 4,
+    textAlign: 'right',
+  },
+  businessInfoText: {
+    fontSize: 9,
+    color: colors.textSecondary,
+    marginBottom: 2,
+    textAlign: 'right',
+    lineHeight: 1.4,
+  },
+  businessInfoLabel: {
+    fontSize: 8,
     color: colors.textMuted,
-    marginTop: 2,
+    textAlign: 'right',
   },
 
-  // Info containers (From/To)
-  infoContainer: {
+  // =========================================================================
+  // Section B: Client Info (B1) + Invoice Meta (B2)
+  // =========================================================================
+  sectionB: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 30,
+    marginBottom: 25,
   },
-  infoBox: {
-    width: '48%',
+  // B1: Client info (left)
+  clientBox: {
+    width: '55%',
     padding: 12,
     borderWidth: 1,
     borderColor: colors.borderLight,
     borderRadius: 4,
   },
-  infoTitle: {
+  // B2: Invoice meta (right)
+  invoiceMetaBox: {
+    width: '40%',
+    padding: 12,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: 4,
+    backgroundColor: colors.backgroundAlt,
+  },
+  sectionTitle: {
     fontSize: 9,
     fontWeight: 'bold',
     color: colors.primary,
@@ -89,27 +133,49 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.borderLight,
   },
-  infoText: {
-    fontSize: 10,
-    color: colors.textPrimary,
-    marginBottom: 2,
-    lineHeight: 1.4,
-  },
   infoTextBold: {
     fontSize: 10,
     fontWeight: 'bold',
     color: colors.textPrimary,
     marginBottom: 4,
   },
+  infoText: {
+    fontSize: 10,
+    color: colors.textPrimary,
+    marginBottom: 2,
+    lineHeight: 1.4,
+  },
   infoLabel: {
     fontSize: 9,
     color: colors.textSecondary,
     marginBottom: 1,
   },
+  invoiceNumber: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: colors.primary,
+    marginBottom: 8,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  metaLabel: {
+    fontSize: 9,
+    color: colors.textSecondary,
+  },
+  metaValue: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: colors.textPrimary,
+  },
 
-  // Items table
+  // =========================================================================
+  // Section C: Items Table
+  // =========================================================================
   table: {
-    marginBottom: 30,
+    marginBottom: 25,
   },
   tableHeader: {
     flexDirection: 'row',
@@ -150,10 +216,21 @@ const styles = StyleSheet.create({
   colPrice: { flex: 1.5, textAlign: 'right' },
   colTotal: { flex: 1.5, textAlign: 'right' },
 
-  // Totals section
+  // Empty state for items
+  emptyItems: {
+    padding: 20,
+    textAlign: 'center',
+    color: colors.textMuted,
+    fontSize: 10,
+    fontStyle: 'italic',
+  },
+
+  // =========================================================================
+  // Section D: Totals (right-aligned)
+  // =========================================================================
   totalsContainer: {
     alignItems: 'flex-end',
-    marginBottom: 30,
+    marginBottom: 25,
   },
   totalsBox: {
     width: 220,
@@ -194,7 +271,9 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
 
-  // Notes and Terms section
+  // =========================================================================
+  // Section E: Notes/Terms (E1) + Payment Methods placeholder (E2)
+  // =========================================================================
   bottomSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -205,7 +284,7 @@ const styles = StyleSheet.create({
   notesSection: {
     width: '48%',
   },
-  sectionTitle: {
+  bottomSectionTitle: {
     fontSize: 9,
     fontWeight: 'bold',
     color: colors.primary,
@@ -219,22 +298,17 @@ const styles = StyleSheet.create({
     lineHeight: 1.5,
   },
 
-  // Empty state for items
-  emptyItems: {
-    padding: 20,
-    textAlign: 'center',
-    color: colors.textMuted,
-    fontSize: 10,
-    fontStyle: 'italic',
-  },
-
-  // Footer
+  // =========================================================================
+  // Footer with page numbering
+  // =========================================================================
   footer: {
     position: 'absolute',
     bottom: 30,
     left: 40,
     right: 40,
-    textAlign: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: colors.borderLight,
@@ -243,33 +317,10 @@ const styles = StyleSheet.create({
     fontSize: 8,
     color: colors.textMuted,
   },
-
-  // Logo styles (SQ-33)
-  logoContainer: {
-    width: 120,
-    height: 60,
-    marginRight: 16,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  logo: {
-    maxWidth: 120,
-    maxHeight: 60,
-    objectFit: 'contain',
-  },
-  headerWithLogo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    maxWidth: '65%',
-  },
-  headerBusinessInfo: {
-    flex: 1,
-  },
-  headerRight: {
-    alignItems: 'flex-end' as const,
-    flexShrink: 0,
-    minWidth: 150,
+  footerPageNumber: {
+    fontSize: 8,
+    color: colors.textMuted,
+    fontWeight: 'bold',
   },
 });
 
@@ -282,7 +333,7 @@ interface InvoiceDocumentProps {
 }
 
 // =============================================================================
-// InvoiceDocument Component
+// InvoiceDocument Component (SQ-132: restructured to match mockup)
 // =============================================================================
 
 /**
@@ -291,17 +342,13 @@ interface InvoiceDocumentProps {
  * Uses @react-pdf/renderer to generate a professional PDF.
  * All text is sanitized to remove emojis (not supported by PDF renderer).
  *
- * Sections:
- * 1. Header: Logo (if available), business name, invoice number, dates
- * 2. Info boxes: From (Business) / Bill To (Client)
- * 3. Items table: Description, Qty, Price, Total
- * 4. Totals: Subtotal, Discount, Tax, Total
- * 5. Footer: Notes and Terms
- *
- * Logo handling (SQ-33):
- * - Logo URL is validated before rendering
- * - Invalid URLs fall back to text-only header
- * - Max dimensions: 120x60px with aspect ratio preserved
+ * Layout follows the mockup from QA (SQ-32 comments):
+ * - Section A: Logo (A1) + Business Info (A2)
+ * - Section B: Client Info (B1) + Invoice Meta (B2)
+ * - Section C: Items Table
+ * - Section D: Totals (right-aligned)
+ * - Section E: Notes/Terms (E1)
+ * - Footer: Platform credit + Page numbering
  */
 export function InvoiceDocument({ data }: InvoiceDocumentProps) {
   const { client, items, business_profile } = data;
@@ -318,79 +365,91 @@ export function InvoiceDocument({ data }: InvoiceDocumentProps) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        {/* HEADER */}
+        {/* ================================================================
+            SECTION A: HEADER - Logo (A1) + Business Info (A2)
+            ================================================================ */}
         <View style={styles.header}>
-          <View style={styles.headerWithLogo}>
-            {/* Logo (SQ-33) - Only render if valid URL */}
-            {hasValidLogo && (
+          {/* A1: Logo / Brand */}
+          <View style={styles.headerLogoArea}>
+            {hasValidLogo ? (
               <View style={styles.logoContainer}>
                 <Image src={business_profile!.logo_url!} style={styles.logo} />
               </View>
-            )}
-            {/* Business name and tax ID */}
-            <View style={styles.headerBusinessInfo}>
-              <Text style={styles.invoiceTitle}>
+            ) : (
+              <Text style={styles.headerFallbackTitle}>
                 {sanitizeForPDF(business_profile?.business_name) || 'FACTURA'}
               </Text>
-              {business_profile?.tax_id && (
-                <Text style={styles.invoiceDate}>
-                  RFC/NIF: {sanitizeForPDF(business_profile.tax_id)}
-                </Text>
-              )}
-            </View>
+            )}
           </View>
-          <View style={styles.headerRight}>
-            <Text style={styles.invoiceNumber}>N {data.invoice_number}</Text>
-            <Text style={styles.invoiceDate}>Emision: {formatDateShort(data.issue_date)}</Text>
-            <Text style={styles.invoiceDate}>Vencimiento: {formatDateShort(data.due_date)}</Text>
-          </View>
-        </View>
 
-        {/* FROM / TO INFO BOXES */}
-        <View style={styles.infoContainer}>
-          {/* From (Business) */}
-          <View style={styles.infoBox}>
-            <Text style={styles.infoTitle}>De</Text>
-            <Text style={styles.infoTextBold}>
+          {/* A2: Business Info */}
+          <View style={styles.headerBusinessInfo}>
+            <Text style={styles.businessName}>
               {sanitizeForPDF(business_profile?.business_name) || 'Mi Negocio'}
             </Text>
             {business_profile?.address && (
-              <Text style={styles.infoText}>
+              <Text style={styles.businessInfoText}>
                 {sanitizeForPDF(formatBusinessAddress(business_profile.address))}
               </Text>
             )}
+            {business_profile?.tax_id && (
+              <Text style={styles.businessInfoText}>
+                RFC/NIF: {sanitizeForPDF(business_profile.tax_id)}
+              </Text>
+            )}
             {business_profile?.contact_email && (
-              <Text style={styles.infoLabel}>{business_profile.contact_email}</Text>
+              <Text style={styles.businessInfoLabel}>{business_profile.contact_email}</Text>
             )}
             {business_profile?.contact_phone && (
-              <Text style={styles.infoLabel}>{business_profile.contact_phone}</Text>
+              <Text style={styles.businessInfoLabel}>{business_profile.contact_phone}</Text>
             )}
           </View>
+        </View>
 
-          {/* To (Client) */}
-          <View style={styles.infoBox}>
-            <Text style={styles.infoTitle}>Para</Text>
+        {/* ================================================================
+            SECTION B: Client Info (B1) + Invoice Meta (B2)
+            ================================================================ */}
+        <View style={styles.sectionB}>
+          {/* B1: Client Info (Facturar A) */}
+          <View style={styles.clientBox}>
+            <Text style={styles.sectionTitle}>Facturar A</Text>
             <Text style={styles.infoTextBold}>{sanitizeForPDF(client.name)}</Text>
             {client.company && (
               <Text style={styles.infoText}>{sanitizeForPDF(client.company)}</Text>
+            )}
+            {client.tax_id && (
+              <Text style={styles.infoText}>RFC/NIF: {sanitizeForPDF(client.tax_id)}</Text>
             )}
             {client.address && (
               <Text style={styles.infoText}>{sanitizeForPDF(client.address)}</Text>
             )}
             <Text style={styles.infoLabel}>{client.email}</Text>
-            {client.tax_id && (
-              <Text style={styles.infoLabel}>RFC/NIF: {sanitizeForPDF(client.tax_id)}</Text>
-            )}
+          </View>
+
+          {/* B2: Invoice Meta */}
+          <View style={styles.invoiceMetaBox}>
+            <Text style={styles.sectionTitle}>Factura</Text>
+            <Text style={styles.invoiceNumber}>N.{'\u00BA'} {data.invoice_number}</Text>
+            <View style={styles.metaRow}>
+              <Text style={styles.metaLabel}>Fecha de Emision:</Text>
+              <Text style={styles.metaValue}>{formatDateShort(data.issue_date)}</Text>
+            </View>
+            <View style={styles.metaRow}>
+              <Text style={styles.metaLabel}>Fecha de Vencim.:</Text>
+              <Text style={styles.metaValue}>{formatDateShort(data.due_date)}</Text>
+            </View>
           </View>
         </View>
 
-        {/* ITEMS TABLE */}
+        {/* ================================================================
+            SECTION C: ITEMS TABLE
+            ================================================================ */}
         <View style={styles.table}>
           {/* Header */}
           <View style={styles.tableHeader}>
             <Text style={[styles.tableHeaderText, styles.colDescription]}>Descripcion</Text>
             <Text style={[styles.tableHeaderText, styles.colQuantity]}>Cant.</Text>
-            <Text style={[styles.tableHeaderText, styles.colPrice]}>Precio</Text>
+            <Text style={[styles.tableHeaderText, styles.colPrice]}>Precio Unit.</Text>
             <Text style={[styles.tableHeaderText, styles.colTotal]}>Importe</Text>
           </View>
 
@@ -420,7 +479,9 @@ export function InvoiceDocument({ data }: InvoiceDocumentProps) {
           )}
         </View>
 
-        {/* TOTALS */}
+        {/* ================================================================
+            SECTION D: TOTALS (right-aligned)
+            ================================================================ */}
         <View style={styles.totalsContainer}>
           <View style={styles.totalsBox}>
             {/* Subtotal */}
@@ -433,7 +494,7 @@ export function InvoiceDocument({ data }: InvoiceDocumentProps) {
             {discountAmount > 0 && (
               <View style={styles.totalsRow}>
                 <Text style={styles.totalsLabel}>
-                  Descuento {data.discount_type === 'percentage' ? `(${data.discount_value}%)` : ''}
+                  Descuento Total{data.discount_type === 'percentage' ? ` (${data.discount_value}%)` : ''}
                 </Text>
                 <Text style={styles.totalsValue}>-{formatCurrency(discountAmount)}</Text>
               </View>
@@ -455,32 +516,42 @@ export function InvoiceDocument({ data }: InvoiceDocumentProps) {
           </View>
         </View>
 
-        {/* NOTES & TERMS */}
+        {/* ================================================================
+            SECTION E: NOTES & TERMS
+            ================================================================ */}
         {(data.notes || data.terms) && (
           <View style={styles.bottomSection}>
-            {/* Notes */}
+            {/* E1: Notes */}
             {data.notes && (
               <View style={styles.notesSection}>
-                <Text style={styles.sectionTitle}>Notas</Text>
+                <Text style={styles.bottomSectionTitle}>Notas</Text>
                 <Text style={styles.notesText}>{sanitizeForPDF(data.notes)}</Text>
               </View>
             )}
 
-            {/* Terms */}
+            {/* E1 continued: Terms */}
             {data.terms && (
               <View style={styles.notesSection}>
-                <Text style={styles.sectionTitle}>Terminos y Condiciones</Text>
+                <Text style={styles.bottomSectionTitle}>Terminos y Condiciones</Text>
                 <Text style={styles.notesText}>{sanitizeForPDF(data.terms)}</Text>
               </View>
             )}
           </View>
         )}
 
-        {/* FOOTER */}
-        <View style={styles.footer}>
+        {/* ================================================================
+            FOOTER with page numbering (SQ-132)
+            ================================================================ */}
+        <View style={styles.footer} fixed>
           <Text style={styles.footerText}>
-            Generado con SoloQ | {data.invoice_number} | {formatDateShort(data.issue_date)}
+            Generado por SoloQ | {data.invoice_number}
           </Text>
+          <Text
+            style={styles.footerPageNumber}
+            render={({ pageNumber, totalPages }) =>
+              `Pagina ${pageNumber} de ${totalPages}`
+            }
+          />
         </View>
       </Page>
     </Document>

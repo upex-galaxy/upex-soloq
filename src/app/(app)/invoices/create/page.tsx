@@ -30,11 +30,18 @@ import {
   InvoiceSummary,
 } from '@/components/invoices';
 
-// Dynamic import to avoid SSR issues with @react-pdf/renderer
+// Dynamic imports to avoid SSR issues with @react-pdf/renderer
 const InvoicePreviewDialog = dynamic(
   () =>
     import('@/components/invoices/invoice-preview-dialog').then(mod => ({
       default: mod.InvoicePreviewDialog,
+    })),
+  { ssr: false }
+);
+const InvoiceLivePreview = dynamic(
+  () =>
+    import('@/components/invoices/invoice-live-preview').then(mod => ({
+      default: mod.InvoiceLivePreview,
     })),
   { ssr: false }
 );
@@ -155,6 +162,9 @@ export default function CreateInvoicePage() {
 
   const clients = clientsData?.clients ?? [];
 
+  // Watch all form values for live preview
+  const watchedFormData = form.watch();
+
   return (
     <div className="space-y-6" data-testid="create-invoice-page">
       {/* Header */}
@@ -171,6 +181,8 @@ export default function CreateInvoicePage() {
         </div>
       </div>
 
+      {/* Split-view: Form (left) + Live Preview (right) on desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Form Card */}
       <Card>
         <CardHeader>
@@ -383,17 +395,6 @@ export default function CreateInvoicePage() {
                   Cancelar
                 </Button>
                 <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsPreviewOpen(true)}
-                  disabled={isCreating || !canShowPreview(form.getValues(), !!selectedClient)}
-                  title={getPreviewDisabledReason(form.getValues(), !!selectedClient) ?? undefined}
-                  data-testid="preview-button"
-                >
-                  <Eye className="mr-2 h-4 w-4" />
-                  Vista previa
-                </Button>
-                <Button
                   type="submit"
                   disabled={isCreating || !selectedClient || !isInvoiceNumberValid || isDiscountInvalid}
                   data-testid="save-invoice-button"
@@ -413,6 +414,35 @@ export default function CreateInvoicePage() {
         </CardContent>
       </Card>
 
+      {/* Desktop Live Preview Panel (right column) */}
+      <div className="hidden lg:block">
+        <div className="sticky top-8 h-[calc(100vh-280px)] min-h-[700px]">
+          <InvoiceLivePreview
+            formData={watchedFormData}
+            client={selectedClient}
+            businessProfile={businessProfile ?? null}
+          />
+        </div>
+      </div>
+
+      </div>{/* end grid */}
+
+      {/* Mobile: Sticky floating "Vista previa" button */}
+      <div className="fixed bottom-4 right-4 z-50 lg:hidden">
+        <Button
+          type="button"
+          onClick={() => setIsPreviewOpen(true)}
+          disabled={isCreating || !canShowPreview(form.getValues(), !!selectedClient)}
+          title={getPreviewDisabledReason(form.getValues(), !!selectedClient) ?? undefined}
+          className="shadow-lg"
+          size="lg"
+          data-testid="mobile-preview-button"
+        >
+          <Eye className="mr-2 h-4 w-4" />
+          Vista previa
+        </Button>
+      </div>
+
       {/* Create Client Dialog */}
       <CreateClientDialog
         open={isCreateClientOpen}
@@ -420,7 +450,7 @@ export default function CreateInvoicePage() {
         onSuccess={handleClientCreated}
       />
 
-      {/* Invoice Preview Dialog (SQ-26) */}
+      {/* Invoice Preview Dialog - used for mobile viewport */}
       {selectedClient && businessProfile !== undefined && (
         <InvoicePreviewDialog
           open={isPreviewOpen}

@@ -40,11 +40,18 @@ import {
   InvoiceStatusBadge,
 } from '@/components/invoices';
 
-// Dynamic import to avoid SSR issues with @react-pdf/renderer
+// Dynamic imports to avoid SSR issues with @react-pdf/renderer
 const InvoicePreviewDialog = dynamic(
   () =>
     import('@/components/invoices/invoice-preview-dialog').then(mod => ({
       default: mod.InvoicePreviewDialog,
+    })),
+  { ssr: false }
+);
+const InvoiceLivePreview = dynamic(
+  () =>
+    import('@/components/invoices/invoice-live-preview').then(mod => ({
+      default: mod.InvoiceLivePreview,
     })),
   { ssr: false }
 );
@@ -360,6 +367,9 @@ export default function EditInvoicePage() {
     return null;
   }
 
+  // Watch all form values for live preview
+  const watchedFormData = form.watch();
+
   return (
     <div className="space-y-6" data-testid="edit-invoice-page">
       {/* Header */}
@@ -414,6 +424,8 @@ export default function EditInvoicePage() {
         </div>
       </div>
 
+      {/* Split-view: Form (left) + Live Preview (right) on desktop */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Form Card */}
       <Card>
         <CardHeader>
@@ -634,28 +646,6 @@ export default function EditInvoicePage() {
                   >
                     Volver
                   </Button>
-                  {/* Preview button (SQ-26, SQ-121 fix) */}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsPreviewOpen(true)}
-                    disabled={
-                      isUpdating ||
-                      isDeleting ||
-                      isSaving ||
-                      isLoadingBusinessProfile ||
-                      !canShowPreview(form.getValues(), !!selectedClient)
-                    }
-                    title={
-                      isLoadingBusinessProfile
-                        ? 'Cargando perfil de negocio...'
-                        : (getPreviewDisabledReason(form.getValues(), !!selectedClient) ?? undefined)
-                    }
-                    data-testid="preview-button"
-                  >
-                    <Eye className="mr-2 h-4 w-4" />
-                    Vista previa
-                  </Button>
                   {/* Manual save button (TC-01) */}
                   <Button
                     type="button"
@@ -681,6 +671,46 @@ export default function EditInvoicePage() {
           </Form>
         </CardContent>
       </Card>
+
+      {/* Desktop Live Preview Panel (right column) */}
+      <div className="hidden lg:block">
+        <div className="sticky top-8 h-[calc(100vh-280px)] min-h-[700px]">
+          <InvoiceLivePreview
+            formData={watchedFormData}
+            client={selectedClient}
+            businessProfile={businessProfile ?? null}
+            existingInvoiceId={invoiceId}
+          />
+        </div>
+      </div>
+
+      </div>{/* end grid */}
+
+      {/* Mobile: Sticky floating "Vista previa" button */}
+      <div className="fixed bottom-4 right-4 z-50 lg:hidden">
+        <Button
+          type="button"
+          onClick={() => setIsPreviewOpen(true)}
+          disabled={
+            isUpdating ||
+            isDeleting ||
+            isSaving ||
+            isLoadingBusinessProfile ||
+            !canShowPreview(form.getValues(), !!selectedClient)
+          }
+          title={
+            isLoadingBusinessProfile
+              ? 'Cargando perfil de negocio...'
+              : (getPreviewDisabledReason(form.getValues(), !!selectedClient) ?? undefined)
+          }
+          className="shadow-lg"
+          size="lg"
+          data-testid="mobile-preview-button"
+        >
+          <Eye className="mr-2 h-4 w-4" />
+          Vista previa
+        </Button>
+      </div>
 
       {/* Delete Confirmation Dialog (TC-05) */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

@@ -83,16 +83,13 @@ export class BookingsApi extends ApiBase {
 
 ## Commands
 
-| Command                          | Description                                           |
-| -------------------------------- | ----------------------------------------------------- |
-| `bun run api:sync -t`           | Interactive mode + generate types                     |
-| `bun run api:sync --url <url> -t` | Download from URL endpoint + generate types          |
-| `bun run api:sync --file <path> -t` | Copy from local file + generate types              |
-| `bun run api:sync -c -t`        | Use saved config + generate types (for re-syncs)      |
-| `bun run api:sync`               | Interactive mode, sync only (no type generation)     |
-| `bun run api:sync --help`        | Show help                                            |
-
-> **Sources:** The script supports 3 sources: URL (any HTTP endpoint serving OpenAPI/Swagger), GitHub (file in a repo via `gh` CLI), and Local (file on disk).
+| Command                        | Description                                 |
+| ------------------------------ | ------------------------------------------- |
+| `bun run api:sync`             | Download spec + generate types (default)    |
+| `bun run api:sync --url <url>` | Download from specific URL                  |
+| `bun run api:sync --no-types`  | Only download, skip type generation         |
+| `bun run api:sync --help`      | Show help                                   |
+| `bun run api:types`            | Regenerate types from existing openapi.json |
 
 ---
 
@@ -102,13 +99,9 @@ export class BookingsApi extends ApiBase {
 /api
 ├── openapi.json          # Downloaded spec (gitignored)
 ├── openapi-types.ts      # Generated types (committed)
-├── .openapi-config.json  # Sync config & last sync info (gitignored)
-└── schemas/              # Type facade files
-    ├── index.ts          # Barrel re-export
-    ├── auth.types.ts     # Auth domain types
-    └── {domain}.types.ts # Domain type facades
+└── .openapi-config.json  # Last sync info (gitignored)
 
-/scripts
+/cli
 └── sync-openapi.ts       # Sync script
 ```
 

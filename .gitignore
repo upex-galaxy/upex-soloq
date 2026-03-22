@@ -58,7 +58,7 @@ Thumbs.db
 # ===== AI CLI Tools & Configs =====
 .serena
 .gemini/
-.claude/
+.claude/settings.local.json
 .playwright-mcp
 .backups/
 .context/mcp/outputs

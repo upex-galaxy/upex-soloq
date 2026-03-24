@@ -1,0 +1,268 @@
+# ============================================
+# KATA Framework - Regression Test Pipeline
+# ============================================
+# Purpose: Complete test coverage - Integration tests first, then E2E tests.
+# This is the main test pipeline for full regression testing.
+
+name: Regression Tests
+run-name: ${{ github.actor }} triggered Regression Tests on ${{ github.event.inputs.environment || 'staging' }}
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs daily at midnight UTC
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Select the Test Environment
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - local
+          - staging
+      video_record:
+        description: Enable Video Recording
+        required: true
+        default: false
+        type: boolean
+      generate_allure:
+        description: Generate Allure Report
+        required: true
+        default: true
+        type: boolean
+
+env:
+  CI: true
+  TEST_ENV: ${{ github.event.inputs.environment || 'staging' }}
+  VIDEO: ${{ github.event.inputs.video_record || false }}
+  # Credentials (required for test execution)
+  LOCAL_USER_EMAIL: ${{ secrets.LOCAL_USER_EMAIL }}
+  LOCAL_USER_PASSWORD: ${{ secrets.LOCAL_USER_PASSWORD }}
+  STAGING_USER_EMAIL: ${{ secrets.STAGING_USER_EMAIL }}
+  STAGING_USER_PASSWORD: ${{ secrets.STAGING_USER_PASSWORD }}
+  SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+  # TMS Configuration (for Xray sync)
+  AUTO_SYNC: ${{ secrets.AUTO_SYNC || 'false' }}
+  XRAY_CLIENT_ID: ${{ secrets.XRAY_CLIENT_ID }}
+  XRAY_CLIENT_SECRET: ${{ secrets.XRAY_CLIENT_SECRET }}
+
+jobs:
+  # ============================================
+  # Job 1: Integration Tests (API only)
+  # ============================================
+  IntegrationTests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: ${{ github.event.inputs.environment || 'staging' }}
+    defaults:
+      run:
+        working-directory: qa
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install
+
+      - name: Validate Environment Variables
+        run: bun run config/validateEnv.ts
+
+      - name: Install Playwright (API context)
+        run: bun run pw:install
+
+      - name: Run Integration Tests on ${{ env.TEST_ENV }}
+        run: bun run test:integration
+
+      - name: Upload Integration Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-allure-results
+          path: qa/allure-results/
+          retention-days: 10
+
+      - name: Upload Integration Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: qa/test-results/
+          retention-days: 10
+
+      - name: Cleanup Workspace
+        if: always()
+        run: |
+          rm -rf node_modules
+          rm -rf allure-results
+          rm -rf test-results
+
+  # ============================================
+  # Job 2: E2E Tests (Browser)
+  # Runs after Integration Tests complete
+  # ============================================
+  E2ETests:
+    name: E2E Tests
+    needs: IntegrationTests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment:
+      name: ${{ github.event.inputs.environment || 'staging' }}
+    defaults:
+      run:
+        working-directory: qa
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install
+
+      - name: Validate Environment Variables
+        run: bun run config/validateEnv.ts
+
+      - name: Install Playwright Browsers
+        run: bun run pw:install
+
+      - name: Run E2E Tests on ${{ env.TEST_ENV }}
+        run: bun run test:e2e
+
+      - name: Upload E2E Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-allure-results
+          path: qa/allure-results/
+          retention-days: 10
+
+      - name: Upload E2E Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results
+          path: qa/test-results/
+          retention-days: 10
+
+      - name: Upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-playwright-report
+          path: qa/playwright-report/
+          retention-days: 10
+
+      - name: Upload Failure Evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-failure-evidence
+          path: |
+            qa/test-results/
+            qa/playwright-report/
+          retention-days: 10
+
+      - name: Cleanup Workspace
+        if: always()
+        run: |
+          rm -rf node_modules
+          rm -rf allure-results
+          rm -rf test-results
+          rm -rf playwright-report
+
+  # ============================================
+  # Job 3: Build & Deploy Allure Report
+  # ============================================
+  allure-report:
+    name: Build & Deploy Allure Report
+    needs: [IntegrationTests, E2ETests]
+    runs-on: ubuntu-latest
+    if: ${{ always() && github.event.inputs.generate_allure != 'false' }}
+
+    steps:
+      - name: Get Allure History
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+          fetch-depth: 1
+        continue-on-error: true
+
+      - name: Download Integration Allure Results
+        uses: actions/download-artifact@v4
+        with:
+          name: integration-allure-results
+          path: regression-artifacts/integration-allure-results
+        continue-on-error: true
+
+      - name: Download E2E Allure Results
+        uses: actions/download-artifact@v4
+        with:
+          name: e2e-allure-results
+          path: regression-artifacts/e2e-allure-results
+        continue-on-error: true
+
+      - name: Merge Allure Results
+        shell: bash
+        run: |
+          mkdir -p merged-allure-results
+          if [ -d "regression-artifacts/integration-allure-results" ] && [ -n "$(ls -A regression-artifacts/integration-allure-results 2>/dev/null)" ]; then
+            cp -r regression-artifacts/integration-allure-results/. merged-allure-results/
+          fi
+          if [ -d "regression-artifacts/e2e-allure-results" ] && [ -n "$(ls -A regression-artifacts/e2e-allure-results 2>/dev/null)" ]; then
+            cp -r regression-artifacts/e2e-allure-results/. merged-allure-results/
+          fi
+
+      - name: Check Allure Results
+        id: check_allure
+        shell: bash
+        run: |
+          if [ -d "merged-allure-results" ] && [ -n "$(ls -A merged-allure-results 2>/dev/null)" ]; then
+            echo "has_results=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_results=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build Allure Report
+        if: steps.check_allure.outputs.has_results == 'true'
+        uses: simple-elf/allure-report-action@master
+        with:
+          gh_pages: gh-pages
+          subfolder: ${{ env.TEST_ENV }}/regression
+          allure_results: merged-allure-results
+          allure_report: allure-report
+          allure_history: allure-history
+          keep_reports: 3
+
+      - name: Deploy to GitHub Pages
+        if: steps.check_allure.outputs.has_results == 'true'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history/${{ env.TEST_ENV }}/regression
+          destination_dir: ${{ env.TEST_ENV }}/regression
+          keep_files: true
+
+      - name: Post Report URL
+        if: steps.check_allure.outputs.has_results == 'true'
+        run: |
+          echo "## Allure Report" >> $GITHUB_STEP_SUMMARY
+          echo "View the report: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ env.TEST_ENV }}/regression/" >> $GITHUB_STEP_SUMMARY

@@ -100,7 +100,7 @@ function LoginForm() {
           )}
 
           {error && (
-            <Alert variant="destructive">
+            <Alert variant="destructive" data-testid="login-error">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
@@ -127,6 +127,7 @@ function LoginForm() {
               required
               disabled={isLoading}
               autoComplete="email"
+              data-testid="login-email-input"
             />
           </div>
           <div className="space-y-2">
@@ -145,6 +146,7 @@ function LoginForm() {
               required
               disabled={isLoading}
               autoComplete="current-password"
+              data-testid="login-password-input"
             />
           </div>
 
@@ -164,7 +166,7 @@ function LoginForm() {
             </Label>
           </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full" disabled={isLoading} data-testid="login-submit-button">
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

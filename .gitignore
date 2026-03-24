@@ -46,7 +46,6 @@ yarn-error.log*
 .idea/
 *.swp
 *.swo
-*.code-workspace
 
 # ===== OS Files =====
 .DS_Store

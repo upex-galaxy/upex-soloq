@@ -1,0 +1,6 @@
+{
+  "folders": [
+    { "path": ".", "name": "SoloQ (Next.js)" },
+    { "path": "./qa", "name": "QA (Playwright)" }
+  ]
+}

@@ -1,0 +1,19 @@
+
+============================================================
+KATA Framework - Global Teardown
+============================================================
+📊 ATC Report generated: reports/atc_results.json
+
+ATC Execution Summary:
+   Total: 0
+   Passed: 0
+   Failed: 0
+   Skipped: 0
+   Test IDs: 0
+
+[SKIP] TMS sync disabled (set AUTO_SYNC=true to enable)
+
+============================================================
+[OK] Global teardown complete
+============================================================
+

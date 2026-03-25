@@ -16,6 +16,8 @@
 
 import type { TestContextOptions } from '@TestContext';
 
+import { ClientsPage } from '@ui/ClientsPage';
+import { CreateClientPage } from '@ui/CreateClientPage';
 import { ExamplePage } from '@ui/ExamplePage';
 import { LoginPage } from '@ui/LoginPage';
 import { UiBase } from '@ui/UiBase';
@@ -28,6 +30,12 @@ export class UiFixture extends UiBase {
   /** Login page component - handles authentication flows */
   readonly login: LoginPage;
 
+  /** Clients page component - handles client management flows */
+  readonly clients: ClientsPage;
+
+  /** Create client page component - handles client creation flows */
+  readonly createClient: CreateClientPage;
+
   /** Example component - reference only */
   readonly example: ExamplePage;
 
@@ -37,5 +45,7 @@ export class UiFixture extends UiBase {
     // All components receive the same options (same page context)
     this.login = new LoginPage(options);
     this.example = new ExamplePage(options);
+    this.clients = new ClientsPage(options);
+    this.createClient = new CreateClientPage(options);
   }
 }

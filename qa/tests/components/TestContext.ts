@@ -13,10 +13,11 @@
  * the same context, ensuring consistency across UI and API operations.
  */
 
-import type { APIRequestContext, Page } from '@playwright/test';
+import type { APIRequestContext, Expect, Page } from '@playwright/test';
 import type { Environment } from '@variables';
-
 import { DataFactory } from '@DataFactory';
+
+import { expect } from '@playwright/test';
 import { config, env } from '@variables';
 
 // ============================================
@@ -40,6 +41,8 @@ export class TestContext {
   /** Playwright Page instance - available in UI tests */
   protected readonly _page?: Page;
 
+  protected readonly expect: Expect;
+
   /** Playwright APIRequestContext instance - available in API tests */
   protected readonly _request?: APIRequestContext;
 
@@ -56,6 +59,7 @@ export class TestContext {
     this._page = options.page;
     this._request = options.request;
     this.env = options.environment ?? env.current;
+    this.expect = expect;
   }
 
   /** Acceso a DataFactory desde instancia (conveniente para componentes) */

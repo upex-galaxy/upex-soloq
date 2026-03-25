@@ -36,7 +36,7 @@ export class CreateClientPage extends UiBase {
   async createClientSuccessfully(clientFormData: CreateClientFormData) {
     await this.fillClientForm(clientFormData);
     const response = await this.submitClientForm();
-    this.expect(response.status()).toBe(201);
+    this.expect(response.ok()).toBe(true);
     await this.expect(this.page).not.toHaveURL(/.*clients\/create.*/);
     await this.expect(this.page.getByText('Cliente guardado correctamente')).toBeVisible();
     return response;

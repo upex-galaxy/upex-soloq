@@ -1,0 +1,5 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","1293","SQ-XXX: should load dashboard with authenticated session @critical","e2e","Thu Mar 26 03:13:05 UTC 2026","passed","Thu Mar 26 03:13:06 UTC 2026","SQ-XXX: Dashboard","e2e/dashboard/dashboard.test.ts","",""
+"","5","Global Teardown: generate reports and sync TMS","global-teardown","Thu Mar 26 03:13:07 UTC 2026","passed","Thu Mar 26 03:13:07 UTC 2026","","teardown/global.teardown.ts","",""
+"","9","Global Setup: prepare environment","global-setup","Thu Mar 26 03:12:57 UTC 2026","passed","Thu Mar 26 03:12:57 UTC 2026","","setup/global.setup.ts","",""
+"","2902","UI Setup: authenticate via UI","ui-setup","Thu Mar 26 03:12:59 UTC 2026","passed","Thu Mar 26 03:13:01 UTC 2026","","setup/ui-auth.setup.ts","",""

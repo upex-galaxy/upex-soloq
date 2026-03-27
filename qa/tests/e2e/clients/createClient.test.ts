@@ -1,7 +1,7 @@
 import type { CreateClientFormData } from '@/tests/components/ui/types/CreateClientFormTypes';
 import { expect, test } from '@TestFixture';
 
-test.describe('Create Client', () => {
+test.describe('Create Client', { tag: ['@critical'] }, () => {
   test.beforeEach(async ({ ui }) => {
     await ui.page.goto('/clients');
   });

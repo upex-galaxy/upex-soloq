@@ -1,13 +1,14 @@
 import type { TestContextOptions } from '@TestContext';
 import type { CreateClientFormData } from './types/CreateClientFormTypes';
 import { UiBase } from '@ui/UiBase';
-import { atc } from '@/tests/utils/decorators';
+import { atc, step } from '@utils/decorators';
 
 export class CreateClientPage extends UiBase {
   constructor(options: TestContextOptions) {
     super(options);
   }
 
+  @step
   async fillClientForm(clientFormData: CreateClientFormData) {
     const { name, email, company, phone, tax_id, address, notes } = clientFormData;
     name && await this.page.getByTestId('client-name-input').fill(name);
@@ -19,12 +20,14 @@ export class CreateClientPage extends UiBase {
     notes && await this.page.getByTestId('client-notes-input').fill(notes);
   }
 
+  @step
   async cancelClientForm() {
     const cancelClientButton = this.page.getByTestId('client-form-cancel');
     await cancelClientButton.click();
     await this.expect(this.page).not.toHaveURL(/.*clients\/create.*/);
   }
 
+  @step
   async submitClientForm() {
     const interceptionEndpoint = this.page.waitForResponse(response => response.url().includes('api/clients'));
     await this.page.getByTestId('client-form-submit').click();

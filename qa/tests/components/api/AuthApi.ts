@@ -19,7 +19,7 @@ import type { TestContextOptions } from '@TestContext';
 
 import { ApiBase } from '@api/ApiBase';
 import { expect } from '@playwright/test';
-import { atc } from '@utils/decorators';
+import { atc, step } from '@utils/decorators';
 
 // Re-export types for consumers that import from AuthApi
 export type { AuthErrorResponse, LoginPayload, TokenResponse, UserInfoResponse } from '@schemas/auth.types';
@@ -64,6 +64,7 @@ export class AuthApi extends ApiBase {
    *
    * @returns Tuple with response and user info
    */
+  @step
   async getCurrentUser(): Promise<[APIResponse, UserInfoResponse]> {
     const [response, body] = await this.apiGET<UserInfoResponse>(this.config.auth.meEndpoint);
     return [response, body];

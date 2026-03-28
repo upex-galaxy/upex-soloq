@@ -2,6 +2,7 @@ import type { Locator } from '@playwright/test';
 import type { TestContextOptions } from '@TestContext';
 import type { ClientsResponse } from './types/ClientsResponseTypes';
 import { UiBase } from '@ui/UiBase';
+import { step } from '@utils/decorators';
 
 export class ClientsPage extends UiBase {
   noFoundClients: Locator;
@@ -11,12 +12,14 @@ export class ClientsPage extends UiBase {
     this.noFoundClients = this.page.getByText('No se encontraron clientes');
   }
 
+  @step
   async goToCreateClientPage() {
     const newClientButton = this.page.getByText('Nuevo Cliente', { exact: true });
     await newClientButton.click();
     await this.expect(this.page).toHaveURL(/.*clients\/create.*/);
   }
 
+  @step
   async searchClients(searchValue: string) {
     const searchBarInput = this.page.getByTestId('clients-search-input');
     const interceptionEndpoint = this.page.waitForResponse(response => response.url().includes('api/clients?'));
@@ -29,6 +32,7 @@ export class ClientsPage extends UiBase {
   }
 
   // todo: @atc('')
+  @step
   async searchExistingClients(searchValue: string) {
     const clients = await this.searchClients(searchValue);
     this.expect(clients.length).toBeGreaterThanOrEqual(1);
@@ -37,6 +41,7 @@ export class ClientsPage extends UiBase {
   }
 
   // todo: @atc('')
+  @step
   async searchNoExistingClients(searchValue: string) {
     const clients = await this.searchClients(searchValue);
     this.expect(clients).toBe(0);

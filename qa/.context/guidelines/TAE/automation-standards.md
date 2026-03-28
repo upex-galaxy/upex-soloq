@@ -545,7 +545,7 @@ tests/components/steps/
 
 import { expect, type APIResponse } from '@playwright/test';
 import { ApiBase } from '@api/ApiBase';
-import { atc } from '@utils/decorators';
+import { atc, step } from '@utils/decorators';
 import type { Environment } from '@variables';
 
 // ============================================
@@ -565,7 +565,16 @@ export class ResourceApi extends ApiBase {
   }
 
   // ============================================
-  // ATCs
+  // Helpers - Read-only operations (@step for tracing)
+  // ============================================
+
+  @step
+  async getResource(id: number): Promise<[APIResponse, ResourceResponse]> {
+    return this.apiGET<ResourceResponse>(`/resource/${id}`);
+  }
+
+  // ============================================
+  // ATCs (@atc for TMS)
   // ============================================
 
   @atc('TK-XXX')
@@ -580,9 +589,10 @@ export default ResourceApi;
 ### Order of Methods
 
 1. Constructor
-2. Navigation methods (UI only)
-3. ATCs (decorated with `@atc`)
-4. Helper methods (no decorator)
+2. Navigation methods (UI only) — decorated with `@step`
+3. Helper methods (public, read-only) — decorated with `@step`
+4. ATCs (decorated with `@atc`)
+5. Private helper methods (no decorator)
 
 ---
 

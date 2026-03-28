@@ -464,6 +464,72 @@ Update Xray Test Cases (PASSED/FAILED)
 
 **Configuration**: See `tms-integration.md` for setup details.
 
+### @step Decorator
+
+The `@step` decorator adds method-level tracing for **public helper methods** (non-ATC). It wraps the method in `test.step()` so KataReporter displays it in the terminal output and `allure-playwright` captures it automatically for Allure reports.
+
+```typescript
+import { atc, step } from '@utils/decorators';
+
+class ClientsPage extends UiBase {
+  // ─── HELPERS (read-only, @step for tracing) ────────────
+
+  @step
+  async goToCreateClientPage() {
+    await this.page.getByText('Nuevo Cliente').click();
+    await this.expect(this.page).toHaveURL(/.*clients\/create.*/);
+  }
+
+  // ─── ATCs (state-changing, @atc for TMS) ───────────────
+
+  @atc('SQ-90')
+  async createClientSuccessfully(data: CreateClientFormData) {
+    await this.fillClientForm(data);
+    const response = await this.submitClientForm();
+    this.expect(response.ok()).toBe(true);
+    return response;
+  }
+}
+```
+
+**When to use `@step`:**
+
+- Public helper methods called by ATCs or test files
+- Navigation methods (e.g., `goto()`)
+- Read-only operations (e.g., `getCurrentUser()`)
+- Form fill helpers (e.g., `fillClientForm()`)
+
+**When NOT to use `@step`:**
+
+- Methods already decorated with `@atc`
+- Private methods (internal helpers)
+- Layer 2 base methods (`apiGET`, `apiPOST`, `interceptResponse`, etc.)
+
+**Comparison: `@atc` vs `@step`:**
+
+| Aspect | `@atc('TICKET-ID')` | `@step` |
+|--------|---------------------|---------|
+| Syntax | Factory: `@atc('SQ-90')` | Direct: `@step` |
+| Jira/TMS link | Yes | No |
+| Result tracking | Yes (`AtcResult` + NDJSON) | No |
+| Console output | `✅ [SQ-90] method - PASS` | Via KataReporter only |
+| Allure metadata | Labels, severity, links | None (automatic via `test.step`) |
+| Parameter display | Yes (with masking) | Yes (with masking) |
+
+**Terminal output example:**
+
+```
+🧪 Running Test [1/1] => SQ-90: TC1: Should create client...
+    ---- ✓ fillClientForm({ name: "Test Client", email: "test@example.com", password: "***" })
+        ---- step passed ✅ [234ms]
+    ---- ✓ submitClientForm()
+        ---- step passed ✅ [512ms]
+    ---- ✓ ATC [SQ-90]: createClientSuccessfully({ name: "Test Client", ... })
+        ---- step passed ✅ [1134ms]
+    ✅ [SQ-90] createClientSuccessfully - PASS (1155ms)
+    ---- 🔎 Test Output: ✅ PASSED
+```
+
 ---
 
 ## 8. Best Practices

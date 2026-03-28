@@ -43,11 +43,11 @@ Core Features (Sprint 6)
 ## Metadata
 
 - **Created:** 2026-01-21T01:07:57.853Z
-- **Updated:** 2026-03-28T23:24:46.364Z
+- **Updated:** 2026-03-28T23:41:34.293Z
 - **Reporter:** Ely
 - **Assignee:** Unassigned
 
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T23:27:57.216Z_
+_Last sync: 2026-03-28T23:41:47.175Z_

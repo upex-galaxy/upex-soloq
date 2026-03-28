@@ -213,4 +213,4 @@ As a user, I want to filter invoices by status (draft, sent, paid, overdue), so 
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T23:27:58.510Z_
+_Last sync: 2026-03-28T23:41:49.192Z_

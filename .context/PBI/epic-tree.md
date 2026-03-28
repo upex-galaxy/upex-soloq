@@ -4,18 +4,18 @@ _Project: SQ_
 
 ---
 
-## [SQ-39](https://upexgalaxy65.atlassian.net/browse/SQ-39) - Payment Tracking
+## [SQ-38](https://upexgalaxy65.atlassian.net/browse/SQ-38) - Invoice Dashboard & Tracking
 
-**Status:** Backlog | **Stories:** 6 | **Points:** 12
+**Status:** Backlog | **Stories:** 6 | **Points:** 15
 
-- [SQ-53](https://upexgalaxy65.atlassian.net/browse/SQ-53) As a user, I want to mark an invoice as paid so that I can update its status _(2 pts, Backlog)_
-- [SQ-54](https://upexgalaxy65.atlassian.net/browse/SQ-54) As a user, I want to record the payment method used so that I have a record _(2 pts, Backlog)_
-- [SQ-55](https://upexgalaxy65.atlassian.net/browse/SQ-55) As a user, I want to record the amount received so that I can verify against the total invoiced _(2 pts, Shift-Left QA)_
-- [SQ-56](https://upexgalaxy65.atlassian.net/browse/SQ-56) As a user, I want to add notes to my payment so that I have context for future reference _(2 pts, Backlog)_
-- [SQ-57](https://upexgalaxy65.atlassian.net/browse/SQ-57) As a user, I want to record the payment date so that I have an accurate payment history _(2 pts, Backlog)_
-- [SQ-58](https://upexgalaxy65.atlassian.net/browse/SQ-58) As a user, I want to revert an invoice from paid to pending so that I can correct errors _(2 pts, Backlog)_
+- [SQ-47](https://upexgalaxy65.atlassian.net/browse/SQ-47) As a user, I want to see a dashboard with all my invoices so that I have a general view _(3 pts, Ready For Dev)_
+- [SQ-48](https://upexgalaxy65.atlassian.net/browse/SQ-48) As a user, I want to filter invoices by status (draft, sent, paid, overdue) so that I can find the ones I need _(3 pts, Ready For Dev)_
+- [SQ-49](https://upexgalaxy65.atlassian.net/browse/SQ-49) As a user, I want to see the total pending amount so that I know my financial situation _(2 pts, Backlog)_
+- [SQ-50](https://upexgalaxy65.atlassian.net/browse/SQ-50) As a user, I want to see overdue invoices highlighted so that I can prioritize follow-up _(2 pts, Backlog)_
+- [SQ-51](https://upexgalaxy65.atlassian.net/browse/SQ-51) As a user, I want to search invoices by client or number so that I can find a specific one _(3 pts, Shift-Left QA)_
+- [SQ-52](https://upexgalaxy65.atlassian.net/browse/SQ-52) As a user, I want to see a summary of monthly income so that I can track my progress _(2 pts, Backlog)_
 
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T23:28:01.906Z_
+_Last sync: 2026-03-28T23:41:52.346Z_

@@ -197,6 +197,11 @@ User -> Payment Form -> POST /api/invoices/{invoiceId}/payments -> PostgreSQL ->
 - Needed for: validacion del formulario.
 - Suggestion: definir si siempre usa total de invoice.
 
+**Missing 4:** Regla exacta de precision/rounding y tratamiento de ceros.
+
+- Needed for: validacion de bordes y formato monetario.
+- Suggestion: especificar si se aceptan 0, 0.00, 01000, espacios y cuantos decimales maximos/minimos permite.
+
 ### Suggested Improvements (Before Implementation)
 
 **Improvement 1:** Alinear copy de warnings y validaciones.
@@ -212,6 +217,13 @@ User -> Payment Form -> POST /api/invoices/{invoiceId}/payments -> PostgreSQL ->
 - Current State: formato y decimales no estan cerrados.
 - Suggested Change: definir precision, rounding y valores invalidos.
 - Benefit: tests y implementacion mas precisos.
+
+**Improvement 3:** Cerrar la politica de warning para partial/overpayment.
+
+- Story Affected: STORY-SQ-55
+- Current State: no esta definido si el warning bloquea o solo informa.
+- Suggested Change: documentar comportamiento y copy exacto.
+- Benefit: evita interpretaciones distintas entre QA y Dev.
 
 ---
 
@@ -438,4 +450,4 @@ User -> Payment Form -> POST /api/invoices/{invoiceId}/payments -> PostgreSQL ->
 
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T23:27:58.083Z_
+_Last sync: 2026-03-28T23:41:47.991Z_

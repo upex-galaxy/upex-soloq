@@ -103,4 +103,4 @@ As a user, I want to see a summary of monthly income, so that I can track my pro
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T23:28:00.963Z_
+_Last sync: 2026-03-28T23:41:51.637Z_

@@ -103,4 +103,4 @@ As a user, I want to mark an invoice as paid, so that I can update its status. S
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T23:27:58.094Z_
+_Last sync: 2026-03-28T23:41:48.002Z_

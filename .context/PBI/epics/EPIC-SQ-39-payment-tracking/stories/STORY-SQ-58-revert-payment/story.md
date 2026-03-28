@@ -134,4 +134,4 @@ As a user, I want to revert an invoice from paid to pending, so that I can corre
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T23:28:01.184Z_
+_Last sync: 2026-03-28T23:41:50.950Z_

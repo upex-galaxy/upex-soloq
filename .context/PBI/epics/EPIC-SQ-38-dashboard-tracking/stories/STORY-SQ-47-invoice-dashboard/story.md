@@ -148,4 +148,4 @@ As a user, I want to see a dashboard with all my invoices, so that I have a gene
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T23:27:57.738Z_
+_Last sync: 2026-03-28T23:41:48.458Z_

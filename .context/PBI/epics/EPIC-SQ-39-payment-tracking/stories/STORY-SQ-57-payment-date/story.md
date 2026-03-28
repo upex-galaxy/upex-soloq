@@ -129,4 +129,4 @@ As a user, I want to record the payment date, so that I have accurate history. S
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T23:28:00.477Z_
+_Last sync: 2026-03-28T23:41:50.174Z_

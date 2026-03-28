@@ -130,4 +130,4 @@ As a user, I want to record the amount received, so that I can verify against th
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T23:27:59.485Z_
+_Last sync: 2026-03-28T23:41:49.154Z_

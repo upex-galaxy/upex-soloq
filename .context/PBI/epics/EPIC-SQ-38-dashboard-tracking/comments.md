@@ -805,6 +805,10 @@ User -> Dashboard UI -> GET /api/invoices + GET /api/invoices/dashboard -> Postg
 - Needed for: probar inputs invalidos o inesperados en SQ-51.
 - Suggestion: definir si cualquier string es valido o si existe normalizacion.
 
+**Missing 4:** Detalle exacto del comportamiento de search.
+- Needed for: separar live search, submit search, fields buscados y orden de precedence.
+- Suggestion: especificar si el buscador consulta `invoice_number`, `client.name`, `client.email` o solo algunos de ellos, y si el criterio es partial/case-insensitive/fuzzy.
+
 ### Suggested Improvements (Before Implementation)
 
 **Improvement 1:** Estabilizar terminos de estado (`sent` vs `pending`).
@@ -824,6 +828,12 @@ User -> Dashboard UI -> GET /api/invoices + GET /api/invoices/dashboard -> Postg
 - Current State: falta detalle sobre live search vs submit.
 - Suggested Change: definir debounce, comportamiento y campo(s) buscados.
 - Benefit: tests mas precisos y menos retrabajo.
+
+**Improvement 4:** Formalizar prioridad entre search, filters y pagination.
+- Story Affected: STORY-SQ-51
+- Current State: no esta documentado el orden de aplicacion.
+- Suggested Change: definir precedence y comportamiento ante combinaciones.
+- Benefit: reduce ambiguedad y errores de backend/frontend.
 
 ---
 
@@ -919,7 +929,7 @@ User -> Dashboard UI -> GET /api/invoices + GET /api/invoices/dashboard -> Postg
 - Boundary: 3
 - Integration: 3
 - API: 2
-- Rationale: search, debounce, partial match, empty/no-results y rendimiento.
+- Rationale: search, debounce, partial match, empty/no-results, precedence with filters/pagination and performance.
 - Parametrized Tests Recommended: Yes
 
 **SQ-52: Monthly income summary**
@@ -1030,4 +1040,4 @@ User -> Dashboard UI -> GET /api/invoices + GET /api/invoices/dashboard -> Postg
 
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T23:27:57.721Z_
+_Last sync: 2026-03-28T23:41:48.454Z_

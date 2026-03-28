@@ -30,6 +30,9 @@
  *   ATLASSIAN_EMAIL=your-email@example.com
  *   ATLASSIAN_API_TOKEN=ATATT3x...
  *
+ * Compatible Jira aliases:
+ *   JIRA_URL, JIRA_USERNAME (or JIRA_EMAIL), JIRA_API_TOKEN
+ *
  * Optional:
  *   JIRA_PROJECT=SQ                    # Default project key
  *   JIRA_SYNC_OUTPUT=.context/PBI      # Output directory
@@ -48,7 +51,7 @@
  *   pull                Sync all Epics and Stories from Jira
  *     --epic <key>      Sync specific epic with all its stories
  *     --story <key>     Sync specific story only
- *     --include-comments Include Jira comments in comments.md
+ *     --include-comments Include Jira comments in comments.md (story + epic)
  *     --dry-run         Show what would be done without writing files
  *     --json            Output results as JSON
  *   help                Show this help message
@@ -413,9 +416,9 @@ function parseArgs(args: string[]): ParsedArgs {
 // ============================================================================
 
 function getConfig(): Config {
-  const baseUrl = process.env.ATLASSIAN_URL;
-  const email = process.env.ATLASSIAN_EMAIL;
-  const apiToken = process.env.ATLASSIAN_API_TOKEN;
+  const baseUrl = process.env.ATLASSIAN_URL || process.env.JIRA_URL;
+  const email = process.env.ATLASSIAN_EMAIL || process.env.JIRA_USERNAME || process.env.JIRA_EMAIL;
+  const apiToken = process.env.ATLASSIAN_API_TOKEN || process.env.JIRA_API_TOKEN;
 
   const missing: string[] = [];
   if (!baseUrl) { missing.push('ATLASSIAN_URL'); }
@@ -614,7 +617,7 @@ function generateTraceabilitySection(
   return lines.join('\n').trim();
 }
 
-function processNode(node: AdfNode): string {
+function processNode(node: AdfNode, depth = 0): string {
   switch (node.type) {
     case 'paragraph':
       return processInlineContent(node.content);
@@ -628,8 +631,8 @@ function processNode(node: AdfNode): string {
       return (
         node.content
           ?.map((item) => {
-            const content = item.content?.[0];
-            return `- ${processInlineContent(content?.content)}`;
+            const rendered = processListItem(item, depth);
+            return rendered;
           })
           .join('\n') || ''
       );
@@ -638,8 +641,7 @@ function processNode(node: AdfNode): string {
       return (
         node.content
           ?.map((item, i) => {
-            const content = item.content?.[0];
-            return `${i + 1}. ${processInlineContent(content?.content)}`;
+            return processListItem(item, depth, i + 1, true);
           })
           .join('\n') || ''
       );
@@ -653,7 +655,7 @@ function processNode(node: AdfNode): string {
     case 'blockquote':
       return (
         node.content
-          ?.map(p => `> ${processNode(p)}`)
+          ?.map(p => `> ${processNode(p, depth)}`)
           .join('\n') || ''
       );
 
@@ -686,13 +688,47 @@ function processNode(node: AdfNode): string {
 
     case 'panel': {
       const panelType = String(node.attrs?.panelType || 'info').toUpperCase();
-      const content = node.content?.map(n => processNode(n)).join('\n') || '';
+      const content = node.content?.map(n => processNode(n, depth)).join('\n') || '';
       return `> **${panelType}:** ${content}`;
     }
+
+    case 'listItem':
+      return processListItem(node, depth);
 
     default:
       return processInlineContent(node.content);
   }
+}
+
+function processListItem(node: AdfNode, depth = 0, index?: number, ordered = false): string {
+  const indent = '  '.repeat(depth);
+  const prefix = ordered ? `${index ?? 1}. ` : '- ';
+  const blockLines: string[] = [];
+  const nestedLines: string[] = [];
+
+  for (const child of node.content || []) {
+    if (child.type === 'bulletList' || child.type === 'orderedList') {
+      const rendered = processNode(child, depth + 1);
+      if (rendered) {
+        nestedLines.push(rendered);
+      }
+    }
+    else {
+      const rendered = processNode(child, depth);
+      if (rendered) {
+        blockLines.push(rendered);
+      }
+    }
+  }
+
+  const firstLine = `${indent}${prefix}${blockLines.join(' ').trim()}`.trimEnd();
+  const lines = [firstLine];
+
+  for (const nested of nestedLines) {
+    lines.push(nested);
+  }
+
+  return lines.filter(Boolean).join('\n');
 }
 
 function processInlineContent(content: AdfNode[] | undefined): string {
@@ -1509,6 +1545,17 @@ async function syncEpic(
 
   result.synced.epics++;
 
+  if (options.includeComments) {
+    const epicComments = await fetchComments(config, epic.key);
+    const epicCommentsContent = generateCommentsMarkdown(epicComments, epic.key, config);
+    const epicCommentsPath = join(epicFolder, 'comments.md');
+    const epicCommentsResult = writeIfNotProtected(epicCommentsPath, epicCommentsContent, options.dryRun);
+
+    if (epicCommentsResult.status === 'created') { result.files.created++; }
+    else if (epicCommentsResult.status === 'updated') { result.files.updated++; }
+    else { result.files.skipped++; }
+  }
+
   // Sync stories
   for (let i = 0; i < stories.length; i++) {
     const story = stories[i];
@@ -2149,9 +2196,9 @@ ${colors.bold}EXAMPLES${colors.reset}
   bun jira-sync pull --include-comments --dry-run
 
 ${colors.bold}ENVIRONMENT VARIABLES${colors.reset}
-  ATLASSIAN_URL         Jira instance URL (required)
-  ATLASSIAN_EMAIL       Your email (required)
-  ATLASSIAN_API_TOKEN   API token (required)
+  ATLASSIAN_URL / JIRA_URL         Jira instance URL (required)
+  ATLASSIAN_EMAIL / JIRA_USERNAME  Your email (required)
+  ATLASSIAN_API_TOKEN / JIRA_API_TOKEN  API token (required)
   JIRA_PROJECT          Default project key (default: SQ)
   JIRA_SYNC_OUTPUT      Output directory (default: .context/PBI)
 

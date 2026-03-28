@@ -16,31 +16,41 @@ As a user, I want to mark an invoice as paid, so that I can update its status. S
 
 ## Acceptance Criteria
 
-1. 
+1.
+  1.
+    1. Scenario 1: Mark as paid button
 
 - ****Given:**** I have a sent invoice
 - ****When:**** I view it
 - ****Then:**** I see a "Mark as Paid" button
 
-1. 
+1.
+  1.
+    1. Scenario 2: Quick mark from list
 
 - ****Given:**** I am on the invoices list
 - ****When:**** I click the "paid" icon on a row
 - ****Then:**** A payment form/modal opens
 
-1. 
+1.
+  1.
+    1. Scenario 3: Status update
 
 - ****Given:**** I mark an invoice as paid
 - ****When:**** I confirm the action
 - ****Then:**** The status changes to "paid"
 
-1. 
+1.
+  1.
+    1. Scenario 4: Paid timestamp recorded
 
 - ****Given:**** I mark an invoice as paid
 - ****When:**** I view the invoice details
 - ****Then:**** I see the paid_at timestamp
 
-1. 
+1.
+  1.
+    1. Scenario 5: Cannot re-pay
 
 - ****Given:**** An invoice is already paid
 - ****When:**** I view it
@@ -50,7 +60,9 @@ As a user, I want to mark an invoice as paid, so that I can update its status. S
 
 ## Scope
 
-1. 
+1.
+  1.
+    1. In Scope
 
 - "Mark as Paid" button on invoice detail
 - Quick action icon on invoice list row
@@ -61,7 +73,9 @@ As a user, I want to mark an invoice as paid, so that I can update its status. S
 - Dashboard stats recalculation
 - Disable action for already-paid invoices
 
-1. 
+1.
+  1.
+    1. Out of Scope
 
 - Partial payment handling
 - Multiple payments per invoice
@@ -81,12 +95,12 @@ As a user, I want to mark an invoice as paid, so that I can update its status. S
 
 ## Metadata
 
-- **Created:** 1/20/2026
-- **Updated:** 3/2/2026
+- **Created:** 20/1/2026
+- **Updated:** 11/3/2026
 - **Reporter:** Ely
 - **Assignee:** Unassigned
 
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-02T19:54:04.021Z_
+_Last sync: 2026-03-28T21:41:10.252Z_

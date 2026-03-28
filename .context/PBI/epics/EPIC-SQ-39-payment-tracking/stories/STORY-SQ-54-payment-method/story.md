@@ -16,31 +16,41 @@ As a user, I want to record the payment method used, so that I have a record. St
 
 ## Acceptance Criteria
 
-1. 
+1.
+  1.
+    1. Scenario 1: Method selection
 
 - ****Given:**** I am recording a payment
 - ****When:**** I fill the form
 - ****Then:**** I can select a payment method from a dropdown
 
-1. 
+1.
+  1.
+    1. Scenario 2: Method options
 
 - ****Given:**** I view the method dropdown
 - ****When:**** I see the options
 - ****Then:**** I see: Bank Transfer, PayPal, MercadoPago, Cash, Other
 
-1. 
+1.
+  1.
+    1. Scenario 3: Default to configured methods
 
 - ****Given:**** I have payment methods configured in my profile
 - ****When:**** I see the dropdown
 - ****Then:**** My configured methods appear first
 
-1. 
+1.
+  1.
+    1. Scenario 4: Method recorded
 
 - ****Given:**** I select a payment method
 - ****When:**** I save the payment
 - ****Then:**** The method is stored in payments.payment_method
 
-1. 
+1.
+  1.
+    1. Scenario 5: View method in history
 
 - ****Given:**** I view a payment record
 - ****When:**** I check the details
@@ -50,7 +60,9 @@ As a user, I want to record the payment method used, so that I have a record. St
 
 ## Scope
 
-1. 
+1.
+  1.
+    1. In Scope
 
 - Payment method dropdown selector
 - Options: bank*transfer, paypal, mercado*pago, cash, other
@@ -59,7 +71,9 @@ As a user, I want to record the payment method used, so that I have a record. St
 - Method displayed in payment history
 - Optional field (can save without selecting)
 
-1. 
+1.
+  1.
+    1. Out of Scope
 
 - Add new payment method during payment recording
 - Payment method analytics/reports
@@ -79,12 +93,12 @@ As a user, I want to record the payment method used, so that I have a record. St
 
 ## Metadata
 
-- **Created:** 1/20/2026
-- **Updated:** 3/2/2026
+- **Created:** 20/1/2026
+- **Updated:** 11/3/2026
 - **Reporter:** Ely
 - **Assignee:** Unassigned
 
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-02T19:54:04.290Z_
+_Last sync: 2026-03-28T21:41:10.525Z_

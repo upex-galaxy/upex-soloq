@@ -160,4 +160,20 @@ Ver `docs/mcp-builder-strategy.md` para más detalles.
 
 ---
 
+## Checks Recomendados
+
+Antes de usar flujos de Jira o GitHub, valida los MCPs críticos:
+
+```bash
+bun ai:check
+```
+
+Debe pasar con:
+- `atlassian` activo y con valores resueltos para `JIRA_URL`, `JIRA_USERNAME` y `JIRA_API_TOKEN`
+- `github` activo y con `GITHUB_TOKEN` resuelto
+- `supabase` activo y con `SUPABASE_ACCESS_TOKEN` resuelto
+- `vercel` reportado sin errores críticos
+
+---
+
 **Última actualización**: 2025-12-26

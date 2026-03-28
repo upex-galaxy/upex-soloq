@@ -1,4 +1,4 @@
-<!-- MANUAL PARA HUMANOS - No es un prompt para IA -->
+
 
 # Shift-Left Testing - Manual
 
@@ -89,6 +89,7 @@ El principio fundamental: **encontrar defectos es más barato cuanto antes los e
 
 ### 🔑 Tipos de Test Cases
 
+
 | Tipo            | Propósito                 | Ejemplo                                     |
 | --------------- | ------------------------- | ------------------------------------------- |
 | **Positive**    | Happy path, flujo exitoso | Login con credenciales válidas              |
@@ -96,6 +97,7 @@ El principio fundamental: **encontrar defectos es más barato cuanto antes los e
 | **Boundary**    | Valores límite            | Email con exactamente 254 caracteres        |
 | **Edge Case**   | Escenarios inusuales      | Login con sesión activa en otro dispositivo |
 | **Integration** | Puntos de integración     | Frontend → API → Database                   |
+
 
 ### 🔑 Gherkin Format
 
@@ -133,16 +135,16 @@ Then I should be redirected to "/dashboard"
 
 ### Documentación Lista
 
-- [ ] `.context/PRD/` - Product Requirements Document completo
-- [ ] `.context/SRS/` - Software Requirements Specification completo
-- [ ] `.context/PBI/epics/EPIC-XXX/epic.md` - Épica documentada
-- [ ] `.context/PBI/epics/EPIC-XXX/stories/STORY-YYY/story.md` - Stories documentadas
+- `.context/PRD/` - Product Requirements Document completo
+- `.context/SRS/` - Software Requirements Specification completo
+- `.context/PBI/epics/EPIC-XXX/epic.md` - Épica documentada
+- `.context/PBI/epics/EPIC-XXX/stories/STORY-YYY/story.md` - Stories documentadas
 
 ### Jira Configurado
 
-- [ ] Épica existe en Jira con ID real
-- [ ] Stories existen en Jira vinculadas a la épica
-- [ ] Permisos para comentar y editar issues
+- Épica existe en Jira con ID real
+- Stories existen en Jira vinculadas a la épica
+- Permisos para comentar y editar issues
 
 ---
 
@@ -546,6 +548,7 @@ Estima cuántos test cases necesitas por story.
 
 Para cada story, evalúa:
 
+
 | Factor             | Low                | Medium         | High                 |
 | ------------------ | ------------------ | -------------- | -------------------- |
 | Business Logic     | Simple validations | Multiple rules | Complex calculations |
@@ -553,6 +556,7 @@ Para cada story, evalúa:
 | Data Validations   | 1-3 fields         | 4-6 fields     | 7+ fields            |
 | Error Scenarios    | 1-2 cases          | 3-5 cases      | 6+ cases             |
 | UI Complexity      | 1 form             | Multiple forms | Complex UI           |
+
 
 ### 6.2 Estimate Per Story
 
@@ -628,7 +632,7 @@ See comment below for full list.
 ---
 ```
 
-4. Agrega label: `test-plan-ready`
+1. Agrega label: `test-plan-ready`
 
 ### 7.3 Add Comment with Full Test Plan
 
@@ -804,7 +808,7 @@ Convierte los scenarios en test cases ejecutables.
 
 ### 11.1 Test Case Structure
 
-````markdown
+```markdown
 ### TC-01: Validar signup exitoso con credenciales válidas
 
 **Type:** Positive
@@ -858,7 +862,7 @@ Convierte los scenarios en test cases ejecutables.
   "password": "SecurePass123!"
 }
 ```
-````
+```
 
 ---
 
@@ -876,7 +880,7 @@ Usa formato claro:
 
 Validar [COMPORTAMIENTO] [CONDICIÓN]
 
-````
+```
 
 **Ejemplos:**
 - `Validar signup exitoso con credenciales válidas`
@@ -919,7 +923,7 @@ Cuando tienes el mismo test con diferentes datos, usa parametrización:
 ---
 
 **Benefit:** 5 test scenarios en 1 test case parametrizado
-````
+```
 
 ---
 
@@ -947,7 +951,7 @@ POST /auth/signup
 Content-Type: application/json
 
 {
-"email": "test@example.com",
+"email": "[test@example.com](mailto:test@example.com)",
 "password": "SecurePass123!"
 }
 
@@ -969,7 +973,7 @@ HTTP 201 Created
 "message": "Account created",
 "user": {
 "id": "uuid-xxx",
-"email": "test@example.com"
+"email": "[test@example.com](mailto:test@example.com)"
 }
 }
 
@@ -1036,7 +1040,7 @@ Incluye:
 ---
 ```
 
-3. Agrega label: `shift-left-reviewed`
+1. Agrega label: `shift-left-reviewed`
 
 ### 13.3 Add Comment with Test Cases
 
@@ -1048,35 +1052,35 @@ Agrega comentario con test cases completos y taggea al equipo.
 
 ### Feature Test Plan (Epic Level) ✅
 
-- [ ] Business context analyzed
-- [ ] Technical architecture analyzed
-- [ ] Risk analysis completed (technical, business, integration)
-- [ ] Critical questions documented
-- [ ] Test strategy defined (scope, levels, tools)
-- [ ] Entry/Exit criteria defined
-- [ ] Test cases estimated per story
-- [ ] `feature-test-plan.md` created
-- [ ] Epic updated in Jira
-- [ ] Team notified
+- Business context analyzed
+- Technical architecture analyzed
+- Risk analysis completed (technical, business, integration)
+- Critical questions documented
+- Test strategy defined (scope, levels, tools)
+- Entry/Exit criteria defined
+- Test cases estimated per story
+- `feature-test-plan.md` created
+- Epic updated in Jira
+- Team notified
 
 ### Acceptance Test Plan ✅
 
-- [ ] Story analyzed for ambiguities
-- [ ] Missing information identified
-- [ ] Edge cases identified
-- [ ] Acceptance criteria refined with specific data
-- [ ] Test cases designed (positive, negative, boundary)
-- [ ] Integration tests designed (if applicable)
-- [ ] Parametrization used where beneficial
-- [ ] `acceptance-test-plan.md` created
-- [ ] Story updated in Jira
-- [ ] Team notified
+- Story analyzed for ambiguities
+- Missing information identified
+- Edge cases identified
+- Acceptance criteria refined with specific data
+- Test cases designed (positive, negative, boundary)
+- Integration tests designed (if applicable)
+- Parametrization used where beneficial
+- `acceptance-test-plan.md` created
+- Story updated in Jira
+- Team notified
 
 ### Questions Resolved ✅
 
-- [ ] PO answered business questions
-- [ ] Dev answered technical questions
-- [ ] Test cases updated based on answers
+- PO answered business questions
+- Dev answered technical questions
+- Test cases updated based on answers
 
 ---
 

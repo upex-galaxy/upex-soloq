@@ -73,9 +73,9 @@
       "command": "uvx",
       "args": ["mcp-atlassian"],
       "env": {
-        "JIRA_URL": "https://upexgalaxy62.atlassian.net",
-        "JIRA_USERNAME": "tu.email@ejemplo.com",
-        "JIRA_API_TOKEN": "{{JIRA_API_TOKEN}}"
+        "JIRA_URL": "{env:JIRA_URL}",
+        "JIRA_USERNAME": "{env:JIRA_USERNAME}",
+        "JIRA_API_TOKEN": "{env:JIRA_API_TOKEN}"
       }
     },
     "github": {

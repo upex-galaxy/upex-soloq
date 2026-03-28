@@ -86,16 +86,18 @@ args = [
 ```json
 {
   "tavily": {
-    "type": "remote",
-    "url": "https://mcp.tavily.com/mcp",
-    "oauth": false,
-    "headers": {
-      "Authorization": "Bearer {env:TAVILY_API_KEY}"
-    },
+    "type": "local",
+    "command": [
+      "cmd",
+      "/c",
+      "npx -y mcp-remote https://mcp.tavily.com/mcp/?tavilyApiKey=%TAVILY_API_KEY%"
+    ],
     "enabled": true
   }
 }
 ```
+
+> En OpenCode de este repo usamos `cmd /c` para resolver `TAVILY_API_KEY` en Windows.
 
 ---
 

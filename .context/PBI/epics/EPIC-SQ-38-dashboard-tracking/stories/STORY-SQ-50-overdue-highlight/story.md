@@ -16,31 +16,41 @@ As a user, I want to see overdue invoices highlighted, so that I can prioritize 
 
 ## Acceptance Criteria
 
-1. 
+1.
+  1.
+    1. Scenario 1: Visual highlight
 
 - ****Given:**** I have overdue invoices
 - ****When:**** I view the invoice list
 - ****Then:**** Overdue invoices have a visual indicator (red badge/row)
 
-1. 
+1.
+  1.
+    1. Scenario 2: Overdue badge
 
 - ****Given:**** An invoice is past due
 - ****When:**** I view its status
 - ****Then:**** I see "Overdue" badge instead of "Sent"
 
-1. 
+1.
+  1.
+    1. Scenario 3: Days overdue displayed
 
 - ****Given:**** An invoice is overdue
 - ****When:**** I view the row
 - ****Then:**** I see how many days overdue it is (e.g., "7 days overdue")
 
-1. 
+1.
+  1.
+    1. Scenario 4: Dashboard alert
 
 - ****Given:**** I have overdue invoices
 - ****When:**** I view the dashboard
 - ****Then:**** I see an alert banner or count of overdue invoices
 
-1. 
+1.
+  1.
+    1. Scenario 5: Sort overdue first
 
 - ****Given:**** I have mixed status invoices
 - ****When:**** I sort by urgency
@@ -50,7 +60,9 @@ As a user, I want to see overdue invoices highlighted, so that I can prioritize 
 
 ## Scope
 
-1. 
+1.
+  1.
+    1. In Scope
 
 - Visual highlight for overdue rows (red/orange)
 - "Overdue" status badge
@@ -59,7 +71,9 @@ As a user, I want to see overdue invoices highlighted, so that I can prioritize 
 - Sort by urgency option
 - Overdue detection: status='sent' AND due*date < CURRENT*DATE
 
-1. 
+1.
+  1.
+    1. Out of Scope
 
 - Automatic status change to 'overdue'
 - Push notifications for overdue
@@ -79,12 +93,12 @@ As a user, I want to see overdue invoices highlighted, so that I can prioritize 
 
 ## Metadata
 
-- **Created:** 1/20/2026
-- **Updated:** 3/2/2026
+- **Created:** 20/1/2026
+- **Updated:** 11/3/2026
 - **Reporter:** Ely
 - **Assignee:** Unassigned
 
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-02T19:54:02.398Z_
+_Last sync: 2026-03-28T21:41:12.084Z_

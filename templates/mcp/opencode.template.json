@@ -56,12 +56,12 @@
       "enabled": false
     },
     "tavily": {
-      "type": "remote",
-      "url": "https://mcp.tavily.com/mcp",
-      "oauth": false,
-      "headers": {
-        "Authorization": "Bearer {{TAVILY_API_KEY}}"
-      },
+      "type": "local",
+      "command": [
+        "cmd",
+        "/c",
+        "npx -y mcp-remote https://mcp.tavily.com/mcp/?tavilyApiKey=%TAVILY_API_KEY%"
+      ],
       "enabled": false
     },
     "postman": {
@@ -92,9 +92,9 @@
       "type": "local",
       "command": ["uvx", "mcp-atlassian"],
       "environment": {
-        "JIRA_URL": "https://upexgalaxy62.atlassian.net",
-        "JIRA_USERNAME": "tu.email@ejemplo.com",
-        "JIRA_API_TOKEN": "{{JIRA_API_TOKEN}}"
+        "JIRA_URL": "{env:JIRA_URL}",
+        "JIRA_USERNAME": "{env:JIRA_USERNAME}",
+        "JIRA_API_TOKEN": "{env:JIRA_API_TOKEN}"
       },
       "enabled": false
     },

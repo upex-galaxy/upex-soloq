@@ -101,6 +101,16 @@ Run your agent and verify with:
 /mcp
 ```
 
+### 5. Run Critical MCP Checks
+
+Validate Atlassian and GitHub before starting project-management or code-review flows:
+
+```bash
+bun ai:check
+```
+
+This confirms the active config has `atlassian`, `github`, and `supabase` enabled and also reports `vercel` status.
+
 ## Key Differences by Tool
 
 | Feature        | Claude         | OpenCode         | Codex          | Gemini       |

@@ -79,7 +79,7 @@ Staging validado (Fase 9-12)
 │  Merge a main:                         │
 │  git checkout main                     │
 │  git pull origin main                  │
-│  git merge develop                     │
+│  git merge staging                     │
 │  git push origin main                  │
 │                                        │
 │  Vercel auto-deploya:                  │
@@ -113,7 +113,7 @@ Staging validado (Fase 9-12)
 │  1. Vercel: Promote previous deploy    │
 │  2. Validar producción estable         │
 │  3. Investigar causa (RCA)             │
-│  4. Fix en develop                     │
+│  4. Fix en staging                     │
 │  5. Re-testear en staging              │
 │  6. Re-deploy cuando listo             │
 │                                        │
@@ -125,14 +125,14 @@ Staging validado (Fase 9-12)
 ## Proceso de Deploy (Vercel)
 
 ```bash
-# 1. Asegurar que develop está listo
-git checkout develop
-git pull origin develop
+# 1. Asegurar que staging está listo
+git checkout staging
+git pull origin staging
 
 # 2. Merge a main (trigger auto-deploy)
 git checkout main
 git pull origin main
-git merge develop --no-ff -m "Release: [version/feature]"
+git merge staging --no-ff -m "Release: [version/feature]"
 git push origin main
 
 # 3. Monitorear en Vercel Dashboard
@@ -182,7 +182,7 @@ Con producción estable:
 ## FAQ
 
 **P: ¿Qué pasa si el deploy falla en build?**
-R: Vercel no promoverá el deploy. Fix en develop y re-push a main.
+R: Vercel no promoverá el deploy. Fix en staging y re-push a main.
 
 **P: ¿Cuánto tiempo monitorear post-deploy?**
 R: Mínimo 2 horas para features menores, 4+ horas para features mayores.

@@ -4,13 +4,13 @@
 
 La **Fase 9: Deployment & Staging** configura el pipeline de CI/CD y despliega código a staging environment para validación QA.
 
-**Esta fase se ejecuta UNA SOLA VEZ** (setup de CI/CD) y luego AUTOMÁTICAMENTE en cada merge a develop.
+**Esta fase se ejecuta UNA SOLA VEZ** (setup de CI/CD) y luego AUTOMÁTICAMENTE en cada merge a `staging`.
 
 **Esta fase se enfoca en:**
 
 - ✅ Configurar GitHub Actions workflow (CI/CD pipeline)
 - ✅ Configurar environment variables por ambiente (dev, staging, prod)
-- ✅ Desplegar automáticamente a staging cuando merge a `develop`
+- ✅ Desplegar automáticamente a staging cuando merge a `staging`
 - ✅ Validar deployment con smoke tests básicos
 - ✅ Preparar infraestructura para Fase 10 (Exploratory Testing)
 
@@ -33,7 +33,7 @@ La **Fase 9: Deployment & Staging** configura el pipeline de CI/CD y despliega c
 
 **Total estimado (setup inicial):** 50-85 minutos
 
-**Después del setup:** Deploy automático en cada merge a `develop` (3-7 minutos por GitHub Actions)
+**Después del setup:** Deploy automático en cada merge a `staging` (3-7 minutos por GitHub Actions)
 
 ---
 
@@ -122,7 +122,7 @@ Esta fase requiere los siguientes MCP tools configurados:
 
 **✅ Fase 8 (Code Review) completada:**
 
-- PR aprobado y listo para merge a `develop`
+- PR aprobado y listo para merge a `staging`
 - Unit tests pasando
 - Build local exitoso
 
@@ -134,7 +134,7 @@ Esta fase requiere los siguientes MCP tools configurados:
 **✅ GitHub Repository configurado:**
 
 - Repositorio GitHub existente
-- Branches `main` (production) y `develop` (staging) creadas
+- Branches `main` (production) y `staging` (staging) creadas
 - Acceso de escritura al repo (para configurar secrets)
 
 **✅ Herramientas locales instaladas:**
@@ -165,9 +165,9 @@ Al finalizar esta fase tendrás:
 ### **1. CI/CD Pipeline Configurado:**
 
 - ✅ `.github/workflows/ci.yml` - GitHub Actions workflow completo
-- ✅ Workflow triggers: push/PR a `main` y `develop`
+- ✅ Workflow triggers: push/PR a `main` y `staging`
 - ✅ Jobs secuenciales: lint → test → build → deploy
-- ✅ Deploy automático a staging cuando push a `develop`
+- ✅ Deploy automático a staging cuando push a `staging`
 - ✅ (Opcional) Deploy automático a production cuando push a `main`
 
 ### **2. GitHub Secrets Configurados:**
@@ -197,7 +197,7 @@ Al finalizar esta fase tendrás:
 ### **4. Deployment en Staging:**
 
 - ✅ Código desplegado en staging environment
-- ✅ Staging URL accesible: `https://[project]-develop.vercel.app`
+- ✅ Staging URL accesible: `https://[project]-staging.vercel.app`
 - ✅ Smoke test básico pasado
 - ✅ No hay errores 500 críticos
 
@@ -233,7 +233,7 @@ Al finalizar esta fase tendrás:
 
 **Output:** CI/CD completamente automatizado, deploys automáticos en cada merge.
 
-**Después de esto:** Cada merge a `develop` despliega automáticamente sin intervención.
+**Después de esto:** Cada merge a `staging` despliega automáticamente sin intervención.
 
 ---
 
@@ -244,10 +244,10 @@ Al finalizar esta fase tendrás:
 **Flujo:**
 
 1. Implementa feature en `feature/STORY-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}` branch
-2. Crea Pull Request a `develop`
+2. Crea Pull Request a `staging`
 3. GitHub Actions ejecuta: lint → test → build (automático)
 4. Si CI pasa → Code review (Fase 8)
-5. Merge PR a `develop`
+5. Merge PR a `staging`
 6. **GitHub Actions despliega automáticamente a staging** (sin intervención)
 7. Valida staging URL
 
@@ -284,7 +284,7 @@ Al finalizar esta fase tendrás:
 3. Trigger re-deploy:
    ```bash
    git commit --allow-empty -m "chore: trigger redeploy for env var update"
-   git push origin develop
+   git push origin staging
    ```
 4. GitHub Actions re-despliega con nuevas variables
 
@@ -324,7 +324,7 @@ Al finalizar esta fase tendrás:
 **Solución:**
 
 ```
-Push a develop → GitHub Actions ejecuta:
+Push a staging → GitHub Actions ejecuta:
   1. Lint (valida code style)
   2. Test (valida funcionalidad)
   3. Build (valida que compila)
@@ -353,7 +353,7 @@ jobs:
 
   deploy-staging:
     needs: build # Solo despliega si todo lo anterior pasó
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/staging'
     steps:
       - Deploy to Vercel staging
 ```
@@ -375,7 +375,7 @@ jobs:
 Development:   NEXT_PUBLIC_API_URL=http://localhost:3000
                SUPABASE_URL=https://dev-project.supabase.co
 
-Staging:       NEXT_PUBLIC_API_URL=https://[project]-develop.vercel.app
+Staging:       NEXT_PUBLIC_API_URL=https://[project]-staging.vercel.app
                SUPABASE_URL=https://staging-project.supabase.co
 
 Production:    NEXT_PUBLIC_API_URL=https://[domain].com
@@ -402,13 +402,13 @@ Production:    NEXT_PUBLIC_API_URL=https://[domain].com
 
 **URL típica:**
 
-- Staging: `https://[project]-develop.vercel.app`
+- Staging: `https://[project]-staging.vercel.app`
 - Production: `https://[project].vercel.app` o `https://[domain].com`
 
 **Flujo de datos:**
 
 ```
-Feature branch → develop → Staging → QA valida → main → Production
+Feature branch → staging → Staging → QA valida → main → Production
 ```
 
 **Beneficio:** Bugs se descubren en staging, NO en production.
@@ -479,7 +479,7 @@ Smoke Test - Staging:
   - [ ] `VERCEL_TOKEN`
   - [ ] `VERCEL_ORG_ID`
   - [ ] `VERCEL_PROJECT_ID`
-- [ ] Push a `develop` trigger GitHub Actions automáticamente
+- [ ] Push a `staging` trigger GitHub Actions automáticamente
 - [ ] Workflow ejecuta jobs: lint → test → build → deploy
 - [ ] `.context/ci-cd-setup.md` documentado
 - [ ] README.md tiene badge de CI status
@@ -514,10 +514,10 @@ Smoke Test - Staging:
 
 **Después de `deploy-to-staging.md`:**
 
-- [ ] Feature branch merged a `develop` (o push directo)
+- [ ] Feature branch merged a `staging` (o push directo)
 - [ ] GitHub Actions workflow ejecutado exitosamente
 - [ ] Deployment completado en Vercel/Railway
-- [ ] Staging URL accesible: `https://[project]-develop.vercel.app`
+- [ ] Staging URL accesible: `https://[project]-staging.vercel.app`
 - [ ] Smoke test básico pasado:
   - [ ] Aplicación carga sin errores 500
   - [ ] No hay errores en browser console
@@ -527,7 +527,7 @@ Smoke Test - Staging:
 **Verificar en Vercel:**
 
 1. Ve a: `https://vercel.com/[org]/[project]`
-2. En "Deployments", busca deployment más reciente de `develop`
+2. En "Deployments", busca deployment más reciente de `staging`
 3. Status debe ser "Ready" (verde)
 4. Click en URL para validar
 
@@ -552,7 +552,7 @@ npm ERR! npm ci can only install packages when your package.json and package-loc
    npm install
    git add package-lock.json
    git commit -m "fix: update package-lock.json"
-   git push origin develop
+   git push origin staging
    ```
 2. GitHub Actions re-ejecuta automáticamente
 
@@ -599,7 +599,7 @@ Error: NEXT_PUBLIC_SUPABASE_URL is not defined
 3. Trigger re-deploy:
    ```bash
    git commit --allow-empty -m "chore: trigger redeploy"
-   git push origin develop
+   git push origin staging
    ```
 
 ---
@@ -618,12 +618,12 @@ Error: NEXT_PUBLIC_SUPABASE_URL is not defined
 1. Verifica condición en `.github/workflows/ci.yml`:
    ```yaml
    deploy-staging:
-     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+     if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
    ```
 2. Deploy SOLO ejecuta si:
-   - Push directo a `develop` (no PR)
+   - Push directo a `staging` (no PR)
    - Evento es `push` (no `pull_request`)
-3. Si hiciste PR a develop, necesitas **merge** el PR para trigger deploy
+3. Si hiciste PR a staging, necesitas **merge** el PR para trigger deploy
 
 ---
 
@@ -637,7 +637,7 @@ Error: NEXT_PUBLIC_SUPABASE_URL is not defined
    - Ve a Supabase Dashboard → Authentication → URL Configuration
    - Redirect URLs debe incluir:
      - `http://localhost:3000/**` (dev)
-     - `https://[project]-develop.vercel.app/**` (staging)
+     - `https://[project]-staging.vercel.app/**` (staging)
 2. Guarda cambios en Supabase
 3. Re-testea auth flow en staging
 
@@ -668,7 +668,7 @@ Type error: Property 'email' does not exist on type 'User'
    ```bash
    git add .
    git commit -m "fix: resolve TypeScript errors"
-   git push origin develop
+   git push origin staging
    ```
 
 ---
@@ -716,15 +716,15 @@ Production:   SUPABASE_URL=https://prod-project.supabase.co
 **Workflow recomendado:**
 
 ```bash
-# 1. Merge PR a develop
-git checkout develop
+# 1. Merge PR a staging
+git checkout staging
 git merge feature/STORY-123
-git push origin develop
+git push origin staging
 
 # 2. Esperar GitHub Actions (~5 min)
 
 # 3. Abrir staging URL INMEDIATAMENTE
-https://[project]-develop.vercel.app
+https://[project]-staging.vercel.app
 
 # 4. Smoke test básico:
 # - ✅ App carga
@@ -742,7 +742,7 @@ https://[project]-develop.vercel.app
 
 **Checklist:**
 
-1. Push a develop
+1. Push a staging
 2. Ve a: `https://github.com/[org]/[repo]/actions`
 3. Espera a que workflow complete (3-7 min)
 4. Verifica todos los jobs están verdes (✅)
@@ -766,10 +766,10 @@ git add .github/workflows/ci.yml .context/ci-cd-setup.md
 git commit -m "ci: configure GitHub Actions CI/CD pipeline
 
 - Lint, test, build jobs
-- Auto-deploy to staging on develop push
+- Auto-deploy to staging on staging push
 - Secrets documented in ci-cd-setup.md
 "
-git push origin develop
+git push origin staging
 ```
 
 **Después de `environment-config.md`:**
@@ -781,7 +781,7 @@ git commit -m "chore: configure environment variables per environment
 - Dev, staging, production variables documented
 - .env.example updated
 "
-git push origin develop
+git push origin staging
 ```
 
 **Beneficio:** Trazabilidad clara de qué cambió y cuándo.
@@ -820,7 +820,7 @@ git push origin develop
 
 **Objetivo:** QA valida features en staging, reporta bugs.
 
-**Staging URL:** `https://[project]-develop.vercel.app`
+**Staging URL:** `https://[project]-staging.vercel.app`
 
 ---
 
@@ -833,7 +833,7 @@ Fix en feature branch
     ↓
 Code review (Fase 8)
     ↓
-Merge a develop
+Merge a staging
     ↓
 GitHub Actions re-despliega a staging (automático)
     ↓
@@ -859,7 +859,7 @@ Si OK → Fase 11 (Test Automation)
 **Cuando features están estables en staging:**
 
 - Configurar environment variables de production
-- Merge `develop` → `main`
+- Merge `staging` → `main`
 - GitHub Actions despliega a production
 - Smoke test en production
 
@@ -897,7 +897,7 @@ Si OK → Fase 11 (Test Automation)
 
 ✅ **CI/CD automatizado:**
 
-- Cada merge a `develop` despliega a staging automáticamente
+- Cada merge a `staging` despliega a staging automáticamente
 - Zero deploys manuales necesarios
 - CI valida código antes de desplegar
 
@@ -909,7 +909,7 @@ Si OK → Fase 11 (Test Automation)
 
 ✅ **Staging accesible:**
 
-- URL funcional: `https://[project]-develop.vercel.app`
+- URL funcional: `https://[project]-staging.vercel.app`
 - Smoke test pasa
 - Listo para QA (Fase 10)
 
@@ -946,7 +946,7 @@ Si OK → Fase 11 (Test Automation)
    ```
 4. Badge en README:
    ```markdown
-   [![Coverage](https://codecov.io/gh/[org]/[repo]/branch/develop/graph/badge.svg)](https://codecov.io/gh/[org]/[repo])
+   [![Coverage](https://codecov.io/gh/[org]/[repo]/branch/staging/graph/badge.svg)](https://codecov.io/gh/[org]/[repo])
    ```
 
 ---
@@ -966,7 +966,7 @@ Si OK → Fase 11 (Test Automation)
      run: |
        curl -X POST ${{ secrets.SLACK_WEBHOOK }} \
        -H 'Content-Type: application/json' \
-       -d '{"text":"✅ Deploy to staging complete: https://[project]-develop.vercel.app"}'
+       -d '{"text":"✅ Deploy to staging complete: https://[project]-staging.vercel.app"}'
    ```
 
 ---

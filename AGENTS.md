@@ -107,6 +107,17 @@ Antes de testear, leer:
     └── Atlassian → Gestion de tests
 ```
 
+### Contexto de negocio y testing
+
+```
+Antes de definir pruebas o revisar flujos de negocio, leer:
+├── .context/business-data-map.md   # Mapa visual/narrativo de entidades y flujos
+├── .context/project-test-guide.md   # Qué validar y por qué importa
+└── .context/PRD/ + .context/SRS/    # Requerimientos fuente
+
+Si no existen, generarlos primero con los prompts standalone correspondientes.
+```
+
 ### Si estas haciendo TAE (Test Automation)
 
 ```

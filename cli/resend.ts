@@ -708,4 +708,6 @@ async function main(): Promise<void> {
   }
 }
 
+export {};
+
 await main();

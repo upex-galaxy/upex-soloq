@@ -4,7 +4,7 @@
 
 ---
 
-### Fernando Javier Masci - 25/3/2026, 00:17:15
+### Fernando Javier Masci - 2026-03-25T03:17:15.235Z
 
 Shift Left
 
@@ -12,49 +12,49 @@ Shift Left
 
 Scenario 1: Search box visible
 
-- ****Given:**** I am on the dashboard
-- ****When:**** I look at the header
-- ****Then:**** I see a search box
+- ***Given:*** I am on the dashboard
+- ***When:*** I look at the header
+- ***Then:*** I see a search box
   - Notas: Hay un solo tipo de usuario en cuanto a permisos de visibildad?
 
 Scenario 2: Search by invoice number
 
-- ****Given:**** I type an invoice number (e.g., "INV-2026-0042")
-- ****When:**** I submit the search
-- ****Then:**** I see invoices matching that number
+- ***Given:*** I type an invoice number (e.g., "INV-2026-0042")
+- ***When:*** I submit the search
+- ***Then:*** I see invoices matching that number
   - Notas: Hay reglas de validacion de formato de invoice number? Probar valores invalidos
 
 Scenario 3: Search by client name
 
-- ****Given:**** I type a client's name
-- ****When:**** I submit the search
-- ****Then:**** I see all invoices for that client
-  - Notas: El campo de busqueda admite ***Búsqueda difusa (Fuzzy Search / Fuzzy Matching)***?
+- ***Given:*** I type a client's name
+- ***When:*** I submit the search
+- ***Then:*** I see all invoices for that client
+  - Notas: El campo de busqueda admite **Búsqueda difusa (Fuzzy Search / Fuzzy Matching)**?
 
 Scenario 4: Partial match
 
-- ****Given:**** I type partial text (e.g., "John")
-- ****When:**** I search
-- ****Then:**** I see results that contain the search term
+- ***Given:*** I type partial text (e.g., "John")
+- ***When:*** I search
+- ***Then:*** I see results that contain the search term
   - Probar cantidad de resultados, validar que los muestre todos.
 
 Scenario 5: No results
 
-- ****Given:**** I search for something that doesn't exist
-- ****When:**** I view the results
-- ****Then:**** I see a "No results found" message
+- ***Given:*** I search for something that doesn't exist
+- ***When:*** I view the results
+- ***Then:*** I see a "No results found" message
   - Notas: Relacionado al Fuzzy Matching, probar valores limites, o hasta donde admite “fuzzy”
 
 Scenario 6: Clear search
 
-- ****Given:**** I have an active search
-- ****When:**** I clear the search box
-- ****Then:**** I see all invoices again
+- ***Given:*** I have an active search
+- ***When:*** I clear the search box
+- ***Then:*** I see all invoices again
   - Notas: Antes de borrar el search box también mostraba todos los invoices?
 
 ---
 
-### Fernando Javier Masci - 28/3/2026, 18:11:39
+### Fernando Javier Masci - 2026-03-28T21:11:39.399Z
 
 # Feature Test Plan - SQ-51
 
@@ -107,10 +107,10 @@ Validate invoice search from the dashboard with focus on UX, correctness, perfor
 
 ---
 
-*Synced from Jira by jira-sync* *Last sync: 2026-03-28T21:11:54.573Z*
+_Synced from Jira by jira-sync_ _Last sync: 2026-03-28T21:11:54.573Z_
 
 ---
 
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T21:41:13.031Z_
+_Last sync: 2026-03-28T23:28:00.961Z_

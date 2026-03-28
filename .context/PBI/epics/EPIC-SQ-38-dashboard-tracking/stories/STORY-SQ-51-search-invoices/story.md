@@ -20,49 +20,49 @@ As a user, I want to search invoices by client or number, so that I can find a s
   1.
     1. Scenario 1: Search box visible
 
-- ****Given:**** I am on the dashboard
-- ****When:**** I look at the header
-- ****Then:**** I see a search box
+- ***Given:*** I am on the dashboard
+- ***When:*** I look at the header
+- ***Then:*** I see a search box
 
 1.
   1.
     1. Scenario 2: Search by invoice number
 
-- ****Given:**** I type an invoice number (e.g., "INV-2026-0042")
-- ****When:**** I submit the search
-- ****Then:**** I see invoices matching that number
+- ***Given:*** I type an invoice number (e.g., "INV-2026-0042")
+- ***When:*** I submit the search
+- ***Then:*** I see invoices matching that number
 
 1.
   1.
     1. Scenario 3: Search by client name
 
-- ****Given:**** I type a client's name
-- ****When:**** I submit the search
-- ****Then:**** I see all invoices for that client
+- ***Given:*** I type a client's name
+- ***When:*** I submit the search
+- ***Then:*** I see all invoices for that client
 
 1.
   1.
     1. Scenario 4: Partial match
 
-- ****Given:**** I type partial text (e.g., "John")
-- ****When:**** I search
-- ****Then:**** I see results that contain the search term
+- ***Given:*** I type partial text (e.g., "John")
+- ***When:*** I search
+- ***Then:*** I see results that contain the search term
 
 1.
   1.
     1. Scenario 5: No results
 
-- ****Given:**** I search for something that doesn't exist
-- ****When:**** I view the results
-- ****Then:**** I see a "No results found" message
+- ***Given:*** I search for something that doesn't exist
+- ***When:*** I view the results
+- ***Then:*** I see a "No results found" message
 
 1.
   1.
     1. Scenario 6: Clear search
 
-- ****Given:**** I have an active search
-- ****When:**** I clear the search box
-- ****Then:**** I see all invoices again
+- ***Given:*** I have an active search
+- ***When:*** I clear the search box
+- ***Then:*** I see all invoices again
 
 ---
 
@@ -104,12 +104,12 @@ As a user, I want to search invoices by client or number, so that I can find a s
 
 ## Metadata
 
-- **Created:** 20/1/2026
-- **Updated:** 28/3/2026
+- **Created:** 2026-01-21T01:09:31.468Z
+- **Updated:** 2026-03-28T21:25:22.205Z
 - **Reporter:** Ely
 - **Assignee:** Fernando Javier Masci
 
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T21:41:12.767Z_
+_Last sync: 2026-03-28T23:28:00.642Z_

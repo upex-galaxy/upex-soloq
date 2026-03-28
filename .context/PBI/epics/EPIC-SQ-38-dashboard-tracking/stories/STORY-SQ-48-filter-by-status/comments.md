@@ -4,19 +4,19 @@
 
 ---
 
-### Joel Armando Ramírez Rodríguez - 16/3/2026, 10:15:00
+### Joel Armando Ramírez Rodríguez - 2026-03-16T13:15:00.152Z
 
 # Acceptance Test Plan: STORY-SQ-48 - Filter invoices by status
 
-***Fecha:*** 2026-03-16  
+**Fecha:** 2026-03-16  
 
-***QA Engineer:*** AI-Generated  
+**QA Engineer:** AI-Generated  
 
-***Story Jira Key:*** SQ-48  
+**Story Jira Key:** SQ-48  
 
-***Epic:*** EPIC-SQ-38 - Invoice Dashboard & Tracking  
+**Epic:** EPIC-SQ-38 - Invoice Dashboard & Tracking  
 
-***Status:*** Draft - Pending PO/Dev Review
+**Status:** Draft - Pending PO/Dev Review
 
 ---
 
@@ -24,37 +24,37 @@
 
 ### Business Context of This Story
 
-***User Persona Affected:***
+**User Persona Affected:**
 
-- ***Primary:*** Carlos (Disenador Organizado) - necesita encontrar rapido facturas por estado para no perder seguimiento.
-- ***Secondary:*** Valentina (Desarrolladora Internacional) - depende de identificar `sent` y `overdue` para acelerar cobros.
+- **Primary:** Carlos (Disenador Organizado) - necesita encontrar rapido facturas por estado para no perder seguimiento.
+- **Secondary:** Valentina (Desarrolladora Internacional) - depende de identificar `sent` y `overdue` para acelerar cobros.
 
-***Business Value:***
+**Business Value:**
 
-- ***Value Proposition:*** mejora visibilidad operativa diaria en el dashboard sin friccion.
-- ***Business Impact:*** aporta a MAU y a reduccion de tiempo de cobro, al facilitar acciones sobre facturas pendientes/vencidas.
+- **Value Proposition:** mejora visibilidad operativa diaria en el dashboard sin friccion.
+- **Business Impact:** aporta a MAU y a reduccion de tiempo de cobro, al facilitar acciones sobre facturas pendientes/vencidas.
 
-***Related User Journey:***
+**Related User Journey:**
 
-- Journey: ***Journey 2 - Seguimiento y Cobro de Factura***
-- Step: ***Step 1-2*** (ver dashboard e identificar factura vencida)
+- Journey: **Journey 2 - Seguimiento y Cobro de Factura**
+- Step: **Step 1-2** (ver dashboard e identificar factura vencida)
 
 ---
 
 ### Technical Context of This Story
 
-***Frontend:***
+**Frontend:**
 
 - Componentes: tabs de estado, badges de conteo, tabla/lista de facturas, estado vacio por filtro.
 - Pages/Routes: `/(app)/dashboard` y persistencia de filtro en URL.
 
-***Backend:***
+**Backend:**
 
 - API Endpoints: `GET /api/invoices` (query `status`) y soporte de respuesta consistente con conteos.
 - Services: logica de filtrado por estado y regla derivada de overdue.
-- Database: tabla `invoices` (status, due*date, paid*at) + joins con `clients` para listado.
+- Database: tabla `invoices` (status, due_date, paid_at) + joins con `clients` para listado.
 
-***Integration Points:***
+**Integration Points:**
 
 - Frontend tabs ↔ `GET /api/invoices?status=...`
 - Badges de tabs ↔ conteos retornados por backend o calculados en vista
@@ -64,38 +64,38 @@
 
 ### Story Complexity Analysis
 
-***Overall Complexity:*** Medium
+**Overall Complexity:** Medium
 
-***Complexity Factors:***
+**Complexity Factors:**
 
-- Business logic complexity: ***Medium*** - incluye estado derivado (`overdue`) y consistencia de conteos.
-- Integration complexity: ***Medium*** - tabs, query params, render y persistencia URL.
-- Data validation complexity: ***Medium*** - edge cases de fechas limite y combinaciones de estado.
-- UI complexity: ***Low/Medium*** - interaccion simple, pero sensible a race conditions y feedback visual.
+- Business logic complexity: **Medium** - incluye estado derivado (`overdue`) y consistencia de conteos.
+- Integration complexity: **Medium** - tabs, query params, render y persistencia URL.
+- Data validation complexity: **Medium** - edge cases de fechas limite y combinaciones de estado.
+- UI complexity: **Low/Medium** - interaccion simple, pero sensible a race conditions y feedback visual.
 
-***Estimated Test Effort:*** Medium
+**Estimated Test Effort:** Medium
 
 ---
 
 ### Epic-Level Context (From Jira Epic Comments)
 
-***Critical Risks inherited from Epic SQ-38:***
+**Critical Risks inherited from Epic SQ-38:**
 
 - Riesgo de inconsistencia entre listado y resumen por reglas de overdue/timezone.
 - Riesgo de resultados incorrectos en combinaciones de filtros + busqueda + paginacion.
 
-***Integration Points from Epic Analysis that apply:***
+**Integration Points from Epic Analysis that apply:**
 
 - Frontend dashboard ↔ `GET /api/invoices` ✅ Yes
 - Backend API ↔ DB con RLS ✅ Yes
 - Payment flow refresh ↔ dashboard ⚠️ Parcial para SQ-48 (consistencia futura)
 
-***Critical Questions already seen at Epic level (relevant):***
+**Critical Questions already seen at Epic level (relevant):**
 
 - Definicion de timezone para evaluar overdue.
 - Diferencia funcional entre `pending` y `sent` en narrativa de producto.
 
-***How this story fits the epic:***
+**How this story fits the epic:**
 
 - SQ-48 implementa la navegacion principal por estado dentro del dashboard (base para SQ-49, SQ-50, SQ-51 y SQ-52).
 
@@ -105,31 +105,31 @@
 
 ### Ambiguities Identified
 
-***Ambiguity 1: timezone de overdue no definido***
+**Ambiguity 1: timezone de overdue no definido**
 
-- ***Location in Story:*** AC de filtro `Overdue`.
-- ***Question for PO/Dev:*** el corte usa timezone del usuario o UTC del servidor?
-- ***Impact on Testing:*** cambia resultados frontera (`due_date = today`).
+- **Location in Story:** AC de filtro `Overdue`.
+- **Question for PO/Dev:** el corte usa timezone del usuario o UTC del servidor?
+- **Impact on Testing:** cambia resultados frontera (`due_date = today`).
 
-***Ambiguity 2: origen de conteos por tab***
+**Ambiguity 2: origen de conteos por tab**
 
-- ***Location in Story:*** AC de count badges.
-- ***Question for PO/Dev:*** los conteos se obtienen por endpoint dedicado, en la misma respuesta de listado o por calculo local?
-- ***Impact on Testing:*** estrategia de validacion API/UI y riesgos de inconsistencia.
+- **Location in Story:** AC de count badges.
+- **Question for PO/Dev:** los conteos se obtienen por endpoint dedicado, en la misma respuesta de listado o por calculo local?
+- **Impact on Testing:** estrategia de validacion API/UI y riesgos de inconsistencia.
 
 ### Missing Information / Gaps
 
-***Gap 1: comportamiento sin resultados por filtro***
+**Gap 1: comportamiento sin resultados por filtro**
 
-- ***Type:*** Acceptance Criteria
-- ***Why It's Critical:*** asegura UX clara y evita falsos bugs.
-- ***Suggested Addition:*** AC explicito para estado vacio por tab.
+- **Type:** Acceptance Criteria
+- **Why It's Critical:** asegura UX clara y evita falsos bugs.
+- **Suggested Addition:** AC explicito para estado vacio por tab.
 
-***Gap 2: concurrencia al cambiar tabs rapidamente***
+**Gap 2: concurrencia al cambiar tabs rapidamente**
 
-- ***Type:*** Technical behavior
-- ***Why It's Critical:*** evita que respuestas tardias sobreescriban el ultimo filtro activo.
-- ***Suggested Addition:*** regla “last interaction wins”.
+- **Type:** Technical behavior
+- **Why It's Critical:** evita que respuestas tardias sobreescriban el ultimo filtro activo.
+- **Suggested Addition:** regla “last interaction wins”.
 
 ### Edge Cases NOT Covered in Original Story
 
@@ -140,7 +140,7 @@
 
 ### Testability Validation
 
-***Is this story testeable as written?*** ⚠️ Partially
+**Is this story testeable as written?** ⚠️ Partially
 
 - Faltan definiciones puntuales de timezone y comportamiento de concurrencia.
 
@@ -150,65 +150,65 @@
 
 ### Scenario 1: Tabs de estado visibles y seleccion por defecto
 
-***Type:*** Positive  
+**Type:** Positive  
 
-***Priority:*** Critical
+**Priority:** Critical
 
-- ***Given:*** usuario autenticado en dashboard con acceso a sus facturas
-- ***When:*** abre la vista de listado
-- ***Then:*** visualiza tabs `All`, `Draft`, `Sent`, `Paid`, `Overdue`
-- ***And:*** `All` queda activo por defecto
+- **Given:** usuario autenticado en dashboard con acceso a sus facturas
+- **When:** abre la vista de listado
+- **Then:** visualiza tabs `All`, `Draft`, `Sent`, `Paid`, `Overdue`
+- **And:** `All` queda activo por defecto
 
 ### Scenario 2: Filtrado correcto por Draft/Sent/Paid
 
-***Type:*** Positive  
+**Type:** Positive  
 
-***Priority:*** High
+**Priority:** High
 
-- ***Given:*** dataset con facturas en estados mixtos
-- ***When:*** selecciona cada tab (`Draft`, `Sent`, `Paid`)
-- ***Then:*** solo se listan facturas del estado correspondiente
+- **Given:** dataset con facturas en estados mixtos
+- **When:** selecciona cada tab (`Draft`, `Sent`, `Paid`)
+- **Then:** solo se listan facturas del estado correspondiente
 
 ### Scenario 3: Regla de overdue derivada
 
-***Type:*** Boundary  
+**Type:** Boundary  
 
-***Priority:*** Critical
+**Priority:** Critical
 
-- ***Given:*** facturas `sent` con fechas de vencimiento en ayer/hoy/manana
-- ***When:*** selecciona `Overdue`
-- ***Then:*** aparecen solo `sent` con `due_date < today`
-- ***And:*** facturas `paid` no aparecen en overdue
+- **Given:** facturas `sent` con fechas de vencimiento en ayer/hoy/manana
+- **When:** selecciona `Overdue`
+- **Then:** aparecen solo `sent` con `due_date < today`
+- **And:** facturas `paid` no aparecen en overdue
 
 ### Scenario 4: Conteos por tab consistentes
 
-***Type:*** Integration  
+**Type:** Integration  
 
-***Priority:*** High
+**Priority:** High
 
-- ***Given:*** tabs con badge de conteo
-- ***When:*** compara badge del tab activo vs filas listadas
-- ***Then:*** ambos valores coinciden en todas las tabs
+- **Given:** tabs con badge de conteo
+- **When:** compara badge del tab activo vs filas listadas
+- **Then:** ambos valores coinciden en todas las tabs
 
 ### Scenario 5: Persistencia de filtro en URL
 
-***Type:*** Positive  
+**Type:** Positive  
 
-***Priority:*** Medium
+**Priority:** Medium
 
-- ***Given:*** filtro `paid` seleccionado
-- ***When:*** recarga pagina o abre la URL en nueva pestana
-- ***Then:*** se mantiene filtro activo y resultados correspondientes
+- **Given:** filtro `paid` seleccionado
+- **When:** recarga pagina o abre la URL en nueva pestana
+- **Then:** se mantiene filtro activo y resultados correspondientes
 
 ### Scenario 6: No results por filtro
 
-***Type:*** Negative  
+**Type:** Negative  
 
-***Priority:*** Medium
+**Priority:** Medium
 
-- ***Given:*** no existen facturas para un estado especifico (ej. `draft`)
-- ***When:*** abre ese tab
-- ***Then:*** muestra estado de “sin resultados” sin errores ni datos cruzados
+- **Given:** no existen facturas para un estado especifico (ej. `draft`)
+- **When:** abre ese tab
+- **Then:** muestra estado de “sin resultados” sin errores ni datos cruzados
 
 ---
 
@@ -216,7 +216,7 @@
 
 ### Test Coverage Analysis
 
-***Total Test Cases Needed:*** 12
+**Total Test Cases Needed:** 12
 
 - Positive: 4
 - Negative: 3
@@ -226,9 +226,9 @@
 
 ### Parametrization Opportunities
 
-***Parametrized Tests Recommended:*** ✅ Yes
+**Parametrized Tests Recommended:** ✅ Yes
 
-***Parametrized Test Group 1: Mapeo tab → estado esperado***
+**Parametrized Test Group 1: Mapeo tab → estado esperado**
 
 | Tab | Query Param | Expected Dataset |
 | --- | --- | --- |
@@ -238,7 +238,7 @@
 | Paid | paid | only paid |
 | Overdue | overdue | sent and due_date < today |
 
-***Parametrized Test Group 2: Boundary de overdue por fecha***
+**Parametrized Test Group 2: Boundary de overdue por fecha**
 
 | due_date delta | expected in overdue |
 | --- | --- |
@@ -252,26 +252,26 @@
 
 #### Validar tabs de estado visibles al cargar dashboard
 
-***Related Scenario:*** Scenario 1  
+**Related Scenario:** Scenario 1  
 
-***Type:*** Positive  
+**Type:** Positive  
 
-***Priority:*** Critical  
+**Priority:** Critical  
 
-***Test Level:*** UI
+**Test Level:** UI
 
-***Preconditions:***
+**Preconditions:**
 
 - Usuario autenticado
 - Existe al menos 1 factura del usuario
 
-***Test Steps:***
+**Test Steps:**
 
 1. Abrir `/(app)/dashboard`
 2. Observar barra de tabs
 3. Verificar tab activo por defecto
 
-***Expected Result:***
+**Expected Result:**
 
 - Se muestran `All`, `Draft`, `Sent`, `Paid`, `Overdue`
 - `All` aparece seleccionado por defecto
@@ -280,25 +280,25 @@
 
 #### Validar filtrado por estado Draft/Sent/Paid
 
-***Related Scenario:*** Scenario 2  
+**Related Scenario:** Scenario 2  
 
-***Type:*** Positive  
+**Type:** Positive  
 
-***Priority:*** High  
+**Priority:** High  
 
-***Test Level:*** UI/API
+**Test Level:** UI/API
 
-***Preconditions:***
+**Preconditions:**
 
 - Dataset con al menos 1 factura por estado (`draft`, `sent`, `paid`)
 
-***Test Steps:***
+**Test Steps:**
 
 1. Seleccionar tab `Draft`
 2. Verificar filas listadas
 3. Repetir para `Sent` y `Paid`
 
-***Expected Result:***
+**Expected Result:**
 
 - Cada tab muestra solo su estado correspondiente
 - No hay mezcla de estados en resultados
@@ -307,27 +307,27 @@
 
 #### Validar filtro overdue con regla derivada
 
-***Related Scenario:*** Scenario 3  
+**Related Scenario:** Scenario 3  
 
-***Type:*** Boundary  
+**Type:** Boundary  
 
-***Priority:*** Critical  
+**Priority:** Critical  
 
-***Test Level:*** API/Integration
+**Test Level:** API/Integration
 
-***Preconditions:***
+**Preconditions:**
 
 - Factura A: `sent`, `due_date = yesterday`
 - Factura B: `sent`, `due_date = today`
 - Factura C: `sent`, `due_date = tomorrow`
 - Factura D: `paid`, `due_date = yesterday`
 
-***Test Steps:***
+**Test Steps:**
 
 1. Ejecutar `GET /api/invoices?status=overdue`
 2. Abrir tab `Overdue` en UI
 
-***Expected Result:***
+**Expected Result:**
 
 - Solo factura A aparece en overdue
 - Facturas B/C/D no aparecen en overdue
@@ -336,15 +336,15 @@
 
 #### Validar consistencia entre badges y filas renderizadas
 
-***Related Scenario:*** Scenario 4  
+**Related Scenario:** Scenario 4  
 
-***Type:*** Integration  
+**Type:** Integration  
 
-***Priority:*** High  
+**Priority:** High  
 
-***Test Level:*** UI/Integration
+**Test Level:** UI/Integration
 
-***Expected Result:***
+**Expected Result:**
 
 - Badge del tab activo == cantidad de filas en tabla
 - No se observan diferencias entre tabs en el mismo dataset
@@ -353,15 +353,15 @@
 
 #### Validar persistencia de filtro en URL
 
-***Related Scenario:*** Scenario 5  
+**Related Scenario:** Scenario 5  
 
-***Type:*** Positive  
+**Type:** Positive  
 
-***Priority:*** Medium  
+**Priority:** Medium  
 
-***Test Level:*** UI/E2E
+**Test Level:** UI/E2E
 
-***Expected Result:***
+**Expected Result:**
 
 - Filtro seleccionado se conserva tras refresh
 - URL y estado visual quedan sincronizados
@@ -370,15 +370,15 @@
 
 #### Validar empty state por filtro sin coincidencias
 
-***Related Scenario:*** Scenario 6  
+**Related Scenario:** Scenario 6  
 
-***Type:*** Negative  
+**Type:** Negative  
 
-***Priority:*** Medium  
+**Priority:** Medium  
 
-***Test Level:*** UI
+**Test Level:** UI
 
-***Expected Result:***
+**Expected Result:**
 
 - Mensaje claro de sin resultados para ese estado
 - Sin errores de render y sin datos de otro tab
@@ -389,14 +389,14 @@
 
 ### Integration Test 1: Tabs UI ↔ API listInvoices
 
-- ***Integration Point:*** Frontend tabs → `GET /api/invoices?status=...`
-- ***Contract Validation:*** status query param acepta `all,draft,sent,paid,overdue`
-- ***Expected Result:*** respuesta API y render UI consistentes
+- **Integration Point:** Frontend tabs → `GET /api/invoices?status=...`
+- **Contract Validation:** status query param acepta `all,draft,sent,paid,overdue`
+- **Expected Result:** respuesta API y render UI consistentes
 
 ### Integration Test 2: Conteos ↔ listado final
 
-- ***Integration Point:*** badges de tabs ↔ dataset final mostrado
-- ***Expected Result:*** sin desfase entre conteo y filas
+- **Integration Point:** badges de tabs ↔ dataset final mostrado
+- **Expected Result:** sin desfase entre conteo y filas
 
 ---
 
@@ -413,17 +413,17 @@
 
 ## 📝 Action Required
 
-***@ProductOwner:***
+**@ProductOwner:**
 
 - Confirmar timezone oficial para overdue (`user timezone` vs `UTC`).
 - Confirmar copy esperado para empty state por filtro.
 
-***@DevLead:***
+**@DevLead:**
 
 - Confirmar estrategia de obtencion de conteos por tab.
 - Confirmar manejo de respuestas fuera de orden al alternar tabs rapidamente.
 
-***@QATeam:***
+**@QATeam:**
 
 - Preparar dataset con bordes de fecha (ayer/hoy/manana).
 - Preparar suite parametrizada tab→estado y overdue boundary.
@@ -432,13 +432,13 @@
 
 ## 📋 Test Execution Tracking
 
-***Test Execution Date:*** TBD  
+**Test Execution Date:** TBD  
 
-***Environment:*** Staging  
+**Environment:** Staging  
 
-***Executed By:*** TBD
+**Executed By:** TBD
 
-***Results:***
+**Results:**
 
 - Total Tests: 12
 - Passed: TBD
@@ -449,4 +449,4 @@
 
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T21:41:11.762Z_
+_Last sync: 2026-03-28T23:27:59.230Z_

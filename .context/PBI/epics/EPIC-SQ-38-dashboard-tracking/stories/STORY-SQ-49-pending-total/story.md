@@ -20,41 +20,41 @@ As a user, I want to see the total pending amount, so that I know my financial s
   1.
     1. Scenario 1: Pending total visible
 
-- ****Given:**** I am on the dashboard
-- ****When:**** I view the summary cards
-- ****Then:**** I see my total pending amount prominently displayed
+- ***Given:*** I am on the dashboard
+- ***When:*** I view the summary cards
+- ***Then:*** I see my total pending amount prominently displayed
 
 1.
   1.
     1. Scenario 2: Calculation accuracy
 
-- ****Given:**** I have pending invoices
-- ****When:**** I view the pending total
-- ****Then:**** It equals the sum of all sent (unpaid) invoices
+- ***Given:*** I have pending invoices
+- ***When:*** I view the pending total
+- ***Then:*** It equals the sum of all sent (unpaid) invoices
 
 1.
   1.
     1. Scenario 3: Currency format
 
-- ****Given:**** I view the pending total
-- ****When:**** I look at the number
-- ****Then:**** It is formatted with currency symbol and thousands separators
+- ***Given:*** I view the pending total
+- ***When:*** I look at the number
+- ***Then:*** It is formatted with currency symbol and thousands separators
 
 1.
   1.
     1. Scenario 4: Updates on payment
 
-- ****Given:**** I mark an invoice as paid
-- ****When:**** I return to the dashboard
-- ****Then:**** The pending total is updated (decreased)
+- ***Given:*** I mark an invoice as paid
+- ***When:*** I return to the dashboard
+- ***Then:*** The pending total is updated (decreased)
 
 1.
   1.
     1. Scenario 5: Zero state
 
-- ****Given:**** I have no pending invoices
-- ****When:**** I view the pending total
-- ****Then:**** It shows $0.00 with positive messaging
+- ***Given:*** I have no pending invoices
+- ***When:*** I view the pending total
+- ***Then:*** It shows $0.00 with positive messaging
 
 ---
 
@@ -93,12 +93,12 @@ As a user, I want to see the total pending amount, so that I know my financial s
 
 ## Metadata
 
-- **Created:** 20/1/2026
-- **Updated:** 11/3/2026
+- **Created:** 2026-01-21T01:09:30.595Z
+- **Updated:** 2026-03-11T03:26:37.788Z
 - **Reporter:** Ely
 - **Assignee:** Unassigned
 
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T21:41:11.770Z_
+_Last sync: 2026-03-28T23:27:59.232Z_

@@ -20,41 +20,41 @@ As a user, I want to see overdue invoices highlighted, so that I can prioritize 
   1.
     1. Scenario 1: Visual highlight
 
-- ****Given:**** I have overdue invoices
-- ****When:**** I view the invoice list
-- ****Then:**** Overdue invoices have a visual indicator (red badge/row)
+- ***Given:*** I have overdue invoices
+- ***When:*** I view the invoice list
+- ***Then:*** Overdue invoices have a visual indicator (red badge/row)
 
 1.
   1.
     1. Scenario 2: Overdue badge
 
-- ****Given:**** An invoice is past due
-- ****When:**** I view its status
-- ****Then:**** I see "Overdue" badge instead of "Sent"
+- ***Given:*** An invoice is past due
+- ***When:*** I view its status
+- ***Then:*** I see "Overdue" badge instead of "Sent"
 
 1.
   1.
     1. Scenario 3: Days overdue displayed
 
-- ****Given:**** An invoice is overdue
-- ****When:**** I view the row
-- ****Then:**** I see how many days overdue it is (e.g., "7 days overdue")
+- ***Given:*** An invoice is overdue
+- ***When:*** I view the row
+- ***Then:*** I see how many days overdue it is (e.g., "7 days overdue")
 
 1.
   1.
     1. Scenario 4: Dashboard alert
 
-- ****Given:**** I have overdue invoices
-- ****When:**** I view the dashboard
-- ****Then:**** I see an alert banner or count of overdue invoices
+- ***Given:*** I have overdue invoices
+- ***When:*** I view the dashboard
+- ***Then:*** I see an alert banner or count of overdue invoices
 
 1.
   1.
     1. Scenario 5: Sort overdue first
 
-- ****Given:**** I have mixed status invoices
-- ****When:**** I sort by urgency
-- ****Then:**** Overdue invoices appear at the top
+- ***Given:*** I have mixed status invoices
+- ***When:*** I sort by urgency
+- ***Then:*** Overdue invoices appear at the top
 
 ---
 
@@ -69,7 +69,7 @@ As a user, I want to see overdue invoices highlighted, so that I can prioritize 
 - Days overdue calculation and display
 - Dashboard alert/count for overdue
 - Sort by urgency option
-- Overdue detection: status='sent' AND due*date < CURRENT*DATE
+- Overdue detection: status='sent' AND due_date < CURRENT_DATE
 
 1.
   1.
@@ -93,12 +93,12 @@ As a user, I want to see overdue invoices highlighted, so that I can prioritize 
 
 ## Metadata
 
-- **Created:** 20/1/2026
-- **Updated:** 11/3/2026
+- **Created:** 2026-01-21T01:09:30.963Z
+- **Updated:** 2026-03-11T03:26:37.945Z
 - **Reporter:** Ely
 - **Assignee:** Unassigned
 
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T21:41:12.084Z_
+_Last sync: 2026-03-28T23:27:59.920Z_

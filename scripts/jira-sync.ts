@@ -263,6 +263,8 @@ interface JiraSearchResponse {
 interface JiraCommentsResponse {
   comments: JiraComment[]
   total: number
+  startAt?: number
+  maxResults?: number
 }
 
 // Atlassian Document Format types
@@ -514,11 +516,26 @@ async function fetchIssue(config: Config, key: string, fields: string[]): Promis
 }
 
 async function fetchComments(config: Config, key: string): Promise<JiraComment[]> {
-  const response = await jiraFetch<JiraCommentsResponse>(
-    config,
-    `/rest/api/3/issue/${key}/comment`,
-  );
-  return response.comments;
+  const comments: JiraComment[] = [];
+  const maxResults = 100;
+  let startAt = 0;
+
+  while (true) {
+    const response = await jiraFetch<JiraCommentsResponse>(
+      config,
+      `/rest/api/3/issue/${key}/comment?startAt=${startAt}&maxResults=${maxResults}`,
+    );
+
+    comments.push(...response.comments);
+
+    if (comments.length >= response.total || response.comments.length === 0) {
+      break;
+    }
+
+    startAt = (response.startAt ?? startAt) + (response.maxResults ?? maxResults);
+  }
+
+  return comments;
 }
 
 // ============================================================================
@@ -527,7 +544,7 @@ async function fetchComments(config: Config, key: string): Promise<JiraComment[]
 
 function adfToMarkdown(adf: AdfDocument | string | null | undefined): string {
   if (!adf) { return ''; }
-  if (typeof adf === 'string') { return cleanMarkdown(adf); }
+  if (typeof adf === 'string') { return adf.trim(); }
   if (!adf.content) { return ''; }
 
   const markdown = adf.content.map(node => processNode(node)).join('\n\n');
@@ -547,9 +564,7 @@ function cleanMarkdown(text: string): string {
     .replace(/^h5\.\s*/gm, '##### ')
     .replace(/^h6\.\s*/gm, '###### ')
     .replace(/\{noformat\}/g, '```')
-    .replace(/\{code(?::.*?)?\}/g, '```')
-    .replace(/\*([^*\n]+)\*/g, '**$1**') // Wiki bold *text* to Markdown **text**
-    .replace(/_([^_\n]+)_/g, '*$1*'); // Wiki italic _text_ to Markdown *text*
+    .replace(/\{code(?::.*?)?\}/g, '```');
 }
 
 /**
@@ -908,8 +923,8 @@ function generateEpicMarkdown(
     '',
     '## Metadata',
     '',
-    `- **Created:** ${fields.created ? new Date(fields.created).toLocaleDateString() : 'Unknown'}`,
-    `- **Updated:** ${fields.updated ? new Date(fields.updated).toLocaleDateString() : 'Unknown'}`,
+    `- **Created:** ${fields.created ? new Date(fields.created).toISOString() : 'Unknown'}`,
+    `- **Updated:** ${fields.updated ? new Date(fields.updated).toISOString() : 'Unknown'}`,
     `- **Reporter:** ${fields.reporter?.displayName || 'Unknown'}`,
     `- **Assignee:** ${fields.assignee?.displayName || 'Unassigned'}`,
   );
@@ -1027,8 +1042,8 @@ function generateStoryMarkdown(
     '',
     '## Metadata',
     '',
-    `- **Created:** ${fields.created ? new Date(fields.created).toLocaleDateString() : 'Unknown'}`,
-    `- **Updated:** ${fields.updated ? new Date(fields.updated).toLocaleDateString() : 'Unknown'}`,
+    `- **Created:** ${fields.created ? new Date(fields.created).toISOString() : 'Unknown'}`,
+    `- **Updated:** ${fields.updated ? new Date(fields.updated).toISOString() : 'Unknown'}`,
     `- **Reporter:** ${fields.reporter?.displayName || 'Unknown'}`,
     `- **Assignee:** ${fields.assignee?.displayName || 'Unassigned'}`,
   );
@@ -1062,7 +1077,7 @@ function generateCommentsMarkdown(
   else {
     for (const comment of comments) {
       const author = comment.author?.displayName || 'Unknown';
-      const date = new Date(comment.created).toLocaleString();
+      const date = new Date(comment.created).toISOString();
       const body = adfToMarkdown(comment.body as AdfDocument);
 
       lines.push(`### ${author} - ${date}`, '', body, '', '---', '');
@@ -1170,8 +1185,8 @@ function generateBugMarkdown(
     '',
     '## Metadata',
     '',
-    `- **Created:** ${fields.created ? new Date(fields.created).toLocaleDateString() : 'Unknown'}`,
-    `- **Updated:** ${fields.updated ? new Date(fields.updated).toLocaleDateString() : 'Unknown'}`,
+    `- **Created:** ${fields.created ? new Date(fields.created).toISOString() : 'Unknown'}`,
+    `- **Updated:** ${fields.updated ? new Date(fields.updated).toISOString() : 'Unknown'}`,
     `- **Reporter:** ${fields.reporter?.displayName || 'Unknown'}`,
     `- **Assignee:** ${fields.assignee?.displayName || 'Unassigned'}`,
   );
@@ -1274,8 +1289,8 @@ function generateDefectMarkdown(
     '',
     '## Metadata',
     '',
-    `- **Created:** ${fields.created ? new Date(fields.created).toLocaleDateString() : 'Unknown'}`,
-    `- **Updated:** ${fields.updated ? new Date(fields.updated).toLocaleDateString() : 'Unknown'}`,
+    `- **Created:** ${fields.created ? new Date(fields.created).toISOString() : 'Unknown'}`,
+    `- **Updated:** ${fields.updated ? new Date(fields.updated).toISOString() : 'Unknown'}`,
     `- **Reporter:** ${fields.reporter?.displayName || 'Unknown'}`,
     `- **Assignee:** ${fields.assignee?.displayName || 'Unassigned'}`,
   );
@@ -1333,8 +1348,8 @@ function generateImprovementMarkdown(
     '',
     '## Metadata',
     '',
-    `- **Created:** ${fields.created ? new Date(fields.created).toLocaleDateString() : 'Unknown'}`,
-    `- **Updated:** ${fields.updated ? new Date(fields.updated).toLocaleDateString() : 'Unknown'}`,
+    `- **Created:** ${fields.created ? new Date(fields.created).toISOString() : 'Unknown'}`,
+    `- **Updated:** ${fields.updated ? new Date(fields.updated).toISOString() : 'Unknown'}`,
     `- **Reporter:** ${fields.reporter?.displayName || 'Unknown'}`,
     `- **Assignee:** ${fields.assignee?.displayName || 'Unassigned'}`,
   );
@@ -1391,8 +1406,8 @@ function generateTestMarkdown(
     '',
     '## Metadata',
     '',
-    `- **Created:** ${fields.created ? new Date(fields.created).toLocaleDateString() : 'Unknown'}`,
-    `- **Updated:** ${fields.updated ? new Date(fields.updated).toLocaleDateString() : 'Unknown'}`,
+    `- **Created:** ${fields.created ? new Date(fields.created).toISOString() : 'Unknown'}`,
+    `- **Updated:** ${fields.updated ? new Date(fields.updated).toISOString() : 'Unknown'}`,
     `- **Reporter:** ${fields.reporter?.displayName || 'Unknown'}`,
     `- **Assignee:** ${fields.assignee?.displayName || 'Unassigned'}`,
   );

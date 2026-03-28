@@ -4,7 +4,7 @@
 
 ---
 
-### Fernando Javier Masci - 25/3/2026, 00:30:51
+### Fernando Javier Masci - 2026-03-25T03:30:51.771Z
 
 Shift Left:
 
@@ -16,58 +16,58 @@ Acceptance Criteria (Gherkin)
 
 1. Scenario 1: Record full payment amount
 
-- ****Given:**** I am on the payment recording form for invoice INV-2026-0042 with total $1,500.00
-- ****When:**** I enter amount received as 1500.00
-- ****Then:**** The system accepts the amount and shows it matches the invoice total
-- ****And:**** The amount is displayed with proper currency formatting ($1,500.00)
+- ***Given:*** I am on the payment recording form for invoice INV-2026-0042 with total $1,500.00
+- ***When:*** I enter amount received as 1500.00
+- ***Then:*** The system accepts the amount and shows it matches the invoice total
+- ***And:*** The amount is displayed with proper currency formatting ($1,500.00)
   - Note: revisar reglas de validacion de formato
   - Note2: acepta diferentes currency?
 
 Scenario 2: Record partial payment amount
 
-- ****Given:**** I am recording a payment for an invoice with total $2,000.00
-- ****When:**** I enter amount received as 1000.00
-- ****Then:**** The system accepts the partial amount
-- ****And:**** Shows a warning that the amount received ($1,000.00) is less than the invoice total ($2,000.00)
+- ***Given:*** I am recording a payment for an invoice with total $2,000.00
+- ***When:*** I enter amount received as 1000.00
+- ***Then:*** The system accepts the partial amount
+- ***And:*** Shows a warning that the amount received ($1,000.00) is less than the invoice total ($2,000.00)
   - Notes: Hay algun limite en donde el warning sea restrictivo? Es decir impida al user continuar
-- ****And:**** Allows me to proceed with the partial payment
+- ***And:*** Allows me to proceed with the partial payment
 
 Scenario 3: Record overpayment amount
 
-- ****Given:**** I am recording a payment for an invoice with total $500.00
-- ****When:**** I enter amount received as 550.00
-- ****Then:**** The system accepts the overpayment
-- ****And:**** Shows a notice that the amount received ($550.00) exceeds the invoice total ($500.00)
+- ***Given:*** I am recording a payment for an invoice with total $500.00
+- ***When:*** I enter amount received as 550.00
+- ***Then:*** The system accepts the overpayment
+- ***And:*** Shows a notice that the amount received ($550.00) exceeds the invoice total ($500.00)
   - Note: es restrictivo o igual le permite continuar?
 
 Scenario 4: Validate required amount field
 
-- ****Given:**** I am on the payment recording form
-- ****When:**** I try to submit without entering an amount
-- ****Then:**** The system shows a validation error "Amount received is required"
-- ****And:**** The form is not submitted
+- ***Given:*** I am on the payment recording form
+- ***When:*** I try to submit without entering an amount
+- ***Then:*** The system shows a validation error "Amount received is required"
+- ***And:*** The form is not submitted
   - Note: Que pasa por formatos invalidos?
 
 Scenario 5: Validate positive amount
 
-- ****Given:**** I am on the payment recording form
-- ****When:**** I enter a negative amount (-100)
-- ****Then:**** The system shows a validation error "Amount must be greater than 0"
+- ***Given:*** I am on the payment recording form
+- ***When:*** I enter a negative amount (-100)
+- ***Then:*** The system shows a validation error "Amount must be greater than 0"
   - Note: admite “ceros” por delante? 01000
 
 
 
 1. Scenario 7: Amount field pre-filled with invoice total
 
-- ****Given:**** I open the payment recording form for invoice with total $750.00
-- ****When:**** The form loads
-- ****Then:**** The amount field is pre-filled with 750.00
-- ****And:**** I can modify the amount if needed
+- ***Given:*** I open the payment recording form for invoice with total $750.00
+- ***When:*** The form loads
+- ***Then:*** The amount field is pre-filled with 750.00
+- ***And:*** I can modify the amount if needed
   - Note: El pre-filled es siempre por default? Si hay mas de un payment? cual aparece primero? como ordena? por fecha? por monto?
 
 ---
 
-### Fernando Javier Masci - 28/3/2026, 18:11:39
+### Fernando Javier Masci - 2026-03-28T21:11:39.390Z
 
 # Feature Test Plan - SQ-55
 
@@ -118,10 +118,10 @@ Validate amount-received entry against the invoice total with strong coverage fo
 
 ---
 
-*Synced from Jira by jira-sync* *Last sync: 2026-03-28T21:11:54.870Z*
+_Synced from Jira by jira-sync_ _Last sync: 2026-03-28T21:11:54.870Z_
 
 ---
 
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T21:41:11.078Z_
+_Last sync: 2026-03-28T23:27:59.774Z_

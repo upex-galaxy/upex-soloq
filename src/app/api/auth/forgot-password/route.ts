@@ -99,12 +99,13 @@ export async function POST(request: NextRequest) {
 
     // Check email rate limit (FT-SQ4-05b)
     if (!checkEmailRateLimit(normalizedEmail)) {
-      // Return same generic message to prevent enumeration
-      // But internally we blocked it
-      return NextResponse.json(
-        { error: 'Demasiadas solicitudes para este email. Intenta más tarde.' },
-        { status: 429 }
-      );
+      // Return same generic success response to prevent email enumeration
+      // Silently block without revealing rate-limit state for specific emails
+      await new Promise(resolve => setTimeout(resolve, Math.random() * 200));
+      return NextResponse.json({
+        success: true,
+        message: 'Si existe una cuenta con este email, enviamos un link de recuperación.',
+      });
     }
 
     // Create Supabase client

@@ -3,14 +3,14 @@
 **Jira Key:** [SQ-51](https://upexgalaxy65.atlassian.net/browse/SQ-51)
 **Epic:** [SQ-38](https://upexgalaxy65.atlassian.net/browse/SQ-38) (Invoice Dashboard & Tracking)
 **Priority:** Medium
-**Story Points:** 3
+**Story Points:** 13
 **Status:** Shift-Left QA
 
 ---
 
 ## User Story
 
-As a user, I want to search invoices by client or number, so that I can find a specific one. Story Points: 2
+As a user, I want to search invoices by client or number, so that I can find a specific one.
 
 ---
 
@@ -105,11 +105,11 @@ As a user, I want to search invoices by client or number, so that I can find a s
 ## Metadata
 
 - **Created:** 2026-01-21T01:09:31.468Z
-- **Updated:** 2026-03-28T21:25:22.205Z
+- **Updated:** 2026-03-29T01:22:14.134Z
 - **Reporter:** Ely
 - **Assignee:** Fernando Javier Masci
 
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T23:41:50.933Z_
+_Last sync: 2026-03-29T01:22:25.272Z_

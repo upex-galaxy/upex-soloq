@@ -3,14 +3,14 @@
 **Jira Key:** [SQ-55](https://upexgalaxy65.atlassian.net/browse/SQ-55)
 **Epic:** [SQ-39](https://upexgalaxy65.atlassian.net/browse/SQ-39) (Payment Tracking)
 **Priority:** Medium
-**Story Points:** 2
+**Story Points:** 8
 **Status:** Shift-Left QA
 
 ---
 
 ## User Story
 
-As a user, I want to record the amount received, so that I can verify against the invoiced total. Story Points: 2
+As a user, I want to record the amount received, so that I can verify against the invoiced total.
 
 ---
 
@@ -123,11 +123,11 @@ As a user, I want to record the amount received, so that I can verify against th
 ## Metadata
 
 - **Created:** 2026-01-21T01:09:36.510Z
-- **Updated:** 2026-03-28T21:25:22.210Z
+- **Updated:** 2026-03-29T01:22:14.172Z
 - **Reporter:** Ely
 - **Assignee:** Fernando Javier Masci
 
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-28T23:41:49.154Z_
+_Last sync: 2026-03-29T01:22:25.075Z_

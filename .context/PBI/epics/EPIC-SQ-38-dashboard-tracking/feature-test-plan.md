@@ -246,15 +246,6 @@ User -> Dashboard UI -> GET /api/invoices + GET /api/invoices/dashboard -> Postg
 
 ### Test Types per Story
 
-| Story | Complexity | Est. TC | Pos | Neg | Bound | Int | API | Focus |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| SQ-47 Dashboard base list | Medium | 14 | 4 | 3 | 3 | 2 | 2 | list rendering, empty state, pagination |
-| SQ-48 Filter by status | Medium | 12 | 4 | 2 | 2 | 2 | 2 | tab/status mapping, URL state |
-| SQ-49 Pending total | Medium | 10 | 3 | 2 | 2 | 2 | 1 | amount aggregation, formatting |
-| SQ-50 Overdue highlight | Medium | 10 | 3 | 2 | 2 | 2 | 1 | due-date edges, urgency highlight |
-| SQ-51 Search invoices | High | 16 | 5 | 3 | 3 | 3 | 2 | debounce, precedence, no-results |
-| SQ-52 Monthly income summary | Medium | 12 | 4 | 2 | 2 | 2 | 2 | monthly aggregation, chart data |
-
 **SQ-47: Dashboard base list**
 - Complexity: Medium
 - Estimated Test Cases: 14

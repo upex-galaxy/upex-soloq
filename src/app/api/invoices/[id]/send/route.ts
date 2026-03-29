@@ -242,6 +242,11 @@ export async function POST(
       client: client,
       items: items,
       business_profile: businessProfile ?? null,
+      payment_methods: paymentMethods.map((pm) => ({
+        type: pm.type as PaymentMethodType,
+        label: pm.label,
+        value: pm.value,
+      })),
     };
 
     let pdfBuffer: Buffer;

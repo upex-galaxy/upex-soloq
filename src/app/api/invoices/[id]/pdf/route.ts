@@ -124,6 +124,16 @@ export async function GET(
       .eq('user_id', user.id)
       .single();
 
+    // Fetch active payment methods for PDF display
+    const { data: paymentMethods } = await supabase
+      .from('payment_methods')
+      .select('type, label, value')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .order('is_default', { ascending: false })
+      .order('sort_order', { ascending: true })
+      .limit(3);
+
     // Build invoice data for PDF
     const invoiceData: InvoiceWithDetails = {
       id: invoice.id,
@@ -143,6 +153,11 @@ export async function GET(
       client: invoice.client as unknown as InvoiceWithDetails['client'],
       items: items ?? [],
       business_profile: businessProfile ?? null,
+      payment_methods: (paymentMethods ?? []).map(pm => ({
+        type: pm.type,
+        label: pm.label,
+        value: typeof pm.value === 'string' ? pm.value : JSON.stringify(pm.value),
+      })),
     };
 
     // Generate PDF buffer

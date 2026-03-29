@@ -121,6 +121,9 @@ export function buildPreviewData(
           default_terms: businessProfile.default_terms,
         }
       : null,
+
+    // Payment methods (loaded separately, not available in preview)
+    payment_methods: [],
   };
 
   return previewData;

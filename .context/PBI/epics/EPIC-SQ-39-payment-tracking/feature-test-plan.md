@@ -234,6 +234,15 @@ User -> Payment Form -> POST /api/invoices/{invoiceId}/payments -> PostgreSQL ->
 
 ### Test Types per Story
 
+| Story | Complexity | Est. TC | Pos | Neg | Bound | Int | API | Focus |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| SQ-53 Mark invoice as paid | Medium | 10 | 4 | 2 | 2 | 1 | 1 | status transition, refresh |
+| SQ-54 Payment method | Medium | 8 | 3 | 2 | 1 | 1 | 1 | method selection, persistence |
+| SQ-55 Amount received | High | 14 | 5 | 4 | 3 | 1 | 1 | formatting, warnings, prefill |
+| SQ-56 Payment notes | Low | 8 | 3 | 2 | 1 | 1 | 1 | notes input, sanitization |
+| SQ-57 Payment date | Medium | 8 | 3 | 2 | 1 | 1 | 1 | date validation, timezone |
+| SQ-58 Revert paid to pending | Medium | 10 | 4 | 2 | 2 | 1 | 1 | reversal, consistency |
+
 **SQ-53: Mark invoice as paid**
 - Complexity: Medium
 - Estimated Test Cases: 10

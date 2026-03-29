@@ -2,50 +2,63 @@
 
 ## Estado actual
 
-- `opencode.json` sigue configurado con `openapi`, `sql`/DBHub y `tavily` activos.
-- `tavily` usa `cmd /c` + `mcp-remote` en Windows, sin comillas alrededor de la URL.
-- `dbhub.toml` está en la raíz del repo con la conexión base a Supabase/Postgres.
-- `opencode.json` usa variables de entorno para credenciales sensibles.
-- `TAVILY_API_KEY` está presente en `.env`.
-- `atlassian` corre con `uvx mcp-atlassian` leyendo `JIRA_*` desde `.env`.
-- Se corrigió `JIRA_URL` para que apunte a la raíz del sitio Atlassian, no al board.
-- Se reparó el parseo de `.env` para que Bun cargue correctamente las variables `JIRA_*`.
-- `bun scripts/mcp-builder.js check` ya valida `atlassian`, `github` y `tavily` como OK.
-- `SQ-53` se lee bien desde `.context/PBI/.../story.md`, pero Jira web en esta sesión redirige a login y no quedó accesible directo.
-- La copia local de Jira se genera con `scripts/jira-sync.ts` y se sobrescribe con cada `bun jira-sync pull`.
-- Los comentarios solo se sincronizan con `bun jira-sync pull --include-comments`.
+- Se completo Fase 5 (Shift-Left) a nivel de artefactos para `SQ-51` y `SQ-55`.
+- Se creo mirror local del FTP de `SQ-39` desde comentario reciente de Jira:
+  - `.context/PBI/epics/EPIC-SQ-39-payment-tracking/feature-test-plan.md`
+- Se crearon ATPs locales:
+  - `.context/PBI/epics/EPIC-SQ-38-dashboard-tracking/stories/STORY-SQ-51-search-invoices/acceptance-test-plan.md`
+  - `.context/PBI/epics/EPIC-SQ-39-payment-tracking/stories/STORY-SQ-55-payment-amount/acceptance-test-plan.md`
+- En Jira (`SQ-51` y `SQ-55`) se agregaron:
+  - comentario con ATP completo (mirror local),
+  - comentario con propuesta de defaults para preguntas abiertas,
+  - labels: `shift-left-reviewed`, `test-plan-ready`.
+- El sync local confirma labels en story metadata:
+  - `STORY-SQ-51-search-invoices/story.md` (labels presentes)
+  - `STORY-SQ-55-payment-amount/story.md` (labels presentes)
+- Se corrigieron referencias legacy de prompt:
+  - `story-test-cases.md` -> `acceptance-test-plan.md` en docs internos detectados.
 
-## Variables pendientes
+## Variables/decisiones pendientes
 
-- Password real de DBHub en `dbhub.toml`
-- Si Jira sigue sin devolver `SQ`, revisar permisos/acceso real al sitio o reautorizar la cuenta Atlassian.
+- Bloqueante funcional: faltan respuestas PO/Dev en Jira para cerrar ambiguedades y pasar ATP de Draft a Approved.
+- `SQ-51` pendientes de confirmacion:
+  - trigger de busqueda (live debounced vs submit),
+  - precedencia con filtros/paginacion,
+  - normalizacion de query (`trim`),
+  - comportamiento final no-results vs empty-state.
+- `SQ-55` pendientes de confirmacion:
+  - warning parcial/sobrepago (informativo vs bloqueante),
+  - regla oficial de decimales/rounding,
+  - normalizacion de inputs (`0`, `0.00`, `01000`, espacios),
+  - regla de prefill y formato monetario final (locale/currency).
 
-## Verificación al reiniciar
+## Verificacion al reiniciar
 
-- Abrir OpenCode.
-- Revisar `/mcp`.
-- Confirmar que `openapi`, `sql`, `tavily` y `atlassian` aparecen conectados.
-- Si `tavily` no aparece, reiniciar OpenCode para recargar la config activa.
-- Si `atlassian` falla, revisar `JIRA_URL`, `JIRA_USERNAME` y `JIRA_API_TOKEN` en `.env`.
-- Si vuelve a fallar, revisar el stderr de `uvx mcp-atlassian` antes de tocar la config.
-- Si Jira sigue vacío, probar acceso directo al proyecto `SQ` en la web.
-- Si necesitas refrescar la réplica local, correr `bun jira-sync pull --include-comments`.
+- Abrir OpenCode y revisar `/mcp`.
+- Confirmar MCPs esperados conectados (`openapi`, `sql`, `tavily`, `atlassian`).
+- Si falla Jira sync por variables:
+  - usar `JIRA_USERNAME` + `JIRA_API_TOKEN`,
+  - mapear aliases si script exige `ATLASSIAN_EMAIL`/`ATLASSIAN_API_TOKEN`.
+- Verificar que stories mantengan labels tras sync:
+  - `shift-left-reviewed`, `test-plan-ready` en `SQ-51` y `SQ-55`.
+- Si se actualizan comentarios en Jira, correr:
+  - `bun jira-sync pull --story SQ-51 --include-comments`
+  - `bun jira-sync pull --story SQ-55 --include-comments`
 
-## Cambio reciente
+## Cambios recientes
 
-- Se corrigió Tavily quitando las comillas del URL para evitar `Invalid URL`.
-- Se alinearon `scripts/mcp-builder.js` y las guías de Tavily con la config activa.
-- Se migró Atlassian de vuelta a `uvx mcp-atlassian` para usar credenciales locales desde `.env`.
-- Se corrigió `JIRA_URL` para usar la raíz del sitio Atlassian y se validó el arranque MCP.
-- Se verificó que el navegador controlado por esta sesión no usa el Chrome logueado del usuario, así que Jira web no quedó accesible directo.
-- Se confirmó que `story.md` y `comments.md` son snapshots regenerables desde Jira, no memoria viva.
+- Sync de `SQ-39` con comentarios incluido; se genero `comments.md` de epic.
+- Publicacion de ATPs de `SQ-51` y `SQ-55` en Jira.
+- Publicacion de comentarios de "proposed defaults" para destrabar decisiones PO/Dev.
+- Creacion de `feature-test-plan.md` local para `EPIC-SQ-39`.
+- Limpieza de nomenclatura en documentacion interna hacia `acceptance-test-plan.md`.
 
 ## Regla de mantenimiento
 
-- Este archivo se usa para guardar el resumen de reinicio de la sesión actual.
-- En cada sesión, cuando pidas un resumen de reinicio, guardarlo siempre aquí.
-- No asumir que sirve como memoria permanente entre sesiones; solo registrar el estado vigente.
+- Este archivo guarda el estado vigente de la sesion actual.
+- Actualizarlo en cada cierre/reinicio de sesion.
+- No asumir memoria permanente entre sesiones.
 
-## Última actualización
+## Ultima actualizacion
 
-- 2026-03-25
+- 2026-03-29

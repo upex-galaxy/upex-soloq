@@ -548,8 +548,8 @@ export function InvoiceDocument({ data }: InvoiceDocumentProps) {
               </View>
             )}
 
-            {/* Tax (if any) */}
-            {(data.tax_rate ?? 0) > 0 && (
+            {/* Tax (if any) — hide when tax_amount is 0 (e.g. discount >= subtotal) */}
+            {(data.tax_rate ?? 0) > 0 && (data.tax_amount ?? 0) > 0 && (
               <View style={styles.totalsRow}>
                 <Text style={styles.totalsLabel}>IVA ({data.tax_rate}%)</Text>
                 <Text style={styles.totalsValue}>{formatCurrency(data.tax_amount)}</Text>

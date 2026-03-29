@@ -6,6 +6,7 @@ import {
   formatBusinessAddress,
   isValidImageUrl,
 } from '@/lib/utils/pdf-utils';
+import { calculateDiscountAmount } from '@/lib/utils/invoice-calculations';
 import type { InvoiceWithDetails } from '@/hooks/invoices/use-invoice';
 
 // =============================================================================
@@ -353,11 +354,12 @@ interface InvoiceDocumentProps {
 export function InvoiceDocument({ data }: InvoiceDocumentProps) {
   const { client, items, business_profile } = data;
 
-  // Calculate discount amount based on type
-  const discountAmount =
-    data.discount_type === 'percentage'
-      ? (data.subtotal * (data.discount_value ?? 0)) / 100
-      : (data.discount_value ?? 0);
+  // Calculate discount amount using shared utility (handles capping + percentage)
+  const { amount: discountAmount } = calculateDiscountAmount(
+    data.subtotal,
+    data.discount_type,
+    data.discount_value
+  );
 
   // Check if logo URL is valid (SQ-33)
   const hasValidLogo = isValidImageUrl(business_profile?.logo_url);

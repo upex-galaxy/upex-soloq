@@ -1034,8 +1034,8 @@ function updateExamples() {
  * @returns {boolean} true si el script fue actualizado y necesita reiniciarse
  */
 function selfUpdate() {
-  const currentScriptPath = path.join(process.cwd(), 'scripts', 'update-template.js');
-  const templateScriptPath = path.join(TEMP_DIR, 'scripts', 'update-template.js');
+  const currentScriptPath = path.join(process.cwd(), 'cli', 'update-template.js');
+  const templateScriptPath = path.join(TEMP_DIR, 'cli', 'update-template.js');
 
   if (!fs.existsSync(templateScriptPath)) {
     return false;
@@ -1048,7 +1048,7 @@ function selfUpdate() {
 
   if (currentContent !== templateContent) {
     logStep('Auto-actualizando update-template.js...');
-    fs.mkdirSync('scripts', { recursive: true });
+    fs.mkdirSync('cli', { recursive: true });
     fs.cpSync(templateScriptPath, currentScriptPath);
     logSuccess('update-template.js actualizado a la ultima version');
     return true;

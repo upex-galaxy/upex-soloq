@@ -41,6 +41,7 @@ KATA (Komponent Action Test Architecture) is a test automation framework where:
 | Review ATC fundamental rules       | `automation-standards.md` (section 1)                             |
 | Understand test data strategy      | `test-data-management.md`                                         |
 | Learn about Steps module           | `automation-standards.md` (section 1.7)                           |
+| Add tracing to helper methods      | `kata-architecture.md` (section 7) + `automation-standards.md`    |
 | Configure TMS integration          | `tms-integration.md`                                              |
 | Configure CI/CD                    | `ci-cd-integration.md`                                            |
 | Configure OpenAPI/MCP              | `openapi-integration.md`                                          |

@@ -14,14 +14,14 @@
 
 import { expect, test } from '@TestFixture';
 
-test.describe('SQ-XXX: Dashboard', () => {
+test.describe('SQ-XXX: Dashboard', { tag: ['@critical'] }, () => {
   /**
-   * @critical - Validates Global Setup authentication
+   * Validates Global Setup authentication
    *
    * This test verifies that the authenticated session from e2e-setup
    * is correctly loaded and allows access to protected pages.
    */
-  test('SQ-XXX: should load dashboard with authenticated session @critical', async ({ page }) => {
+  test('SQ-XXX: should load dashboard with authenticated session', async ({ page }) => {
     // Navigate to home/dashboard - should work because we're authenticated
     await page.goto('/');
 

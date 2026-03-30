@@ -78,3 +78,6 @@ dbhub.toml
 
 # Testing session artifacts (snapshots, screenshots, console logs)
 .context/PBI/testing-session/
+
+# Fix session progress (local tracking, not pushed)
+.context/FIX-SESSION-PROGRESS.md

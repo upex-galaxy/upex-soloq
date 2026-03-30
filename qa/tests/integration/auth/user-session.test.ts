@@ -11,7 +11,7 @@
 
 import { config, expect, test } from '@TestFixture';
 
-test.describe('SQ-XXX: User Session API', () => {
+test.describe('SQ-XXX: User Session API', { tag: ['@critical'] }, () => {
   /**
    * Validates that the auth token is automatically loaded from api-state.json
    * and can be used to make authenticated Supabase API calls.

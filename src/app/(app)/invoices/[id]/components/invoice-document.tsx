@@ -6,6 +6,7 @@ import {
   formatBusinessAddress,
   isValidImageUrl,
 } from '@/lib/utils/pdf-utils';
+import { calculateDiscountAmount } from '@/lib/utils/invoice-calculations';
 import type { InvoiceWithDetails } from '@/hooks/invoices/use-invoice';
 
 // =============================================================================
@@ -272,7 +273,7 @@ const styles = StyleSheet.create({
   },
 
   // =========================================================================
-  // Section E: Notes/Terms (E1) + Payment Methods placeholder (E2)
+  // Section E: Notes/Terms (E1) + Payment Methods (E2)
   // =========================================================================
   bottomSection: {
     flexDirection: 'row',
@@ -296,6 +297,19 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: colors.textSecondary,
     lineHeight: 1.5,
+  },
+  paymentMethodLabel: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: colors.textPrimary,
+    marginBottom: 2,
+  },
+  paymentMethodValue: {
+    fontSize: 8,
+    color: colors.textSecondary,
+    backgroundColor: '#f3f4f6',
+    padding: '3 6',
+    borderRadius: 2,
   },
 
   // =========================================================================
@@ -337,6 +351,39 @@ interface InvoiceDocumentProps {
 // =============================================================================
 
 /**
+ * Format payment method value JSON string for PDF display
+ */
+function formatPaymentMethodValue(type: string, valueStr: string): string {
+  try {
+    const parsed = typeof valueStr === 'string' ? JSON.parse(valueStr) : valueStr;
+    switch (type) {
+      case 'bank_transfer': {
+        const parts: string[] = [];
+        if (parsed.bank_name) parts.push(parsed.bank_name);
+        if (parsed.clabe) parts.push(`CLABE: ${parsed.clabe}`);
+        if (parsed.cbu) parts.push(`CBU: ${parsed.cbu}`);
+        if (parsed.account_number) parts.push(`Cuenta: ${parsed.account_number}`);
+        return parts.join(' | ');
+      }
+      case 'paypal':
+        return parsed.email || valueStr;
+      case 'mercado_pago': {
+        const parts: string[] = [];
+        if (parsed.alias) parts.push(`Alias: ${parsed.alias}`);
+        if (parsed.cvu) parts.push(`CVU: ${parsed.cvu}`);
+        return parts.join(' | ');
+      }
+      case 'cash':
+        return parsed.instructions || 'Efectivo';
+      default:
+        return parsed.instructions || parsed.name || valueStr;
+    }
+  } catch {
+    return valueStr;
+  }
+}
+
+/**
  * PDF Document template for invoices
  *
  * Uses @react-pdf/renderer to generate a professional PDF.
@@ -347,17 +394,18 @@ interface InvoiceDocumentProps {
  * - Section B: Client Info (B1) + Invoice Meta (B2)
  * - Section C: Items Table
  * - Section D: Totals (right-aligned)
- * - Section E: Notes/Terms (E1)
+ * - Section E: Notes/Terms (E1) + Payment Methods (E2)
  * - Footer: Platform credit + Page numbering
  */
 export function InvoiceDocument({ data }: InvoiceDocumentProps) {
   const { client, items, business_profile } = data;
 
-  // Calculate discount amount based on type
-  const discountAmount =
-    data.discount_type === 'percentage'
-      ? (data.subtotal * (data.discount_value ?? 0)) / 100
-      : (data.discount_value ?? 0);
+  // Calculate discount amount using shared utility (handles capping + percentage)
+  const { amount: discountAmount } = calculateDiscountAmount(
+    data.subtotal,
+    data.discount_type,
+    data.discount_value
+  );
 
   // Check if logo URL is valid (SQ-33)
   const hasValidLogo = isValidImageUrl(business_profile?.logo_url);
@@ -500,8 +548,8 @@ export function InvoiceDocument({ data }: InvoiceDocumentProps) {
               </View>
             )}
 
-            {/* Tax (if any) */}
-            {(data.tax_rate ?? 0) > 0 && (
+            {/* Tax (if any) — hide when tax_amount is 0 (e.g. discount >= subtotal) */}
+            {(data.tax_rate ?? 0) > 0 && (data.tax_amount ?? 0) > 0 && (
               <View style={styles.totalsRow}>
                 <Text style={styles.totalsLabel}>IVA ({data.tax_rate}%)</Text>
                 <Text style={styles.totalsValue}>{formatCurrency(data.tax_amount)}</Text>
@@ -517,23 +565,42 @@ export function InvoiceDocument({ data }: InvoiceDocumentProps) {
         </View>
 
         {/* ================================================================
-            SECTION E: NOTES & TERMS
+            SECTION E: NOTES, TERMS & PAYMENT METHODS
             ================================================================ */}
-        {(data.notes || data.terms) && (
+        {(data.notes || data.terms || (data.payment_methods && data.payment_methods.length > 0)) && (
           <View style={styles.bottomSection}>
-            {/* E1: Notes */}
-            {data.notes && (
+            {/* E1: Notes & Terms */}
+            {(data.notes || data.terms) && (
               <View style={styles.notesSection}>
-                <Text style={styles.bottomSectionTitle}>Notas</Text>
-                <Text style={styles.notesText}>{sanitizeForPDF(data.notes)}</Text>
+                {data.notes && (
+                  <View style={{ marginBottom: data.terms ? 10 : 0 }}>
+                    <Text style={styles.bottomSectionTitle}>Notas</Text>
+                    <Text style={styles.notesText}>{sanitizeForPDF(data.notes)}</Text>
+                  </View>
+                )}
+                {data.terms && (
+                  <View>
+                    <Text style={styles.bottomSectionTitle}>Terminos y Condiciones</Text>
+                    <Text style={styles.notesText}>{sanitizeForPDF(data.terms)}</Text>
+                  </View>
+                )}
               </View>
             )}
 
-            {/* E1 continued: Terms */}
-            {data.terms && (
+            {/* E2: Payment Methods */}
+            {data.payment_methods && data.payment_methods.length > 0 && (
               <View style={styles.notesSection}>
-                <Text style={styles.bottomSectionTitle}>Terminos y Condiciones</Text>
-                <Text style={styles.notesText}>{sanitizeForPDF(data.terms)}</Text>
+                <Text style={styles.bottomSectionTitle}>Metodos de Pago</Text>
+                {data.payment_methods.map((pm, idx) => (
+                  <View key={idx} style={{ marginBottom: 6 }}>
+                    <Text style={styles.paymentMethodLabel}>
+                      {sanitizeForPDF(pm.label)}
+                    </Text>
+                    <Text style={styles.paymentMethodValue}>
+                      {sanitizeForPDF(formatPaymentMethodValue(pm.type, pm.value))}
+                    </Text>
+                  </View>
+                ))}
               </View>
             )}
           </View>

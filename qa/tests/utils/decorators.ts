@@ -1,15 +1,20 @@
 /**
- * KATA Framework - ATC Decorator & Result Tracking
+ * KATA Framework - ATC & Step Decorators + Result Tracking
  *
  * The @atc decorator connects test methods to Jira/Xray test cases
  * and tracks execution results for reporting and TMS synchronization.
  *
- * Logging happens ONLY within the decorator - not in base components.
+ * The @step decorator adds method-level tracing for public helper methods
+ * (read-only queries, navigation, form fills) so they appear in KataReporter
+ * terminal output and Allure reports via test.step().
+ *
+ * Logging happens ONLY within decorators - not in base components.
  */
 
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { dirname } from 'node:path';
+import { appendFileSync, mkdirSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 
+import { test } from '@playwright/test';
 import { config } from '@variables';
 import * as allure from 'allure-js-commons';
 
@@ -35,12 +40,6 @@ export interface AtcOptions {
   description?: string
   severity?: 'blocker' | 'critical' | 'normal' | 'minor' | 'trivial'
 }
-
-// ============================================
-// Global Results Storage
-// ============================================
-
-const atcResults: Map<string, AtcResult[]> = new Map();
 
 // ============================================
 // ATC Decorator
@@ -147,8 +146,9 @@ export function atc(testId: string, options: AtcOptions = {}) {
       }
 
       try {
-        // Execute within Allure step
-        const returnValue = await allure.step(`ATC: ${testId} - ${methodName}`, async () => {
+        // Execute within test.step() for KataReporter + Allure visibility
+        const stepTitle = `ATC [${testId}]: ${methodName}${formatArgs(args)}`;
+        const returnValue = await test.step(stepTitle, async () => {
           return originalMethod.apply(this, args);
         });
 
@@ -190,74 +190,122 @@ export function atc(testId: string, options: AtcOptions = {}) {
 }
 
 // ============================================
+// Step Decorator (helper tracing)
+// ============================================
+
+/**
+ * @step decorator for helper method tracing
+ *
+ * Wraps the method in Playwright's test.step() so it appears in KataReporter.
+ * Shows method name and formatted parameters in the terminal.
+ *
+ * Use on Layer 3 public helper methods (read-only queries, navigation, form fills).
+ * Do NOT use on @atc methods or Layer 2 base methods.
+ *
+ * @example
+ * @step
+ * async getCurrentUser(): Promise<[APIResponse, UserInfoResponse]> {
+ *   return this.apiGET<UserInfoResponse>('/auth/v1/user');
+ * }
+ * // Terminal: ---- ✓ getCurrentUser()
+ *
+ * @step
+ * async fillClientForm(data: CreateClientFormData) {
+ *   // ...
+ * }
+ * // Terminal: ---- ✓ fillClientForm({ name: "Test Client", email: "test@..." })
+ */
+// eslint-disable-next-line ts/no-explicit-any -- Required for decorator flexibility with strict mode
+export function step<T extends (...args: any[]) => Promise<any>>(
+  originalMethod: T,
+  context: ClassMethodDecoratorContext,
+): T {
+  const methodName = String(context.name);
+
+  // eslint-disable-next-line ts/no-explicit-any -- Matches generic T signature
+  async function replacement(this: unknown, ...args: any[]) {
+    const stepTitle = `${methodName}${formatArgs(args)}`;
+    return test.step(stepTitle, async () => {
+      return originalMethod.apply(this, args);
+    });
+  }
+
+  return replacement as T;
+}
+
+// ============================================
+// Parameter Formatting (for step titles)
+// ============================================
+
+const SENSITIVE_KEYS = new Set(['password', 'token', 'secret', 'authorization', 'access_token']);
+const MAX_STRING_LEN = 80;
+const MAX_OBJECT_LEN = 120;
+
+function formatValue(value: unknown, key?: string): string {
+  if (key && SENSITIVE_KEYS.has(key.toLowerCase())) {
+    return '"***"';
+  }
+  if (value === null) {
+    return 'null';
+  }
+  if (value === undefined) {
+    return 'undefined';
+  }
+  if (typeof value === 'function') {
+    return '[Function]';
+  }
+
+  if (typeof value === 'string') {
+    return value.length > MAX_STRING_LEN
+      ? `"${value.slice(0, MAX_STRING_LEN)}..."`
+      : `"${value}"`;
+  }
+
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value);
+  }
+  if (Array.isArray(value)) {
+    return `[Array(${value.length})]`;
+  }
+
+  if (typeof value === 'object') {
+    const entries = Object.entries(value as Record<string, unknown>);
+    const formatted = entries
+      .slice(0, 5)
+      .map(([k, v]) => `${k}: ${formatValue(v, k)}`)
+      .join(', ');
+    const suffix = entries.length > 5 ? ', ...' : '';
+    const result = `{ ${formatted}${suffix} }`;
+    return result.length > MAX_OBJECT_LEN
+      ? `${result.slice(0, MAX_OBJECT_LEN)}...}`
+      : result;
+  }
+
+  return String(value);
+}
+
+function formatArgs(args: unknown[]): string {
+  if (args.length === 0) {
+    return '()';
+  }
+  return `(${args.map(a => formatValue(a)).join(', ')})`;
+}
+
+// ============================================
 // Result Storage Functions
 // ============================================
 
-function storeResult(testId: string, result: AtcResult) {
-  const existing = atcResults.get(testId);
-  if (existing) {
-    existing.push(result);
-  }
-  else {
-    atcResults.set(testId, [result]);
-  }
-}
+/**
+ * NDJSON file path for cross-process ATC result persistence.
+ *
+ * Playwright runs each project (setup, e2e, integration, teardown) in
+ * separate worker processes. In-memory Maps don't survive across them.
+ * Each @atc execution appends one JSON line here; KataReporter.onEnd()
+ * aggregates all lines into the final report.
+ */
+export const ATC_PARTIAL_PATH = resolve('reports/.atc_partial.ndjson');
 
-export function getAtcResults() {
-  return new Map(atcResults);
-}
-
-export function getAtcResultsObject() {
-  const obj: Record<string, AtcResult[]> = {};
-  atcResults.forEach((value, key) => {
-    obj[key] = value;
-  });
-  return obj;
-}
-
-export function clearAtcResults() {
-  atcResults.clear();
-}
-
-export function getAtcSummary() {
-  let total = 0;
-  let passed = 0;
-  let failed = 0;
-  let skipped = 0;
-  const testIds: string[] = [];
-
-  atcResults.forEach((results, testId) => {
-    testIds.push(testId);
-    results.forEach((r) => {
-      total++;
-      if (r.status === 'PASS') {
-        passed++;
-      }
-      else if (r.status === 'FAIL') {
-        failed++;
-      }
-      else {
-        skipped++;
-      }
-    });
-  });
-
-  return { total, passed, failed, skipped, testIds };
-}
-
-// ============================================
-// Report Generation
-// ============================================
-
-export async function generateAtcReport(outputPath = 'reports/atc_results.json') {
-  const report = {
-    generatedAt: new Date().toISOString(),
-    summary: getAtcSummary(),
-    results: getAtcResultsObject(),
-  };
-
-  // Create parent directories if they don't exist
-  mkdirSync(dirname(outputPath), { recursive: true });
-  writeFileSync(outputPath, JSON.stringify(report, null, 2));
-  console.log(`📊 ATC Report generated: ${outputPath}`);
+function storeResult(_testId: string, result: AtcResult) {
+  mkdirSync(dirname(ATC_PARTIAL_PATH), { recursive: true });
+  appendFileSync(ATC_PARTIAL_PATH, `${JSON.stringify(result)}\n`);
 }

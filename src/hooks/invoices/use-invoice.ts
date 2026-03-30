@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import type { Invoice, InvoiceItem, Client, BusinessProfile } from '@/lib/types';
+import type { Invoice, InvoiceItem, Client, BusinessProfile, PaymentMethodType } from '@/lib/types';
 
 /**
  * Extended invoice type with all related data needed for PDF generation
@@ -38,6 +38,11 @@ export interface InvoiceWithDetails {
     | 'logo_url'
     | 'default_terms'
   > | null;
+  payment_methods: Array<{
+    type: PaymentMethodType;
+    label: string;
+    value: string;
+  }>;
 }
 
 interface UseInvoiceResult {

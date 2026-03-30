@@ -10,7 +10,7 @@
 
 ## User Story
 
-As a user, I want to search invoices by client or number, so that I can find a specific one.
+As a user, I want to search invoices by client or number, so that I can find a specific one. Story Points: 2
 
 ---
 
@@ -105,11 +105,12 @@ As a user, I want to search invoices by client or number, so that I can find a s
 ## Metadata
 
 - **Created:** 2026-01-21T01:09:31.468Z
-- **Updated:** 2026-03-29T01:22:14.134Z
+- **Updated:** 2026-03-29T04:51:12.143Z
 - **Reporter:** Ely
 - **Assignee:** Fernando Javier Masci
+- **Labels:** shift-left-reviewed, test-plan-ready
 
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-29T01:22:25.272Z_
+_Last sync: 2026-03-29T04:51:22.901Z_

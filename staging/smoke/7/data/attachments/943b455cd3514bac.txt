@@ -1,0 +1,3 @@
+---- API OK: 200 - https://czuusjchqpgvanvbdrnz.supabase.co/auth/v1/token
+---- API OK: 200 - https://czuusjchqpgvanvbdrnz.supabase.co/auth/v1/user
+✅ [SQ-XXX] authenticateSuccessfully - PASS (192ms)

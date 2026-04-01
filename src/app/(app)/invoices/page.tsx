@@ -7,6 +7,8 @@ import { Plus, FileText, AlertCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Animation variants
 const containerVariants = {
@@ -32,13 +34,6 @@ const itemVariants = {
   },
 };
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
   Table,
   TableBody,
   TableCell,
@@ -47,14 +42,20 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useInvoices } from '@/hooks/invoices';
+import { useInvoices, useDashboardSummary } from '@/hooks/invoices';
 import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
 import { PaginationControls } from '@/components/invoices/pagination-controls';
 import { INVOICE_STATUS_OPTIONS, type InvoiceStatus } from '@/lib/types';
 
-/**
- * Format currency in USD
- */
+const STATUS_TABS: { value: InvoiceStatus | 'all'; label: string }[] = [
+  { value: 'all', label: 'Todas' },
+  { value: 'draft', label: 'Borrador' },
+  { value: 'sent', label: 'Enviada' },
+  { value: 'paid', label: 'Pagada' },
+  { value: 'overdue', label: 'Vencida' },
+];
+
+
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -62,9 +63,6 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-/**
- * Format date in user-friendly format
- */
 function formatDate(dateString: string | null): string {
   if (!dateString) return '-';
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -77,6 +75,8 @@ function formatDate(dateString: string | null): string {
 export default function InvoicesPage() {
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | 'all'>('all');
   const [currentPage, setCurrentPage] = useState(1);
+
+  const { data: summary } = useDashboardSummary();
 
   const {
     data: invoices,
@@ -91,10 +91,23 @@ export default function InvoicesPage() {
     limit: 20,
   });
 
-  // Reset to page 1 when filter changes
-  const handleStatusChange = (value: string) => {
+  const handleTabChange = (value: string) => {
     setStatusFilter(value as InvoiceStatus | 'all');
     setCurrentPage(1);
+  };
+
+  const getTabCount = (status: InvoiceStatus | 'all'): number | undefined => {
+    if (!summary) return undefined;
+    if (status === 'all') {
+      return (
+        summary.status_counts.draft +
+        summary.status_counts.sent +
+        summary.status_counts.paid +
+        summary.status_counts.overdue +
+        summary.status_counts.cancelled
+      );
+    }
+    return summary.status_counts[status];
   };
 
   return (
@@ -122,24 +135,34 @@ export default function InvoicesPage() {
         </Button>
       </motion.div>
 
-      {/* Filters */}
-      <motion.div className="flex items-center gap-4" variants={itemVariants}>
-        <Select
+      {/* Status Tabs */}
+      <motion.div variants={itemVariants}>
+        <Tabs
           value={statusFilter}
-          onValueChange={handleStatusChange}
+          onValueChange={handleTabChange}
+          data-testid="status-filter-tabs"
         >
-          <SelectTrigger className="w-[180px] shadow-sm" data-testid="status-filter">
-            <SelectValue placeholder="Filtrar por estado" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos los estados</SelectItem>
-            {INVOICE_STATUS_OPTIONS.map(option => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
+          <TabsList className="shadow-sm">
+            {STATUS_TABS.map(tab => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                data-testid={`status-tab-${tab.value}`}
+              >
+                {tab.label}
+                {getTabCount(tab.value) !== undefined && (
+                  <Badge
+                    variant="secondary"
+                    className="ml-1.5 h-5 min-w-[20px] px-1.5 text-xs"
+                    data-testid={`status-count-${tab.value}`}
+                  >
+                    {getTabCount(tab.value)}
+                  </Badge>
+                )}
+              </TabsTrigger>
             ))}
-          </SelectContent>
-        </Select>
+          </TabsList>
+        </Tabs>
       </motion.div>
 
       {/* Content */}

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { isInvoiceOverdue, getDaysOverdue, formatDaysOverdue } from '@/lib/utils/overdue';
 
 // Animation variants
 const containerVariants = {
@@ -255,11 +256,17 @@ export default function InvoicesPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {invoices.map(invoice => (
+                    {invoices.map(invoice => {
+                      const overdue = isInvoiceOverdue(invoice.status, invoice.due_date);
+                      const daysOverdue = overdue ? getDaysOverdue(invoice.due_date) : 0;
+                      const effectiveStatus = overdue ? 'overdue' : (invoice.status ?? 'draft');
+
+                      return (
                       <TableRow
                         key={invoice.id}
-                        className="table-row-interactive cursor-pointer"
+                        className={`table-row-interactive cursor-pointer ${overdue ? 'bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-950/30' : ''}`}
                         data-testid={`invoice-row-${invoice.id}`}
+                        data-overdue={overdue || undefined}
                       >
                         <TableCell>
                           <Link
@@ -285,7 +292,14 @@ export default function InvoicesPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <InvoiceStatusBadge status={invoice.status ?? 'draft'} />
+                          <div className="flex flex-col gap-1">
+                            <InvoiceStatusBadge status={effectiveStatus as import('@/lib/types').InvoiceStatus} />
+                            {overdue && daysOverdue > 0 && (
+                              <span className="text-xs text-destructive" data-testid={`days-overdue-${invoice.id}`}>
+                                {formatDaysOverdue(daysOverdue)}
+                              </span>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell className="text-right font-medium">
                           {formatCurrency(invoice.total ?? 0)}
@@ -297,7 +311,8 @@ export default function InvoicesPage() {
                           {formatDate(invoice.due_date)}
                         </TableCell>
                       </TableRow>
-                    ))}
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>

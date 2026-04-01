@@ -218,11 +218,21 @@ export function MarkAsPaidDialog({
             <Textarea
               id="notes"
               value={notes}
-              onChange={e => setNotes(e.target.value)}
-              placeholder="Notas adicionales sobre el pago..."
-              rows={2}
+              onChange={e => {
+                if (e.target.value.length <= 500) setNotes(e.target.value);
+              }}
+              placeholder="Referencia de pago, número de transacción, notas..."
+              rows={3}
               data-testid="payment-notes-input"
             />
+            <div className="flex justify-end">
+              <span
+                className={`text-xs ${notes.length >= 450 ? 'text-yellow-600' : 'text-muted-foreground'} ${notes.length >= 500 ? 'text-destructive' : ''}`}
+                data-testid="payment-notes-counter"
+              >
+                {notes.length}/500
+              </span>
+            </div>
           </div>
 
           {markAsPaid.isError && (

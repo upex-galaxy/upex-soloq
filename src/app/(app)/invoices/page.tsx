@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Plus, FileText, AlertCircle, Search, X } from 'lucide-react';
+import { Plus, FileText, AlertCircle, Search, X, CheckCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -48,6 +48,7 @@ import { useInvoices, useDashboardSummary } from '@/hooks/invoices';
 import { useDebounce } from '@/hooks/use-debounce';
 import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
 import { PaginationControls } from '@/components/invoices/pagination-controls';
+import { MarkAsPaidDialog } from '@/components/invoices/mark-as-paid-dialog';
 import { INVOICE_STATUS_OPTIONS, type InvoiceStatus } from '@/lib/types';
 
 const STATUS_TABS: { value: InvoiceStatus | 'all'; label: string }[] = [
@@ -80,6 +81,11 @@ export default function InvoicesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, 300);
+  const [paymentInvoice, setPaymentInvoice] = useState<{
+    id: string;
+    invoice_number: string;
+    total: number;
+  } | null>(null);
 
   const { data: summary } = useDashboardSummary();
 
@@ -288,6 +294,7 @@ export default function InvoicesPage() {
                       <TableHead className="text-right font-semibold">Total</TableHead>
                       <TableHead className="font-semibold">Fecha</TableHead>
                       <TableHead className="font-semibold">Vencimiento</TableHead>
+                      <TableHead className="font-semibold w-[80px]">Acción</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -345,6 +352,26 @@ export default function InvoicesPage() {
                         <TableCell className="text-muted-foreground">
                           {formatDate(invoice.due_date)}
                         </TableCell>
+                        <TableCell>
+                          {(invoice.status === 'sent' || invoice.status === 'overdue' || overdue) && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50"
+                              onClick={() =>
+                                setPaymentInvoice({
+                                  id: invoice.id,
+                                  invoice_number: invoice.invoice_number ?? '',
+                                  total: invoice.total ?? 0,
+                                })
+                              }
+                              title="Marcar como pagada"
+                              data-testid={`quick-pay-${invoice.id}`}
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </TableCell>
                       </TableRow>
                       );
                     })}
@@ -367,6 +394,19 @@ export default function InvoicesPage() {
         </CardContent>
       </Card>
       </motion.div>
+
+      {/* Mark as Paid Dialog */}
+      {paymentInvoice && (
+        <MarkAsPaidDialog
+          open={!!paymentInvoice}
+          onOpenChange={open => {
+            if (!open) setPaymentInvoice(null);
+          }}
+          invoiceId={paymentInvoice.id}
+          invoiceNumber={paymentInvoice.invoice_number}
+          invoiceTotal={paymentInvoice.total}
+        />
+      )}
     </motion.div>
   );
 }

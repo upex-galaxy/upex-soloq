@@ -1,13 +1,16 @@
 'use client';
 
-import { use } from 'react';
+import { use, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { ArrowLeft, Loader2, FileX } from 'lucide-react';
+import { ArrowLeft, Loader2, FileX, CheckCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useInvoice } from '@/hooks/invoices/use-invoice';
+import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
+import { MarkAsPaidDialog } from '@/components/invoices/mark-as-paid-dialog';
+import { isInvoiceOverdue } from '@/lib/utils/overdue';
 
 // =============================================================================
 // Dynamic Imports - Avoid SSR issues with react-pdf
@@ -53,6 +56,7 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   const invoiceId = resolvedParams.id;
 
   const { data: invoice, isLoading, isError } = useInvoice(invoiceId);
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
 
   // Loading state
   if (isLoading) {
@@ -124,6 +128,11 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   }
 
   // Invoice found - show preview
+  const canMarkAsPaid =
+    invoice.status === 'sent' ||
+    invoice.status === 'overdue' ||
+    isInvoiceOverdue(invoice.status, invoice.due_date);
+
   return (
     <div className="space-y-8" data-testid="invoice-detail-page">
       {/* Header */}
@@ -135,15 +144,34 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight" data-testid="invoice-number-title">
-              {invoice.invoice_number}
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold tracking-tight" data-testid="invoice-number-title">
+                {invoice.invoice_number}
+              </h1>
+              <InvoiceStatusBadge
+                status={
+                  isInvoiceOverdue(invoice.status, invoice.due_date)
+                    ? 'overdue'
+                    : (invoice.status ?? 'draft')
+                }
+              />
+            </div>
             <p className="text-muted-foreground">
               {invoice.client.name}
               {invoice.client.company && ` - ${invoice.client.company}`}
             </p>
           </div>
         </div>
+        {canMarkAsPaid && (
+          <Button
+            onClick={() => setPaymentDialogOpen(true)}
+            data-testid="mark-as-paid-button"
+            className="shadow-sm hover:shadow-md transition-shadow"
+          >
+            <CheckCircle className="mr-2 h-4 w-4" />
+            Marcar como Pagada
+          </Button>
+        )}
       </div>
 
       {/* PDF Preview Card */}
@@ -152,6 +180,17 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
           <InvoicePreview invoice={invoice} />
         </CardContent>
       </Card>
+
+      {/* Mark as Paid Dialog */}
+      {canMarkAsPaid && (
+        <MarkAsPaidDialog
+          open={paymentDialogOpen}
+          onOpenChange={setPaymentDialogOpen}
+          invoiceId={invoice.id}
+          invoiceNumber={invoice.invoice_number}
+          invoiceTotal={invoice.total}
+        />
+      )}
     </div>
   );
 }

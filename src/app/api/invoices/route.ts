@@ -321,6 +321,8 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
  * - status: InvoiceStatus (optional) - Filter by status
  * - page: number (default: 1) - Page number
  * - limit: number (default: 20, max: 50) - Items per page
+ * - sortBy: string (default: 'created_at') - Sort field
+ * - sortOrder: 'asc' | 'desc' (default: 'desc') - Sort direction
  *
  * Responses:
  * - 200: List of invoices with pagination
@@ -348,6 +350,12 @@ export async function GET(request: Request): Promise<NextResponse<ListInvoicesRe
     const limit = Math.min(50, Math.max(1, parseInt(url.searchParams.get('limit') || '20', 10)));
     const offset = (page - 1) * limit;
 
+    // Sort params
+    const validSortFields = ['created_at', 'updated_at', 'issue_date', 'due_date', 'total', 'invoice_number', 'status'];
+    const sortByParam = url.searchParams.get('sortBy') || 'created_at';
+    const sortBy = validSortFields.includes(sortByParam) ? sortByParam : 'created_at';
+    const sortOrder = url.searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc';
+
     // Build query
     let query = supabase
       .from('invoices')
@@ -365,7 +373,7 @@ export async function GET(request: Request): Promise<NextResponse<ListInvoicesRe
         { count: 'exact' }
       )
       .is('deleted_at', null)
-      .order('updated_at', { ascending: false })
+      .order(sortBy, { ascending: sortOrder === 'asc' })
       .range(offset, offset + limit - 1);
 
     // Apply status filter if provided

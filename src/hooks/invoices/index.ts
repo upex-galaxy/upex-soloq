@@ -5,3 +5,4 @@ export { useUpdateInvoice } from './use-update-invoice';
 export { useDeleteInvoice } from './use-delete-invoice';
 export { useAutoSave } from './use-auto-save';
 export { useSendInvoice } from './use-send-invoice';
+export { useDashboardSummary } from './use-dashboard-summary';

@@ -2,12 +2,15 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { DollarSign, FileText, AlertTriangle, Users, Plus, ArrowUpRight } from 'lucide-react';
+import { DollarSign, FileText, AlertTriangle, Plus, ArrowUpRight } from 'lucide-react';
 
 import { useAuth } from '@/contexts/auth-context';
+import { useDashboardSummary } from '@/hooks/invoices';
+import { useInvoices } from '@/hooks/invoices';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
 
 // Animation variants for staggered entrance
 const containerVariants = {
@@ -54,66 +57,15 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-// Mock data for demo
-const mockStats = {
-  totalPending: 2450.0,
-  overdueCount: 2,
-  paidThisMonth: 5200.0,
-  activeClients: 8,
-};
-
-const mockInvoices = [
-  {
-    id: '1',
-    invoice_number: 'INV-2025-001',
-    client_name: 'Tech Solutions CDMX',
-    total: 1200.0,
-    status: 'sent' as const,
-    due_date: '2025-01-25',
-  },
-  {
-    id: '2',
-    invoice_number: 'INV-2025-002',
-    client_name: 'Diseño Creativo SA',
-    total: 850.0,
-    status: 'overdue' as const,
-    due_date: '2025-01-15',
-  },
-  {
-    id: '3',
-    invoice_number: 'INV-2024-098',
-    client_name: 'Marketing Digital Co',
-    total: 2100.0,
-    status: 'paid' as const,
-    due_date: '2025-01-10',
-  },
-  {
-    id: '4',
-    invoice_number: 'INV-2025-003',
-    client_name: 'Startup Innovadora',
-    total: 400.0,
-    status: 'draft' as const,
-    due_date: '2025-01-30',
-  },
-];
-
-const statusConfig = {
-  draft: { label: 'Borrador', className: 'bg-gray-100 text-gray-800 hover:bg-gray-100' },
-  sent: { label: 'Enviada', className: 'bg-blue-100 text-blue-800 hover:bg-blue-100' },
-  paid: { label: 'Pagada', className: 'bg-green-100 text-green-800 hover:bg-green-100' },
-  overdue: { label: 'Vencida', className: 'bg-red-100 text-red-800 hover:bg-red-100' },
-  cancelled: { label: 'Cancelada', className: 'bg-gray-100 text-gray-500 hover:bg-gray-100' },
-};
-
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('es-MX', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
   }).format(amount);
 }
 
 function formatDate(date: string): string {
-  return new Date(date).toLocaleDateString('es-MX', {
+  return new Date(date).toLocaleDateString('en-US', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -121,7 +73,11 @@ function formatDate(date: string): string {
 }
 
 export default function DashboardPage() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const { data: summary, isLoading: isSummaryLoading } = useDashboardSummary();
+  const { data: recentInvoices, isLoading: isInvoicesLoading } = useInvoices({ limit: 5 });
+
+  const isLoading = isAuthLoading;
 
   // Show skeleton while loading auth state (SQ-74 fix)
   if (isLoading) {
@@ -147,12 +103,18 @@ export default function DashboardPage() {
   const displayName =
     user?.businessProfile?.business_name || user?.email?.split('@')[0] || 'Mi Cuenta';
 
+  const pendingTotal = summary?.pending_total ?? 0;
+  const overdueCount = summary?.overdue_count ?? 0;
+  const paidThisMonth = summary?.paid_this_month ?? 0;
+  const overdueTotal = summary?.overdue_total ?? 0;
+
   return (
     <motion.div
       className="space-y-8"
       initial="hidden"
       animate="visible"
       variants={containerVariants}
+      data-testid="dashboard-page"
     >
       {/* Header */}
       <motion.div
@@ -177,9 +139,10 @@ export default function DashboardPage() {
       <motion.div
         className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
         variants={containerVariants}
+        data-testid="dashboard-summary-cards"
       >
         <motion.div variants={cardVariants}>
-          <Card className="card-interactive border-border/50 hover:border-border">
+          <Card className="card-interactive border-border/50 hover:border-border" data-testid="pending-total-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Pendiente</CardTitle>
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
@@ -187,14 +150,26 @@ export default function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(mockStats.totalPending)}</div>
-              <p className="text-xs text-muted-foreground mt-1">Facturas enviadas sin pagar</p>
+              {isSummaryLoading ? (
+                <Skeleton className="h-8 w-32" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold" data-testid="pending-total-amount">
+                    {formatCurrency(pendingTotal)}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1" data-testid="pending-total-message">
+                    {pendingTotal === 0
+                      ? 'All invoices are paid!'
+                      : 'Facturas enviadas sin pagar'}
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
         </motion.div>
 
         <motion.div variants={cardVariants}>
-          <Card className="card-interactive border-border/50 hover:border-border">
+          <Card className="card-interactive border-border/50 hover:border-border" data-testid="overdue-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Facturas Vencidas</CardTitle>
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-destructive/10">
@@ -202,14 +177,24 @@ export default function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-destructive">{mockStats.overdueCount}</div>
-              <p className="text-xs text-muted-foreground mt-1">Requieren seguimiento</p>
+              {isSummaryLoading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold text-destructive" data-testid="overdue-count">
+                    {overdueCount}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {overdueCount === 0 ? 'Sin vencimientos' : `${formatCurrency(overdueTotal)} total`}
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
         </motion.div>
 
         <motion.div variants={cardVariants}>
-          <Card className="card-interactive border-border/50 hover:border-border">
+          <Card className="card-interactive border-border/50 hover:border-border" data-testid="paid-this-month-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Cobrado este Mes</CardTitle>
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-500/10">
@@ -217,25 +202,45 @@ export default function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                {formatCurrency(mockStats.paidThisMonth)}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">+12% vs mes anterior</p>
+              {isSummaryLoading ? (
+                <Skeleton className="h-8 w-32" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold text-green-600" data-testid="paid-this-month-amount">
+                    {formatCurrency(paidThisMonth)}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Este mes</p>
+                </>
+              )}
             </CardContent>
           </Card>
         </motion.div>
 
         <motion.div variants={cardVariants}>
-          <Card className="card-interactive border-border/50 hover:border-border">
+          <Card className="card-interactive border-border/50 hover:border-border" data-testid="active-clients-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Clientes Activos</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Facturas</CardTitle>
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                <Users className="h-4 w-4 text-primary" />
+                <FileText className="h-4 w-4 text-primary" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{mockStats.activeClients}</div>
-              <p className="text-xs text-muted-foreground mt-1">Con facturas este trimestre</p>
+              {isSummaryLoading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold" data-testid="total-invoices-count">
+                    {summary
+                      ? summary.status_counts.draft +
+                        summary.status_counts.sent +
+                        summary.status_counts.paid +
+                        summary.status_counts.overdue +
+                        summary.status_counts.cancelled
+                      : 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">En todos los estados</p>
+                </>
+              )}
             </CardContent>
           </Card>
         </motion.div>
@@ -257,8 +262,20 @@ export default function DashboardPage() {
             </Button>
           </CardHeader>
           <CardContent>
-            {mockInvoices.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
+            {isInvoicesLoading ? (
+              <div className="space-y-4" data-testid="recent-invoices-loading">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="flex items-center space-x-4">
+                    <Skeleton className="h-12 w-12 rounded" />
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-4 w-[200px]" />
+                      <Skeleton className="h-4 w-[150px]" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : recentInvoices.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center" data-testid="dashboard-empty-state">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
                   <FileText className="h-8 w-8 text-muted-foreground" />
                 </div>
@@ -274,7 +291,7 @@ export default function DashboardPage() {
                 </Button>
               </div>
             ) : (
-              <div className="rounded-lg border border-border/50 overflow-hidden">
+              <div className="rounded-lg border border-border/50 overflow-hidden" data-testid="recent-invoices-list">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-muted/30 hover:bg-muted/30">
@@ -286,21 +303,33 @@ export default function DashboardPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockInvoices.map(invoice => (
+                    {recentInvoices.map(invoice => (
                       <TableRow
                         key={invoice.id}
                         className="table-row-interactive cursor-pointer"
+                        data-testid={`recent-invoice-row-${invoice.id}`}
                       >
-                        <TableCell className="font-medium">{invoice.client_name}</TableCell>
-                        <TableCell className="font-mono text-sm text-muted-foreground">{invoice.invoice_number}</TableCell>
-                        <TableCell className="font-medium">{formatCurrency(invoice.total)}</TableCell>
+                        <TableCell className="font-medium">
+                          {invoice.client?.name || 'Sin cliente'}
+                        </TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className={statusConfig[invoice.status].className}>
-                            {statusConfig[invoice.status].label}
-                          </Badge>
+                          <Link
+                            href={
+                              invoice.status === 'draft'
+                                ? `/invoices/${invoice.id}/edit`
+                                : `/invoices/${invoice.id}`
+                            }
+                            className="font-mono text-sm text-primary hover:underline"
+                          >
+                            {invoice.invoice_number}
+                          </Link>
+                        </TableCell>
+                        <TableCell className="font-medium">{formatCurrency(invoice.total ?? 0)}</TableCell>
+                        <TableCell>
+                          <InvoiceStatusBadge status={invoice.status ?? 'draft'} />
                         </TableCell>
                         <TableCell className="text-muted-foreground">
-                          {formatDate(invoice.due_date)}
+                          {invoice.due_date ? formatDate(invoice.due_date) : '-'}
                         </TableCell>
                       </TableRow>
                     ))}

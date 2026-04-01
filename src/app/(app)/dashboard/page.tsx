@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { DollarSign, FileText, AlertTriangle, Plus, ArrowUpRight } from 'lucide-react';
+import { DollarSign, FileText, AlertTriangle, Plus, ArrowUpRight, TrendingUp, TrendingDown, Minus, Sparkles } from 'lucide-react';
 
 import { useAuth } from '@/contexts/auth-context';
 import { useDashboardSummary } from '@/hooks/invoices';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
+import { MonthlyIncomeChart } from '@/components/invoices/monthly-income-chart';
 
 // Animation variants for staggered entrance
 const containerVariants = {
@@ -262,6 +263,95 @@ export default function DashboardPage() {
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">En todos los estados</p>
                 </>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
+
+      {/* Monthly Summary */}
+      <motion.div
+        className="grid gap-4 md:grid-cols-2"
+        variants={containerVariants}
+        data-testid="monthly-summary-section"
+      >
+        {/* Monthly Income Card */}
+        <motion.div variants={cardVariants}>
+          <Card className="card-elevated border-border/50" data-testid="monthly-income-card">
+            <CardHeader>
+              <CardTitle>Ingreso Mensual</CardTitle>
+              <CardDescription>Resumen de ingresos del mes actual</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isSummaryLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-10 w-40" />
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-3xl font-bold" data-testid="monthly-income-amount">
+                      {formatCurrency(summary?.paid_this_month ?? 0)}
+                    </span>
+                    {summary?.trend_label && (
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
+                          summary.trend_label === 'up'
+                            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                            : summary.trend_label === 'down'
+                              ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                              : summary.trend_label === 'new'
+                                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                                : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
+                        }`}
+                        data-testid="monthly-trend-indicator"
+                      >
+                        {summary.trend_label === 'up' && <TrendingUp className="h-3 w-3" />}
+                        {summary.trend_label === 'down' && <TrendingDown className="h-3 w-3" />}
+                        {summary.trend_label === 'flat' && <Minus className="h-3 w-3" />}
+                        {summary.trend_label === 'new' && <Sparkles className="h-3 w-3" />}
+                        {summary.trend_percentage !== null
+                          ? `${summary.trend_percentage > 0 ? '+' : ''}${summary.trend_percentage}%`
+                          : summary.trend_label === 'new'
+                            ? 'Nuevo'
+                            : ''}
+                      </span>
+                    )}
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Cobrado</span>
+                      <span className="font-medium text-green-600" data-testid="monthly-paid-amount">
+                        {formatCurrency(summary?.paid_this_month ?? 0)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Pendiente del mes</span>
+                      <span className="font-medium" data-testid="monthly-pending-amount">
+                        {formatCurrency(summary?.monthly_pending ?? 0)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Monthly Chart */}
+        <motion.div variants={cardVariants}>
+          <Card className="card-elevated border-border/50" data-testid="monthly-chart-card">
+            <CardHeader>
+              <CardTitle>Tendencia de Ingresos</CardTitle>
+              <CardDescription>Ingresos cobrados en los últimos 6 meses</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isSummaryLoading ? (
+                <Skeleton className="h-[200px] w-full" />
+              ) : (
+                <MonthlyIncomeChart data={summary?.chart_data ?? []} />
               )}
             </CardContent>
           </Card>

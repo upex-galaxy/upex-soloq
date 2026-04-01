@@ -135,6 +135,28 @@ export default function DashboardPage() {
         </Button>
       </motion.div>
 
+      {/* Overdue Alert Banner */}
+      {!isSummaryLoading && overdueCount > 0 && (
+        <motion.div variants={itemVariants}>
+          <div
+            className="flex items-center justify-between rounded-lg border border-destructive/30 bg-destructive/5 p-4"
+            data-testid="overdue-alert-banner"
+          >
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              <p className="text-sm font-medium">
+                {overdueCount} factura{overdueCount !== 1 ? 's' : ''} vencida{overdueCount !== 1 ? 's' : ''} por {formatCurrency(overdueTotal)}
+              </p>
+            </div>
+            <Button variant="outline" size="sm" asChild className="border-destructive/30 text-destructive hover:bg-destructive/10">
+              <Link href="/invoices?status=overdue">
+                Ver vencidas
+              </Link>
+            </Button>
+          </div>
+        </motion.div>
+      )}
+
       {/* Stats Cards */}
       <motion.div
         className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"

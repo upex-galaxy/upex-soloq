@@ -356,7 +356,66 @@ export async function GET(request: Request): Promise<NextResponse<ListInvoicesRe
     const sortBy = validSortFields.includes(sortByParam) ? sortByParam : 'created_at';
     const sortOrder = url.searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc';
 
-    // Build query
+    // Search param
+    const search = url.searchParams.get('search')?.trim() || '';
+
+    // When search is active, fetch all matching invoices and filter in app layer
+    // (PostgREST doesn't support OR across joined tables natively)
+    if (search) {
+      let searchQuery = supabase
+        .from('invoices')
+        .select(
+          `
+          *,
+          client:clients!inner (
+            id,
+            name,
+            email,
+            company,
+            tax_id
+          )
+        `
+        )
+        .is('deleted_at', null)
+        .order(sortBy, { ascending: sortOrder === 'asc' });
+
+      if (status) {
+        searchQuery = searchQuery.eq('status', status);
+      }
+
+      const { data: allInvoices, error: searchError } = await searchQuery;
+
+      if (searchError) {
+        console.error('Error searching invoices:', searchError);
+        return NextResponse.json({ error: 'Error al buscar facturas' }, { status: 500 });
+      }
+
+      const searchLower = search.toLowerCase();
+      const filtered = (allInvoices || []).filter(invoice => {
+        const client = invoice.client as Pick<Client, 'id' | 'name' | 'email' | 'company' | 'tax_id'>;
+        return (
+          invoice.invoice_number?.toLowerCase().includes(searchLower) ||
+          client?.name?.toLowerCase().includes(searchLower) ||
+          client?.email?.toLowerCase().includes(searchLower)
+        );
+      });
+
+      const total = filtered.length;
+      const totalPages = Math.ceil(total / limit);
+      const paginatedResults = filtered.slice(offset, offset + limit);
+
+      const transformedSearch: InvoiceWithClient[] = paginatedResults.map(invoice => ({
+        ...invoice,
+        client: invoice.client as Pick<Client, 'id' | 'name' | 'email' | 'company' | 'tax_id'>,
+      }));
+
+      return NextResponse.json({
+        data: transformedSearch,
+        pagination: { page, limit, total, totalPages },
+      });
+    }
+
+    // Standard query (no search) — uses DB-level pagination
     let query = supabase
       .from('invoices')
       .select(

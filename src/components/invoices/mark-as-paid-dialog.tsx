@@ -35,6 +35,7 @@ interface MarkAsPaidDialogProps {
   invoiceId: string;
   invoiceNumber: string;
   invoiceTotal: number;
+  invoiceIssueDate?: string;
   configuredMethods?: ConfiguredPaymentMethod[];
 }
 
@@ -59,6 +60,7 @@ export function MarkAsPaidDialog({
   invoiceId,
   invoiceNumber,
   invoiceTotal,
+  invoiceIssueDate,
   configuredMethods,
 }: MarkAsPaidDialogProps) {
   const [amountReceived, setAmountReceived] = useState(invoiceTotal.toString());
@@ -196,9 +198,19 @@ export function MarkAsPaidDialog({
               type="date"
               value={paymentDate}
               onChange={e => setPaymentDate(e.target.value)}
+              max={new Date().toISOString().split('T')[0]}
               required
               data-testid="payment-date-input"
             />
+            {invoiceIssueDate && paymentDate && paymentDate < invoiceIssueDate && (
+              <div
+                className="flex items-start gap-2 rounded-md border border-yellow-300 bg-yellow-50 p-2 text-sm text-yellow-800 dark:border-yellow-700 dark:bg-yellow-950/30 dark:text-yellow-400"
+                data-testid="payment-date-before-issue-warning"
+              >
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>La fecha de pago es anterior a la fecha de emisión de la factura</span>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">

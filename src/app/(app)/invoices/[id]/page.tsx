@@ -189,6 +189,7 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
           invoiceId={invoice.id}
           invoiceNumber={invoice.invoice_number}
           invoiceTotal={invoice.total}
+          invoiceIssueDate={invoice.issue_date}
           configuredMethods={invoice.payment_methods}
         />
       )}

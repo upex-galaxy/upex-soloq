@@ -24,15 +24,21 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useMarkAsPaid } from '@/hooks/invoices';
 
+interface ConfiguredPaymentMethod {
+  type: string;
+  label: string;
+}
+
 interface MarkAsPaidDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   invoiceId: string;
   invoiceNumber: string;
   invoiceTotal: number;
+  configuredMethods?: ConfiguredPaymentMethod[];
 }
 
-const PAYMENT_METHODS = [
+const ALL_PAYMENT_METHODS = [
   { value: 'bank_transfer', label: 'Transferencia Bancaria' },
   { value: 'paypal', label: 'PayPal' },
   { value: 'mercado_pago', label: 'Mercado Pago' },
@@ -53,9 +59,11 @@ export function MarkAsPaidDialog({
   invoiceId,
   invoiceNumber,
   invoiceTotal,
+  configuredMethods,
 }: MarkAsPaidDialogProps) {
   const [amountReceived, setAmountReceived] = useState(invoiceTotal.toString());
-  const [paymentMethod, setPaymentMethod] = useState('bank_transfer');
+  const defaultMethod = configuredMethods?.[0]?.type || 'bank_transfer';
+  const [paymentMethod, setPaymentMethod] = useState(defaultMethod);
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
 
@@ -154,11 +162,29 @@ export function MarkAsPaidDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {PAYMENT_METHODS.map(method => (
-                  <SelectItem key={method.value} value={method.value}>
-                    {method.label}
-                  </SelectItem>
-                ))}
+                {configuredMethods && configuredMethods.length > 0 ? (
+                  <>
+                    {configuredMethods.map(method => (
+                      <SelectItem key={method.type} value={method.type}>
+                        {method.label}
+                      </SelectItem>
+                    ))}
+                    <div className="my-1 border-t border-border" />
+                    {ALL_PAYMENT_METHODS.filter(
+                      m => !configuredMethods.some(cm => cm.type === m.value)
+                    ).map(method => (
+                      <SelectItem key={method.value} value={method.value}>
+                        {method.label}
+                      </SelectItem>
+                    ))}
+                  </>
+                ) : (
+                  ALL_PAYMENT_METHODS.map(method => (
+                    <SelectItem key={method.value} value={method.value}>
+                      {method.label}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>

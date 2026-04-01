@@ -199,6 +199,25 @@ export type PaymentMethodValue =
   | OtherPaymentValue;
 
 // =============================================================================
+// Dashboard Types
+// =============================================================================
+
+/** Dashboard summary data from GET /api/invoices/dashboard */
+export interface DashboardSummary {
+  pending_total: number;
+  overdue_total: number;
+  paid_this_month: number;
+  overdue_count: number;
+  status_counts: {
+    draft: number;
+    sent: number;
+    paid: number;
+    overdue: number;
+    cancelled: number;
+  };
+}
+
+// =============================================================================
 // Constants (for UI selects, filters, etc.)
 // =============================================================================
 

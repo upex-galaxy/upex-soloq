@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle, Loader2 } from 'lucide-react';
+import { CheckCircle, Loader2, AlertTriangle, Info } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -106,6 +106,45 @@ export function MarkAsPaidDialog({
               required
               data-testid="payment-amount-input"
             />
+            {/* Amount comparison feedback */}
+            {(() => {
+              const amount = parseFloat(amountReceived);
+              if (isNaN(amount) || amount <= 0) return null;
+
+              if (amount < invoiceTotal) {
+                return (
+                  <div
+                    className="flex items-start gap-2 rounded-md border border-yellow-300 bg-yellow-50 p-2 text-sm text-yellow-800 dark:border-yellow-700 dark:bg-yellow-950/30 dark:text-yellow-400"
+                    data-testid="payment-partial-warning"
+                  >
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>
+                      Pago parcial: {formatCurrency(amount)} de {formatCurrency(invoiceTotal)}
+                    </span>
+                  </div>
+                );
+              }
+
+              if (amount > invoiceTotal) {
+                return (
+                  <div
+                    className="flex items-start gap-2 rounded-md border border-blue-300 bg-blue-50 p-2 text-sm text-blue-800 dark:border-blue-700 dark:bg-blue-950/30 dark:text-blue-400"
+                    data-testid="payment-overpayment-notice"
+                  >
+                    <Info className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>
+                      Sobrepago: {formatCurrency(amount)} excede el total de {formatCurrency(invoiceTotal)}
+                    </span>
+                  </div>
+                );
+              }
+
+              return (
+                <p className="text-xs text-green-600" data-testid="payment-full-match">
+                  Coincide con el total de la factura
+                </p>
+              );
+            })()}
           </div>
 
           <div className="space-y-2">

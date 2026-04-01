@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Plus, FileText, AlertCircle } from 'lucide-react';
+import { Plus, FileText, AlertCircle, Search, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -44,6 +45,7 @@ import {
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useInvoices, useDashboardSummary } from '@/hooks/invoices';
+import { useDebounce } from '@/hooks/use-debounce';
 import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
 import { PaginationControls } from '@/components/invoices/pagination-controls';
 import { INVOICE_STATUS_OPTIONS, type InvoiceStatus } from '@/lib/types';
@@ -75,6 +77,8 @@ function formatDate(dateString: string | null): string {
 export default function InvoicesPage() {
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | 'all'>('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
   const { data: summary } = useDashboardSummary();
 
@@ -87,12 +91,18 @@ export default function InvoicesPage() {
     refetch,
   } = useInvoices({
     status: statusFilter === 'all' ? undefined : statusFilter,
+    search: debouncedSearch || undefined,
     page: currentPage,
     limit: 20,
   });
 
   const handleTabChange = (value: string) => {
     setStatusFilter(value as InvoiceStatus | 'all');
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
     setCurrentPage(1);
   };
 
@@ -163,6 +173,30 @@ export default function InvoicesPage() {
             ))}
           </TabsList>
         </Tabs>
+      </motion.div>
+
+      {/* Search */}
+      <motion.div variants={itemVariants}>
+        <div className="relative" data-testid="search-container">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por número, cliente o email..."
+            value={searchQuery}
+            onChange={e => handleSearchChange(e.target.value)}
+            className="pl-9 pr-9"
+            data-testid="invoice-search-input"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => handleSearchChange('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              data-testid="search-clear-button"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </motion.div>
 
       {/* Content */}

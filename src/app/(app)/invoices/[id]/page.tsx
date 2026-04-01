@@ -3,11 +3,22 @@
 import { use, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { ArrowLeft, Loader2, FileX, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, FileX, CheckCircle, Undo2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useInvoice } from '@/hooks/invoices/use-invoice';
+import { useRevertPayment } from '@/hooks/invoices';
 import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
 import { MarkAsPaidDialog } from '@/components/invoices/mark-as-paid-dialog';
 import { isInvoiceOverdue } from '@/lib/utils/overdue';
@@ -57,6 +68,8 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
 
   const { data: invoice, isLoading, isError } = useInvoice(invoiceId);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [revertDialogOpen, setRevertDialogOpen] = useState(false);
+  const revertPayment = useRevertPayment();
 
   // Loading state
   if (isLoading) {
@@ -162,16 +175,29 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
             </p>
           </div>
         </div>
-        {canMarkAsPaid && (
-          <Button
-            onClick={() => setPaymentDialogOpen(true)}
-            data-testid="mark-as-paid-button"
-            className="shadow-sm hover:shadow-md transition-shadow"
-          >
-            <CheckCircle className="mr-2 h-4 w-4" />
-            Marcar como Pagada
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {canMarkAsPaid && (
+            <Button
+              onClick={() => setPaymentDialogOpen(true)}
+              data-testid="mark-as-paid-button"
+              className="shadow-sm hover:shadow-md transition-shadow"
+            >
+              <CheckCircle className="mr-2 h-4 w-4" />
+              Marcar como Pagada
+            </Button>
+          )}
+          {invoice.status === 'paid' && (
+            <Button
+              variant="outline"
+              onClick={() => setRevertDialogOpen(true)}
+              disabled={revertPayment.isPending}
+              data-testid="revert-payment-button"
+            >
+              <Undo2 className="mr-2 h-4 w-4" />
+              Revertir Pago
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* PDF Preview Card */}
@@ -193,6 +219,35 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
           configuredMethods={invoice.payment_methods}
         />
       )}
+
+      {/* Revert Payment Confirmation Dialog */}
+      <AlertDialog open={revertDialogOpen} onOpenChange={setRevertDialogOpen}>
+        <AlertDialogContent data-testid="revert-payment-dialog">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Revertir Pago</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción revertirá el pago registrado para la factura {invoice.invoice_number}.
+              La factura volverá al estado pendiente. Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={revertPayment.isPending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                revertPayment.mutate(
+                  { invoiceId: invoice.id },
+                  { onSuccess: () => setRevertDialogOpen(false) }
+                );
+              }}
+              disabled={revertPayment.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="confirm-revert-button"
+            >
+              {revertPayment.isPending ? 'Revirtiendo...' : 'Revertir Pago'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

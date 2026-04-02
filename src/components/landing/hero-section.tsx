@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Zap, TrendingUp, Clock, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -194,9 +195,9 @@ export function HeroSection() {
             </span>
           </motion.div>
 
-          {/* Stats Grid */}
+          {/* Stats Row */}
           <motion.div
-            className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-4 md:gap-6"
+            className="mt-12 flex flex-wrap items-center justify-center gap-8 md:gap-12"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -206,20 +207,40 @@ export function HeroSection() {
               <motion.div
                 key={stat.label}
                 variants={statsVariants}
-                whileHover={{ scale: 1.05, y: -5 }}
-                className="group relative rounded-2xl border border-border/50 bg-background/60 backdrop-blur-sm p-5 md:p-6 shadow-lg hover:shadow-xl hover:border-primary/20 transition-all duration-300"
+                className="text-center"
               >
-                {/* Gradient overlay on hover */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 to-violet-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                <div className="relative">
-                  <stat.icon className="h-5 w-5 text-primary/60 mb-2" />
-                  <div className="text-2xl md:text-3xl font-bold text-foreground">{stat.value}</div>
-                  <div className="mt-1 text-xs md:text-sm text-muted-foreground">{stat.label}</div>
-                </div>
+                <div className="text-2xl md:text-3xl font-bold text-foreground">{stat.value}</div>
+                <div className="mt-1 text-xs md:text-sm text-muted-foreground">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
+        </motion.div>
+
+        {/* Dashboard Mockup Image */}
+        <motion.div
+          className="relative mt-16 md:mt-20 mx-auto max-w-5xl"
+          initial={{ opacity: 0, y: 60, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.6, ease: 'easeOut' }}
+        >
+          {/* Glow effect behind the image */}
+          <div className="absolute -inset-4 bg-gradient-to-r from-blue-500/20 via-violet-500/20 to-purple-500/20 rounded-3xl blur-2xl opacity-60" />
+
+          {/* Image container with border and shadow */}
+          <div className="relative rounded-2xl overflow-hidden border border-border/50 shadow-2xl shadow-blue-900/20">
+            <Image
+              src="/images/landing/hero-dashboard-mockup.png"
+              alt="Dashboard de SoloQ mostrando facturas, ingresos y estados de cobro"
+              width={1376}
+              height={768}
+              className="w-full h-auto"
+              priority
+              quality={90}
+            />
+
+            {/* Subtle gradient overlay at bottom */}
+            <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-background/80 to-transparent" />
+          </div>
         </motion.div>
       </div>
 

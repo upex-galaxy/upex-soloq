@@ -3,6 +3,7 @@ import {
   HeroSection,
   FeaturesBento,
   BenefitsSection,
+  RemindersSection,
   PricingSection,
   CTASection,
   Footer,
@@ -22,6 +23,9 @@ export default function HomePage() {
 
         {/* Benefits - Por qué SoloQ */}
         <BenefitsSection />
+
+        {/* Recordatorios Automáticos - Feature Pro */}
+        <RemindersSection />
 
         {/* Pricing - Transparencia total */}
         <PricingSection />

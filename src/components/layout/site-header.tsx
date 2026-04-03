@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
@@ -19,11 +20,17 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 text-white shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/30 transition-shadow">
-            <FileText className="h-4.5 w-4.5" />
-          </div>
-          <span className="font-bold text-xl">SoloQ</span>
+        <Link href="/" className="flex items-center gap-2 group">
+          <Image
+            src="/images/branding/logo-icon-only-transparent.png"
+            alt="SoloQ"
+            width={36}
+            height={36}
+            className="rounded-lg group-hover:scale-105 transition-transform"
+          />
+          <span className="font-bold text-xl bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
+            SoloQ
+          </span>
         </Link>
 
         {/* Desktop Navigation */}

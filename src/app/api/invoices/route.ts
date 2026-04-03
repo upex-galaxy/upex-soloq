@@ -321,6 +321,8 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
  * - status: InvoiceStatus (optional) - Filter by status
  * - page: number (default: 1) - Page number
  * - limit: number (default: 20, max: 50) - Items per page
+ * - sortBy: string (default: 'created_at') - Sort field
+ * - sortOrder: 'asc' | 'desc' (default: 'desc') - Sort direction
  *
  * Responses:
  * - 200: List of invoices with pagination
@@ -348,7 +350,72 @@ export async function GET(request: Request): Promise<NextResponse<ListInvoicesRe
     const limit = Math.min(50, Math.max(1, parseInt(url.searchParams.get('limit') || '20', 10)));
     const offset = (page - 1) * limit;
 
-    // Build query
+    // Sort params
+    const validSortFields = ['created_at', 'updated_at', 'issue_date', 'due_date', 'total', 'invoice_number', 'status'];
+    const sortByParam = url.searchParams.get('sortBy') || 'created_at';
+    const sortBy = validSortFields.includes(sortByParam) ? sortByParam : 'created_at';
+    const sortOrder = url.searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc';
+
+    // Search param
+    const search = url.searchParams.get('search')?.trim() || '';
+
+    // When search is active, fetch all matching invoices and filter in app layer
+    // (PostgREST doesn't support OR across joined tables natively)
+    if (search) {
+      let searchQuery = supabase
+        .from('invoices')
+        .select(
+          `
+          *,
+          client:clients!inner (
+            id,
+            name,
+            email,
+            company,
+            tax_id
+          )
+        `
+        )
+        .is('deleted_at', null)
+        .order(sortBy, { ascending: sortOrder === 'asc' });
+
+      if (status) {
+        searchQuery = searchQuery.eq('status', status);
+      }
+
+      const { data: allInvoices, error: searchError } = await searchQuery;
+
+      if (searchError) {
+        console.error('Error searching invoices:', searchError);
+        return NextResponse.json({ error: 'Error al buscar facturas' }, { status: 500 });
+      }
+
+      const searchLower = search.toLowerCase();
+      const filtered = (allInvoices || []).filter(invoice => {
+        const client = invoice.client as Pick<Client, 'id' | 'name' | 'email' | 'company' | 'tax_id'>;
+        return (
+          invoice.invoice_number?.toLowerCase().includes(searchLower) ||
+          client?.name?.toLowerCase().includes(searchLower) ||
+          client?.email?.toLowerCase().includes(searchLower)
+        );
+      });
+
+      const total = filtered.length;
+      const totalPages = Math.ceil(total / limit);
+      const paginatedResults = filtered.slice(offset, offset + limit);
+
+      const transformedSearch: InvoiceWithClient[] = paginatedResults.map(invoice => ({
+        ...invoice,
+        client: invoice.client as Pick<Client, 'id' | 'name' | 'email' | 'company' | 'tax_id'>,
+      }));
+
+      return NextResponse.json({
+        data: transformedSearch,
+        pagination: { page, limit, total, totalPages },
+      });
+    }
+
+    // Standard query (no search) — uses DB-level pagination
     let query = supabase
       .from('invoices')
       .select(
@@ -365,7 +432,7 @@ export async function GET(request: Request): Promise<NextResponse<ListInvoicesRe
         { count: 'exact' }
       )
       .is('deleted_at', null)
-      .order('updated_at', { ascending: false })
+      .order(sortBy, { ascending: sortOrder === 'asc' })
       .range(offset, offset + limit - 1);
 
     // Apply status filter if provided

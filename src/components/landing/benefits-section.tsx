@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
 import { useRef, useEffect, useState } from 'react';
 import { CheckCircle2, ArrowRight, BarChart3, TrendingUp, Clock, Zap } from 'lucide-react';
@@ -156,7 +157,7 @@ export function BenefitsSection() {
             </motion.div>
           </motion.div>
 
-          {/* Right Column - Stats Card */}
+          {/* Right Column - Visual */}
           <motion.div
             className="relative"
             initial={{ opacity: 0, x: 30 }}
@@ -168,96 +169,57 @@ export function BenefitsSection() {
             <div className="absolute -top-8 -right-8 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-violet-500/20 rounded-full blur-3xl" />
             <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 rounded-full blur-2xl" />
 
-            <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-gray-900 to-gray-800 shadow-2xl">
-              <CardContent className="p-0">
-                {/* Header with gradient */}
-                <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 p-6 md:p-8">
-                  {/* Animated shine */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                    animate={{ x: ['-200%', '200%'] }}
-                    transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
-                  />
+            <div className="relative space-y-6">
+              {/* Freelancer image */}
+              <motion.div
+                className="rounded-2xl overflow-hidden shadow-2xl border border-border/30"
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Image
+                  src="/images/landing/hero-freelancer.png"
+                  alt="Freelancer latinoamericana usando SoloQ para facturar"
+                  width={1376}
+                  height={768}
+                  className="w-full h-auto"
+                  quality={85}
+                />
+              </motion.div>
 
-                  <div className="relative flex items-center gap-4">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm shadow-lg">
-                      <BarChart3 className="h-7 w-7 text-white" />
+              {/* Floating stats card overlay */}
+              <motion.div
+                className="absolute -bottom-4 -left-4 md:-left-8"
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.6 }}
+              >
+                <Card className="border-0 bg-gradient-to-br from-gray-900 to-gray-800 shadow-2xl">
+                  <CardContent className="p-4 md:p-5">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/20">
+                        <TrendingUp className="h-5 w-5 text-emerald-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-400">Cobrado este mes</p>
+                        <p className="text-xl font-bold text-white">
+                          $<CountUp end={12450} duration={2000} /> USD
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-white/80 font-medium">Total Cobrado</p>
-                      <p className="text-3xl md:text-4xl font-bold text-white">
-                        $<CountUp end={12450} duration={2000} /> USD
-                      </p>
+                    <div className="mt-3 grid grid-cols-3 gap-3">
+                      {painPoints.map((point) => (
+                        <div key={point.label} className="text-center">
+                          <div className="text-[10px] text-gray-500 line-through">{point.before}</div>
+                          <div className="text-sm font-bold text-emerald-400">{point.after}</div>
+                          <div className="text-[10px] text-gray-400">{point.label}</div>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                </div>
-
-                {/* Stats rows */}
-                <div className="p-6 space-y-4 bg-gradient-to-b from-gray-800 to-gray-900">
-                  {/* Before/After comparison */}
-                  <div className="grid grid-cols-3 gap-3">
-                    {painPoints.map((point, index) => (
-                      <motion.div
-                        key={point.label}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.5 + index * 0.1 }}
-                        className="text-center"
-                      >
-                        <div className="text-xs text-gray-500 line-through mb-1">{point.before}</div>
-                        <div className="text-xl font-bold text-emerald-400">{point.after}</div>
-                        <div className="text-xs text-gray-400 mt-1">{point.label}</div>
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  <div className="h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent my-4" />
-
-                  {/* Metric rows */}
-                  <div className="space-y-3">
-                    <motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.6 }}
-                      className="flex justify-between items-center p-3 rounded-xl bg-gray-800/50"
-                    >
-                      <span className="text-gray-400 text-sm">Facturas enviadas</span>
-                      <span className="font-bold text-lg text-white">24</span>
-                    </motion.div>
-
-                    <motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.7 }}
-                      className="flex justify-between items-center p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20"
-                    >
-                      <span className="text-gray-400 text-sm flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4 text-emerald-400" />
-                        Pagadas a tiempo
-                      </span>
-                      <span className="font-bold text-lg text-emerald-400">87%</span>
-                    </motion.div>
-
-                    <motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.8 }}
-                      className="flex justify-between items-center p-3 rounded-xl bg-gray-800/50"
-                    >
-                      <span className="text-gray-400 text-sm flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-blue-400" />
-                        Tiempo promedio de cobro
-                      </span>
-                      <span className="font-bold text-lg text-white">12 días</span>
-                    </motion.div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
           </motion.div>
         </div>
       </div>

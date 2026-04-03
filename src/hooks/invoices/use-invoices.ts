@@ -10,10 +10,15 @@ export interface InvoiceWithClient extends Invoice {
   client: Pick<Client, 'id' | 'name' | 'email' | 'company' | 'tax_id'>;
 }
 
+type InvoiceSortField = 'created_at' | 'updated_at' | 'issue_date' | 'due_date' | 'total' | 'invoice_number' | 'status';
+
 interface UseInvoicesOptions {
   status?: InvoiceStatus;
+  search?: string;
   page?: number;
   limit?: number;
+  sortBy?: InvoiceSortField;
+  sortOrder?: 'asc' | 'desc';
 }
 
 interface PaginationInfo {
@@ -51,18 +56,21 @@ interface FetchInvoicesError {
  * const { data: drafts } = useInvoices({ status: 'draft' });
  */
 export function useInvoices(options?: UseInvoicesOptions): UseInvoicesResult {
-  const { status, page = 1, limit = 20 } = options || {};
+  const { status, search, page = 1, limit = 20, sortBy = 'created_at', sortOrder = 'desc' } = options || {};
 
   const query = useQuery<
     { invoices: InvoiceWithClient[]; pagination: PaginationInfo },
     FetchInvoicesError
   >({
-    queryKey: ['invoices', { status, page, limit }],
+    queryKey: ['invoices', { status, search, page, limit, sortBy, sortOrder }],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (status) params.set('status', status);
+      if (search) params.set('search', search);
       params.set('page', page.toString());
       params.set('limit', limit.toString());
+      params.set('sortBy', sortBy);
+      params.set('sortOrder', sortOrder);
 
       const response = await fetch(`/api/invoices?${params.toString()}`);
 

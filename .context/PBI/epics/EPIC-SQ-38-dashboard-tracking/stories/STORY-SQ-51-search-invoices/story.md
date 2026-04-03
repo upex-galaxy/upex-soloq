@@ -4,7 +4,7 @@
 **Epic:** [SQ-38](https://upexgalaxy65.atlassian.net/browse/SQ-38) (Invoice Dashboard & Tracking)
 **Priority:** Medium
 **Story Points:** 13
-**Status:** Shift-Left QA
+**Status:** Ready For QA
 
 ---
 
@@ -105,7 +105,7 @@ As a user, I want to search invoices by client or number, so that I can find a s
 ## Metadata
 
 - **Created:** 2026-01-21T01:09:31.468Z
-- **Updated:** 2026-03-29T04:51:12.143Z
+- **Updated:** 2026-04-01T05:34:55.114Z
 - **Reporter:** Ely
 - **Assignee:** Fernando Javier Masci
 - **Labels:** shift-left-reviewed, test-plan-ready
@@ -113,4 +113,4 @@ As a user, I want to search invoices by client or number, so that I can find a s
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-29T04:51:22.901Z_
+_Last sync: 2026-04-02T19:25:24.577Z_

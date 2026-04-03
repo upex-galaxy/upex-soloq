@@ -64,6 +64,45 @@
   - Workflow: `.github/workflows/jira-sync-smart.yml`
   - Modos: `repository_dispatch` (event-driven), `workflow_dispatch`, `schedule` (cada 6h)
   - Documentacion: `docs/jira-sync-automation.md`
+- Exploratory manual en staging (`https://staging-upexsoloq.vercel.app/`) detecta bloqueo de `SQ-55`:
+  - no se logra ruta alcanzable `draft -> sent` en el flujo observado,
+  - sin `sent/overdue` no aparece accion de pago (precondicion no cumplida).
+- Comentarios Jira publicados:
+  - `SQ-90` (fail smoke create->search): comment id `53286`
+  - `SQ-12` (solo un metodo preferido): comment id `53287`
+  - `SQ-55` (blocked por precondicion en staging): comment id `53289`
+  - `SQ-55` (hallazgos manuales detallados de validacion de monto): comment id `53292`
+  - `SQ-39` (impacto epic-level): comment id `53290`
+  - `SQ-51` (stream QA activo no bloqueado): comment id `53291`
+  - `SQ-51` (resultado smoke + finding no-results vs empty-state): comment id `53293`
+  - `SQ-51` (resultado exploratorio parcial + bug candidate): comment id `53294`
+  - `SQ-51` (reconciliacion reporte manual vs MCP): comment id `53295`
+  - `SQ-51` (referencia de bug creado `SQ-169`): comment id `53296`
+  - `SQ-51` (transicion de estado a `In Test`): comment id `53297`
+  - `SQ-55` (transicion de estado a `BLOCKED`): comment id `53298`
+- Se creo worktree limpio para QA desde `origin/staging`:
+  - `C:/upex-soloq-qa` en branch `qa/sq55-exploratory`
+- Se promovio `SQ-51` como stream activo no bloqueado:
+  - smoke checklist: `STORY-SQ-51-search-invoices/smoke-test.md`
+  - decision matrix: `STORY-SQ-51-search-invoices/exploratory-decision-matrix.md`
+  - tablero de ejecucion: `docs/qa-live-execution-board.md`
+- Smoke manual ejecutado con MCP en staging:
+  - `SQ-51`: PASSED (go/no-go), con hallazgo funcional en no-results vs empty-state.
+  - `SQ-55`: sigue BLOCKED por precondicion (`sent/overdue` no alcanzable para QA user).
+- Exploratory SQ-51 ejecutado con MCP:
+  - PASS en trigger de busqueda, precedencia filtro/paginacion y normalizacion de query.
+  - BUG candidate en separacion de no-results vs empty-state (`0 resultados` + heading de cuenta vacia).
+  - Bug Jira creado y vinculado: `SQ-169` (Relates -> `SQ-51`).
+- Workflow Jira verificado via API y aplicado:
+  - `SQ-51`: `Ready For QA` -> `In Test`
+  - `SQ-55`: `Ready For QA` -> `In Test` -> `BLOCKED`
+  - Desde `In Test` se confirmaron transiciones disponibles: `QA Approved`, `Ready For QA`, `BLOCKED`.
+- Estandar permanente de PR agregado al repo:
+  - Template: `.github/pull_request_template.md`
+  - Guardrails CI: `.github/workflows/pr-guardrails.yml`
+  - Helper transiciones Jira: `scripts/jira-transition.ts` + script `bun jira-transition`
+  - Guia de estados/automatizacion: `docs/jira-story-workflow-automation.md`
+- Deuda tecnica registrada: limpieza de ramas/worktrees diferida hasta cierre del hilo QA actual.
 
 ## Regla de mantenimiento
 

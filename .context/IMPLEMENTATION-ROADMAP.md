@@ -1,6 +1,6 @@
 # Implementation Roadmap - SoloQ
 
-> **Documento provisional** - Generado: 2026-02-07 | **Ultima actualizacion:** 2026-03-28
+> **Documento provisional** - Generado: 2026-02-07 | **Ultima actualizacion:** 2026-03-31
 > **Proposito:** Panorama completo del estado actual y plan de implementacion ordenado por dependencias.
 
 ---
@@ -103,14 +103,33 @@ Continua con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | SQ-44 | Include Payment Data in Email      | **Ready For QA**| Medium   | Alicia Juste             | -             | -            |
 | SQ-46 | View Email Send Confirmation       | Shift-Left QA   | Medium   | Miguel Millan            | -             | -            |
 
-### Epic: SQ-45 - Invoice Management & Tracking
+### Epic: SQ-38 - Invoice Dashboard & Tracking
 
-| Key   | Story                           | Status          | Priority | Assignee             | PR Shift-Left | PR Impl |
-| ----- | ------------------------------- | --------------- | -------- | -------------------- | ------------- | ------- |
-| SQ-47 | Dashboard with all invoices     | **Ready For Dev** | Medium | Alfonso Hernandez    | -             | -       |
-| SQ-48 | Filter invoices by status       | **Ready For Dev** | Medium | Ely                  | -             | -       |
-| SQ-51 | Search invoices by client/number| Shift-Left QA   | Medium   | Fernando Javier Masci| -             | -       |
-| SQ-55 | Record amount received          | Shift-Left QA   | Medium   | Fernando Javier Masci| -             | -       |
+| Key   | Story                              | Status            | Priority | Assignee          | PR Shift-Left  | PR Impl |
+| ----- | ---------------------------------- | ----------------- | -------- | ----------------- | -------------- | ------- |
+| SQ-47 | Dashboard with all invoices        | **Ready For Dev** | Medium   | Alfonso Hernandez | #92 (MERGED)   | -       |
+| SQ-48 | Filter invoices by status          | **Ready For Dev** | Medium   | Ely               | #92 (MERGED)   | -       |
+| SQ-49 | Total pending amount               | **Ready For Dev** | Medium   | Unassigned        | #92 (MERGED)   | -       |
+| SQ-50 | Overdue invoice highlighting       | **Ready For Dev** | Medium   | Unassigned        | #92 (MERGED)   | -       |
+| SQ-51 | Search invoices by client/number   | **Ready For Dev** | Medium   | Fernando J. Masci | #88 (MERGED)   | -       |
+| SQ-52 | Monthly income summary             | **Ready For Dev** | Medium   | Unassigned        | #92 (MERGED)   | -       |
+
+**FIP:** ✅ Created — `.context/PBI/epics/EPIC-SQ-38-dashboard-tracking/feature-implementation-plan.md`
+**Implementation Order:** SQ-47 → SQ-49 → SQ-48 → SQ-50 → SQ-51 → SQ-52
+
+### Epic: SQ-39 - Payment Tracking
+
+| Key   | Story                              | Status            | Priority | Assignee          | PR Shift-Left  | PR Impl |
+| ----- | ---------------------------------- | ----------------- | -------- | ----------------- | -------------- | ------- |
+| SQ-53 | Mark invoice as paid               | **Ready For Dev** | Medium   | Unassigned        | #93 (MERGED)   | -       |
+| SQ-54 | Record payment method              | **Ready For Dev** | Medium   | Unassigned        | #93 (MERGED)   | -       |
+| SQ-55 | Record amount received             | **Ready For Dev** | Medium   | Fernando J. Masci | #88 (MERGED)   | -       |
+| SQ-56 | Add payment notes                  | **Ready For Dev** | Medium   | Unassigned        | #93 (MERGED)   | -       |
+| SQ-57 | Record payment date                | **Ready For Dev** | Medium   | Unassigned        | #93 (MERGED)   | -       |
+| SQ-58 | Revert payment                     | **Ready For Dev** | Medium   | Unassigned        | #93 (MERGED)   | -       |
+
+**FIP:** ✅ Created — `.context/PBI/epics/EPIC-SQ-39-payment-tracking/feature-implementation-plan.md`
+**Implementation Order:** SQ-53 → SQ-55 → SQ-54 → SQ-57 → SQ-56 → SQ-58
 
 ---
 
@@ -149,17 +168,36 @@ FASE 4 - Auth & Recovery + Avanzado ✅ COMPLETADA
   21. SQ-18: View Client Invoice History ✅ (Ready For QA)
   22. SQ-43: Include PDF Attachment in Email ✅ (In Test)
   23. SQ-26: Preview Invoice Before Sending ✅ (Ready For QA)
+
+FASE 5 - Invoice Dashboard & Tracking (EPIC-SQ-38) ⏳ READY FOR DEV
+  FIP: ✅ Created | FTP: ✅ Ready | ATPs: ✅ All 6 stories
+  24. SQ-47: Dashboard with all invoices ⏳ (Ready For Dev)
+  25. SQ-49: Total pending amount ⏳ (Ready For Dev)
+  26. SQ-48: Filter invoices by status ⏳ (Ready For Dev)
+  27. SQ-50: Overdue invoice highlighting ⏳ (Ready For Dev)
+  28. SQ-51: Search invoices by client/number ⏳ (Ready For Dev)
+  29. SQ-52: Monthly income summary ⏳ (Ready For Dev)
+
+FASE 6 - Payment Tracking (EPIC-SQ-39) ⏳ READY FOR DEV
+  FIP: ✅ Created | FTP: ✅ Ready | ATPs: ✅ All 6 stories
+  30. SQ-53: Mark invoice as paid ⏳ (Ready For Dev)
+  31. SQ-55: Record amount received ⏳ (Ready For Dev)
+  32. SQ-54: Record payment method ⏳ (Ready For Dev)
+  33. SQ-57: Record payment date ⏳ (Ready For Dev)
+  34. SQ-56: Add payment notes ⏳ (Ready For Dev)
+  35. SQ-58: Revert payment ⏳ (Ready For Dev)
 ```
 
-### Metricas (2026-03-28)
+### Metricas (2026-03-31)
 
 - **Total US implementadas:** 23 (PRs mergeados en staging)
 - **US en QA Approved:** 8 (SQ-2, SQ-3, SQ-14, SQ-16, SQ-23, SQ-24, SQ-25, SQ-32)
 - **US en In Test:** 5 (SQ-4, SQ-28, SQ-30, SQ-33, SQ-43)
 - **US en Ready For QA:** 11 (listas para testing)
 - **US en BLOCKED:** 0 ✅
-- **US en Shift-Left QA:** 5 (SQ-5, SQ-34, SQ-46, SQ-51, SQ-55)
-- **US en Ready For Dev:** 3 (SQ-47, SQ-48, SQ-68)
+- **US en Shift-Left QA:** 3 (SQ-5, SQ-34, SQ-46)
+- **US en Ready For Dev:** 15 (SQ-47-52, SQ-53-58, SQ-68)
+- **FIPs creados:** 2 (SQ-38 ✅, SQ-39 ✅)
 - **Bugs OPEN:** 8
 - **Bugs Ready For QA:** 4
 - **Improvements activos:** 3 (1 OPEN, 2 Ready For QA)
@@ -203,13 +241,35 @@ SQ-31 (PDF Generation Epic)
 
 ---
 
-## Proximas US en Ready For Dev (3 disponibles)
+## Proximas US en Ready For Dev (15 disponibles)
 
-| Orden | Key   | Story                            | Status        | Assignee          |
-| ----- | ----- | -------------------------------- | ------------- | ----------------- |
-| 1     | SQ-47 | Dashboard with all invoices      | Ready For Dev | Alfonso Hernandez |
-| 2     | SQ-48 | Filter invoices by status        | Ready For Dev | Ely               |
-| 3     | SQ-68 | Validate client email deliverability | Ready For Dev | Alfonso Hernandez |
+### EPIC-SQ-38: Invoice Dashboard & Tracking (Fase 5)
+
+| Orden | Key   | Story                              | Status        | Assignee          |
+| ----- | ----- | ---------------------------------- | ------------- | ----------------- |
+| 1     | SQ-47 | Dashboard with all invoices        | Ready For Dev | Alfonso Hernandez |
+| 2     | SQ-49 | Total pending amount               | Ready For Dev | Unassigned        |
+| 3     | SQ-48 | Filter invoices by status          | Ready For Dev | Ely               |
+| 4     | SQ-50 | Overdue invoice highlighting       | Ready For Dev | Unassigned        |
+| 5     | SQ-51 | Search invoices by client/number   | Ready For Dev | Fernando J. Masci |
+| 6     | SQ-52 | Monthly income summary             | Ready For Dev | Unassigned        |
+
+### EPIC-SQ-39: Payment Tracking (Fase 6)
+
+| Orden | Key   | Story                              | Status        | Assignee          |
+| ----- | ----- | ---------------------------------- | ------------- | ----------------- |
+| 7     | SQ-53 | Mark invoice as paid               | Ready For Dev | Unassigned        |
+| 8     | SQ-55 | Record amount received             | Ready For Dev | Fernando J. Masci |
+| 9     | SQ-54 | Record payment method              | Ready For Dev | Unassigned        |
+| 10    | SQ-57 | Record payment date                | Ready For Dev | Unassigned        |
+| 11    | SQ-56 | Add payment notes                  | Ready For Dev | Unassigned        |
+| 12    | SQ-58 | Revert payment                     | Ready For Dev | Unassigned        |
+
+### Otras
+
+| Orden | Key   | Story                                    | Status        | Assignee          |
+| ----- | ----- | ---------------------------------------- | ------------- | ----------------- |
+| -     | SQ-68 | Validate client email deliverability     | Ready For Dev | Alfonso Hernandez |
 
 ---
 
@@ -255,6 +315,9 @@ SQ-31 (PDF Generation Epic)
 
 | Fecha      | Cambios                                                                                     |
 | ---------- | ------------------------------------------------------------------------------------------- |
+| 2026-03-31 | **FIPs creados**: EPIC-SQ-38 y EPIC-SQ-39. Synced a Jira con label `implementation-plan-ready`. |
+| 2026-03-31 | **Shift-Left QA completo**: 12 stories ahora Ready For Dev. PRs #92, #93 merged (ATPs).   |
+| 2026-03-31 | **Roadmap actualizado**: Fases 5 (Dashboard) y 6 (Payments) con orden de implementacion.  |
 | 2026-03-28 | **Sync Jira completa**: 7 bugs cerrados (SQ-81,86,98,99,111,121,123). 8 bugs nuevos OPEN. |
 | 2026-03-28 | **QA Approved nuevos**: SQ-2, SQ-25, SQ-32. **In Test nuevos**: SQ-33, SQ-43.             |
 | 2026-03-28 | **Ready For Dev nuevos**: SQ-47, SQ-48, SQ-68. **SQ-44**: Ready For Dev → Ready For QA.   |
@@ -269,4 +332,4 @@ SQ-31 (PDF Generation Epic)
 
 ---
 
-_Actualizado por Claude Code - 2026-03-28 (Sync completo con tablero Jira)_
+_Actualizado por Claude Code - 2026-03-31 (FIPs creados, Shift-Left completo, Roadmap Fases 5-6)_

@@ -3,10 +3,14 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Plus, FileText, AlertCircle } from 'lucide-react';
+import { Plus, FileText, AlertCircle, Search, X, CheckCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { isInvoiceOverdue, getDaysOverdue, formatDaysOverdue } from '@/lib/utils/overdue';
 
 // Animation variants
 const containerVariants = {
@@ -32,13 +36,6 @@ const itemVariants = {
   },
 };
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
   Table,
   TableBody,
   TableCell,
@@ -47,26 +44,32 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useInvoices } from '@/hooks/invoices';
+import { useInvoices, useDashboardSummary } from '@/hooks/invoices';
+import { useDebounce } from '@/hooks/use-debounce';
 import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
+import { PaginationControls } from '@/components/invoices/pagination-controls';
+import { MarkAsPaidDialog } from '@/components/invoices/mark-as-paid-dialog';
 import { INVOICE_STATUS_OPTIONS, type InvoiceStatus } from '@/lib/types';
 
-/**
- * Format currency in Mexican pesos
- */
+const STATUS_TABS: { value: InvoiceStatus | 'all'; label: string }[] = [
+  { value: 'all', label: 'Todas' },
+  { value: 'draft', label: 'Borrador' },
+  { value: 'sent', label: 'Enviada' },
+  { value: 'paid', label: 'Pagada' },
+  { value: 'overdue', label: 'Vencida' },
+];
+
+
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('es-MX', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'MXN',
+    currency: 'USD',
   }).format(amount);
 }
 
-/**
- * Format date in Spanish locale
- */
 function formatDate(dateString: string | null): string {
   if (!dateString) return '-';
-  return new Date(dateString).toLocaleDateString('es-MX', {
+  return new Date(dateString).toLocaleDateString('en-US', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -75,14 +78,54 @@ function formatDate(dateString: string | null): string {
 
 export default function InvoicesPage() {
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | 'all'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 300);
+  const [paymentInvoice, setPaymentInvoice] = useState<{
+    id: string;
+    invoice_number: string;
+    total: number;
+  } | null>(null);
+
+  const { data: summary } = useDashboardSummary();
 
   const {
     data: invoices,
+    pagination,
     isLoading,
     isError,
     error,
     refetch,
-  } = useInvoices(statusFilter === 'all' ? undefined : { status: statusFilter });
+  } = useInvoices({
+    status: statusFilter === 'all' ? undefined : statusFilter,
+    search: debouncedSearch || undefined,
+    page: currentPage,
+    limit: 20,
+  });
+
+  const handleTabChange = (value: string) => {
+    setStatusFilter(value as InvoiceStatus | 'all');
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  };
+
+  const getTabCount = (status: InvoiceStatus | 'all'): number | undefined => {
+    if (!summary) return undefined;
+    if (status === 'all') {
+      return (
+        summary.status_counts.draft +
+        summary.status_counts.sent +
+        summary.status_counts.paid +
+        summary.status_counts.overdue +
+        summary.status_counts.cancelled
+      );
+    }
+    return summary.status_counts[status];
+  };
 
   return (
     <motion.div
@@ -90,6 +133,7 @@ export default function InvoicesPage() {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
+      data-testid="invoices-page"
     >
       {/* Header */}
       <motion.div
@@ -108,24 +152,58 @@ export default function InvoicesPage() {
         </Button>
       </motion.div>
 
-      {/* Filters (TC-03) */}
-      <motion.div className="flex items-center gap-4" variants={itemVariants}>
-        <Select
+      {/* Status Tabs */}
+      <motion.div variants={itemVariants}>
+        <Tabs
           value={statusFilter}
-          onValueChange={value => setStatusFilter(value as InvoiceStatus | 'all')}
+          onValueChange={handleTabChange}
+          data-testid="status-filter-tabs"
         >
-          <SelectTrigger className="w-[180px] shadow-sm" data-testid="status-filter">
-            <SelectValue placeholder="Filtrar por estado" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos los estados</SelectItem>
-            {INVOICE_STATUS_OPTIONS.map(option => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
+          <TabsList className="shadow-sm">
+            {STATUS_TABS.map(tab => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                data-testid={`status-tab-${tab.value}`}
+              >
+                {tab.label}
+                {getTabCount(tab.value) !== undefined && (
+                  <Badge
+                    variant="secondary"
+                    className="ml-1.5 h-5 min-w-[20px] px-1.5 text-xs"
+                    data-testid={`status-count-${tab.value}`}
+                  >
+                    {getTabCount(tab.value)}
+                  </Badge>
+                )}
+              </TabsTrigger>
             ))}
-          </SelectContent>
-        </Select>
+          </TabsList>
+        </Tabs>
+      </motion.div>
+
+      {/* Search */}
+      <motion.div variants={itemVariants}>
+        <div className="relative" data-testid="search-container">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por número, cliente o email..."
+            value={searchQuery}
+            onChange={e => handleSearchChange(e.target.value)}
+            className="pl-9 pr-9"
+            data-testid="invoice-search-input"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => handleSearchChange('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              data-testid="search-clear-button"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </motion.div>
 
       {/* Content */}
@@ -140,14 +218,14 @@ export default function InvoicesPage() {
           <CardDescription>
             {isLoading
               ? 'Cargando...'
-              : `${invoices.length} factura${invoices.length !== 1 ? 's' : ''} encontrada${invoices.length !== 1 ? 's' : ''}`}
+              : `${pagination?.total ?? invoices.length} factura${(pagination?.total ?? invoices.length) !== 1 ? 's' : ''} encontrada${(pagination?.total ?? invoices.length) !== 1 ? 's' : ''}`}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {/* Loading state */}
           {isLoading && (
-            <div className="space-y-4">
-              {[1, 2, 3].map(i => (
+            <div className="space-y-4" data-testid="invoice-list-loading">
+              {[1, 2, 3, 4, 5].map(i => (
                 <div key={i} className="flex items-center space-x-4">
                   <Skeleton className="h-12 w-12 rounded" />
                   <div className="space-y-2 flex-1">
@@ -161,13 +239,13 @@ export default function InvoicesPage() {
 
           {/* Error state */}
           {isError && (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="flex flex-col items-center justify-center py-12 text-center" data-testid="invoice-list-error">
               <AlertCircle className="h-12 w-12 text-destructive/50 mb-4" />
               <h3 className="text-lg font-medium">Error al cargar facturas</h3>
               <p className="text-muted-foreground max-w-md mb-4">
                 {(error as Error)?.message || 'Ocurrió un error inesperado'}
               </p>
-              <Button variant="outline" onClick={() => refetch()}>
+              <Button variant="outline" onClick={() => refetch()} data-testid="invoice-list-retry">
                 Reintentar
               </Button>
             </div>
@@ -175,7 +253,10 @@ export default function InvoicesPage() {
 
           {/* Empty state */}
           {!isLoading && !isError && invoices.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div
+              className="flex flex-col items-center justify-center py-12 text-center"
+              data-testid="invoice-empty-state"
+            >
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
                 <FileText className="h-8 w-8 text-muted-foreground" />
               </div>
@@ -190,10 +271,10 @@ export default function InvoicesPage() {
                   : 'Intenta con otro filtro o crea una nueva factura.'}
               </p>
               {statusFilter === 'all' && (
-                <Button asChild className="shadow-sm hover:shadow-md transition-shadow">
+                <Button asChild className="shadow-sm hover:shadow-md transition-shadow" data-testid="create-first-invoice-button">
                   <Link href="/invoices/create">
                     <Plus className="mr-2 h-4 w-4" />
-                    Crear factura
+                    Crear primera factura
                   </Link>
                 </Button>
               )}
@@ -202,68 +283,130 @@ export default function InvoicesPage() {
 
           {/* Invoices table */}
           {!isLoading && !isError && invoices.length > 0 && (
-            <div className="rounded-lg border border-border/50 overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/30 hover:bg-muted/30">
-                    <TableHead className="font-semibold">Número</TableHead>
-                    <TableHead className="font-semibold">Cliente</TableHead>
-                    <TableHead className="font-semibold">Estado</TableHead>
-                    <TableHead className="text-right font-semibold">Total</TableHead>
-                    <TableHead className="font-semibold">Vencimiento</TableHead>
-                    <TableHead className="font-semibold">Actualizada</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {invoices.map(invoice => (
-                    <TableRow
-                      key={invoice.id}
-                      className="table-row-interactive cursor-pointer"
-                      data-testid={`invoice-row-${invoice.id}`}
-                    >
-                      <TableCell>
-                        <Link
-                          href={
-                            invoice.status === 'draft'
-                              ? `/invoices/${invoice.id}/edit`
-                              : `/invoices/${invoice.id}`
-                          }
-                          className="font-medium text-primary hover:underline"
-                        >
-                          {invoice.invoice_number}
-                        </Link>
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{invoice.client?.name || 'Sin cliente'}</div>
-                          {invoice.client?.company && (
-                            <div className="text-sm text-muted-foreground">
-                              {invoice.client.company}
-                            </div>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <InvoiceStatusBadge status={invoice.status ?? 'draft'} />
-                      </TableCell>
-                      <TableCell className="text-right font-medium">
-                        {formatCurrency(invoice.total ?? 0)}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {formatDate(invoice.due_date)}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {formatDate(invoice.updated_at)}
-                      </TableCell>
+            <>
+              <div className="rounded-lg border border-border/50 overflow-hidden" data-testid="invoice-list">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/30 hover:bg-muted/30">
+                      <TableHead className="font-semibold">Número</TableHead>
+                      <TableHead className="font-semibold">Cliente</TableHead>
+                      <TableHead className="font-semibold">Estado</TableHead>
+                      <TableHead className="text-right font-semibold">Total</TableHead>
+                      <TableHead className="font-semibold">Fecha</TableHead>
+                      <TableHead className="font-semibold">Vencimiento</TableHead>
+                      <TableHead className="font-semibold w-[80px]">Acción</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {invoices.map(invoice => {
+                      const overdue = isInvoiceOverdue(invoice.status, invoice.due_date);
+                      const daysOverdue = overdue ? getDaysOverdue(invoice.due_date) : 0;
+                      const effectiveStatus = overdue ? 'overdue' : (invoice.status ?? 'draft');
+
+                      return (
+                      <TableRow
+                        key={invoice.id}
+                        className={`table-row-interactive cursor-pointer ${overdue ? 'bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-950/30' : ''}`}
+                        data-testid={`invoice-row-${invoice.id}`}
+                        data-overdue={overdue || undefined}
+                      >
+                        <TableCell>
+                          <Link
+                            href={
+                              invoice.status === 'draft'
+                                ? `/invoices/${invoice.id}/edit`
+                                : `/invoices/${invoice.id}`
+                            }
+                            className="font-medium text-primary hover:underline"
+                            data-testid={`invoice-number-${invoice.id}`}
+                          >
+                            {invoice.invoice_number}
+                          </Link>
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">{invoice.client?.name || 'Sin cliente'}</div>
+                            {invoice.client?.company && (
+                              <div className="text-sm text-muted-foreground">
+                                {invoice.client.company}
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col gap-1">
+                            <InvoiceStatusBadge status={effectiveStatus as import('@/lib/types').InvoiceStatus} />
+                            {overdue && daysOverdue > 0 && (
+                              <span className="text-xs text-destructive" data-testid={`days-overdue-${invoice.id}`}>
+                                {formatDaysOverdue(daysOverdue)}
+                              </span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          {formatCurrency(invoice.total ?? 0)}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {formatDate(invoice.issue_date)}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {formatDate(invoice.due_date)}
+                        </TableCell>
+                        <TableCell>
+                          {(invoice.status === 'sent' || invoice.status === 'overdue' || overdue) && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50"
+                              onClick={() =>
+                                setPaymentInvoice({
+                                  id: invoice.id,
+                                  invoice_number: invoice.invoice_number ?? '',
+                                  total: invoice.total ?? 0,
+                                })
+                              }
+                              title="Marcar como pagada"
+                              data-testid={`quick-pay-${invoice.id}`}
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Pagination */}
+              {pagination && (
+                <PaginationControls
+                  page={pagination.page}
+                  totalPages={pagination.totalPages}
+                  total={pagination.total}
+                  limit={pagination.limit}
+                  onPageChange={setCurrentPage}
+                />
+              )}
+            </>
           )}
         </CardContent>
       </Card>
       </motion.div>
+
+      {/* Mark as Paid Dialog */}
+      {paymentInvoice && (
+        <MarkAsPaidDialog
+          open={!!paymentInvoice}
+          onOpenChange={open => {
+            if (!open) setPaymentInvoice(null);
+          }}
+          invoiceId={paymentInvoice.id}
+          invoiceNumber={paymentInvoice.invoice_number}
+          invoiceTotal={paymentInvoice.total}
+        />
+      )}
     </motion.div>
   );
 }

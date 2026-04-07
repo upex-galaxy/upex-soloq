@@ -5,6 +5,7 @@ import {
   BenefitsSection,
   RemindersSection,
   PricingSection,
+  FAQSection,
   CTASection,
   Footer,
 } from '@/components/landing';
@@ -29,6 +30,9 @@ export default function HomePage() {
 
         {/* Pricing - Transparencia total */}
         <PricingSection />
+
+        {/* FAQ - Preguntas frecuentes */}
+        <FAQSection />
 
         {/* CTA Final - El empujón final */}
         <CTASection />

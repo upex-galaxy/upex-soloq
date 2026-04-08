@@ -1,0 +1,6 @@
+[UI Setup] Starting UI authentication...
+[UI Setup] Target: /login
+❌ [SQ-XXX] loginSuccessfully - FAIL: page.waitForURL: Timeout 15000ms exceeded.
+=========================== logs ===========================
+waiting for navigation until "load"
+============================================================

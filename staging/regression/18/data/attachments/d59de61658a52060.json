@@ -1,0 +1,52 @@
+{
+  "access_token": "eyJhbGciOiJFUzI1NiIsImtpZCI6IjU3Mzg0YWVhLTI1YTAtNDc1My04OGM5LTJlYjg4YzA3MDk5MSIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2N6dXVzamNocXBndmFudmJkcm56LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyN2Y2MTlkYS01NmEwLTQ0NDItODFjYy1jYzViMmU3N2YyM2YiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzc2NDcwOTE1LCJpYXQiOjE3NzU4NjYxMTUsImVtYWlsIjoiZGVtb0Bzb2xvcS5hcHAiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsIjoiZGVtb0Bzb2xvcS5hcHAiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJzdWIiOiIyN2Y2MTlkYS01NmEwLTQ0NDItODFjYy1jYzViMmU3N2YyM2YifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc3NTg2NjExNX1dLCJzZXNzaW9uX2lkIjoiNzQyNGI3MDctNzY1OC00Nzk4LThhOTAtZjE4YTI1OGU1Njk3IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.fEcf0iAgEYJ2NFF5XbYWvbQA_slTQjIEtg9WoaTJDAs6Z1-ZiD7DXsdfEfA8F4VLTxufn6rUQs2UVwON1oNiyg",
+  "token_type": "bearer",
+  "expires_in": 604800,
+  "expires_at": 1776470915,
+  "refresh_token": "idzqvmryearp",
+  "user": {
+    "id": "27f619da-56a0-4442-81cc-cc5b2e77f23f",
+    "aud": "authenticated",
+    "role": "authenticated",
+    "email": "demo@soloq.app",
+    "email_confirmed_at": "2026-02-17T01:17:30.209698Z",
+    "phone": "",
+    "confirmed_at": "2026-02-17T01:17:30.209698Z",
+    "recovery_sent_at": "2026-03-28T19:11:40.857477Z",
+    "last_sign_in_at": "2026-04-11T00:08:35.120867719Z",
+    "app_metadata": {
+      "provider": "email",
+      "providers": [
+        "email"
+      ]
+    },
+    "user_metadata": {
+      "email": "demo@soloq.app",
+      "email_verified": true,
+      "phone_verified": false,
+      "sub": "27f619da-56a0-4442-81cc-cc5b2e77f23f"
+    },
+    "identities": [
+      {
+        "identity_id": "deef999f-7661-49de-8410-432ae71cc1da",
+        "id": "27f619da-56a0-4442-81cc-cc5b2e77f23f",
+        "user_id": "27f619da-56a0-4442-81cc-cc5b2e77f23f",
+        "identity_data": {
+          "email": "demo@soloq.app",
+          "email_verified": false,
+          "phone_verified": false,
+          "sub": "27f619da-56a0-4442-81cc-cc5b2e77f23f"
+        },
+        "provider": "email",
+        "last_sign_in_at": "2026-02-17T01:17:30.20428Z",
+        "created_at": "2026-02-17T01:17:30.204329Z",
+        "updated_at": "2026-02-17T01:17:30.204329Z",
+        "email": "demo@soloq.app"
+      }
+    ],
+    "created_at": "2026-02-17T01:17:30.173481Z",
+    "updated_at": "2026-04-11T00:08:35.123684Z",
+    "is_anonymous": false
+  },
+  "weak_password": null
+}

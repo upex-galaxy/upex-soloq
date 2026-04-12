@@ -4,7 +4,7 @@
 **Epic:** [SQ-38](https://upexgalaxy65.atlassian.net/browse/SQ-38) (Invoice Dashboard & Tracking)
 **Priority:** Medium
 **Story Points:** 13
-**Status:** Ready For QA
+**Status:** In Test
 
 ---
 
@@ -93,6 +93,14 @@ As a user, I want to search invoices by client or number, so that I can find a s
 
 ---
 
+## Traceability
+
+### Defect (1)
+
+- [SQ-169](https://upexgalaxy65.atlassian.net/browse/SQ-169): SQ-51: En búsqueda sin resultados se muestra copy de cuenta vacía en lugar de estado diferenciado de no resultados _(OPEN)_
+
+---
+
 ## Definition of Done
 
 - [ ] Implementation complete
@@ -105,7 +113,7 @@ As a user, I want to search invoices by client or number, so that I can find a s
 ## Metadata
 
 - **Created:** 2026-01-21T01:09:31.468Z
-- **Updated:** 2026-04-01T05:34:55.114Z
+- **Updated:** 2026-04-12T05:12:59.982Z
 - **Reporter:** Ely
 - **Assignee:** Fernando Javier Masci
 - **Labels:** shift-left-reviewed, test-plan-ready
@@ -113,4 +121,4 @@ As a user, I want to search invoices by client or number, so that I can find a s
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-04-02T19:25:24.577Z_
+_Last sync: 2026-04-12T15:50:28.268Z_

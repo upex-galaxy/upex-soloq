@@ -416,6 +416,96 @@ Estado: pendiente confirmacion final del equipo.
 
 ---
 
+### Fernando Javier Masci - 2026-04-03T02:02:35.257Z
+
+QA execution update: SQ-51 promoted as active non-blocked stream while SQ-55 remains blocked by staging precondition.
+
+Next actions in progress: smoke check for search path and exploratory decision matrix focused on trigger behavior, filter and pagination precedence, query normalization, and no-results versus empty-state behavior.
+
+Evidence package will include UI behavior, network request patterns, and consistency notes for PO/TL decision points.
+
+---
+
+### Fernando Javier Masci - 2026-04-03T02:28:15.080Z
+
+SQ-51 smoke execution update in staging: PASSED for go/no-go, with one important functional finding.
+
+Smoke checks passed: login, invoices access, search input visibility, exact/partial query, clear search restore, API responses 200, no console errors.
+
+Validated queries: INV-2026-20354, test client, POSTMAN.
+
+Important finding: no-results query (zzzz-not-found) shows empty-account style copy (No tienes facturas aun) instead of differentiated no-results behavior.
+
+This appears to conflict with expected no-results versus empty-state separation and should be triaged in exploratory as potential bug.
+
+Network evidence: GET /api/invoices?search=... requests returned 200 for tested queries.
+
+---
+
+### Fernando Javier Masci - 2026-04-03T02:34:35.127Z
+
+SQ-51 exploratory update (staging): partial pass with one defect candidate.
+
+PASS: search trigger works without submit (live behavior observed), filter plus pagination precedence is consistent (search keeps status filter and resets page to 1), query normalization is effective (spaced query still matches expected invoice).
+
+BUG candidate: no-results vs empty-state is not differentiated. Query zzzz-not-found shows 0 facturas encontradas but heading renders No tienes facturas aun (first-use empty-account style).
+
+Evidence: GET /api/invoices?search=INV-2026-20354 -> 200, search=test+client -> 200, search=POSTMAN -> 200, search=zzzz-not-found -> 200, status=sent&search=test+client&page=1 -> 200.
+
+Recommendation: track this as UX/functional bug linked to SQ-51 and retest after fix.
+
+---
+
+### Fernando Javier Masci - 2026-04-03T02:38:30.423Z
+
+SQ-51 reconciliation update (manual report vs MCP smoke):
+
+Scenario 1: PASS with clarification. Search box is currently exposed in /invoices (not dashboard header).
+
+Scenarios 2, 3, 4, 6: PASS (invoice number, client name, partial match, clear search).
+
+Scenario 5: functional pass (0 results returned) but UX discrepancy remains: no-results path still shows empty-account style heading.
+
+Disposition: smoke remains PASSED; keep exploratory bug candidate open for no-results vs empty-state separation.
+
+---
+
+### Fernando Javier Masci - 2026-04-03T02:40:20.727Z
+
+QA follow-up: bug created for SQ-51 no-results vs empty-state discrepancy.
+
+Bug key: SQ-169
+
+Link type: Relates
+
+Scope: search query with zero matches shows empty-account style heading instead of differentiated no-results state.
+
+Next step: prioritize fix and retest SQ-51 acceptance criterion for no-results behavior.
+
+---
+
+### Fernando Javier Masci - 2026-04-03T03:05:02.316Z
+
+QA workflow update: status transitioned from Ready For QA to In Test.
+
+Reason: smoke and exploratory execution are actively in progress.
+
+Current transitions available from In Test: QA Approved, Ready For QA, BLOCKED.
+
+---
+
+### Fernando Javier Masci - 2026-04-12T05:10:06.648Z
+
+@@Ely 
+
+QA update 2026-04-12. Trifuerza completed in this session: 
+
+- UI Playwright plus API manual plus DB read-only SQL. UI confirms no-results copy discrepancy linked to [https://upexgalaxy65.atlassian.net/browse/SQ-169#icft=SQ-169](https://upexgalaxy65.atlassian.net/browse/SQ-169#icft=SQ-169).
+- API and DB passed with no new defects.
+- Recommendation: keep In Test until [https://upexgalaxy65.atlassian.net/browse/SQ-169#icft=SQ-169](https://upexgalaxy65.atlassian.net/browse/SQ-169#icft=SQ-169) fix and retest.
+
+---
+
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-04-02T19:25:25.547Z_
+_Last sync: 2026-04-12T15:50:29.177Z_

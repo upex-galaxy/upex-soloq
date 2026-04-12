@@ -55,10 +55,11 @@ const PROFILES = {
   frontend: ['playwright', 'context7', 'tavily'],
   report: ['github', 'atlassian', 'slack'],
   docs: ['notion', 'context7', 'tavily'],
-  uitest: ['playwright', 'devtools', 'context7', 'tavily'],
+  uitest: ['playwright', 'context7', 'tavily'],
   debug: ['tavily'],
-  apitest: ['postman', 'context7'], // Add @ivotoby/openapi-mcp-server MCP when project has openapi.json
-  dbtest: ['supabase', 'context7'], // or use @bytebase/dbhub for SQL testing alternative.
+  apitest: ['postman', 'openapi', 'context7', 'tavily'],
+  dbtest: ['sql', 'context7'],
+  qatest: ['playwright', 'postman', 'openapi', 'sql', 'atlassian', 'tavily'],
   e2etest: ['playwright', 'postman', 'supabase', 'context7'],
   full: 'ALL', // Marcador especial: carga TODOS los MCPs del catálogo
 };

@@ -88,8 +88,8 @@ Ver `docs/testing/database-guide/mcp-dbhub.md` para configuración y patrones SQ
 ## Perfil MCP Builder
 
 ```bash
-node scripts/mcp-builder.js dbtest    # Incluye dbhub
-node scripts/mcp-builder.js qatest    # Incluye dbhub
+node scripts/mcp-builder.js dbtest    # Incluye sql (DBHub)
+node scripts/mcp-builder.js qatest    # Incluye sql (DBHub) + trifuerza
 ```
 
 ---

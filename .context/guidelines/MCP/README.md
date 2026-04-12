@@ -35,7 +35,7 @@ Living Data (usar MCP) vs Static Docs (leer archivo)
 | DevTools   | `devtools.md`   | Debug de tests, network, console    |
 | Postman    | `postman.md`    | API testing con colecciones         |
 | OpenAPI    | `openapi.md`    | API testing via spec (requests)     |
-| DBHub      | `dbhub.md`      | SQL queries, verificación de datos  |
+| DBHub (`sql`) | `dbhub.md`   | SQL queries, verificación de datos  |
 | Sentry     | `sentry.md`     | Errores en producción               |
 | Atlassian  | `atlassian.md`  | Jira, Confluence                    |
 | GitHub     | `github.md`     | Issues, PRs, código                 |
@@ -48,7 +48,7 @@ Living Data (usar MCP) vs Static Docs (leer archivo)
 | ---- | -------------------- | ------------------------------ |
 | UI   | `playwright`         | `docs/testing/ui-guide/`       |
 | API  | `postman`, `openapi` | `docs/testing/api-guide/`      |
-| DB   | `dbhub`              | `docs/testing/database-guide/` |
+| DB   | `sql` (DBHub)        | `docs/testing/database-guide/` |
 
 ---
 
@@ -111,16 +111,16 @@ Secundarios: github, postman, openapi
 ### QA (Testing Manual)
 
 ```
-Primarios: atlassian, playwright, postman, dbhub
+Primarios: atlassian, playwright, postman, sql
 Secundarios: openapi, tavily, slack
-Trifuerza: playwright (UI) + postman/openapi (API) + dbhub (DB)
+Trifuerza: playwright (UI) + postman/openapi (API) + sql (DBHub)
 ```
 
 ### TAE (Test Automation)
 
 ```
 Primarios: playwright, devtools, context7
-Secundarios: postman, openapi, dbhub, sentry, tavily
+Secundarios: postman, openapi, sql, sentry, tavily
 ```
 
 ---
@@ -140,10 +140,22 @@ node scripts/mcp-builder.js frontend
 
 # Solo para testing
 node scripts/mcp-builder.js uitest
-# Carga: playwright + devtools + context7 + tavily
+# Carga: playwright + context7 + tavily
+
+# API exploratory testing
+node scripts/mcp-builder.js apitest
+# Carga: postman + openapi + context7 + tavily
+
+# DB exploratory testing
+node scripts/mcp-builder.js dbtest
+# Carga: sql (DBHub) + context7
+
+# QA Trifuerza completa
+node scripts/mcp-builder.js qatest
+# Carga: playwright + postman + openapi + sql + atlassian + tavily
 ```
 
-Ver `docs/mcp-builder-strategy.md` para más detalles.
+Ver `docs/mcp/builder-strategy.md` para más detalles.
 
 ---
 

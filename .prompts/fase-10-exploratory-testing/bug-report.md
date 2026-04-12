@@ -1,4 +1,4 @@
-# Bug Report
+# Bug / Defect Report
 
 > AI-guided bug identification, retest, and complete Jira reporting with Custom Fields.
 
@@ -10,8 +10,19 @@ Identify, validate, and report defects found during exploratory testing. This pr
 
 1. **Retest the bug** to confirm it's reproducible
 2. **Document the defect** with proper evidence
-3. **Create the bug in Jira** with ALL required custom fields
+3. **Create the ticket in Jira** with correct issue type + ALL required custom fields
 4. **Attach evidence files** (screenshots, logs, etc.)
+
+### Issue Type Decision (MANDATORY)
+
+Before creating any Jira ticket, classify the finding source:
+
+| Finding Source | Jira Issue Type |
+| --- | --- |
+| Found while validating the current story scope/ACs | `Defect` |
+| Found during regression testing outside current story scope | `Bug` |
+
+**Rule:** If the finding belongs to the story under test, create `Defect` and link it to the story.
 
 **Prerequisites:**
 
@@ -356,9 +367,11 @@ Ejemplo: "CheckoutFlow: Payment: No se muestra error al ingresar contraseña inc
 I've documented the following bug:
 
 **Title:** [Title]
+**Issue Type:** [Defect/Bug]
 **Error Type:** [Error Type]
 **Severity:** [Severity]
 **Environment:** [Environment]
+**Parent Epic:** [EPIC-XXX]
 
 **Summary:** [Brief description]
 
@@ -387,6 +400,15 @@ Do you want me to:
 
 ### Phase 5: Create in Jira
 
+**Step 0: Resolve parent Epic and ticket type before create (required)**
+
+1. Get story details (`jira_get_issue`) and read parent Epic key.
+2. Decide issue type using the matrix above:
+   - Story validation finding -> `Defect`
+   - Regression finding -> `Bug`
+3. Create the issue with the resolved `issue_type`.
+4. Ensure the created ticket has `parent` Epic.
+
 **Step 1: Create the issue with all custom fields**
 
 Use the EXACT JSON structure below. Replace only the values in `[brackets]`:
@@ -397,9 +419,10 @@ Tool: mcp__atlassian__jira_create_issue
 {
   "project_key": "[PROJECT_KEY]",  // e.g., "SQ", "UPEX", "QA", etc.
   "summary": "[Formato: <EPICNAME>: <COMPONENT>: <ISSUE_SUMMARY>]",
-  "issue_type": "Bug",
+  "issue_type": "[Defect|Bug]",
   "description": "[See Jira Description Template below]",
   "additional_fields": {
+    "parent": {"key": "[EPIC-XXX]"},
     "priority": {"name": "[Highest|High|Medium|Low]"},
     "labels": ["bug", "exploratory-testing"],
 
@@ -458,6 +481,14 @@ Tool: mcp__atlassian__jira_update_issue
 
 **After creating the bug:**
 
+0. **Hard verification (required):**
+
+   - `issue_type` is correct (`Defect` for story findings, `Bug` for regression findings)
+   - `parent` Epic is present and correct
+   - Issue is linked to the tested story
+
+   If any of these is wrong, fix immediately with `jira_update_issue` before proceeding.
+
 1. **Confirm creation** with user:
 
    ```
@@ -471,7 +502,7 @@ Tool: mcp__atlassian__jira_update_issue
    ✅ Ready for QA triage
    ```
 
-2. **Link to related story** (if applicable):
+2. **Link to related story** (required for story findings):
 
    ```
    Tool: mcp__atlassian__jira_add_comment
@@ -653,6 +684,9 @@ API: Users: PUT /users/settings retorna 500 al guardar
 6. **Always confirm with human** - Avoid false positives
 7. **Fill ALL custom fields** - Incomplete reports slow down triage
 8. **Attach files when available** - Use the attachments parameter
+9. **Apply Defect vs Bug rule** - Story findings must be `Defect`
+10. **Always set parent Epic** - No orphan tickets
+11. **Verify type+parent after create** - Correct immediately if mismatch
 
 ---
 
@@ -679,9 +713,10 @@ Here's a real example of creating a bug with all fields:
 mcp__atlassian__jira_create_issue({
   "project_key": "SQ",  // Replace with actual project key
   "summary": "ClientManagement: AddClient: Email case-insensitive validation missing",
-  "issue_type": "Bug",
+  "issue_type": "Defect",
   "description": "_RESUMEN_\nEl sistema permite crear clientes duplicados cuando el email usa diferente capitalización (ej: user@email.com vs USER@email.com).\n\n----\n\n_STEPS TO REPRODUCE_\n\nh4. Crear cliente con email 'test@email.com'\n\nh4. Crear otro cliente con email 'TEST@email.com'\n\nh4. Observar que ambos clientes se crean sin error\n\n----\n\n_TECHNICAL ANALYSIS_\n\n* _Archivo:_ src/app/(app)/clients/page.tsx\n* _Función:_ handleSubmit\n* _Problema:_ Comparación de email es case-sensitive\n\n----\n\n_IMPACTO_\n\n* Usuarios pueden crear clientes duplicados accidentalmente\n* Inconsistencia en la base de datos",
   "additional_fields": {
+    "parent": {"key": "SQ-20"},
     "priority": {"name": "High"},
     "labels": ["bug", "exploratory-testing", "clients"],
     "customfield_10109": "Al intentar crear un cliente con email 'TEST@email.com' cuando ya existe 'test@email.com', el sistema lo acepta y crea un cliente duplicado.",
@@ -706,8 +741,10 @@ mcp__atlassian__jira_update_issue({
 
 ## Output
 
-- Bug documented with ALL required custom fields
-- Bug created in Jira with complete information
+- Ticket documented with ALL required custom fields
+- Ticket created in Jira with complete information
+- Correct issue type applied (`Defect` or `Bug`)
+- Parent Epic set and verified
 - Evidence files attached (if provided)
 - Related story updated with bug reference
 - Issue assigned (if specified)
@@ -723,3 +760,4 @@ mcp__atlassian__jira_update_issue({
 | "Attachment file not found"              | Verify absolute path. Ask user to confirm file location.          |
 | Bug created but some fields empty        | Check if field format is correct (string vs object).              |
 | Cannot transition to next status         | Some transitions require specific fields filled. Check workflow.  |
+| `jira_add_comment` fails (`public` + `visibility`) | Use fallback: `jira_edit_comment` on latest QA comment or `jira_update_issue` with `update.comment.add` and document fallback in final note. |

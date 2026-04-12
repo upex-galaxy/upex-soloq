@@ -1,5 +1,35 @@
 # Fase 10: Exploratory Testing
 
+## Pre-flight obligatorio (Tavily + MCPs)
+
+Ejecuta esta validacion antes de correr cualquier prompt de esta fase para asegurar que Tavily y el resto de MCPs esten disponibles.
+
+```bash
+# 1) Cargar MCPs para exploracion UI + research
+bun ai uitest
+
+# 2) Verificar MCPs y variables criticas
+bun ai:check
+
+# 3) Confirmacion rapida de key en runtime Bun
+bun -e "console.log(process.env.TAVILY_API_KEY ? 'TAVILY_API_KEY: OK' : 'TAVILY_API_KEY: MISSING')"
+```
+
+### Criterio de salida
+
+- `bun ai:check` debe mostrar `MCP: tavily` con `estado: ok`.
+- El comando Bun debe imprimir `TAVILY_API_KEY: OK`.
+- Si falla cualquiera, no iniciar Fase 10 hasta corregir.
+
+### Trifuerza completa (UI + API + DB)
+
+Si vas a ejecutar `exploratory-test.md`, `exploratory-api-test.md` y `exploratory-db-test.md` en la misma sesion:
+
+```bash
+bun ai playwright,postman,openapi,dbhub,atlassian,tavily
+bun ai:check
+```
+
 ## Purpose
 
 Execute manual exploratory testing to validate functionality and discover defects BEFORE investing in test automation.
@@ -95,6 +125,10 @@ US Status: Ready For QA
         ↓
 [3] Bug Report (if issues found)
     └── Use bug-report.md for each issue
+    └── Classify issue type before create:
+        • Story validation finding -> Defect
+        • Regression finding -> Bug
+    └── Set and verify parent Epic on created ticket
     └── Report to Jira (with human confirmation)
         ↓
 Decision: PASSED or FAILED?

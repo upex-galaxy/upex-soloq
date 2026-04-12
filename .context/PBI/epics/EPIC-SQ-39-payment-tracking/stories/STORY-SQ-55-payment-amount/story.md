@@ -4,7 +4,7 @@
 **Epic:** [SQ-39](https://upexgalaxy65.atlassian.net/browse/SQ-39) (Payment Tracking)
 **Priority:** Medium
 **Story Points:** 8
-**Status:** Shift-Left QA
+**Status:** BLOCKED
 
 ---
 
@@ -123,12 +123,12 @@ As a user, I want to record the amount received, so that I can verify against th
 ## Metadata
 
 - **Created:** 2026-01-21T01:09:36.510Z
-- **Updated:** 2026-03-29T04:51:13.491Z
+- **Updated:** 2026-04-03T03:05:03.260Z
 - **Reporter:** Ely
-- **Assignee:** Fernando Javier Masci
+- **Assignee:** Ely
 - **Labels:** shift-left-reviewed, test-plan-ready
 
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-29T04:51:24.851Z_
+_Last sync: 2026-04-03T04:44:55.425Z_

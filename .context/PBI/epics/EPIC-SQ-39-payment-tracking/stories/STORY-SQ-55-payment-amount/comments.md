@@ -443,10 +443,60 @@ Propuesta de cierre para desbloquear implementacion. Requiere confirmacion PO/De
 - Prefill: usar siempre invoice.total actual al abrir formulario; valor editable por usuario.
 - Formato UI: currency consistente con locale del negocio, persistiendo valor decimal canonico en backend.
 
-Estado: pendiente confirmacion final del equipo.
+Estado: pendiente confirmacion final del equipo.@@Ely 
+
+---
+
+### Automation for Jira - 2026-04-01T05:22:43.300Z
+
+🔎 Pull Request created. Task is pending to ANALYZE and REVIEW by the team. Waiting for PR Approval.
+
+---
+
+### Fernando Javier Masci - 2026-04-03T01:43:39.974Z
+
+@@Ely 
+
+QA exploratory update: BLOCKED by staging precondition.
+
+Environment tested manually: https://staging-upexsoloq.vercel.app/
+
+Observed behavior: invoice flow remains in draft and does not expose a reachable draft to sent path in current manual journey.
+
+Impact: Mark as paid flow cannot be executed because payment action requires sent or overdue invoice status.
+
+Already validated: this is not a credentials issue in CI (env and auth checks passed in smoke workflow).
+
+Request to owner and TL: confirm deployment alignment and provide one of these to unblock QA: exact UI steps for draft to sent in current staging, or seeded sent/overdue invoice data for QA user.
+
+QA disposition: SQ-55 remains BLOCKED until precondition is reachable in staging.
+
+Additional QA manual findings for SQ-55 in staging ([https://staging-upexsoloq.vercel.app/](https://staging-upexsoloq.vercel.app/) ):
+
+1. Full payment exact (e.g., total 1500, input 1500.00): blocked by precondition, invoice does not reach sent state in observed flow.
+
+1. Partial payment: blocked by same precondition.
+
+1. Overpayment: blocked by same precondition.
+
+1. Invalid inputs (0, 0.00, -100, abc): input control prevents invalid entries; no explicit validation message observed.
+
+1. Precision/normalization (01000, spaces, 1000.999): value is normalized to a valid number; no explicit validation message observed.
+
+Need owner/TL guidance for a reachable draft to sent route or seeded sent/overdue invoices to complete end-to-end payment validations.
+
+---
+
+### Fernando Javier Masci - 2026-04-03T03:05:03.260Z
+
+QA workflow update: status transitioned from Ready For QA to In Test and then to BLOCKED.
+
+Reason: payment flow precondition remains unreachable in current staging path (cannot reach sent or overdue state for payment validation).
+
+Unblock request remains open with TL/owner for draft to sent route or seeded sent-overdue data.
 
 ---
 
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-29T04:51:25.575Z_
+_Last sync: 2026-04-03T04:44:55.741Z_

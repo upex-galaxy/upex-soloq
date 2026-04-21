@@ -92,14 +92,16 @@ export async function GET(request: Request): Promise<NextResponse<DashboardRespo
       }
     }
 
-    // Paid this month: invoices with status 'paid' and updated_at in current month
+    // Paid this month: invoices with status 'paid' and paid_at in current month
+    // Filters out paid_at IS NULL so pre-SQ-174 historical rows do not contribute.
     const { data: paidRows, error: paidError } = await supabase
       .from('invoices')
       .select('total')
       .eq('status', 'paid')
       .is('deleted_at', null)
-      .gte('updated_at', monthStart)
-      .lte('updated_at', monthEnd);
+      .not('paid_at', 'is', null)
+      .gte('paid_at', monthStart)
+      .lte('paid_at', monthEnd);
 
     if (paidError) {
       console.error('Error fetching paid this month:', paidError);
@@ -123,8 +125,9 @@ export async function GET(request: Request): Promise<NextResponse<DashboardRespo
       .select('total')
       .eq('status', 'paid')
       .is('deleted_at', null)
-      .gte('updated_at', lastMonthStart)
-      .lte('updated_at', lastMonthEnd);
+      .not('paid_at', 'is', null)
+      .gte('paid_at', lastMonthStart)
+      .lte('paid_at', lastMonthEnd);
 
     let lastMonthPaid = 0;
     for (const row of lastMonthPaidRows || []) {
@@ -173,8 +176,9 @@ async function getMonthlyChartData(
       .select('total')
       .eq('status', 'paid')
       .is('deleted_at', null)
-      .gte('updated_at', start)
-      .lte('updated_at', end);
+      .not('paid_at', 'is', null)
+      .gte('paid_at', start)
+      .lte('paid_at', end);
 
     let total = 0;
     for (const row of rows || []) {

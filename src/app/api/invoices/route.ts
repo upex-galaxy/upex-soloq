@@ -276,6 +276,10 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
     }
 
     // Insert line items if provided (SQ-22)
+    // SQ-142: If item insert fails, delete the parent invoice to prevent a
+    // "ghost subtotal" — a persisted invoice row whose subtotal references
+    // items that never actually persisted. Previously this was a log-and-continue
+    // best-effort insert, which produced orphaned parents with divergent totals.
     let insertedItems: Pick<InvoiceItem, 'id' | 'description' | 'quantity' | 'unit_price' | 'subtotal'>[] = [];
 
     if (items.length > 0) {
@@ -294,12 +298,31 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
         .select('id, description, quantity, unit_price, subtotal');
 
       if (itemsError) {
-        console.error('Error creating invoice items:', itemsError);
-        // Invoice was created but items failed - log but don't fail the request
-        // Items can be added later via edit
-      } else {
-        insertedItems = createdItems || [];
+        console.error('Error creating invoice items (compensating parent delete):', itemsError);
+
+        // SQ-142: Compensating delete — roll back the parent insert so the
+        // invoice is not persisted with a subtotal that references nonexistent
+        // items. Items cascade on delete (FK), so any partial child row is
+        // cleaned up as well.
+        const { error: rollbackError } = await supabase
+          .from('invoices')
+          .delete()
+          .eq('id', invoice.id);
+
+        if (rollbackError) {
+          // Best-effort: log for observability. The DB trigger introduced in
+          // the accompanying migration will still recompute subtotal to 0
+          // if the orphan survives, so user-visible divergence is bounded.
+          console.error('Compensating delete failed for invoice', invoice.id, rollbackError);
+        }
+
+        return NextResponse.json(
+          { error: 'Error al crear los items de la factura. Intenta de nuevo.' },
+          { status: 500 }
+        );
       }
+
+      insertedItems = createdItems || [];
     }
 
     // Return invoice with client data and items

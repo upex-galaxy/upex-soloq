@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerFromRequest } from '@/lib/supabase/server';
+import { isInvoiceOverdue } from '@/lib/utils/overdue';
 import type { DashboardSummary, MonthlyChartData } from '@/lib/types';
 
 interface DashboardResponse {
@@ -36,10 +37,12 @@ export async function GET(request: Request): Promise<NextResponse<DashboardRespo
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    // Fetch all non-deleted invoices for aggregation (RLS scopes to user)
+    // Fetch all non-deleted invoices for aggregation (RLS scopes to user).
+    // `due_date` is required because "overdue" is DERIVED (no cron/trigger
+    // ever writes status='overdue'); see src/lib/utils/overdue.ts.
     const { data: invoices, error: queryError } = await supabase
       .from('invoices')
-      .select('total, status, issue_date, updated_at')
+      .select('total, status, issue_date, due_date, updated_at')
       .is('deleted_at', null);
 
     if (queryError) {
@@ -56,7 +59,11 @@ export async function GET(request: Request): Promise<NextResponse<DashboardRespo
     const monthStart = new Date(currentYear, currentMonth, 1).toISOString();
     const monthEnd = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59, 999).toISOString();
 
-    // Calculate aggregations
+    // Calculate aggregations.
+    //
+    // Overdue is DERIVED from (status='sent' AND due_date < today), matching
+    // `isInvoiceOverdue` used by the invoice list UI. This keeps
+    // dashboard.overdue_* and the list's red-highlighted rows in sync.
     let pendingTotal = 0;
     let overdueTotal = 0;
     let overdueCount = 0;
@@ -72,12 +79,19 @@ export async function GET(request: Request): Promise<NextResponse<DashboardRespo
     for (const row of rows) {
       const status = row.status as keyof typeof statusCounts;
       const total = row.total ?? 0;
+      const derivedOverdue = isInvoiceOverdue(row.status, row.due_date);
 
-      if (status in statusCounts) {
+      // status_counts reflects the EFFECTIVE status. A sent-but-past-due
+      // invoice counts as 'overdue', not 'sent', so the tabs on
+      // /invoices (Todas / Enviada / Vencida / ...) add up correctly.
+      if (derivedOverdue) {
+        statusCounts.overdue++;
+      } else if (status in statusCounts) {
         statusCounts[status]++;
       }
 
-      if (status === 'sent' || status === 'overdue') {
+      // Pending = unpaid & still owed = sent (incl. derived-overdue).
+      if (status === 'sent') {
         pendingTotal += total;
 
         // Monthly pending: issued this month and still sent/overdue
@@ -86,7 +100,7 @@ export async function GET(request: Request): Promise<NextResponse<DashboardRespo
         }
       }
 
-      if (status === 'overdue') {
+      if (derivedOverdue) {
         overdueTotal += total;
         overdueCount++;
       }

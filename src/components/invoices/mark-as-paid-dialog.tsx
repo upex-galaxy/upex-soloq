@@ -160,7 +160,7 @@ export function MarkAsPaidDialog({
           <div className="space-y-2">
             <Label htmlFor="payment_method">Método de Pago</Label>
             <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-              <SelectTrigger data-testid="payment-method-select">
+              <SelectTrigger id="payment_method" data-testid="payment-method-select">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

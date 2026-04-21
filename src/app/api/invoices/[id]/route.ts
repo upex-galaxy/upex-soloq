@@ -340,6 +340,11 @@ export async function PUT(
 
     if (itemsChanged && items) {
       // Delete existing items
+      // SQ-142 note: the AFTER trigger on invoice_items will recompute
+      // invoices.subtotal to 0 when the last item is deleted, keeping the
+      // subtotal invariant intact even if a subsequent failure interrupts
+      // the flow. tax_amount/total are still app-derived so we keep them
+      // consistent via the explicit UPDATE at the end of this handler.
       const { error: deleteItemsError } = await supabase
         .from('invoice_items')
         .delete()
@@ -368,6 +373,26 @@ export async function PUT(
 
         if (insertItemsError) {
           console.error('Error inserting invoice items:', insertItemsError);
+
+          // SQ-142: The old items were already deleted. To avoid leaving
+          // tax_amount/total out of sync with the now-empty items set
+          // (subtotal is already recomputed to 0 by the DB trigger), we
+          // zero out the derived totals on the parent row. This keeps the
+          // invariant subtotal = SUM(items) AND total = taxable_base + tax
+          // even in this partial-failure path.
+          const { error: syncError } = await supabase
+            .from('invoices')
+            .update({
+              tax_amount: 0,
+              total: 0,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', invoiceId);
+
+          if (syncError) {
+            console.error('Failed to sync totals after items failure', invoiceId, syncError);
+          }
+
           return NextResponse.json({ error: 'Error al actualizar los items' }, { status: 500 });
         }
 

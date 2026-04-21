@@ -107,10 +107,15 @@ export async function POST(request: Request, context: RouteContext) {
       );
     }
 
-    // Update invoice status to 'paid'
+    // Update invoice status to 'paid' and persist paid_at (SQ-174)
+    const now = new Date().toISOString();
     const { error: updateError } = await supabase
       .from('invoices')
-      .update({ status: 'paid' as const })
+      .update({
+        status: 'paid' as const,
+        paid_at: now,
+        updated_at: now,
+      })
       .eq('id', invoiceId);
 
     if (updateError) {
@@ -119,6 +124,27 @@ export async function POST(request: Request, context: RouteContext) {
         { error: 'Pago registrado pero error al actualizar estado de factura' },
         { status: 500 }
       );
+    }
+
+    // Emit 'paid' invoice event for audit/timeline history (SQ-174)
+    // Mirrors the pattern used by the send route for the 'sent' event.
+    const { error: eventError } = await supabase.from('invoice_events').insert({
+      invoice_id: invoiceId,
+      event_type: 'paid',
+      metadata: {
+        paid_at: now,
+        paid_by: user.id,
+        payment_id: payment.id,
+        amount_received,
+        payment_method,
+        payment_date,
+        reference: reference || null,
+      },
+    });
+
+    if (eventError) {
+      // Log but don't fail - event tracking is secondary to the payment itself
+      console.error('Error creating invoice event (paid):', eventError);
     }
 
     return NextResponse.json({ data: payment }, { status: 201 });

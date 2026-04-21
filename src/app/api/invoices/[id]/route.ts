@@ -8,6 +8,7 @@ import {
   calculateLineTotal,
   calculateSubtotal,
 } from '@/lib/utils/invoice-calculations';
+import { sanitizePlainText } from '@/lib/utils/sanitize';
 import type { InvoiceWithDetails } from '@/hooks/invoices/use-invoice';
 import type { Invoice, Client, DiscountType, InvoiceItem } from '@/lib/types';
 
@@ -326,12 +327,15 @@ export async function PUT(
       updates.due_date = dueDate || null;
     }
 
+    // Sanitize free-text fields at the write trust boundary (SQ-156).
+    // Strips any HTML/script payloads so the DB stores plain text only. See
+    // .context/reports/incident-SQ-156-investigation.md.
     if (notes !== undefined) {
-      updates.notes = notes || null;
+      updates.notes = notes ? sanitizePlainText(notes) || null : null;
     }
 
     if (terms !== undefined) {
-      updates.terms = terms || null;
+      updates.terms = terms ? sanitizePlainText(terms) || null : null;
     }
 
     // Handle items update (SQ-22)

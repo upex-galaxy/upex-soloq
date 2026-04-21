@@ -330,8 +330,13 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
  * - status: InvoiceStatus (optional) - Filter by status
  * - page: number (default: 1) - Page number
  * - limit: number (default: 20, max: 50) - Items per page
- * - sortBy: string (default: 'created_at') - Sort field
- * - sortOrder: 'asc' | 'desc' (default: 'desc') - Sort direction
+ * - sortBy: string (default: 'created_at') - Sort field.
+ *   Accepts: 'created_at' | 'updated_at' | 'issue_date' | 'due_date'
+ *          | 'total' | 'invoice_number' | 'status' | 'urgency'
+ *   'urgency' surfaces the most pressing invoices first (derived-overdue,
+ *   then sent & nearest due, then others). See src/lib/utils/overdue.ts.
+ * - sortOrder: 'asc' | 'desc' (default: 'desc') - Sort direction.
+ *   Ignored when sortBy='urgency' (urgency always ranks most-urgent first).
  *
  * Responses:
  * - 200: List of invoices with pagination
@@ -360,10 +365,30 @@ export async function GET(request: Request): Promise<NextResponse<ListInvoicesRe
     const offset = (page - 1) * limit;
 
     // Sort params
-    const validSortFields = ['created_at', 'updated_at', 'issue_date', 'due_date', 'total', 'invoice_number', 'status'];
+    const validSortFields = ['created_at', 'updated_at', 'issue_date', 'due_date', 'total', 'invoice_number', 'status', 'urgency'];
     const sortByParam = url.searchParams.get('sortBy') || 'created_at';
     const sortBy = validSortFields.includes(sortByParam) ? sortByParam : 'created_at';
     const sortOrder = url.searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc';
+
+    // "urgency" is a derived sort key — expand it into a deterministic,
+    // DB-level ordering: by due_date ASC (earliest-due first — which puts
+    // overdue rows at the top) with created_at DESC as a tiebreaker.
+    // Status filtering is still respected.
+    const isUrgencySort = sortBy === 'urgency';
+
+    // Helper: apply the chosen ordering to a Supabase query builder.
+    // Typed minimally so it works for both the search and standard queries.
+    type Orderable<Q> = {
+      order: (col: string, opts?: { ascending?: boolean; nullsFirst?: boolean }) => Q;
+    };
+    const applyOrdering = <Q extends Orderable<Q>>(q: Q): Q => {
+      if (isUrgencySort) {
+        return q
+          .order('due_date', { ascending: true, nullsFirst: false })
+          .order('created_at', { ascending: false });
+      }
+      return q.order(sortBy, { ascending: sortOrder === 'asc' });
+    };
 
     // Search param
     const search = url.searchParams.get('search')?.trim() || '';
@@ -385,8 +410,9 @@ export async function GET(request: Request): Promise<NextResponse<ListInvoicesRe
           )
         `
         )
-        .is('deleted_at', null)
-        .order(sortBy, { ascending: sortOrder === 'asc' });
+        .is('deleted_at', null);
+
+      searchQuery = applyOrdering(searchQuery);
 
       if (status) {
         searchQuery = searchQuery.eq('status', status);
@@ -440,9 +466,10 @@ export async function GET(request: Request): Promise<NextResponse<ListInvoicesRe
       `,
         { count: 'exact' }
       )
-      .is('deleted_at', null)
-      .order(sortBy, { ascending: sortOrder === 'asc' })
-      .range(offset, offset + limit - 1);
+      .is('deleted_at', null);
+
+    query = applyOrdering(query);
+    query = query.range(offset, offset + limit - 1);
 
     // Apply status filter if provided
     if (status) {

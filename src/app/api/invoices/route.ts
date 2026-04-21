@@ -8,6 +8,7 @@ import {
   calculateLineTotal,
   calculateSubtotal,
 } from '@/lib/utils/invoice-calculations';
+import { sanitizePlainText } from '@/lib/utils/sanitize';
 import type { Invoice, Client, InvoiceStatus, InvoiceItem } from '@/lib/types';
 
 // =============================================================================
@@ -227,6 +228,14 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
     const taxAmount = calculateTax(subtotal, discountAmount, taxRate);
     const total = calculateTotal(subtotal, discountAmount, taxAmount);
 
+    // Sanitize free-text fields at the write trust boundary (SQ-156).
+    // `notes` and `terms` are persisted verbatim and would become a stored-XSS
+    // vector the moment any future feature renders them as HTML, so we strip
+    // all HTML/script payloads here before the DB insert. See
+    // .context/reports/incident-SQ-156-investigation.md.
+    const sanitizedNotes = notes ? sanitizePlainText(notes) : null;
+    const sanitizedTerms = terms ? sanitizePlainText(terms) : null;
+
     // Create invoice with status 'draft'
     const { data: invoice, error: insertError } = await supabase
       .from('invoices')
@@ -236,8 +245,8 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
         invoice_number: invoiceNumber,
         due_date: dueDate || getDefaultDueDate(),
         status: 'draft',
-        notes: notes || null,
-        terms: terms || null,
+        notes: sanitizedNotes || null,
+        terms: sanitizedTerms || null,
         subtotal,
         tax_rate: taxRate,
         tax_amount: taxAmount,

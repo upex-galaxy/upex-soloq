@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Plus, FileText, AlertCircle, Search, X, CheckCircle, Send } from 'lucide-react';
 
@@ -52,13 +53,31 @@ import { MarkAsPaidDialog } from '@/components/invoices/mark-as-paid-dialog';
 import { SendInvoiceDialog } from '@/components/invoices/send-invoice-dialog';
 import { INVOICE_STATUS_OPTIONS, type InvoiceStatus } from '@/lib/types';
 
-const STATUS_TABS: { value: InvoiceStatus | 'all'; label: string }[] = [
+type StatusFilterValue = InvoiceStatus | 'all';
+
+const STATUS_TABS: { value: StatusFilterValue; label: string }[] = [
   { value: 'all', label: 'Todas' },
   { value: 'draft', label: 'Borrador' },
   { value: 'sent', label: 'Enviada' },
   { value: 'paid', label: 'Pagada' },
   { value: 'overdue', label: 'Vencida' },
 ];
+
+const VALID_STATUS_VALUES = new Set<StatusFilterValue>(STATUS_TABS.map(t => t.value));
+
+function parseStatusParam(raw: string | null): StatusFilterValue {
+  if (!raw) return 'all';
+  return VALID_STATUS_VALUES.has(raw as StatusFilterValue)
+    ? (raw as StatusFilterValue)
+    : 'all';
+}
+
+function parsePageParam(raw: string | null): number {
+  if (!raw) return 1;
+  const parsed = Number.parseInt(raw, 10);
+  if (!Number.isFinite(parsed) || parsed < 1) return 1;
+  return parsed;
+}
 
 
 function formatCurrency(amount: number): string {
@@ -77,11 +96,28 @@ function formatDate(dateString: string | null): string {
   });
 }
 
-export default function InvoicesPage() {
-  const [statusFilter, setStatusFilter] = useState<InvoiceStatus | 'all'>('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
+function InvoicesPageContent() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Derive filter state from URL (source of truth)
+  const statusFilter = parseStatusParam(searchParams.get('status'));
+  const urlSearch = searchParams.get('q') ?? '';
+  const currentPage = parsePageParam(searchParams.get('page'));
+
+  // Local state mirrors the search input so typing is responsive; URL is
+  // updated on debounce to keep the source of truth stable and shareable.
+  const [searchQuery, setSearchQuery] = useState<string>(urlSearch);
   const debouncedSearch = useDebounce(searchQuery, 300);
+
+  // Keep local input in sync when the URL changes externally (e.g. navigation,
+  // back/forward). We intentionally only react to external URL changes, not to
+  // our own debounced writes.
+  useEffect(() => {
+    setSearchQuery(prev => (prev === urlSearch ? prev : urlSearch));
+  }, [urlSearch]);
+
   const [paymentInvoice, setPaymentInvoice] = useState<{
     id: string;
     invoice_number: string;
@@ -95,6 +131,33 @@ export default function InvoicesPage() {
   } | null>(null);
 
   const { data: summary } = useDashboardSummary();
+
+  // Build a URL with the given patch applied on top of the current params.
+  const buildUrl = useCallback(
+    (patch: Record<string, string | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      for (const [key, value] of Object.entries(patch)) {
+        if (value === null || value === '') {
+          params.delete(key);
+        } else {
+          params.set(key, value);
+        }
+      }
+      const qs = params.toString();
+      return qs ? `${pathname}?${qs}` : pathname;
+    },
+    [pathname, searchParams]
+  );
+
+  // Propagate debounced search to URL. Resets page when the term changes.
+  useEffect(() => {
+    if (debouncedSearch === urlSearch) return;
+    const nextUrl = buildUrl({
+      q: debouncedSearch || null,
+      page: null, // reset pagination when the search term changes
+    });
+    router.replace(nextUrl, { scroll: false });
+  }, [debouncedSearch, urlSearch, buildUrl, router]);
 
   const {
     data: invoices,
@@ -111,16 +174,27 @@ export default function InvoicesPage() {
   });
 
   const handleTabChange = (value: string) => {
-    setStatusFilter(value as InvoiceStatus | 'all');
-    setCurrentPage(1);
+    const next = parseStatusParam(value);
+    const nextUrl = buildUrl({
+      status: next === 'all' ? null : next,
+      page: null, // reset pagination on filter change
+    });
+    router.replace(nextUrl, { scroll: false });
   };
 
   const handleSearchChange = (value: string) => {
+    // Only update local state here — the debounced effect above writes to URL.
     setSearchQuery(value);
-    setCurrentPage(1);
   };
 
-  const getTabCount = (status: InvoiceStatus | 'all'): number | undefined => {
+  const handlePageChange = (nextPage: number) => {
+    const nextUrl = buildUrl({
+      page: nextPage > 1 ? String(nextPage) : null,
+    });
+    router.replace(nextUrl, { scroll: false });
+  };
+
+  const getTabCount = (status: StatusFilterValue): number | undefined => {
     if (!summary) return undefined;
     if (status === 'all') {
       return (
@@ -133,6 +207,8 @@ export default function InvoicesPage() {
     }
     return summary.status_counts[status];
   };
+
+  const tabCounts = STATUS_TABS.map(tab => ({ ...tab, count: getTabCount(tab.value) }));
 
   return (
     <motion.div
@@ -167,20 +243,20 @@ export default function InvoicesPage() {
           data-testid="status-filter-tabs"
         >
           <TabsList className="shadow-sm">
-            {STATUS_TABS.map(tab => (
+            {tabCounts.map(tab => (
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
                 data-testid={`status-tab-${tab.value}`}
               >
                 {tab.label}
-                {getTabCount(tab.value) !== undefined && (
+                {tab.count !== undefined && (
                   <Badge
                     variant="secondary"
                     className="ml-1.5 h-5 min-w-[20px] px-1.5 text-xs"
                     data-testid={`status-count-${tab.value}`}
                   >
-                    {getTabCount(tab.value)}
+                    {tab.count}
                   </Badge>
                 )}
               </TabsTrigger>
@@ -412,7 +488,7 @@ export default function InvoicesPage() {
                   totalPages={pagination.totalPages}
                   total={pagination.total}
                   limit={pagination.limit}
-                  onPageChange={setCurrentPage}
+                  onPageChange={handlePageChange}
                 />
               )}
             </>
@@ -448,5 +524,15 @@ export default function InvoicesPage() {
         />
       )}
     </motion.div>
+  );
+}
+
+export default function InvoicesPage() {
+  // Suspense boundary is required because the inner component reads
+  // useSearchParams(), which opts the subtree into client-side rendering.
+  return (
+    <Suspense fallback={null}>
+      <InvoicesPageContent />
+    </Suspense>
   );
 }

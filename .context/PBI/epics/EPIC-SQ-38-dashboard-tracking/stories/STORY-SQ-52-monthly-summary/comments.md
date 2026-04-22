@@ -1,6 +1,6 @@
 # Comments for SQ-52
 
-[View in Jira](https://upexgalaxy65.atlassian.net/browse/SQ-52)
+[View in Jira](https://upexgalaxy67.atlassian.net/browse/SQ-52)
 
 ---
 
@@ -20,17 +20,17 @@
 - **Complexity:** High
 - **Key Decisions Proposed:**
 
-  1. "Total income this month" = SUM of invoices with `paid_at` in current month (confirmed payments only)
+1. "Total income this month" = SUM of invoices with `paid_at` in current month (confirmed payments only)
 
-  2. Breakdown: Paid = paid_at in month, Pending = issue_date in month with status sent/overdue
+2. Breakdown: Paid = paid_at in month, Pending = issue_date in month with status sent/overdue
 
-  3. MoM comparison based on paid income (not projected)
+3. MoM comparison based on paid income (not projected)
 
-  4. Chart shows paid income per month (bar chart)
+4. Chart shows paid income per month (bar chart)
 
-  5. Chart with < 6 months: show only available months
+5. Chart with < 6 months: show only available months
 
-  6. MoM when last month = 0: show "New" badge
+6. MoM when last month = 0: show "New" badge
 
 ### Refined Acceptance Criteria
 
@@ -79,7 +79,9 @@
 
 ### Fernando Javier Masci - 2026-04-12T18:18:03.140Z
 
-# Feature Test Plan: QA Exploratory Trifuerza + Coverage Extension - SQ-52
+@@Ely 
+
+# QA Exploratory Trifuerza + Coverage Extension - [https://upexgalaxy67.atlassian.net/browse/SQ-52#icft=SQ-52](https://upexgalaxy67.atlassian.net/browse/SQ-52#icft=SQ-52)
 
 Environment: `Staging` Date: `2026-04-12`
 
@@ -140,4 +142,4 @@ Environment: `Staging` Date: `2026-04-12`
 
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-04-12T19:36:25.538Z_
+_Last sync: 2026-04-22T05:00:14.854Z_

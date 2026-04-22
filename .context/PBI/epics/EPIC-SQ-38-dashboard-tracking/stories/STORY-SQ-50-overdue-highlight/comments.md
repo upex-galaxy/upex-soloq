@@ -1,6 +1,6 @@
 # Comments for SQ-50
 
-[View in Jira](https://upexgalaxy65.atlassian.net/browse/SQ-50)
+[View in Jira](https://upexgalaxy67.atlassian.net/browse/SQ-50)
 
 ---
 
@@ -20,13 +20,13 @@
 - **Complexity:** Medium
 - **Key Decisions Proposed:**
 
-  1. Overdue is derived (not DB status): `status='sent' AND due_date < CURRENT_DATE`
+1. Overdue is derived (not DB status): `status='sent' AND due_date < CURRENT_DATE`
 
-  2. Timezone: user's timezone for overdue calculation
+2. Timezone: user's timezone for overdue calculation
 
-  3. due_date = today is NOT overdue (strict `<`)
+3. due_date = today is NOT overdue (strict `<`)
 
-  4. Sort by urgency: overdue first (most days desc), then sent by due_date asc
+4. Sort by urgency: overdue first (most days desc), then sent by due_date asc
 
 ### Refined Acceptance Criteria
 
@@ -72,7 +72,7 @@
 
 ### Fernando Javier Masci - 2026-04-12T18:18:02.909Z
 
-# Feature Test Plan: QA Exploratory Trifuerza + Coverage Extension - SQ-50
+# Feature Test Plan: QA Exploratory Trifuerza + Coverage Extension - [https://upexgalaxy67.atlassian.net/browse/SQ-50#icft=SQ-50](https://upexgalaxy67.atlassian.net/browse/SQ-50#icft=SQ-50)
 
 Environment: `Staging` Date: `2026-04-12`
 
@@ -125,4 +125,4 @@ Environment: `Staging` Date: `2026-04-12`
 
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-04-12T19:36:25.140Z_
+_Last sync: 2026-04-22T05:00:15.314Z_

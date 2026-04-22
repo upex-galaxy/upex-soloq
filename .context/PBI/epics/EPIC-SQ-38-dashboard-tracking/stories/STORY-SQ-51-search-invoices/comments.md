@@ -1,6 +1,6 @@
 # Comments for SQ-51
 
-[View in Jira](https://upexgalaxy65.atlassian.net/browse/SQ-51)
+[View in Jira](https://upexgalaxy67.atlassian.net/browse/SQ-51)
 
 ---
 
@@ -58,10 +58,10 @@ Scenario 6: Clear search
 
 ## Table Summary
 
-| Item | Details |
+| **Item** | **Details** |
 | --- | --- |
 | Objective | Validate invoice search from the dashboard with focus on UX, correctness, performance, and data consistency. |
-| In Scope | Search box visibility, fixed header behavior, invoice_number, client.name/client.email, partial/case-insensitive match, 300ms debounce, no-results, clear search, `?search={query}`. |
+| In Scope | Search box visibility, fixed header behavior, invoice_number, client.name/client.email, partial/case-insensitive match, 300ms debounce, no-results, clear search, `?search={query`}. |
 | Out of Scope | Advanced search syntax, search by amount, search by date range, saved searches, full-text indexing. |
 | Key Risks | Ambiguous search trigger (live vs submit), precedence with filters/pagination, invalid input handling, large dataset performance. |
 | Test Types | UI, API, DB, UX, performance-functional checks. |
@@ -124,7 +124,7 @@ Acceptance Test Plan (Shift-Left) - Local Mirror actualizado.
 
 Este comentario contiene el ATP completo y las preguntas criticas pendientes para PO/Dev.
 
-```markdown
+```
 # Acceptance Test Plan: STORY-SQ-51 - Search Invoices
 
 **Fecha:** 2026-03-29
@@ -381,7 +381,6 @@ Este comentario contiene el ATP completo y las preguntas criticas pendientes par
 ---
 
 _Archivo generado para Fase 5 (Shift-Left Testing)._
-
 ```
 
 Action required: responder preguntas criticas para cerrar el ATP y habilitar implementacion.
@@ -418,7 +417,7 @@ Estado: pendiente confirmacion final del equipo.
 
 ### Fernando Javier Masci - 2026-04-03T02:02:35.257Z
 
-QA execution update: SQ-51 promoted as active non-blocked stream while SQ-55 remains blocked by staging precondition.
+QA execution update: [https://upexgalaxy67.atlassian.net/browse/SQ-51#icft=SQ-51](https://upexgalaxy67.atlassian.net/browse/SQ-51#icft=SQ-51) promoted as active non-blocked stream while [https://upexgalaxy67.atlassian.net/browse/SQ-55#icft=SQ-55](https://upexgalaxy67.atlassian.net/browse/SQ-55#icft=SQ-55) remains blocked by staging precondition.
 
 Next actions in progress: smoke check for search path and exploratory decision matrix focused on trigger behavior, filter and pagination precedence, query normalization, and no-results versus empty-state behavior.
 
@@ -428,7 +427,7 @@ Evidence package will include UI behavior, network request patterns, and consist
 
 ### Fernando Javier Masci - 2026-04-03T02:28:15.080Z
 
-SQ-51 smoke execution update in staging: PASSED for go/no-go, with one important functional finding.
+[https://upexgalaxy67.atlassian.net/browse/SQ-51#icft=SQ-51](https://upexgalaxy67.atlassian.net/browse/SQ-51#icft=SQ-51) smoke execution update in staging: PASSED for go/no-go, with one important functional finding.
 
 Smoke checks passed: login, invoices access, search input visibility, exact/partial query, clear search restore, API responses 200, no console errors.
 
@@ -444,7 +443,7 @@ Network evidence: GET /api/invoices?search=... requests returned 200 for tested 
 
 ### Fernando Javier Masci - 2026-04-03T02:34:35.127Z
 
-SQ-51 exploratory update (staging): partial pass with one defect candidate.
+[https://upexgalaxy67.atlassian.net/browse/SQ-51#icft=SQ-51](https://upexgalaxy67.atlassian.net/browse/SQ-51#icft=SQ-51) exploratory update (staging): partial pass with one defect candidate.
 
 PASS: search trigger works without submit (live behavior observed), filter plus pagination precedence is consistent (search keeps status filter and resets page to 1), query normalization is effective (spaced query still matches expected invoice).
 
@@ -452,13 +451,13 @@ BUG candidate: no-results vs empty-state is not differentiated. Query zzzz-not-f
 
 Evidence: GET /api/invoices?search=INV-2026-20354 -> 200, search=test+client -> 200, search=POSTMAN -> 200, search=zzzz-not-found -> 200, status=sent&search=test+client&page=1 -> 200.
 
-Recommendation: track this as UX/functional bug linked to SQ-51 and retest after fix.
+Recommendation: track this as UX/functional bug linked to [https://upexgalaxy67.atlassian.net/browse/SQ-51#icft=SQ-51](https://upexgalaxy67.atlassian.net/browse/SQ-51#icft=SQ-51) and retest after fix.
 
 ---
 
 ### Fernando Javier Masci - 2026-04-03T02:38:30.423Z
 
-SQ-51 reconciliation update (manual report vs MCP smoke):
+[https://upexgalaxy67.atlassian.net/browse/SQ-51#icft=SQ-51](https://upexgalaxy67.atlassian.net/browse/SQ-51#icft=SQ-51) reconciliation update (manual report vs MCP smoke):
 
 Scenario 1: PASS with clarification. Search box is currently exposed in /invoices (not dashboard header).
 
@@ -472,15 +471,15 @@ Disposition: smoke remains PASSED; keep exploratory bug candidate open for no-re
 
 ### Fernando Javier Masci - 2026-04-03T02:40:20.727Z
 
-QA follow-up: bug created for SQ-51 no-results vs empty-state discrepancy.
+QA follow-up: bug created for [https://upexgalaxy67.atlassian.net/browse/SQ-51#icft=SQ-51](https://upexgalaxy67.atlassian.net/browse/SQ-51#icft=SQ-51) no-results vs empty-state discrepancy.
 
-Bug key: SQ-169
+Bug key: [https://upexgalaxy67.atlassian.net/browse/SQ-169#icft=SQ-169](https://upexgalaxy67.atlassian.net/browse/SQ-169#icft=SQ-169)
 
 Link type: Relates
 
 Scope: search query with zero matches shows empty-account style heading instead of differentiated no-results state.
 
-Next step: prioritize fix and retest SQ-51 acceptance criterion for no-results behavior.
+Next step: prioritize fix and retest [https://upexgalaxy67.atlassian.net/browse/SQ-51#icft=SQ-51](https://upexgalaxy67.atlassian.net/browse/SQ-51#icft=SQ-51) acceptance criterion for no-results behavior.
 
 ---
 
@@ -500,12 +499,16 @@ Current transitions available from In Test: QA Approved, Ready For QA, BLOCKED.
 
 QA update 2026-04-12. Trifuerza completed in this session: 
 
-- UI Playwright plus API manual plus DB read-only SQL. UI confirms no-results copy discrepancy linked to [https://upexgalaxy65.atlassian.net/browse/SQ-169#icft=SQ-169](https://upexgalaxy65.atlassian.net/browse/SQ-169#icft=SQ-169).
+- UI Playwright plus API manual plus DB read-only SQL. UI confirms no-results copy discrepancy linked to [https://upexgalaxy67.atlassian.net/browse/SQ-169#icft=SQ-169](https://upexgalaxy67.atlassian.net/browse/SQ-169#icft=SQ-169).
 - API and DB passed with no new defects.
-- Recommendation: keep In Test until [https://upexgalaxy65.atlassian.net/browse/SQ-169#icft=SQ-169](https://upexgalaxy65.atlassian.net/browse/SQ-169#icft=SQ-169) fix and retest.
+- Recommendation: keep In Test until [https://upexgalaxy67.atlassian.net/browse/SQ-169#icft=SQ-169](https://upexgalaxy67.atlassian.net/browse/SQ-169#icft=SQ-169) fix and retest.
+
+API Testing results (Postman run 2026-04-22):
+
+- SQ-51: all API requests returned expected HTTP status; one assertion failed only due to dataset dependency (search_invoice_partial had no matching seeded invoice in the current dataset).
 
 ---
 
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-04-12T15:50:29.177Z_
+_Last sync: 2026-04-22T05:00:15.864Z_

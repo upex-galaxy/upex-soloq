@@ -4,7 +4,7 @@
 **Epic:** [SQ-39](https://upexgalaxy65.atlassian.net/browse/SQ-39) (Payment Tracking)
 **Priority:** Medium
 **Story Points:** 8
-**Status:** Shift-Left QA
+**Status:** Ready For QA
 
 ---
 
@@ -123,7 +123,7 @@ As a user, I want to record the amount received, so that I can verify against th
 ## Metadata
 
 - **Created:** 2026-01-21T01:09:36.510Z
-- **Updated:** 2026-03-29T04:51:13.491Z
+- **Updated:** 2026-04-01T05:35:02.937Z
 - **Reporter:** Ely
 - **Assignee:** Fernando Javier Masci
 - **Labels:** shift-left-reviewed, test-plan-ready
@@ -131,4 +131,4 @@ As a user, I want to record the amount received, so that I can verify against th
 ---
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-29T04:51:24.851Z_
+_Last sync: 2026-04-02T19:25:24.771Z_

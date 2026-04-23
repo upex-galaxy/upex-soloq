@@ -1,5 +1,35 @@
 # Fase 10: Exploratory Testing
 
+## Pre-flight obligatorio (Tavily + MCPs)
+
+Ejecuta esta validacion antes de correr cualquier prompt de esta fase para asegurar que Tavily y el resto de MCPs esten disponibles.
+
+```bash
+# 1) Cargar MCPs para exploracion UI + research
+bun ai uitest
+
+# 2) Verificar MCPs y variables criticas
+bun ai:check
+
+# 3) Confirmacion rapida de key en runtime Bun
+bun -e "console.log(process.env.TAVILY_API_KEY ? 'TAVILY_API_KEY: OK' : 'TAVILY_API_KEY: MISSING')"
+```
+
+### Criterio de salida
+
+- `bun ai:check` debe mostrar `MCP: tavily` con `estado: ok`.
+- El comando Bun debe imprimir `TAVILY_API_KEY: OK`.
+- Si falla cualquiera, no iniciar Fase 10 hasta corregir.
+
+### Trifuerza completa (UI + API + DB)
+
+Si vas a ejecutar `exploratory-test.md`, `exploratory-api-test.md` y `exploratory-db-test.md` en la misma sesion:
+
+```bash
+bun ai playwright,postman,openapi,sql,atlassian,tavily
+bun ai:check
+```
+
 ## Purpose
 
 Execute manual exploratory testing to validate functionality and discover defects BEFORE investing in test automation.
@@ -62,7 +92,7 @@ This phase supports **complete feature validation** through three testing layers
 | 1     | `smoke-test.md`           | Quick validation that deployment is functional | playwright       |
 | 2a    | `exploratory-test.md`     | Deep UI exploration                            | playwright       |
 | 2b    | `exploratory-api-test.md` | Deep API exploration                           | postman, openapi |
-| 2c    | `exploratory-db-test.md`  | Deep database verification                     | dbhub            |
+| 2c    | `exploratory-db-test.md`  | Deep database verification                     | sql (DBHub)      |
 | 3     | `bug-report.md`           | Report defects found (conditional)             | atlassian        |
 
 **Note:** 2a, 2b, 2c can be executed in any order or combination based on feature needs.
@@ -95,6 +125,10 @@ US Status: Ready For QA
         ↓
 [3] Bug Report (if issues found)
     └── Use bug-report.md for each issue
+    └── Classify issue type before create:
+        • Story validation finding -> Defect
+        • Regression finding -> Bug
+    └── Set and verify parent Epic on created ticket
     └── Report to Jira (with human confirmation)
         ↓
 Decision: PASSED or FAILED?
@@ -111,7 +145,7 @@ Decision: PASSED or FAILED?
 | `playwright`    | UI exploration, screenshots, interactions | smoke, exploratory |
 | `postman`       | API collections, authenticated flows      | exploratory-api    |
 | `openapi` (api) | API endpoint exploration                  | exploratory-api    |
-| `dbhub` (sql)   | SQL queries, data verification            | exploratory-db     |
+| `sql` (DBHub)   | SQL queries, data verification            | exploratory-db     |
 | `atlassian`     | Bug creation, story transitions           | bug-report         |
 
 ---

@@ -1,0 +1,70 @@
+name: PR Guardrails
+
+on:
+  pull_request:
+    branches:
+      - staging
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  validate-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate PR title and branch naming
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BRANCH: ${{ github.head_ref }}
+        run: |
+          TITLE_REGEX='^(feat|fix|test|docs|chore|refactor)\(SQ-[0-9]+([, ]*SQ-[0-9]+)*\): .+'
+          BRANCH_REGEX='^(feat|fix|test|docs|chore|refactor)/SQ-[0-9]+/.+'
+
+          if ! [[ "$PR_TITLE" =~ $TITLE_REGEX ]]; then
+            echo "❌ Invalid PR title: $PR_TITLE"
+            echo "Expected: <type>(SQ-XX): <summary>"
+            exit 1
+          fi
+
+          if ! [[ "$PR_BRANCH" =~ $BRANCH_REGEX ]]; then
+            echo "❌ Invalid branch name: $PR_BRANCH"
+            echo "Expected: <type>/SQ-XX/<short-description>"
+            exit 1
+          fi
+
+          echo "✅ Naming conventions passed"
+
+      - name: Validate PR description structure
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          REQUIRED_SECTIONS=("## Summary" "## Test Coverage" "## Jira")
+          for section in "${REQUIRED_SECTIONS[@]}"; do
+            if ! grep -Fq "$section" <<< "$PR_BODY"; then
+              echo "❌ Missing PR description section: $section"
+              exit 1
+            fi
+          done
+          echo "✅ PR description structure passed"
+
+      - name: Block sensitive files in PR
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          git fetch origin "$BASE_REF"
+          CHANGED_FILES=$(git diff --name-only "origin/$BASE_REF...$HEAD_SHA")
+          echo "$CHANGED_FILES"
+
+          if grep -E '(^|/)\.env($|\.|_)|(^|/)env\.local$|(^|/)credentials\.json$|\.pem$' <<< "$CHANGED_FILES"; then
+            echo "❌ Sensitive file detected in PR. Remove it before review."
+            exit 1
+          fi
+
+          echo "✅ Sensitive files check passed"

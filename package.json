@@ -17,6 +17,7 @@
     "email:check": "bun scripts/email-checker.js",
     "xray": "bun cli/xray/index.ts",
     "jira-sync": "bun scripts/jira-sync.ts",
+    "jira-transition": "bun scripts/jira-transition.ts",
     "qa:test": "cd qa && bun run test",
     "qa:test:e2e": "cd qa && bun run test:e2e",
     "qa:test:integration": "cd qa && bun run test:integration",

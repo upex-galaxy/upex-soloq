@@ -161,13 +161,13 @@ aicode-starter/
     │   ├── ai-driven-software-project-blueprint.md  Para: Metodologia de 14 fases
     │   └── kata-test-architecture.md   Para: Framework de testing KATA
     │
-    └── MCP Configuration (Model Context Protocol)
-        ├── mcp-config-general.md       Para: Conceptos fundamentales de MCP
-        ├── mcp-config-claudecode.md    Para: Configuracion Claude Code
-        ├── mcp-config-geminicli.md     Para: Configuracion Gemini CLI
-        ├── mcp-config-copilotcli.md    Para: Configuracion GitHub Copilot CLI
-        ├── mcp-config-vscode.md        Para: Configuracion VS Code + Copilot
-        └── mcp-builder-strategy.md     Para: Optimizacion de tokens (session-based)
+    └── mcp/                            Para: Configuracion MCP por herramienta
+        ├── README.md                   Para: Conceptos fundamentales de MCP
+        ├── builder-strategy.md         Para: Optimizacion de tokens (session-based)
+        ├── claude-code.md              Para: Configuracion Claude Code
+        ├── gemini-cli.md               Para: Configuracion Gemini CLI
+        ├── copilot-cli.md              Para: Configuracion GitHub Copilot CLI
+        └── vscode.md                   Para: Configuracion VS Code + Copilot
 ```
 
 ---
@@ -623,22 +623,22 @@ Todos los tests automation siguen KATA.
 
 **Configuracion Esencial**:
 
-1. **[MCP Builder Strategy](./docs/mcp-builder-strategy.md)** - EMPIEZA AQUI
+1. **[MCP Builder Strategy](./docs/mcp/builder-strategy.md)** - EMPIEZA AQUI
    - Solucion al "Token Hell" (reduccion 80-90% tokens)
    - Carga de MCPs por sesion/tarea
    - Setup paso a paso con templates
 
-2. **[MCP - Guia General](./docs/mcp-config-general.md)**
+2. **[MCP - Guia General](./docs/mcp/README.md)**
    - Conceptos fundamentales
    - Tipos de transporte (stdio, HTTP, SSE)
    - Seguridad y autenticacion
 
 **Configuracion por Herramienta** (elige la tuya):
 
-- **[Claude Code](./docs/mcp-config-claudecode.md)** - CLI de Anthropic
-- **[Gemini CLI](./docs/mcp-config-geminicli.md)** - CLI de Google
-- **[GitHub Copilot CLI](./docs/mcp-config-copilotcli.md)** - CLI de GitHub
-- **[VS Code + Copilot](./docs/mcp-config-vscode.md)** - Integracion en editor
+- **[Claude Code](./docs/mcp/claude-code.md)** - CLI de Anthropic
+- **[Gemini CLI](./docs/mcp/gemini-cli.md)** - CLI de Google
+- **[GitHub Copilot CLI](./docs/mcp/copilot-cli.md)** - CLI de GitHub
+- **[VS Code + Copilot](./docs/mcp/vscode.md)** - Integracion en editor
 
 **Quick Start MCP**:
 

@@ -32,7 +32,7 @@ Execute exploratory testing directly on the database to verify data integrity, v
 
 | MCP                | Purpose                         | Required |
 | ------------------ | ------------------------------- | -------- |
-| `dbhub` (sql)      | Execute SQL queries directly    | Yes      |
+| `sql` (DBHub)      | Execute SQL queries directly    | Yes      |
 | `openapi` (api)    | Execute API calls for setup     | Optional |
 | `postman`          | Execute authenticated API flows | Optional |
 | `mcp__atlassian__` | Bug creation                    | Optional |

@@ -305,9 +305,9 @@ This project uses **Context Engineering** for AI-assisted development.
 
 See [Context Engineering Guide](.context/context-engineering.md) for details.
 
-### MCP Integration
+### MCP Integration (OpenCode)
 
-Configure AI tools (Claude Code, Gemini CLI, etc.) with MCPs:
+Load only the MCPs needed for your current task:
 
 ```bash
 # Load MCPs for backend work
@@ -316,9 +316,24 @@ bun ai backend
 # Load MCPs for frontend work
 bun ai frontend
 
-# Load MCPs for testing
-bun ai testing
+# Load MCPs for UI exploratory testing
+bun ai uitest
+
+# Load MCPs for API exploratory testing
+bun ai apitest
+
+# Load MCPs for DB exploratory testing (DBHub via sql alias)
+bun ai dbtest
+
+# Load full Trifuerza for QA (UI + API + DB + Jira)
+bun ai qatest
+
+# Start OpenCode with project .env loaded
+bun run opencode
+
 ```
+
+Note: `opencode` launched directly from shell does not always load project `.env`. Use `bun run opencode` to guarantee `.env` values are injected into the OpenCode process.
 
 ---
 

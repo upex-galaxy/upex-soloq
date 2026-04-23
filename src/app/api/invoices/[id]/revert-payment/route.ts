@@ -80,10 +80,15 @@ export async function POST(request: Request, context: RouteContext) {
       }
     }
 
-    // Update invoice status
+    // Update invoice status and clear paid_at (SQ-174)
+    const now = new Date().toISOString();
     const { error: updateError } = await supabase
       .from('invoices')
-      .update({ status: newStatus })
+      .update({
+        status: newStatus,
+        paid_at: null,
+        updated_at: now,
+      })
       .eq('id', invoiceId);
 
     if (updateError) {
@@ -92,6 +97,27 @@ export async function POST(request: Request, context: RouteContext) {
         { error: 'Error al actualizar el estado de la factura' },
         { status: 500 }
       );
+    }
+
+    // Emit reverse event for audit/timeline history (SQ-174)
+    // The invoice_event_type enum does not currently include a 'reverted' or
+    // 'unpaid' value, so we emit an 'updated' event and flag the intent via
+    // metadata so the timeline can render a payment-reversal entry.
+    const { error: eventError } = await supabase.from('invoice_events').insert({
+      invoice_id: invoiceId,
+      event_type: 'updated',
+      metadata: {
+        action: 'payment_reverted',
+        reverted_at: now,
+        reverted_by: user.id,
+        previous_status: 'paid',
+        new_status: newStatus,
+      },
+    });
+
+    if (eventError) {
+      // Log but don't fail - event tracking is secondary to the revert itself
+      console.error('Error creating invoice event (payment_reverted):', eventError);
     }
 
     return NextResponse.json({

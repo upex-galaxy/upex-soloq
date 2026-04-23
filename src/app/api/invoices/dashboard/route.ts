@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerFromRequest } from '@/lib/supabase/server';
+import { isInvoiceOverdue } from '@/lib/utils/overdue';
 import type { DashboardSummary, MonthlyChartData } from '@/lib/types';
 
 interface DashboardResponse {
@@ -36,10 +37,12 @@ export async function GET(request: Request): Promise<NextResponse<DashboardRespo
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    // Fetch all non-deleted invoices for aggregation (RLS scopes to user)
+    // Fetch all non-deleted invoices for aggregation (RLS scopes to user).
+    // `due_date` is required because "overdue" is DERIVED (no cron/trigger
+    // ever writes status='overdue'); see src/lib/utils/overdue.ts.
     const { data: invoices, error: queryError } = await supabase
       .from('invoices')
-      .select('total, status, issue_date, updated_at')
+      .select('total, status, issue_date, due_date, updated_at')
       .is('deleted_at', null);
 
     if (queryError) {
@@ -56,7 +59,11 @@ export async function GET(request: Request): Promise<NextResponse<DashboardRespo
     const monthStart = new Date(currentYear, currentMonth, 1).toISOString();
     const monthEnd = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59, 999).toISOString();
 
-    // Calculate aggregations
+    // Calculate aggregations.
+    //
+    // Overdue is DERIVED from (status='sent' AND due_date < today), matching
+    // `isInvoiceOverdue` used by the invoice list UI. This keeps
+    // dashboard.overdue_* and the list's red-highlighted rows in sync.
     let pendingTotal = 0;
     let overdueTotal = 0;
     let overdueCount = 0;
@@ -72,12 +79,19 @@ export async function GET(request: Request): Promise<NextResponse<DashboardRespo
     for (const row of rows) {
       const status = row.status as keyof typeof statusCounts;
       const total = row.total ?? 0;
+      const derivedOverdue = isInvoiceOverdue(row.status, row.due_date);
 
-      if (status in statusCounts) {
+      // status_counts reflects the EFFECTIVE status. A sent-but-past-due
+      // invoice counts as 'overdue', not 'sent', so the tabs on
+      // /invoices (Todas / Enviada / Vencida / ...) add up correctly.
+      if (derivedOverdue) {
+        statusCounts.overdue++;
+      } else if (status in statusCounts) {
         statusCounts[status]++;
       }
 
-      if (status === 'sent' || status === 'overdue') {
+      // Pending = unpaid & still owed = sent (incl. derived-overdue).
+      if (status === 'sent') {
         pendingTotal += total;
 
         // Monthly pending: issued this month and still sent/overdue
@@ -86,20 +100,22 @@ export async function GET(request: Request): Promise<NextResponse<DashboardRespo
         }
       }
 
-      if (status === 'overdue') {
+      if (derivedOverdue) {
         overdueTotal += total;
         overdueCount++;
       }
     }
 
-    // Paid this month: invoices with status 'paid' and updated_at in current month
+    // Paid this month: invoices with status 'paid' and paid_at in current month
+    // Filters out paid_at IS NULL so pre-SQ-174 historical rows do not contribute.
     const { data: paidRows, error: paidError } = await supabase
       .from('invoices')
       .select('total')
       .eq('status', 'paid')
       .is('deleted_at', null)
-      .gte('updated_at', monthStart)
-      .lte('updated_at', monthEnd);
+      .not('paid_at', 'is', null)
+      .gte('paid_at', monthStart)
+      .lte('paid_at', monthEnd);
 
     if (paidError) {
       console.error('Error fetching paid this month:', paidError);
@@ -123,8 +139,9 @@ export async function GET(request: Request): Promise<NextResponse<DashboardRespo
       .select('total')
       .eq('status', 'paid')
       .is('deleted_at', null)
-      .gte('updated_at', lastMonthStart)
-      .lte('updated_at', lastMonthEnd);
+      .not('paid_at', 'is', null)
+      .gte('paid_at', lastMonthStart)
+      .lte('paid_at', lastMonthEnd);
 
     let lastMonthPaid = 0;
     for (const row of lastMonthPaidRows || []) {
@@ -173,8 +190,9 @@ async function getMonthlyChartData(
       .select('total')
       .eq('status', 'paid')
       .is('deleted_at', null)
-      .gte('updated_at', start)
-      .lte('updated_at', end);
+      .not('paid_at', 'is', null)
+      .gte('paid_at', start)
+      .lte('paid_at', end);
 
     let total = 0;
     for (const row of rows || []) {

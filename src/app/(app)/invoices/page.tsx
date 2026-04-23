@@ -209,6 +209,8 @@ function InvoicesPageContent() {
   };
 
   const tabCounts = STATUS_TABS.map(tab => ({ ...tab, count: getTabCount(tab.value) }));
+  const hasSearch = debouncedSearch.trim().length > 0;
+  const hasStatusFilter = statusFilter !== 'all';
 
   return (
     <motion.div
@@ -338,28 +340,62 @@ function InvoicesPageContent() {
           {!isLoading && !isError && invoices.length === 0 && (
             <div
               className="flex flex-col items-center justify-center py-12 text-center"
-              data-testid="invoice-empty-state"
+              data-testid={hasSearch ? 'invoice-no-results-state' : 'invoice-empty-state'}
             >
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
-                <FileText className="h-8 w-8 text-muted-foreground" />
+                {hasSearch ? (
+                  <Search className="h-8 w-8 text-muted-foreground" />
+                ) : (
+                  <FileText className="h-8 w-8 text-muted-foreground" />
+                )}
               </div>
-              <h3 className="text-lg font-medium">
-                {statusFilter === 'all'
-                  ? 'No tienes facturas aún'
-                  : `No hay facturas en estado "${INVOICE_STATUS_OPTIONS.find(o => o.value === statusFilter)?.label}"`}
-              </h3>
-              <p className="text-muted-foreground max-w-md mb-4">
-                {statusFilter === 'all'
-                  ? 'Crea tu primera factura para comenzar a facturar a tus clientes.'
-                  : 'Intenta con otro filtro o crea una nueva factura.'}
-              </p>
-              {statusFilter === 'all' && (
-                <Button asChild className="shadow-sm hover:shadow-md transition-shadow" data-testid="create-first-invoice-button">
-                  <Link href="/invoices/create">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Crear primera factura
-                  </Link>
-                </Button>
+
+              {hasSearch ? (
+                <>
+                  <h3 className="text-lg font-medium">No se encontraron facturas</h3>
+                  <p className="text-muted-foreground max-w-md mb-4">
+                    No hay resultados para &ldquo;{debouncedSearch}&rdquo;
+                    {hasStatusFilter
+                      ? ` en estado "${INVOICE_STATUS_OPTIONS.find(o => o.value === statusFilter)?.label}"`
+                      : ''}
+                    . Intenta con otros términos o revisa los filtros.
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleSearchChange('')}
+                    data-testid="invoice-clear-search-button"
+                  >
+                    Limpiar búsqueda
+                  </Button>
+                </>
+              ) : hasStatusFilter ? (
+                <>
+                  <h3 className="text-lg font-medium">
+                    No hay facturas en estado &ldquo;
+                    {INVOICE_STATUS_OPTIONS.find(o => o.value === statusFilter)?.label}
+                    &rdquo;
+                  </h3>
+                  <p className="text-muted-foreground max-w-md mb-4">
+                    Intenta con otro filtro o crea una nueva factura.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h3 className="text-lg font-medium">No tienes facturas aún</h3>
+                  <p className="text-muted-foreground max-w-md mb-4">
+                    Crea tu primera factura para comenzar a facturar a tus clientes.
+                  </p>
+                  <Button
+                    asChild
+                    className="shadow-sm hover:shadow-md transition-shadow"
+                    data-testid="create-first-invoice-button"
+                  >
+                    <Link href="/invoices/create">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Crear primera factura
+                    </Link>
+                  </Button>
+                </>
               )}
             </div>
           )}

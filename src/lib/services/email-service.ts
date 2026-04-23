@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { escapeHtml as escapeHtmlShared } from '@/lib/utils/sanitize';
 
 // =============================================================================
 // Constants
@@ -70,16 +71,11 @@ function getResendClient(): Resend | null {
 // =============================================================================
 
 /**
- * Escape HTML special characters to prevent XSS
+ * Escape HTML special characters to prevent XSS.
+ * Re-exported from the shared sanitize util so email templates and any other
+ * HTML interpolation site share a single implementation. See SQ-156.
  */
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
+const escapeHtml = (text: string): string => escapeHtmlShared(text);
 
 /**
  * Format a single payment method as HTML (SQ-44)
@@ -162,29 +158,39 @@ function generateInvoiceEmailHtml(params: {
   // Generate payment methods section (SQ-44)
   const paymentMethodsSection = generatePaymentMethodsSectionHtml(paymentMethods);
 
+  // Escape user-controlled values before interpolating into the HTML template.
+  // Defense-in-depth for SQ-156: even though notes/terms are sanitized at the
+  // write boundary, clientName / businessName / invoiceNumber come from
+  // user-entered records and must not be trusted as HTML here.
+  const safeClientName = escapeHtml(clientName);
+  const safeInvoiceNumber = escapeHtml(invoiceNumber);
+  const safeTotal = escapeHtml(total);
+  const safeDueDate = escapeHtml(dueDate);
+  const safeBusinessName = escapeHtml(businessName);
+
   return `
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Factura ${invoiceNumber}</title>
+  <title>Factura ${safeInvoiceNumber}</title>
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
   <div style="background-color: #f9fafb; border-radius: 8px; padding: 32px; margin-bottom: 24px;">
-    <h1 style="color: #6366f1; margin: 0 0 8px 0; font-size: 24px;">${businessName}</h1>
+    <h1 style="color: #6366f1; margin: 0 0 8px 0; font-size: 24px;">${safeBusinessName}</h1>
     <p style="color: #6b7280; margin: 0; font-size: 14px;">Factura adjunta</p>
   </div>
 
-  <p style="margin-bottom: 16px;">Hola <strong>${clientName}</strong>,</p>
+  <p style="margin-bottom: 16px;">Hola <strong>${safeClientName}</strong>,</p>
 
   <p style="margin-bottom: 24px;">
-    Te enviamos la factura <strong>${invoiceNumber}</strong> por un total de <strong>${total}</strong>.
+    Te enviamos la factura <strong>${safeInvoiceNumber}</strong> por un total de <strong>${safeTotal}</strong>.
   </p>
 
   <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin-bottom: 24px; border-radius: 0 8px 8px 0;">
     <p style="margin: 0; color: #92400e;">
-      <strong>Fecha de vencimiento:</strong> ${dueDate}
+      <strong>Fecha de vencimiento:</strong> ${safeDueDate}
     </p>
   </div>
 
@@ -201,7 +207,7 @@ function generateInvoiceEmailHtml(params: {
   <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
 
   <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-    Este correo fue enviado desde <strong>${businessName}</strong> usando SoloQ.
+    Este correo fue enviado desde <strong>${safeBusinessName}</strong> usando SoloQ.
   </p>
 </body>
 </html>

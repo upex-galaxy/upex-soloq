@@ -115,7 +115,7 @@ Before using these prompts:
 
 1. **Tests documented in TMS** (Stage 4 completed)
 2. **Tests marked as "automation-candidate"**
-3. **KATA architecture configured** (see `.prompts/setup/kata-architecture-adaptation.md`)
+3. **KATA architecture configured** (see `.prompts/setup/test-framework-adaptation.md`)
 
 ### Context Files Required
 

@@ -263,7 +263,7 @@ Los orquestadores manejan flujos multi-paso despachando subagentes. Cargarlos di
 
 | Archivo                   | Proposito                                     |
 | ------------------------- | --------------------------------------------- |
-| `kata-framework-setup.md` | Setup inicial o refactoring de KATA framework |
+| `monorepo-for-qa-setup.md` | Setup inicial o refactoring de KATA framework |
 
 **IMPORTANTE:**
 
@@ -323,7 +323,7 @@ Los orquestadores manejan flujos multi-paso despachando subagentes. Cargarlos di
 
 | Archivo                   | Proposito                                                      |
 | ------------------------- | -------------------------------------------------------------- |
-| `kata-framework-setup.md` | Setup inicial o refactoring de KATA framework                  |
+| `monorepo-for-qa-setup.md` | Setup inicial o refactoring de KATA framework                  |
 | `business-data-map.md`    | Mapa maestro: flujos de negocio, state machines, integraciones |
 | `project-dev-guide.md`    | Guía de desarrollo basada en el Business Data Map              |
 | `project-test-guide.md`   | Guía de testing basada en el Business Data Map                 |

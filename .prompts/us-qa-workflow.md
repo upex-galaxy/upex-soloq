@@ -571,7 +571,7 @@ Generate the progress tracking structure below using the ticket metadata from se
 
 ### Utilities
 
-- `.prompts/setup/kata-architecture-adaptation.md` - Framework adaptation
+- `.prompts/setup/test-framework-adaptation.md` - Framework adaptation
 - `.prompts/utilities/git-flow.md` - Git workflow
 
 ---

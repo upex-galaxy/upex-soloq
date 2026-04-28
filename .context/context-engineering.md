@@ -132,7 +132,7 @@ aicode-starter/
 │   │
 │   ├── fase-12-test-automation/        Para: Automation con KATA framework
 │   │   ├── README.md                   Para: Guia de la fase
-│   │   ├── kata-framework-setup.md     Para: Setup inicial KATA
+│   │   ├── monorepo-for-qa-setup.md     Para: Setup inicial KATA
 │   │   ├── automation-e2e-test.md      Para: Implementar tests E2E
 │   │   └── automation-integration-test.md Para: Implementar tests API
 │   │
@@ -348,7 +348,7 @@ Usar: .prompts/fase-12-test-automation/
 Arquitectura: KATA Architecture
 
 Flujo:
-1. kata-framework-setup.md         → Setup inicial (primera vez)
+1. monorepo-for-qa-setup.md         → Setup inicial (primera vez)
 2. automation-integration-test.md  → Implementar tests API
 3. automation-e2e-test.md          → Implementar tests E2E
 

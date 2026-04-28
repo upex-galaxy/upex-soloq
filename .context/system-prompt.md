@@ -133,7 +133,7 @@ Nota: Usa gh (CLI de GitHub) para crear PR, hacer reviews, y todo lo relacionado
 ├── git-flow.md                    # Workflow completo de git (branching, merging, etc.)
 ├── us-dev-workflow.md             # Workflow completo de desarrollo
 ├── us-qa-workflow.md              # Workflow completo de testing QA/TAE
-├── kata-framework-setup.md        # Setup inicial o refactoring de KATA framework (test automation)
+├── monorepo-for-qa-setup.md        # Setup inicial o refactoring de KATA framework (test automation)
 └── fase-X-.../                    # Prompts por fase
 ```
 

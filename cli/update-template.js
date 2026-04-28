@@ -136,6 +136,30 @@ const SCRIPTS_FILES = [
   'check-jira-setup.ts',
 ];
 
+// Files removed from the template (renamed or replaced). On `up`, these are
+// deleted from the consumer's repo if present. The pre-update backup captures
+// them, so `--rollback` restores them if needed.
+//
+// When you rename or remove a file from the template, add an entry here with:
+//   - path:            relative path of the OLD file
+//   - component:       component name from validCommands (scopes the cleanup)
+//   - reason:          short note (where the content moved, or why it was removed)
+//   - deprecatedSince: ISO date (helps users gauge how long ago this happened)
+const DEPRECATED_FILES = [
+  {
+    path: '.prompts/setup/kata-framework-setup.md',
+    component: 'prompts',
+    reason: 'renamed to monorepo-for-qa-setup.md',
+    deprecatedSince: '2026-04-28',
+  },
+  {
+    path: '.prompts/setup/kata-architecture-adaptation.md',
+    component: 'prompts',
+    reason: 'renamed to test-framework-adaptation.md',
+    deprecatedSince: '2026-04-28',
+  },
+];
+
 // NOTE: No hardcoded file lists for directories - all use mergeDirectory() for full sync
 // This ensures any new files/folders in the template are automatically included
 
@@ -766,6 +790,66 @@ function createBackup(components) {
 
   logSuccess(`Backup guardado en: ${backupDir}`);
   return backupDir;
+}
+
+/**
+ * Elimina archivos deprecated del repo local si existen.
+ *
+ * Recorre `DEPRECATED_FILES`, filtra por componentes que se estan sincronizando
+ * en esta corrida (un deprecated en `.prompts/` solo se borra si `prompts` esta
+ * en `components`), y elimina los que existen localmente. El backup previo los
+ * captura, asi que `--rollback` los restaura si el usuario lo necesita.
+ *
+ * @param {string[]} components - Componentes que se estan sincronizando
+ * @returns {{ removed: number }} Conteo de archivos eliminados
+ */
+function cleanupDeprecatedFiles(components) {
+  const allMode = components.includes('all');
+  const relevant = DEPRECATED_FILES.filter(d => allMode || components.includes(d.component));
+  const present = relevant.filter(d => fs.existsSync(d.path));
+
+  if (present.length === 0) {
+    return { removed: 0 };
+  }
+
+  console.log('');
+  logStep(`Limpiando ${present.length} archivo(s) deprecated...`);
+
+  let removed = 0;
+  for (const dep of present) {
+    try {
+      fs.unlinkSync(dep.path);
+      logSuccess(`  Eliminado: ${dep.path}`);
+      logInfo(`             Razon: ${dep.reason} (deprecated desde ${dep.deprecatedSince})`);
+      removed++;
+    }
+    catch (err) {
+      logWarning(`  No se pudo eliminar ${dep.path}: ${err.message || String(err)}`);
+    }
+  }
+
+  return { removed };
+}
+
+/**
+ * Preview de archivos deprecated que serian eliminados (modo dry-run).
+ *
+ * @param {string[]} commands - Componentes que se sincronizarian
+ */
+function previewDeprecatedCleanup(commands) {
+  const allMode = commands.includes('all');
+  const relevant = DEPRECATED_FILES.filter(d => allMode || commands.includes(d.component));
+  const present = relevant.filter(d => fs.existsSync(d.path));
+
+  if (present.length === 0) {
+    return;
+  }
+
+  console.log('');
+  console.log(`   ${colors.yellow}Deprecated cleanup${colors.reset}  →  Eliminaria ${present.length} archivo(s):`);
+  for (const dep of present) {
+    console.log(`     ${colors.dim}- ${dep.path}${colors.reset}  ${colors.dim}(${dep.reason})${colors.reset}`);
+  }
 }
 
 /**
@@ -2041,6 +2125,7 @@ async function main() {
       }
     }
 
+    cleanupDeprecatedFiles(components);
     recordSyncVersion(components);
     detectUnfilledVariables();
     if (components.includes('agents') || components.includes('scripts')) {
@@ -2086,6 +2171,7 @@ async function main() {
   // Dry-run mode: preview changes without modifying files
   if (parsed.dryRun) {
     executeDryRun(parsed.commands, parsed.all);
+    previewDeprecatedCleanup(parsed.commands);
     cleanup();
     return;
   }
@@ -2180,6 +2266,7 @@ async function main() {
     addResult(updateContextEngineering());
   }
 
+  cleanupDeprecatedFiles(parsed.commands);
   recordSyncVersion(parsed.commands);
   detectUnfilledVariables();
   if (parsed.commands.includes('agents') || parsed.commands.includes('scripts')) {

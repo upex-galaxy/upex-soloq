@@ -1,8 +1,49 @@
-# KATA Architecture Adaptation
+# Test Framework Adaptation
 
-> **Purpose**: Adapt the KATA template to your specific project's application under test.
-> **When to Use**: After cloning this template and completing Discovery.
-> **Output**: `.context/PBI/kata-architecture-adaptation-plan.md` + Implementation (on approval).
+> **Purpose**: Bridge between project Discovery and writing real feature tests. Connects the KATA architecture (`tests/`, `api/schemas/`, `config/`) of this boilerplate to the target project's stack already reverse-engineered by Discovery.
+>
+> **What this prompt modifies**: Only this repo (the testing repo). The product repo is read-only from here.
+>
+> **Result on success**: AuthApi + LoginPage + first `{Entity}Api`/`{Entity}Page` already speak to the real backend, smoke test passing, auth session reused across tests.
+>
+> **When to invoke**: Immediately after Discovery (`.prompts/discovery/`) and BEFORE writing any feature tests with `.prompts/fase-12-test-automation/`.
+>
+> **Output**: `.context/PBI/test-framework-adaptation-plan.md` (Phase 1) + Implementation (Phase 2, on approval).
+
+## Scope
+
+| USE this prompt to... | DO NOT use this prompt for... |
+|---|---|
+| Wire AuthApi + LoginPage against real endpoints | Regenerate `.context/` -> use `.prompts/discovery/` |
+| Create the first `{Entity}Api` / `{Entity}Page` end-to-end | Write feature tests -> use `.prompts/fase-12-test-automation/` |
+| Register fixtures + run first smoke test | Run regression suites -> use `.prompts/fase-12-test-automation/regression/` |
+| Sync OpenAPI and create type facades in `@schemas/*` | Document TCs in TMS -> use `.prompts/fase-11-test-documentation/` |
+| Configure `.agents/project.yaml` for AI variable resolution | Re-run Discovery from scratch -> use `.prompts/discovery/` |
+
+## Core philosophy
+
+- **One entity end-to-end first.** No mass scaffolding. Additional entities go to "follow-ups" in the plan.
+- **Auth is the most fragile piece** — always against real staging, never mocks.
+- **Golden KATA rule**: components import from `@schemas/*`, never from `@openapi`. Only facades touch `@openapi`.
+- Every ATC carries `@atc('TICKET-ID')`. All imports use aliases (`@api/`, `@ui/`, `@schemas/`, `@utils/`).
+
+## Hard prerequisites (BLOCKING)
+
+Before starting Phase 1, verify ALL of these exist. If any is missing, STOP and direct the user to the appropriate predecessor prompt.
+
+- [ ] `.context/PRD/` populated -> produced by `.prompts/fase-1-constitution`
+- [ ] `.context/SRS/architecture.md` exists -> produced by `.prompts/fase-2-architecture`
+- [ ] `.context/SRS/infrastructure.md` + `frontend.md` exist -> produced by `.prompts/fase-3-infrastructure`
+- [ ] `.context/business-data-map.md` exists -> produced by `.prompts/fase-4-specification`
+- [ ] An OpenAPI contract source is resolvable (one of):
+  - `api/openapi-types.ts` already generated, OR
+  - URL of the OpenAPI spec endpoint, OR
+  - `.context/api-architecture.md` as fallback
+- [ ] `.env.example` exists with the expected env-var keys
+
+> **Note**: `.agents/project.yaml`, `.agents/jira-required.yaml`, `.agents/README.md` ship with the boilerplate and MUST exist. `.agents/jira.json` is generated in Phase 2 (Step 2.4). `.agents/project.yaml` is populated in Phase 2 (Step 2.3).
+
+**If any pre-req is missing**: report which one(s), point at the producing prompt, and abort. Do NOT improvise.
 
 ---
 
@@ -12,6 +53,8 @@ This prompt transforms the generic KATA boilerplate into a project-specific test
 
 1. **Phase 1: Analysis + Plan** — Generate an adaptation plan
 2. **Phase 2: Implementation** — Execute the plan (requires user approval)
+
+**Strict contract**: NEVER skip Phase 1. NEVER start Phase 2 without explicit user approval of the plan generated in Phase 1.
 
 ---
 
@@ -218,16 +261,29 @@ To complete the adaptation plan, I need clarification:
 
 ### STEP 1.8: Generate Adaptation Plan
 
-Create file: `.context/PBI/kata-architecture-adaptation-plan.md`
+Create file: `.context/PBI/test-framework-adaptation-plan.md`
 
 **Use this template:**
 
 ```markdown
-# KATA Architecture Adaptation Plan
+# Test Framework Adaptation Plan
 
 > **Generated**: {DATE}
 > **Project**: {PROJECT_NAME}
 > **Status**: PENDING APPROVAL
+
+---
+
+## 0. Hard prerequisites check
+
+- [x] `.context/PRD/` populated
+- [x] `.context/SRS/architecture.md` exists
+- [x] `.context/infrastructure/{backend,frontend}.md` exist
+- [x] `.context/business-data-map.md` exists
+- [x] OpenAPI source resolvable: {URL / file / fallback}
+- [x] `.env.example` exists
+
+(Mark each as done during analysis. If any is missing, the prompt aborts.)
 
 ---
 
@@ -279,6 +335,18 @@ Create file: `.context/PBI/kata-architecture-adaptation-plan.md`
 ```typescript
 // Example: What the modified loginSuccessfully should look like
 ```
+
+### 2.4 .agents/ Variable Configuration
+
+Values to populate in `.agents/project.yaml` (table from Step 2.3 with concrete values from Discovery, e.g.):
+
+| Key | Value |
+|---|---|
+| `project.project_name` | MyProject |
+| `project.project_key` | MYP |
+| ... | ... |
+
+Validation: `bun run lint:agents` must pass.
 
 ---
 
@@ -358,32 +426,48 @@ XRAY_CLIENT_SECRET=
 
 ## 7. Implementation Steps
 
-### Phase A: Core Authentication + OpenAPI (Critical)
+### Phase A: Configuration (Critical)
 
 1. [ ] Update `config/variables.ts` with project URLs
 2. [ ] Create `.env` from `.env.example` with credentials
-3. [ ] Sync OpenAPI spec: `bun run api:sync -t` (if available)
-4. [ ] Update `api/schemas/auth.types.ts` (uncomment OpenAPI types or update Custom Types)
-5. [ ] Update `tests/components/api/AuthApi.ts` with correct endpoint and types
-6. [ ] Update `tests/components/ui/LoginPage.ts` with correct locators
-7. [ ] Verify: `bun run test --project=api-setup`
-8. [ ] Verify: `bun run test --project=ui-setup`
+3. [ ] Populate `.agents/project.yaml` from Discovery (Step 2.3)
+4. [ ] Configure Jira manifest if applicable (Step 2.4): set Atlassian creds in `.env`, run `bun run jira:sync-fields` and `bun run jira:check`
 
-### Phase B: First Domain Components (High)
+### Phase B: Auth + OpenAPI (Critical)
 
-9. [ ] Create `api/schemas/{domain}.types.ts` facade (based on example.types.ts pattern)
-10. [ ] Update `api/schemas/index.ts` barrel
-11. [ ] Create `{Entity}Api.ts` component (import from @schemas)
-12. [ ] Create `{Entity}Page.ts` component
-13. [ ] Add components to ApiFixture.ts and UiFixture.ts
-14. [ ] Write first domain test
+5. [ ] Sync OpenAPI spec: `bun run api:sync -t` (if available)
+6. [ ] Update `api/schemas/auth.types.ts` (uncomment OpenAPI types or update Custom Types)
+7. [ ] Update `tests/components/api/AuthApi.ts` with correct endpoint and types
+8. [ ] Update `tests/components/ui/LoginPage.ts` with correct locators
+9. [ ] Verify: `bun run test --project=api-setup`
+10. [ ] Verify: `bun run test --project=ui-setup`
 
-### Phase C: Validation
+### Phase C: First Domain Entity (High)
 
-15. [ ] Run `bun run type-check` — must pass
-16. [ ] Run `bun run lint` — must pass
-17. [ ] Run `bun run test --grep @smoke` — must pass
-18. [ ] Verify session reuse (run 2+ tests)
+11. [ ] Create `api/schemas/{domain}.types.ts` facade (based on example.types.ts pattern)
+12. [ ] Update `api/schemas/index.ts` barrel
+13. [ ] Create `{Entity}Api.ts` component (import from @schemas)
+14. [ ] Create `{Entity}Page.ts` component
+15. [ ] Add components to ApiFixture.ts and UiFixture.ts
+16. [ ] Write first domain test
+
+### Phase D: 8 Exit Gates (strict order)
+
+17. [ ] Gate 1 — `bun run type-check`
+18. [ ] Gate 2 — `bun run lint`
+19. [ ] Gate 3 — `bun run lint:agents` (0 errors, 0 warnings)
+20. [ ] Gate 4 — `bun run jira:check` (if Jira project)
+21. [ ] Gate 5 — `bun run test --project=api-setup`
+22. [ ] Gate 6 — `bun run test --project=ui-setup`
+23. [ ] Gate 7 — `bun run test:smoke` (first run)
+24. [ ] Gate 8 — `bun run test:smoke` (second run, session reuse — NO re-login)
+
+### Phase E: Cleanup placeholders
+
+25. [ ] Remove `tests/components/api/ExampleApi.ts`, `tests/components/ui/ExamplePage.ts`, `tests/components/steps/ExampleSteps.ts`, `api/schemas/example.types.ts`
+26. [ ] Drop `example.types` re-export from `api/schemas/index.ts`
+27. [ ] Drop any `Example*` references from `tests/components/ApiFixture.ts` and `tests/components/UiFixture.ts`
+28. [ ] Re-run gates 1-3 to confirm nothing broke
 
 ---
 
@@ -420,6 +504,17 @@ Before proceeding to implementation, confirm:
 
 ---
 
+## 11. Discovery Gaps
+
+Any gaps in Discovery that surfaced during adaptation (and could not be resolved here):
+
+- [ ] Gap: {description}, blocks {what}
+- [ ] ...
+
+(Surface to the user; do NOT improvise. May require running specific Discovery phases again.)
+
+---
+
 **Next Step**: Review this plan and confirm approval to proceed with Phase 2 implementation.
 ```
 
@@ -431,7 +526,7 @@ Before proceeding to implementation, confirm:
 
 ### STEP 2.1: Read Approved Plan
 
-Read `.context/PBI/kata-architecture-adaptation-plan.md` to understand:
+Read `.context/PBI/test-framework-adaptation-plan.md` to understand:
 
 - Exact changes needed for each file
 - Order of implementation
@@ -470,7 +565,91 @@ TEST_USER_PASSWORD=testpassword
 TEST_ENV=staging
 ```
 
-### STEP 2.3: Sync OpenAPI Specification & Generate Types
+### STEP 2.3: Configure `.agents/project.yaml`
+
+**Goal**: populate `.agents/project.yaml` so AI agents can resolve `{{...}}` references in every other prompt of the repo (orchestrators, stage prompts, guidelines).
+
+This is the AI-context companion to `config/variables.ts`:
+
+| File | Consumed by | When |
+|---|---|---|
+| `config/variables.ts` | Playwright runtime (TS code) | Test execution |
+| `.agents/project.yaml` | AI agents (prompts) | Prompt load time |
+
+Both must be configured. Most values overlap and come from Discovery.
+
+**1. Open `.agents/project.yaml`**. It ships with all values as `null` + `# TODO:` comments.
+
+**2. Fill each key from the Discovery context**:
+
+| YAML key | Source |
+|---|---|
+| `project.project_name` | `.context/PRD/` (project name) |
+| `project.project_key` | Issue tracker key (e.g. Jira project key) |
+| `project.webapp_domain` | `.context/SRS/architecture.md` |
+| `backend.backend_repo` | `.context/SRS/infrastructure.md` (relative path) |
+| `backend.backend_stack` | `.context/SRS/architecture.md` |
+| `backend.backend_entry` | `.context/SRS/infrastructure.md` |
+| `frontend.frontend_repo` | `.context/SRS/infrastructure.md` |
+| `frontend.frontend_stack` | idem |
+| `frontend.frontend_entry` | idem |
+| `database.db_type` | `.context/SRS/architecture.md` |
+| `issue_tracker.issue_tracker` | Project context (Jira / GitHub / Linear) |
+| `issue_tracker.issue_tracker_cli` | `acli` (Jira) / `gh issue` (GitHub) / etc. |
+| `issue_tracker.jira_url` | If Jira: instance URL |
+| `testing.default_env` | Default to `staging` unless project specifies otherwise |
+| `testing.tms_cli` | `bun xray` if using Xray, else null |
+| `environments.local.web_url` | Local dev frontend URL |
+| `environments.local.api_url` | Local dev API URL |
+| `environments.local.db_mcp` | MCP server name for local DB |
+| `environments.local.api_mcp` | MCP server name for local API |
+| `environments.staging.*` | Staging URLs and MCP names |
+
+**3. Validate**:
+
+```bash
+bun run lint:agents
+```
+
+Must report **0 errors, 0 warnings**. If it errors, the prompts reference variables that are still null OR not declared in `.agents/project.yaml`. Fix before proceeding.
+
+> **Reference**: `.agents/README.md` documents the four reference syntaxes (`{{...}}` for project values, `{{environments.X.Y}}` for explicit env refs, `{{jira.<slug>}}` for Jira fields, `<<...>>` for session vars).
+
+### STEP 2.4: Configure Jira manifest (CONDITIONAL)
+
+> **Skip this step if the project does NOT use Jira.** The `{{jira.<slug>}}` references in prompts will simply not resolve, which is acceptable for non-Jira projects.
+
+If `.agents/project.yaml` has `issue_tracker.issue_tracker: Jira`:
+
+**1. Set Atlassian credentials in `.env`** (if not already there):
+
+```env
+ATLASSIAN_URL=https://your-instance.atlassian.net
+ATLASSIAN_EMAIL=your-email@example.com
+ATLASSIAN_API_TOKEN=ATATT3x...
+```
+
+Get the API token at: <https://id.atlassian.com/manage-profile/security/api-tokens>
+
+**2. Sync the workspace catalog**:
+
+```bash
+bun run jira:sync-fields
+```
+
+This generates `.agents/jira.json` with all custom fields from the workspace.
+
+**3. Validate the manifest matches the workspace**:
+
+```bash
+bun run jira:check
+```
+
+Must report `0 missing, 0 mismatched`. If a required slug is missing, create the field in Jira admin -> re-run sync-fields -> re-check.
+
+> **Reference**: `.agents/jira-required.yaml` declares the methodology's required custom fields. `.agents/README.md` § 5.1 documents the full setup flow.
+
+### STEP 2.5: Sync OpenAPI Specification & Generate Types
 
 **Objetivo:** Descargar la especificación OpenAPI/Swagger del backend y generar tipos TypeScript para testing type-safe.
 
@@ -539,7 +718,7 @@ bun run api:sync -c -t
 
 > **Referencia:** Ver `.context/guidelines/TAE/openapi-integration.md` para detalles completos.
 
-### STEP 2.4: Create/Update Type Facades
+### STEP 2.6: Create/Update Type Facades
 
 **Objetivo:** Actualizar las facades de tipos para que re-exporten los tipos OpenAPI con nombres legibles. Los componentes NUNCA importan directamente de `@openapi` — siempre usan facades.
 
@@ -555,7 +734,7 @@ tests/components/api/*.ts      ← Componentes consumen facades
 
 El archivo ya existe con TODOs de migración. Según la disponibilidad de OpenAPI:
 
-**Si OpenAPI está disponible (después de Step 2.3):**
+**Si OpenAPI está disponible (después de Step 2.5):**
 
 - Descomentar las líneas `import type { components, paths } from '@openapi'`
 - Descomentar los tipos de Schema/Endpoint
@@ -652,7 +831,7 @@ Los aliases ya deben existir en el boilerplate:
 > **Regla clave del Type Facade Pattern:** Solo los archivos en `api/schemas/` importan de `@openapi`. Los componentes importan de `@schemas/{domain}.types`.
 > **Referencia:** Ver `.context/guidelines/TAE/openapi-integration.md` → Type Facade Pattern.
 
-### STEP 2.5: Adapt Auth Components
+### STEP 2.7: Adapt Auth Components
 
 **File**: `tests/components/api/AuthApi.ts`
 
@@ -704,7 +883,7 @@ async loginSuccessfully(email: string, password: string) {
 }
 ```
 
-### STEP 2.6: Verify Auth Setup Files
+### STEP 2.8: Verify Auth Setup Files
 
 **File**: `tests/setup/api-auth.setup.ts`
 
@@ -716,7 +895,7 @@ async loginSuccessfully(email: string, password: string) {
 - Should work with updated LoginPage
 - Test by running: `bun run test --project=ui-setup`
 
-### STEP 2.7: Create First Domain Component
+### STEP 2.9: Create First Domain Component
 
 Based on project entities, create the first component **using types from the facade**:
 
@@ -774,7 +953,7 @@ export class {Entity}Page extends UiBase {
 }
 ```
 
-### STEP 2.8: Update Fixtures
+### STEP 2.10: Update Fixtures
 
 **File**: `tests/components/ApiFixture.ts`
 
@@ -806,7 +985,7 @@ import { {Entity}Page } from '@ui/{Entity}Page';
 this.{entity}Page = new {Entity}Page(options);
 ```
 
-### STEP 2.9: Create First Test
+### STEP 2.11: Create First Test
 
 Create a smoke test that verifies:
 
@@ -816,38 +995,54 @@ Create a smoke test that verifies:
 
 **Location**: `tests/e2e/{feature}/smoke.test.ts`
 
-### STEP 2.10: Validate
+### STEP 2.12: Run the 8 exit gates (fail-fast, in strict order)
 
-Run validation commands:
+Each gate must pass before the next runs. If a gate fails, STOP and fix before continuing.
 
-```bash
-# 1. TypeScript compilation
-bun run type-check
+| # | Gate | Command | Expected |
+|---|---|---|---|
+| 1 | TypeScript | `bun run type-check` | Exit 0 |
+| 2 | Lint | `bun run lint` | Exit 0 |
+| 3 | Agents lint | `bun run lint:agents` | 0 errors, 0 warnings |
+| 4 | Jira manifest (if Jira project) | `bun run jira:check` | 0 missing, 0 mismatched |
+| 5 | API auth setup | `bun run test --project=api-setup` | Generates `.auth/api-state.json` |
+| 6 | UI auth setup | `bun run test --project=ui-setup` | Generates `.auth/user.json` |
+| 7 | Smoke test #1 | `bun run test:smoke` | Passes against staging |
+| 8 | Smoke test #2 (session reuse) | `bun run test:smoke` again | Reuses `.auth/*` — NO re-login |
 
-# 2. Lint check
-bun run lint
+**Gate 8 is the tightest detector of broken session reuse** — the most common bug after auth adaptation. If gate 8 logs in again instead of reusing the saved state, session reuse is broken. STOP and debug.
 
-# 3. Auth setup tests
-bun run test --project=api-setup
-bun run test --project=ui-setup
+### STEP 2.13: Cleanup boilerplate placeholders
 
-# 4. Smoke test
-bun run test --grep @smoke
-```
+Once the real entity is in place and the 8 exit gates pass, remove the example placeholders that ship with the boilerplate:
 
-### STEP 2.11: Report Completion
+- [ ] `tests/components/api/ExampleApi.ts`
+- [ ] `tests/components/ui/ExamplePage.ts`
+- [ ] `tests/components/steps/ExampleSteps.ts` (if exists)
+- [ ] `api/schemas/example.types.ts`
+- [ ] Update `api/schemas/index.ts` barrel — remove the `example.types` re-export
+- [ ] Remove any `Example*` references from `tests/components/ApiFixture.ts` and `tests/components/UiFixture.ts`
 
-After implementation, update:
+After cleanup, re-run gates 1-3 (`type-check`, `lint`, `lint:agents`) to confirm nothing broke.
 
-- Plan file status to COMPLETED
-- CLAUDE.md with project-specific information
+This keeps the test repo clean — no orphan placeholders pretending to be real components.
+
+### STEP 2.14: Report completion
+
+Update artifacts:
+
+- `.context/PBI/test-framework-adaptation-plan.md` — mark `Status: COMPLETED` and append a "Results" block with:
+  - Auth strategy resolved (token / cookie / hybrid)
+  - First entity adapted: `{Entity}`
+  - Discovery Gaps surfaced (anything Discovery did not cover that came up during adaptation)
+  - Open follow-ups (additional entities to adapt later in `.prompts/fase-12-test-automation/`)
+- `CLAUDE.md` — fill in the "Project Identity" section with project name, stack, target repo (DOES NOT touch the variable system, which lives in `.agents/`).
 
 Report to user:
-
-- What was implemented
-- What tests were created
-- Any issues encountered
-- Next recommended steps
+- What was adapted (auth, OpenAPI, first entity)
+- All 8 gates status (with link to outputs)
+- Discovery Gaps (anything blocking the next step)
+- **Recommended next step**: invoke `.prompts/fase-12-test-automation/` to write feature test #1.
 
 ---
 
@@ -990,5 +1185,5 @@ grep "schemas" api/openapi-types.ts | head -20
 
 ---
 
-**Version**: 2.0
-**Last Updated**: 2025-03-12
+**Version**: 3.0
+**Last Updated**: 2026-04-28

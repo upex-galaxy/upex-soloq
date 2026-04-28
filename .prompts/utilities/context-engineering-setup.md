@@ -95,7 +95,7 @@ Based on what exists:
 |-----------|------|--------|
 | KATA + Context files exist | **Full Update** | Generate complete README + Update all sections |
 | KATA exists, no context | **Minimal Update** | Generate basic README + Keep placeholders |
-| No KATA architecture | **Stop** | Guide user to run `setup/kata-architecture-adaptation.md` first |
+| No KATA architecture | **Stop** | Guide user to run `setup/test-framework-adaptation.md` first |
 
 ---
 

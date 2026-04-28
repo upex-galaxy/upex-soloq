@@ -1,9 +1,9 @@
-# KATA Architecture Setup
+# Monorepo for QA Setup
 
 > **Purpose**: Set up the KATA test automation architecture by cloning the boilerplate into a dedicated `qa/` directory, converting the project into a monorepo.
 > **When to Use**: When starting test automation in a new or existing project.
 > **Output**: `qa/` directory with KATA architecture installed, configured as a monorepo, ready for adaptation.
-> **Next Prompt**: After setup, run `.prompts/setup/kata-architecture-adaptation.md` to customize for your project.
+> **Next Prompt**: After setup, run `.prompts/setup/test-framework-adaptation.md` to customize for your project.
 
 ---
 
@@ -445,7 +445,7 @@ El archivo `[nombre-repo].code-workspace` debe estar en control de versiones.
 Setup is complete. The `qa/` directory has the KATA architecture installed, dependencies ready, and the monorepo properly configured.
 
 > **Run the adaptation prompt** to customize the architecture for your specific project (authentication, OpenAPI types, domain components, first tests):
-> `.prompts/setup/kata-architecture-adaptation.md`
+> `.prompts/setup/test-framework-adaptation.md`
 
 The adaptation prompt will:
 1. Read your project context (`.context/SRS/`, `.context/PRD/`, etc.)
@@ -495,7 +495,7 @@ cp qa/.env.example qa/.env
 echo "✅ KATA Architecture setup complete!"
 echo ""
 echo "Next step: Run the adaptation prompt to customize for your project:"
-echo "→ .prompts/setup/kata-architecture-adaptation.md"
+echo "→ .prompts/setup/test-framework-adaptation.md"
 ```
 
 ---
@@ -514,7 +514,7 @@ echo "→ .prompts/setup/kata-architecture-adaptation.md"
 - [ ] GitHub Actions workflows moved to root `.github/workflows/` with `working-directory: qa`
 - [ ] Root `package.json` has qa scripts (optional)
 - [ ] `qa/.gitignore` verified (should come from boilerplate)
-- [ ] Adaptation prompt executed: `.prompts/setup/kata-architecture-adaptation.md`
+- [ ] Adaptation prompt executed: `.prompts/setup/test-framework-adaptation.md`
 
 ---
 
@@ -552,7 +552,7 @@ cd qa && bun install && cd ..
 2. Verify `qa/tsconfig.json` does NOT extend root tsconfig
 3. Open the project via `.code-workspace` file (not "Open Folder")
 
-> **Note:** For troubleshooting related to authentication, OpenAPI, type facades, and component adaptation, see the adaptation prompt: `.prompts/setup/kata-architecture-adaptation.md`
+> **Note:** For troubleshooting related to authentication, OpenAPI, type facades, and component adaptation, see the adaptation prompt: `.prompts/setup/test-framework-adaptation.md`
 
 ---
 
@@ -589,12 +589,12 @@ cd qa && bun install && cd ..
 
 ### Create Per Project (via Adaptation Prompt)
 
-Project-specific files (OpenAPI types, type facades, domain components, auth adaptation, test files) are created during the adaptation phase. See `.prompts/setup/kata-architecture-adaptation.md` for the complete list.
+Project-specific files (OpenAPI types, type facades, domain components, auth adaptation, test files) are created during the adaptation phase. See `.prompts/setup/test-framework-adaptation.md` for the complete list.
 
 ---
 
 > **Next Step**: After setup is complete, run the adaptation prompt to customize the architecture for your project:
-> `.prompts/setup/kata-architecture-adaptation.md`
+> `.prompts/setup/test-framework-adaptation.md`
 
 ---
 

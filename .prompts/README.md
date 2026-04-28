@@ -6,6 +6,26 @@ Este directorio contiene prompts optimizados para generar documentación de proy
 
 ## PROMPTS DE SESION (Inicio Rapido)
 
+### `session-start.md` - Punto de Entrada por Ticket
+
+**Uso:** Cargar al inicio de una sesion de trabajo sobre un ticket especifico (US, bug, automation).
+
+**Que hace:**
+
+1. Obtiene el ticket desde el issue tracker
+2. Explica el story / feature en lenguaje sencillo
+3. Carga contexto relevante (`.context/`)
+4. Explora codigo relacionado
+5. Crea la carpeta PBI local del ticket
+
+**Como usar:**
+
+```markdown
+@.prompts/session-start.md
+```
+
+---
+
 ### `us-dev-workflow.md` - Workflow Completo de Desarrollo
 
 **Uso:** Copiar y pegar al inicio de cada sesion de desarrollo de User Stories.
@@ -57,6 +77,31 @@ Este directorio contiene prompts optimizados para generar documentación de proy
 - Feature desplegada en staging
 - Acceso a Playwright MCP y Atlassian MCP
 ```
+
+---
+
+### `bug-qa-workflow.md` - Workflow de Bug (QA)
+
+**Uso:** Triage, verificacion y reporte de bugs por parte de QA.
+
+**Como usar:**
+
+```markdown
+@.prompts/bug-qa-workflow.md
+```
+
+---
+
+## ORQUESTADORES (Multi-Ticket / Multi-Step)
+
+Los orquestadores manejan flujos multi-paso despachando subagentes. Cargarlos directamente con `@`.
+
+| Orquestador                                | Proposito                                                              |
+| ------------------------------------------ | ---------------------------------------------------------------------- |
+| `orchestrators/sprint-testing-agent.md`    | Sprint testing (multi-ticket, auto-progresion entre tickets del sprint) |
+| `orchestrators/test-automation-agent.md`   | Automatizacion masiva de specs ya documentadas                         |
+
+**Uso:** `@.prompts/orchestrators/sprint-testing-agent.md` (o el agent equivalente). El orquestador pedira los parametros necesarios (sprint file, ticket de resume, etc.).
 
 ---
 
@@ -184,13 +229,41 @@ Este directorio contiene prompts optimizados para generar documentación de proy
 
 **Por que esta fase:** Documentar tests en Jira DESPUES de validacion exploratoria para trazabilidad.
 
-#### **Fase 12: Test Automation** (Integration + E2E - KATA Framework)
+#### **Fase 12: Test Automation** (Integration + E2E - KATA Architecture)
 
-| Archivo                                                  | Proposito                                     |
-| -------------------------------------------------------- | --------------------------------------------- |
-| `kata-framework-setup.md`                                | Setup inicial o refactoring de KATA framework |
-| `fase-12-test-automation/automation-e2e-test.md`         | Implementar tests E2E (UI)                    |
-| `fase-12-test-automation/automation-integration-test.md` | Implementar tests de integracion (API)        |
+**Planning (macro y per-ticket):**
+
+| Archivo                                                          | Proposito                                                  |
+| ---------------------------------------------------------------- | ---------------------------------------------------------- |
+| `fase-12-test-automation/planning/module-test-specification.md`  | Planificacion macro de un modulo (multi-agente)            |
+| `fase-12-test-automation/planning/test-implementation-plan.md`   | Plan de implementacion E2E o API por test ticket           |
+| `fase-12-test-automation/planning/atc-implementation-plan.md`    | Spec per-ATC (templates API/UI)                            |
+| `fase-12-test-automation/planning/test-specification.md`         | Spec inicial del test                                      |
+
+**Coding (E2E + Integration):**
+
+| Archivo                                                  | Proposito                                                |
+| -------------------------------------------------------- | -------------------------------------------------------- |
+| `fase-12-test-automation/e2e/e2e-plan.md`                | Plan E2E (UI) por test ticket                            |
+| `fase-12-test-automation/e2e/e2e-coding.md`              | Implementar tests E2E (UI)                               |
+| `fase-12-test-automation/e2e/e2e-review.md`              | Code review E2E (KATA compliance)                        |
+| `fase-12-test-automation/integration/integration-plan.md` | Plan API integration por test ticket                     |
+| `fase-12-test-automation/integration/integration-coding.md` | Implementar tests de integracion (API)                  |
+| `fase-12-test-automation/integration/integration-review.md` | Code review API                                        |
+
+**Regression:**
+
+| Archivo                                                      | Proposito                                                  |
+| ------------------------------------------------------------ | ---------------------------------------------------------- |
+| `fase-12-test-automation/regression/regression-execution.md` | Ejecutar la suite de regresion                             |
+| `fase-12-test-automation/regression/regression-analysis.md`  | Analizar resultados y clasificar fallos                    |
+| `fase-12-test-automation/regression/regression-report.md`    | Generar reporte de calidad GO/NO-GO                        |
+
+**Setup (KATA framework):**
+
+| Archivo                   | Proposito                                     |
+| ------------------------- | --------------------------------------------- |
+| `kata-framework-setup.md` | Setup inicial o refactoring de KATA framework |
 
 **IMPORTANTE:**
 
@@ -218,12 +291,38 @@ Este directorio contiene prompts optimizados para generar documentación de proy
 
 ### **PROMPTS STANDALONE** (Utilidades)
 
+**Entry-points por sesion:**
+
+| Archivo                | Proposito                                                       |
+| ---------------------- | --------------------------------------------------------------- |
+| `session-start.md`     | Punto de entrada por ticket (US, bug, automation)               |
+| `us-dev-workflow.md`   | Workflow completo de desarrollo (Fases 6-9)                     |
+| `us-qa-workflow.md`    | Workflow completo de QA (Fases 10-12)                           |
+| `bug-qa-workflow.md`   | Workflow de bug por QA (triage / verify / report)               |
+
+**Orquestadores:**
+
+| Archivo                                       | Proposito                                                    |
+| --------------------------------------------- | ------------------------------------------------------------ |
+| `orchestrators/sprint-testing-agent.md`       | Orquestacion multi-ticket de un sprint (auto-progresion)     |
+| `orchestrators/test-automation-agent.md`      | Orquestacion de automatizacion de specs ya documentadas      |
+
+**Utilidades transversales (`utilities/`):**
+
+| Archivo                                        | Proposito                                                 |
+| ---------------------------------------------- | --------------------------------------------------------- |
+| `utilities/sprint-test-framework-generator.md` | Generar el framework de tests para un sprint completo     |
+| `utilities/sprint-report.md`                   | Reporte de cierre de sprint                               |
+| `utilities/test-execution-breakdown.md`        | Desglose de ejecucion de tests                            |
+| `utilities/traceability-fix.md`                | Reparar trazabilidad TMS                                  |
+| `utilities/context-engineering-setup.md`       | README profesional + System Prompt para AI coding agents  |
+| `utilities/git-flow.md`                        | Estrategia de branching y git workflow                    |
+| `utilities/git-conflict-fix.md`                | Resolver conflictos de merge                              |
+
+**Setup y context generators (raiz de `.prompts/`):**
+
 | Archivo                   | Proposito                                                      |
 | ------------------------- | -------------------------------------------------------------- |
-| `git-flow.md`             | Estrategia de branching y git workflow                         |
-| `git-conflict-fix.md`     | Resolver conflictos de merge                                   |
-| `us-dev-workflow.md`      | Workflow completo de desarrollo (Fases 6-9)                    |
-| `us-qa-workflow.md`       | Workflow completo de QA (Fases 10-12)                          |
 | `kata-framework-setup.md` | Setup inicial o refactoring de KATA framework                  |
 | `business-data-map.md`    | Mapa maestro: flujos de negocio, state machines, integraciones |
 | `project-dev-guide.md`    | Guía de desarrollo basada en el Business Data Map              |
@@ -579,7 +678,6 @@ Despues de usar todos los prompts, tu directorio `.context/` debe verse asi:
     ├── code-standards.md
     ├── error-handling.md
     ├── context-loading.md
-    ├── mcp-usage-tips.md
     │
     └── TAE/                       [Fase 12]
         ├── README.md
@@ -594,9 +692,9 @@ Despues de usar todos los prompts, tu directorio `.context/` debe verse asi:
 ## ESTADISTICAS
 
 - **Fases totales:** 14 (3 sincronicas + 11 asincronicas)
-- **Prompts totales:** 50 archivos
-- **Workflows de sesion:** 2 (us-dev-workflow.md, us-qa-workflow.md)
-- **Utilidades standalone:** 8 (git-flow, git-conflict-fix, kata-framework-setup, business-data-map, project-dev-guide, project-test-guide, api-architecture, project-doc-setup)
+- **Entry-points de sesion:** 4 (session-start, us-dev-workflow, us-qa-workflow, bug-qa-workflow)
+- **Orquestadores:** 2 (sprint-testing-agent, test-automation-agent)
+- **Utilidades transversales:** 7 archivos en `utilities/`
 - **QA Learning Methodology:** 4 niveles (LEVEL0-3)
 - **Fase 3 features:** 4 prompts modulares opcionales
 

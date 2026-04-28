@@ -1,65 +1,98 @@
-# Fase 5: Shift-Left Testing
+# Stage 1: Shift-Left Testing
 
-## Propósito
+## Purpose
 
-Diseñar la estrategia de testing **ANTES** de escribir código. Analiza Epics y Stories desde perspectiva QA para identificar escenarios de prueba, riesgos y criterios de aceptación refinados.
+Design the testing strategy **BEFORE** writing code. Analyze Epics and Stories from a QA perspective to identify test scenarios, risks, and refined acceptance criteria.
 
-**Por qué existe esta fase:**
+**Why this stage exists:**
 
-- Testing shift-left = feedback más temprano = menos bugs
-- Identifica ambigüedades en requirements antes de implementar
-- Define criterios de aceptación testeables
-- Crea base para test automation posterior (Fase 12)
+- Shift-left testing = earlier feedback = fewer bugs
+- Identifies requirement ambiguities before implementation
+- Defines testable acceptance criteria
+- Creates foundation for test automation later (Stage 4)
 
 ---
 
-## Pre-requisitos
+## Prerequisites
 
-- Fase 4 completada:
-  - Product Backlog en Jira
-  - Estructura `.context/PBI/` con Epics y Stories
-- Contexto de negocio:
+- Previous phases completed:
+  - Product Backlog in Jira
+  - `.context/PBI/` structure with Epics and Stories
+- Business context:
   - `.context/idea/business-model.md`
   - `.context/PRD/*.md`
-- Contexto técnico:
+- Technical context:
   - `.context/SRS/*.md`
-- MCP Atlassian disponible
+- Atlassian MCP available
 
 ---
 
-## Prompts en Esta Fase
+## Prompts in This Stage
 
-| Orden | Prompt                    | Nivel | Propósito                                     |
-| ----- | ------------------------- | ----- | --------------------------------------------- |
-| 1     | `feature-test-plan.md`    | Epic  | Test strategy a nivel feature                 |
-| 2     | `acceptance-test-plan.md` | Story | Acceptance test plan con test cases por story |
+| Order | Prompt                    | Level | Purpose                                        |
+| ----- | ------------------------- | ----- | ---------------------------------------------- |
+| 1     | `feature-test-plan.md`    | Epic  | Test strategy at feature level                 |
+| 2     | `acceptance-test-plan.md` | Story | Acceptance test plan with test cases per story |
 
 ---
 
-## Flujo de Ejecución
+## Triage Decision (acceptance-test-plan.md Phase 0)
+
+Before full planning, `acceptance-test-plan.md` runs a triage:
+
+| Decision | Result |
+|----------|--------|
+| **SKIP veto** (backend-only, infra, docs, CSS, tech debt) | Code Review only — no test plan |
+| **REQUIRE veto** (money, data integrity, auth, integrations) | Full Testing — skip risk scoring |
+| **Risk Score 0-3** (LOW) | Code Review only |
+| **Risk Score 4-7** (MEDIUM) | Full Testing (standard workflow) |
+| **Risk Score 8+** (HIGH) | Full Testing + extended edge cases |
+
+---
+
+## Entry / Exit Criteria
+
+### Entry Criteria
+
+- [ ] User Story exists in Jira with Acceptance Criteria
+- [ ] Epic context available (`.context/PBI/epics/EPIC-*/epic.md`)
+- [ ] Business context loaded (`PRD/`, `idea/`)
+- [ ] Atlassian MCP configured and accessible
+
+### Exit Criteria
+
+- [ ] Feature Test Plan generated (if Epic-level)
+- [ ] Acceptance Test Plan generated with test cases
+- [ ] Triage decision documented (SKIP / Code Review / Full Testing)
+- [ ] Jira comment posted with test plan
+- [ ] Local mirror files created in `.context/PBI/`
+
+---
+
+## Execution Flow
 
 ```
-Epic en Jira + Local
+Epic in Jira + Local
         ↓
 ┌───────────────────────────────────────┐
 │  [1] Feature Test Plan (Epic)          │
 ├───────────────────────────────────────┤
 │                                        │
 │  Input:                                │
-│  - Epic path local                     │
+│  - Local epic path                     │
 │  - Business context (PRD)              │
 │  - Technical context (SRS)             │
 │                                        │
-│  Análisis:                             │
-│  - Riesgos de la feature               │
-│  - Escenarios críticos                 │
-│  - Dependencias técnicas               │
-│  - Criterios de éxito                  │
+│  Analysis:                             │
+│  - Feature risks                       │
+│  - Critical scenarios                  │
+│  - Technical dependencies              │
+│  - Success criteria                    │
 │                                        │
 │  Output:                               │
 │  - feature-test-plan.md (local)        │
-│  - Comentario en Epic (Jira)           │
-│  - Epic actualizada con findings       │
+│  - Comment in Epic (Jira)              │
+│  - Epic updated with findings          │
 │                                        │
 └───────────────────────────────────────┘
         ↓
@@ -68,165 +101,167 @@ Epic en Jira + Local
 ├───────────────────────────────────────┤
 │                                        │
 │  Input:                                │
-│  - Story path local                    │
-│  - Feature test plan (Epic padre)      │
-│  - Acceptance Criteria de la Story     │
+│  - Local story path                    │
+│  - Feature test plan (parent Epic)     │
+│  - Story Acceptance Criteria           │
 │                                        │
-│  Análisis:                             │
-│  - Casos positivos (happy path)        │
-│  - Casos negativos (edge cases)        │
-│  - Validaciones de input               │
-│  - Estados de error                    │
+│  Analysis:                             │
+│  - Positive cases (happy path)         │
+│  - Negative cases (edge cases)         │
+│  - Input validations                   │
+│  - Error states                        │
 │                                        │
 │  Output:                               │
 │  - acceptance-test-plan.md (local)     │
-│  - Comentario en Story (Jira)          │
-│  - Story refinada con ACs testeables   │
+│  - Comment in Story (Jira)             │
+│  - Story refined with testable ACs     │
 │                                        │
 └───────────────────────────────────────┘
 ```
 
 ---
 
-## Niveles de Testing (Jerarquía IQL)
+## Testing Levels (IQL Hierarchy)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    SHIFT-LEFT TESTING                        │
-│                    Step 1: Análisis de Requerimientos        │
+│                    Step 1: Requirements Analysis             │
 ├─────────────────────────────────────────────────────────────┤
 │                                                              │
-│   [1a] NIVEL EPIC (Primero)     [1b] NIVEL STORY (Después)  │
-│   ────────────────────────      ─────────────────────────   │
+│   [1a] EPIC LEVEL (First)          [1b] STORY LEVEL (After) │
+│   ────────────────────────         ─────────────────────────│
 │                                                              │
-│   FTP (Feature Test Plan)       ATP (Acceptance Test Plan)  │
-│   - Riesgos                     - Escenarios por AC         │
-│   - Escenarios críticos         - Happy path                │
-│   - Dependencias                - Edge cases                │
-│   - Criterios de éxito          - Estados de error          │
+│   FTP (Feature Test Plan)          ATP (Acceptance Test Plan)│
+│   - Risks                          - Scenarios per AC        │
+│   - Critical scenarios             - Happy path              │
+│   - Dependencies                   - Edge cases              │
+│   - Success criteria               - Error states            │
 │                                                              │
-│   feature-test-plan.md          acceptance-test-plan.md     │
-│   (1 por Epic)                  (1 por Story)               │
-│   Provee CONTEXTO para →        ← Informado por FTP         │
+│   feature-test-plan.md             acceptance-test-plan.md   │
+│   (1 per Epic)                     (1 per Story)             │
+│   Provides CONTEXT for →           ← Informed by FTP         │
 │                                                              │
 │                                        ↓                     │
 │                              ATCs (Mid-Game Step 6)          │
-│                              Documentados en Jira            │
+│                              Documented in Jira              │
 │                                        ↓                     │
 │                              KATA Automation (Steps 8-10)    │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-> **Orden importante:** FTP se crea PRIMERO (contexto macro), ATP se crea DESPUÉS (informado por el FTP). Ambos ocurren ANTES del sprint durante refinamiento.
+> **Important order:** FTP is created FIRST (macro context), ATP is created AFTER (informed by FTP). Both occur BEFORE sprint during refinement.
 
-**Trazabilidad completa:** FTP (Epic) → ATP (Story) → ATCs (Jira) → KATA (Automation)
+**Full traceability:** FTP (Epic) → ATP (Story) → ATCs (Jira) → KATA (Automation)
 
 ---
 
-## Estructura de Archivos Generada
+## Generated File Structure
 
 ```
 .context/PBI/epics/
-└── EPIC-{KEY}-{NUM}-{nombre}/
+└── EPIC-{KEY}-{NUM}-{name}/
     ├── epic.md
-    ├── feature-test-plan.md          # ← Generado por feature-test-plan.md
+    ├── feature-test-plan.md          # ← Generated by feature-test-plan.md
     └── stories/
-        └── STORY-{KEY}-{NUM}-{nombre}/
+        └── STORY-{KEY}-{NUM}-{name}/
             ├── story.md
-            └── acceptance-test-plan.md  # ← Generado por acceptance-test-plan.md
+            └── acceptance-test-plan.md  # ← Generated by acceptance-test-plan.md
 ```
 
 ---
 
-## Workflow Jira-First
+## Jira-First Workflow
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │               JIRA-FIRST → LOCAL MIRROR                      │
 ├─────────────────────────────────────────────────────────────┤
 │                                                              │
-│  1. Leer Epic/Story local (obtener Jira Key)                │
-│  2. Leer Epic/Story actual de Jira (MCP)                    │
-│  3. Analizar con contexto PRD + SRS                         │
-│  4. Actualizar Epic/Story en Jira con findings (MCP)        │
-│  5. Agregar comentario con test plan/cases (MCP)            │
-│  6. Generar archivo local (mirror)                          │
+│  1. Read local Epic/Story (get Jira Key)                    │
+│  2. Read current Epic/Story from Jira (MCP)                 │
+│  3. Analyze with PRD + SRS context                          │
+│  4. Update Epic/Story in Jira with findings (MCP)           │
+│  5. Add comment with test plan/cases (MCP)                  │
+│  6. Generate local file (mirror)                            │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Roles Asumidos por la IA
+## AI Roles Assumed
 
-| Prompt                    | Rol                             |
+| Prompt                    | Role                            |
 | ------------------------- | ------------------------------- |
 | `feature-test-plan.md`    | QA Lead, Test Strategy Expert   |
 | `acceptance-test-plan.md` | QA Engineer, Test Case Designer |
 
 ---
 
-## Herramientas Requeridas
+## Required Tools
 
-| Herramienta   | Propósito                          |
-| ------------- | ---------------------------------- |
-| MCP Atlassian | Leer/actualizar Epics y Stories    |
-| Filesystem    | Leer contexto, escribir test plans |
-
----
-
-## Output de Esta Fase
-
-- **Por Epic:** `feature-test-plan.md` con estrategia de testing
-- **Por Story:** `acceptance-test-plan.md` con acceptance test cases
-- **En Jira:** Comments con test strategy y cases
-- **Refinamiento:** ACs más específicos y testeables
-- **Base para:** Fase 12 (Test Automation)
+| Tool          | Purpose                        |
+| ------------- | ------------------------------ |
+| Atlassian MCP | Read/update Epics and Stories  |
+| Filesystem    | Read context, write test plans |
 
 ---
 
-## Conexión con Mid-Game Testing
+## Output from This Stage
 
-Los artefactos de esta fase alimentan directamente al **Mid-Game Testing (Steps 6-10)**:
+- **Per Epic:** `feature-test-plan.md` with testing strategy
+- **Per Story:** `acceptance-test-plan.md` with acceptance test cases
+- **In Jira:** Comments with test strategy and cases
+- **Refinement:** More specific and testable ACs
+- **Foundation for:** Stage 4 (Test Automation)
 
-| Artefacto Fase 5    | → Mid-Game        | Propósito                          |
+---
+
+## Connection with Mid-Game Testing
+
+The artifacts from this stage directly feed into **Mid-Game Testing (Steps 6-10)**:
+
+| Stage 1 Artifact    | → Mid-Game        | Purpose                            |
 | ------------------- | ----------------- | ---------------------------------- |
-| ATP (Story-level)   | → ATCs (Step 6)   | Escenarios se formalizan en Jira   |
-| Escenarios críticos | → Candidates      | Priorizados para automatización    |
-| Acceptance Criteria | → KATA decorators | Trazabilidad `@atc('PROJECT-XXX')` |
+| ATP (Story-level)   | → ATCs (Step 6)   | Scenarios are formalized in Jira   |
+| Critical scenarios  | → Candidates      | Prioritized for automation         |
+| Acceptance Criteria | → KATA decorators | Traceability `@atc('PROJECT-XXX')` |
 
-**Ver:** `docs/testing/test-architecture/mid-game-testing.md`
+**See:** `docs/testing/test-architecture/mid-game-testing.md`
 
 ---
 
-## Siguiente Fase
+## Next Stage
 
-Con test plans y cases definidos:
+With test plans and cases defined:
 
-- Proceder a **Fase 6: Planning**
-- Crear implementation plans técnicos
-- Definir approach de desarrollo
+- Proceed to **Stage 2: Exploratory Testing**
+- Execute manual validation
+- Discover additional edge cases
 
 ---
 
 ## FAQ
 
-**P: ¿Debo ejecutar esto para TODAS las stories?**
-R: Recomendado para stories críticas. Stories triviales pueden omitirse o tener test cases simplificados.
+**Q: Should I run this for ALL stories?**
+A: Recommended for critical stories. Trivial stories can be skipped or have simplified test cases.
 
-**P: ¿Los test cases se ejecutan en esta fase?**
-R: No. Esta fase es solo diseño. Ejecución ocurre en Fase 10 (Exploratory) y Fase 12 (Automation).
+**Q: Are test cases executed in this stage?**
+A: No. This stage is design only. Execution happens in Stage 2 (Exploratory) and Stage 4 (Automation).
 
-**P: ¿Qué pasa si los requirements cambian?**
-R: Re-ejecuta el prompt con el contexto actualizado. Los archivos se sobrescriben.
+**Q: What if requirements change?**
+A: Re-run the prompt with updated context. Files will be overwritten.
 
 ---
 
-## Documentación Relacionada
+## Related Documentation
 
 - **Product Backlog:** `.context/PBI/`
 - **Main README:** `.prompts/README.md`
-- **Fase 6:** `.prompts/fase-6-planning/README.md`
-- **Fase 10:** `.prompts/fase-10-exploratory-testing/README.md`
-- **Fase 12:** `.prompts/fase-12-test-automation/README.md`
+- **Fase 10 (Exploratory Testing):** `.prompts/fase-10-exploratory-testing/README.md`
+- **Fase 10 (Reporting):** `.prompts/fase-10-exploratory-testing/README.md`
+- **Fase 11 (Test Documentation):** `.prompts/fase-11-test-documentation/README.md`
+- **Fase 12 (Test Automation):** `.prompts/fase-12-test-automation/README.md`
+- **Fase 12 (Regression):** `.prompts/fase-12-test-automation/regression/README.md`

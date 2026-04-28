@@ -1,90 +1,216 @@
-# E2E Test Automation - Coding
+# E2E Test Coding
 
-> **Fase**: 2 de 3 (Plan → Coding → Review)
-> **Propósito**: Implementar el componente KATA y archivo de test basado en el plan aprobado.
-> **Input**: Plan aprobado de la Fase 1.
-
----
-
-## Carga de Contexto
-
-**Cargar estos archivos antes de proceder:**
-
-1. `qa/.context/guidelines/TAE/kata-ai-index.md` → Patrones core KATA
-2. `qa/.context/guidelines/TAE/typescript-patterns.md` → Convenciones TypeScript
-3. `qa/.context/guidelines/TAE/automation-standards.md` → Reglas y estándares
-4. `qa/.context/guidelines/TAE/playwright-automation-system.md` → Arquitectura de código
-
-**Opcional (para exploración UI):**
-
-- Usar Playwright MCP (`mcp__playwright__*`) para explorar UI y capturar locators
+> **Phase**: 2 of 3 (Plan → Coding → Review)
+> **Purpose**: Implement E2E test automation following KATA architecture.
+> **Input**: Approved plan from `planning/test-implementation-plan.md`.
 
 ---
 
-## Input Requerido
+## Purpose
 
-1. **Plan Aprobado** de la Fase 1 (`e2e-plan.md`)
-2. **Caso de Test Original** (Gherkin de Fase 11)
+Create E2E (End-to-End) automated tests for validated scenarios using the KATA architecture.
+
+**This prompt is executed AFTER:**
+
+- Test documented in TMS (Stage 4)
+- Test marked as "automation-candidate"
+- KATA architecture configured in project
+
+**Prerequisites:**
+
+- Access to Playwright MCP tools (for exploration)
+- KATA architecture configured in project
+- Test case documented in TMS
 
 ---
 
-## Flujo de Implementación
+## PREREQUISITE CHECK
 
-### Paso 1: Verificar Prerrequisitos
+Before proceeding, verify that an implementation plan exists for this ticket:
 
-Antes de codificar, verificar:
+1. Check for `{ticket-dir}/implementation-plan.md`
+2. If it does **NOT** exist: **STOP**. Create it first using `.prompts/fase-12-test-automation/planning/test-implementation-plan.md`
+3. If it **DOES** exist: Read it and use it as your blueprint for this phase.
+
+---
+
+## CRITICAL: Read KATA Guidelines First
+
+**Before implementing ANY automation, read:**
+
+```
+MANDATORY READING (in order):
+1. .context/guidelines/TAE/kata-ai-index.md       # Quick orientation
+2. .context/guidelines/TAE/automation-standards.md # Rules and patterns
+3. .context/guidelines/TAE/kata-architecture.md    # Layer structure
+```
+
+**Key KATA principles to follow:**
+
+- ATCs represent UNIQUE expected outputs
+- Locators INLINE within ATCs (no separate storage)
+- NO helper methods for single Playwright actions
+- ATCs do NOT call other ATCs
+- Fixed assertions INSIDE ATCs
+
+---
+
+## Input Required
+
+Provide ONE of the following:
+
+1. **TMS Test ID** - Test case ID to fetch details from TMS
+2. **Test case content** - Gherkin or traditional format directly
+3. **Multiple Test IDs** - For batch automation
+
+**Also specify:**
+
+- Target component (existing or new)
+- Related User Story ID
+
+---
+
+## Workflow
+
+### Phase 1: Understand the Test Case
+
+**Read the test case from TMS or input:**
+
+```
+Extract:
+├── Test name/summary
+├── Preconditions
+├── Steps (Given/When/Then or traditional)
+├── Expected outcomes
+└── Test data requirements
+```
+
+**Map to KATA structure:**
+
+| Test Element  | KATA Element                               |
+| ------------- | ------------------------------------------ |
+| Preconditions | Setup in test file or Steps module         |
+| Steps         | ATC method calls                           |
+| Assertions    | Fixed assertions in ATC                    |
+
+---
+
+### Phase 1.5: Apply Test Data Strategy
+
+> **Reference**: `.context/guidelines/TAE/test-data-management.md`
+
+**Before writing any test code, verify the data strategy from the implementation plan:**
+
+1. **How is precondition data obtained?** (Discover / Modify / Generate)
+2. **Where is it placed?** (`beforeAll` for read-only, `beforeEach` for mutations)
+3. **Is cleanup needed?** (`afterAll`/`afterEach` for Modify/Generate patterns)
+
+**Precondition validation pattern (CRITICAL):**
+
+```typescript
+// ✅ CORRECT — beforeAll discovers, each test guards with test.skip()
+let testProduct: ProductCandidate | null;
+
+test.beforeAll(async ({ api }) => {
+  // Discovery only — NO assertions here
+  testProduct = await api.products.findAvailableProduct();
+});
+
+test('TK-XXX: should display product details', async ({ ui }) => {
+  if (!testProduct) return test.skip(true, 'No available product found');
+  // Safe to use testProduct — TypeScript narrowed
+});
+
+// ❌ WRONG — expect in beforeAll kills ALL tests
+test.beforeAll(async ({ api }) => {
+  testProduct = await api.products.findAvailableProduct();
+  expect(testProduct).toBeDefined(); // If fails → ALL tests fail
+});
+```
+
+**Data rules:**
+- NEVER hardcode entity names, IDs, or dates in test files
+- Use `DataFactory` for generated data, API/DB queries for discovered data
+- Each test is responsible for its own precondition via `test.skip()`
+
+---
+
+### Phase 2: UI Exploration (Optional)
+
+**If locators are unknown, explore with Playwright CLI:**
 
 ```bash
-# Verificar si existen las clases base
-cat qa/tests/components/ui/UiBase.ts
+# Use skill first
+Use skill: playwright-cli
 
-# Verificar estructura de fixture
-cat qa/tests/components/UiFixture.ts
+# Then explore
+playwright-cli goto "{url}"
+playwright-cli snapshot
+playwright-cli click "{selector}"
+```
 
-# Verificar import aliases en tsconfig
-grep -A 10 '"paths"' tsconfig.json
+**Document locators found:**
+
+```markdown
+## Locators Identified
+
+| Element       | Locator                 | Backup Locator                |
+| ------------- | ----------------------- | ----------------------------- |
+| Email input   | `#email`                | `[data-testid="email-input"]` |
+| Submit button | `button[type="submit"]` | `[data-testid="submit"]`      |
 ```
 
 ---
 
-### Paso 2: Crear Definiciones de Tipos (si se necesitan)
+### Phase 3: Architecture Decision
 
-Si el plan requiere nuevos tipos, agregarlos primero:
+**Determine what to create/modify:**
 
-```typescript
-// tests/data/types.ts
+```
+Questions:
+1. Does the UI component exist? (e.g., LoginPage.ts)
+   └── YES → Add new ATC to existing component
+   └── NO  → Create new component
 
-// Agregar nuevo tipo para el componente
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
+2. Does the ATC already exist?
+   └── YES → Use existing ATC
+   └── NO  → Create new ATC
 
-export interface UserRegistrationData {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-}
+3. Is this a reusable flow (2+ tests)?
+   └── YES → Consider Steps module
+   └── NO  → Keep in test file
+```
 
-// Tipo para parámetros del ATC
-export interface CheckoutData {
-  productId: string;
-  quantity: number;
-  shippingAddress: ShippingAddress;
-}
+**Output plan to user:**
+
+```markdown
+## Implementation Plan
+
+**Files to CREATE:**
+
+- tests/components/ui/CheckoutPage.ts
+  └── ATC: completeCheckoutSuccessfully
+
+**Files to MODIFY:**
+
+- tests/components/UiFixture.ts
+  └── Add: readonly checkout: CheckoutPage
+
+**Test file:**
+
+- tests/e2e/checkout/checkout.test.ts
 ```
 
 ---
 
-### Paso 3: Implementar Componente UI
+### Phase 4: Implement UI Component
 
-Crear el componente KATA siguiendo la estructura de Layer 3:
+Create the KATA component following Layer 3 structure:
 
-#### Template de Componente
+#### Component Template
 
 ```typescript
-// qa/tests/components/ui/{PageName}Page.ts
+// tests/components/ui/{PageName}Page.ts
 
 import type { TestContextOptions } from '@components/TestContext';
 import { expect } from '@playwright/test';
@@ -92,36 +218,36 @@ import { UiBase } from '@ui/UiBase';
 import { atc } from '@utils/decorators';
 
 // ============================================================================
-// DEFINICIONES DE TIPOS
+// TYPE DEFINITIONS
 // ============================================================================
 
 export interface {TypeName} {
   email: string;
   password: string;
-  // Agregar campos basados en variables del caso de test
+  // Add fields based on test case variables
 }
 
 // ============================================================================
-// IMPLEMENTACIÓN DEL COMPONENTE
+// COMPONENT IMPLEMENTATION
 // ============================================================================
 
 /**
- * {PageName}Page - Componente UI para {descripción del feature}
+ * {PageName}Page - UI Component for {feature description}
  *
- * Layer: 3 (Componente de Dominio)
- * Extiende: UiBase
+ * Layer: 3 (Domain Component)
+ * Extends: UiBase
  *
  * ATCs:
- * - {TEST-XXX}: {atcName}() - {descripción}
+ * - {TEST-XXX}: {atcName}() - {description}
  */
 export class {PageName}Page extends UiBase {
   // ==========================================================================
-  // LOCATORS COMPARTIDOS (usados en 2+ ATCs)
+  // SHARED LOCATORS (used in 2+ ATCs)
   // ==========================================================================
 
   /**
-   * Extraer locator SOLO si se usa en múltiples ATCs.
-   * De lo contrario, mantener locators inline en métodos ATC.
+   * Extract locator ONLY if used in multiple ATCs.
+   * Otherwise, keep locators inline in ATC methods.
    */
   private readonly submitButton = () => this.page.locator('[data-testid="submit-btn"]');
 
@@ -134,12 +260,12 @@ export class {PageName}Page extends UiBase {
   }
 
   // ==========================================================================
-  // NAVEGACIÓN
+  // NAVIGATION
   // ==========================================================================
 
   /**
-   * Navegar a la página.
-   * Llamar ANTES de ATCs que requieren navegación.
+   * Navigate to the page.
+   * Call this BEFORE ATCs that require navigation.
    */
   async goto(): Promise<void> {
     await this.page.goto(this.buildUrl('/{route}'));
@@ -151,74 +277,74 @@ export class {PageName}Page extends UiBase {
   // ==========================================================================
 
   /**
-   * {TEST-XXX}: {Descripción de lo que valida este ATC}
+   * {TEST-XXX}: {Description of what this ATC validates}
    *
-   * Precondiciones:
-   * - Llamar goto() antes de este ATC
-   * - El usuario puede necesitar estar autenticado (ver archivo de test)
+   * Preconditions:
+   * - Call goto() before this ATC
+   * - User may need to be authenticated (see test file)
    *
-   * Assertions Fijas:
+   * Fixed Assertions:
    * - {assertion 1}
    * - {assertion 2}
    */
   @atc('{TEST-XXX}')
   async {atcName}(data: {TypeName}): Promise<void> {
     // -------------------------------------------------------------------------
-    // ACCIÓN: Llenar campos del formulario
+    // ACTION: Fill form fields
     // -------------------------------------------------------------------------
     await this.page.locator('[data-testid="email-input"]').fill(data.email);
     await this.page.locator('[data-testid="password-input"]').fill(data.password);
 
     // -------------------------------------------------------------------------
-    // ACCIÓN: Enviar formulario
+    // ACTION: Submit form
     // -------------------------------------------------------------------------
     await this.submitButton().click();
 
     // -------------------------------------------------------------------------
-    // ASSERTIONS FIJAS: Validar resultado esperado
+    // FIXED ASSERTIONS: Validate expected outcome
     // -------------------------------------------------------------------------
     await expect(this.page).toHaveURL(/.*dashboard.*/);
     await expect(this.page.locator('[data-testid="welcome-message"]')).toBeVisible();
   }
 
   /**
-   * {TEST-YYY}: Validar error cuando {condición negativa}
+   * {TEST-YYY}: Validate error when {negative condition}
    *
-   * Precondiciones:
-   * - Llamar goto() antes de este ATC
+   * Preconditions:
+   * - Call goto() before this ATC
    *
-   * Assertions Fijas:
-   * - Se muestra mensaje de error
-   * - URL permanece en la misma página
+   * Fixed Assertions:
+   * - Error message is displayed
+   * - URL remains on same page
    */
   @atc('{TEST-YYY}')
   async {atcName}WithInvalid{X}(data: {TypeName}): Promise<void> {
     // -------------------------------------------------------------------------
-    // ACCIÓN: Llenar formulario con datos inválidos
+    // ACTION: Fill form with invalid data
     // -------------------------------------------------------------------------
     await this.page.locator('[data-testid="email-input"]').fill(data.email);
     await this.page.locator('[data-testid="password-input"]').fill(data.password);
 
     // -------------------------------------------------------------------------
-    // ACCIÓN: Enviar formulario
+    // ACTION: Submit form
     // -------------------------------------------------------------------------
     await this.submitButton().click();
 
     // -------------------------------------------------------------------------
-    // ASSERTIONS FIJAS: Validar estado de error
+    // FIXED ASSERTIONS: Validate error state
     // -------------------------------------------------------------------------
     await expect(this.page.locator('[role="alert"]')).toBeVisible();
-    await expect(this.page).toHaveURL(/.*login.*/); // Permanece en misma página
+    await expect(this.page).toHaveURL(/.*login.*/); // Stays on same page
   }
 
   // ==========================================================================
-  // HELPERS PRIVADOS (si se necesitan)
+  // PRIVATE HELPERS (if needed)
   // ==========================================================================
 
   /**
-   * Helper para llenar campos comunes del formulario.
-   * Usar cuando el mismo patrón de llenado se usa en múltiples ATCs.
-   * NO es un método público - solo se usa internamente.
+   * Helper to fill common form fields.
+   * Use when same fill pattern is used in multiple ATCs.
+   * NOT a public method - only used internally.
    */
   private async fillLoginForm(data: {TypeName}): Promise<void> {
     await this.page.locator('[data-testid="email-input"]').fill(data.email);
@@ -229,35 +355,35 @@ export class {PageName}Page extends UiBase {
 
 ---
 
-### Paso 4: Registrar Componente en Fixture
+### Phase 5: Register Component in Fixture
 
-Agregar el nuevo componente a `UiFixture.ts`:
+Add the new component to `UiFixture.ts`:
 
 ```typescript
-// qa/tests/components/UiFixture.ts
+// tests/components/UiFixture.ts
 
 import type { TestContextOptions } from '@components/TestContext';
 import { UiBase } from '@ui/UiBase';
 
-// Importar componentes existentes
+// Import existing components
 import { LoginPage } from '@ui/LoginPage';
-// Agregar nuevo import
+// Add new import
 import { {PageName}Page } from '@ui/{PageName}Page';
 
 export class UiFixture extends UiBase {
-  // Componentes existentes
+  // Existing components
   public readonly login: LoginPage;
 
-  // Agregar nuevo componente
+  // Add new component
   public readonly {pageName}: {PageName}Page;
 
   constructor(options: TestContextOptions) {
     super(options);
 
-    // Inicializar componentes existentes
+    // Initialize existing components
     this.login = new LoginPage(options);
 
-    // Inicializar nuevo componente
+    // Initialize new component
     this.{pageName} = new {PageName}Page(options);
   }
 }
@@ -265,104 +391,103 @@ export class UiFixture extends UiBase {
 
 ---
 
-### Paso 5: Implementar Archivo de Test
+### Phase 6: Implement Test File
 
-Crear el archivo de test siguiendo patrones KATA:
+Create the test file following KATA patterns:
 
-#### Template de Archivo de Test
+#### Test File Template
 
 ```typescript
-// qa/tests/e2e/{feature}/{feature}.test.ts
+// tests/e2e/{feature}/{feature}.test.ts
 
 import { expect } from '@playwright/test';
 import { test } from '@TestFixture';
 import type { {TypeName} } from '@ui/{PageName}Page';
 
 // ============================================================================
-// SUITE DE TESTS: {Nombre del Feature}
+// TEST SUITE: {Feature Name}
 // ============================================================================
 
-test.describe('{Nombre del Feature}', () => {
+test.describe('{Feature Name}', () => {
   // ==========================================================================
-  // FÁBRICA DE DATOS DE TEST
+  // PRECONDITION DATA (Discover pattern — see test-data-management.md)
   // ==========================================================================
 
-  /**
-   * Generar datos de test usando Faker.
-   * Llamar en cada test para asegurar datos únicos.
-   */
-  const createValidData = (): {TypeName} => ({
-    email: `test-${Date.now()}@example.com`,
-    password: 'SecurePassword123!',
-    // Usar TestContext.data.createXxx() si está disponible
-  });
+  // Discover data in beforeAll — NO assertions
+  let product: ProductCandidate | null;
 
-  const createInvalidData = (): {TypeName} => ({
-    email: 'invalid-email',
-    password: 'short',
+  test.beforeAll(async ({ api }) => {
+    product = await api.products.findAvailableProduct();
   });
 
   // ==========================================================================
   // TESTS: Happy Path
   // ==========================================================================
 
-  test('debería {acción} exitosamente @regression @{feature}', async ({ ui }) => {
-    // -------------------------------------------------------------------------
-    // ARRANGE: Preparar datos de test
-    // -------------------------------------------------------------------------
-    const data = createValidData();
+  test('TK-XXX: should {action} successfully @critical', async ({ ui }) => {
+    // Guard: skip if precondition data not found
+    if (!product) return test.skip(true, 'No available product found');
 
     // -------------------------------------------------------------------------
-    // ACT: Navegar y ejecutar ATC
+    // ARRANGE: Dynamic test data via DataFactory
     // -------------------------------------------------------------------------
+    const checkoutData = ui.data.createCheckoutData();
+
+    // -------------------------------------------------------------------------
+    // ACT: Preconditions + ATC
+    // -------------------------------------------------------------------------
+    await ui.auth.loginSuccessfully(credentials);
     await ui.{pageName}.goto();
-    await ui.{pageName}.{atcName}(data);
+    await ui.{pageName}.{atcName}(checkoutData);
 
     // -------------------------------------------------------------------------
-    // ASSERT: Assertions opcionales a nivel de test (más allá de assertions del ATC)
+    // ASSERT: Optional test-level assertions (beyond ATC assertions)
     // -------------------------------------------------------------------------
-    // El ATC ya valida las assertions primarias
-    // Agregar assertions específicas del test aquí si se necesitan
+    // ATC already validates primary assertions
+    // Add test-specific assertions here if needed
   });
 
   // ==========================================================================
-  // TESTS: Edge Cases / Negativos
+  // TESTS: Edge Cases / Negative
   // ==========================================================================
 
-  test('debería mostrar error con {campo} inválido @regression @{feature}', async ({ ui }) => {
+  test('TK-XXX: should show error with invalid {field} @high', async ({ ui }) => {
+    if (!product) return test.skip(true, 'No available product found');
+
     // -------------------------------------------------------------------------
-    // ARRANGE
+    // ARRANGE: Invalid data via DataFactory with override
     // -------------------------------------------------------------------------
-    const data = createInvalidData();
+    const invalidData = ui.data.createCheckoutData({
+      email: 'invalid-email', // Invalid override
+    });
 
     // -------------------------------------------------------------------------
     // ACT
     // -------------------------------------------------------------------------
     await ui.{pageName}.goto();
-    await ui.{pageName}.{atcName}WithInvalid{X}(data);
+    await ui.{pageName}.{atcName}WithInvalid{X}(invalidData);
 
     // -------------------------------------------------------------------------
-    // ASSERT: Assertions adicionales de caso negativo
+    // ASSERT: Additional negative case assertions
     // -------------------------------------------------------------------------
-    // El ATC valida que se muestra el error
+    // ATC validates error is shown
   });
 
   // ==========================================================================
-  // TESTS: Con API Setup (Híbrido)
+  // TESTS: With API Setup (Hybrid)
   // ==========================================================================
 
-  test('debería {acción} con datos existentes @regression', async ({ test: fixture }) => {
+  test('TK-XXX: should {action} with existing data @regression', async ({ test: fixture }) => {
     const { api, ui } = fixture;
 
     // -------------------------------------------------------------------------
-    // ARRANGE: Crear datos via API (setup rápido)
+    // ARRANGE: Create data via API (Generate pattern — for mutations)
     // -------------------------------------------------------------------------
-    const [, createdResource] = await api.{resource}.createSuccessfully({
-      // Datos del recurso
-    });
+    const resourceData = api.data.createResource();
+    const [, createdResource] = await api.{resource}.createSuccessfully(resourceData);
 
     // -------------------------------------------------------------------------
-    // ACT: Verificar via UI
+    // ACT: Verify via UI
     // -------------------------------------------------------------------------
     await ui.{pageName}.goto();
     await ui.{pageName}.view{Resource}Successfully(createdResource.id);
@@ -370,68 +495,75 @@ test.describe('{Nombre del Feature}', () => {
     // -------------------------------------------------------------------------
     // ASSERT
     // -------------------------------------------------------------------------
-    // El ATC maneja las assertions
+    // ATC handles assertions
   });
 });
 ```
 
 ---
 
-### Paso 6: Ejecutar y Validar
+### Phase 7: Run and Validate
 
-Ejecutar el test para verificar la implementación:
+Execute the test to verify implementation:
 
 ```bash
-# Ejecutar archivo de test específico
-cd qa && bun run test tests/e2e/{feature}/{feature}.test.ts
+# Run specific test file
+bun run test tests/e2e/{feature}/{feature}.test.ts
 
-# Ejecutar con modo UI para debugging
-bun run test:ui --grep "{nombre del test}"
+# Run with UI mode for debugging
+bun run test:ui --grep "{test name}"
 
-# Ejecutar con trace para debugging detallado
-cd qa && bun run test --trace on tests/e2e/{feature}/{feature}.test.ts
+# Run with trace for detailed debugging
+bun run test --trace on tests/e2e/{feature}/{feature}.test.ts
 ```
 
 ---
 
-## Checklist de Calidad de Código
+### Phase 8: Update TMS
 
-Antes de completar la fase de Coding, verificar:
+**Mark test as automated in TMS:**
 
-### Calidad del Componente
-
-- [ ] Extiende `UiBase` correctamente
-- [ ] Constructor acepta `TestContextOptions`
-- [ ] Decorator `@atc` con Test ID correcto
-- [ ] Locators son inline (a menos que se compartan en 2+ ATCs)
-- [ ] Assertions fijas dentro del ATC (no solo en test)
-- [ ] Sin `waitForTimeout()` - usar condiciones de espera apropiadas
-- [ ] Import aliases usados (`@ui/`, `@utils/`, etc.)
-
-### Calidad del Archivo de Test
-
-- [ ] Importa `test` desde `@TestFixture`
-- [ ] Datos de test generados frescos (no hardcodeados)
-- [ ] Estructura ARRANGE-ACT-ASSERT
-- [ ] Tags apropiados (`@regression`, `@smoke`, etc.)
-- [ ] Cada test es independiente (sin estado compartido)
-- [ ] Nombres de test descriptivos
-
-### Seguridad de Tipos
-
-- [ ] Todos los parámetros tienen tipos TypeScript
-- [ ] Tipos de retorno especificados en métodos
-- [ ] Sin tipos `any`
-- [ ] Tipos exportados para uso en archivo de test
+- Update test case with automation plan (file path and description)
+- Link to test file location
+- Update status if needed
 
 ---
 
-## Patrones Comunes de Implementación
+## Code Quality Checklist
 
-### Esperar Respuesta de API
+Before completing the Coding phase, verify:
+
+### Component Quality
+- [ ] Extends `UiBase` correctly
+- [ ] Constructor accepts `TestContextOptions`
+- [ ] `@atc` decorator with correct Test ID
+- [ ] Locators are inline (unless shared in 2+ ATCs)
+- [ ] Fixed assertions inside ATC (not just in test)
+- [ ] No `waitForTimeout()` - use proper wait conditions
+- [ ] Import aliases used (`@ui/`, `@utils/`, etc.)
+
+### Test File Quality
+- [ ] Imports `test` from `@TestFixture`
+- [ ] Test data generated fresh (not hardcoded)
+- [ ] ARRANGE-ACT-ASSERT structure
+- [ ] Appropriate tags (`@regression`, `@smoke`, etc.)
+- [ ] Each test is independent (no shared state)
+- [ ] Descriptive test names
+
+### Type Safety
+- [ ] All parameters have TypeScript types
+- [ ] Return types specified on methods
+- [ ] No `any` types
+- [ ] Types exported for test file use
+
+---
+
+## Common Implementation Patterns
+
+### Wait for API Response
 
 ```typescript
-// Esperar a que se complete una llamada API específica
+// Wait for specific API call to complete
 const responsePromise = this.page.waitForResponse(
   response => response.url().includes('/api/endpoint') && response.status() === 200
 );
@@ -439,10 +571,10 @@ await this.submitButton().click();
 await responsePromise;
 ```
 
-### Interceptar y Validar Respuesta
+### Intercept and Validate Response
 
 ```typescript
-// Usando helper UiBase.interceptResponse
+// Using UiBase.interceptResponse helper
 const { responseBody, status } = await this.interceptResponse<RequestType, ResponseType>({
   urlPattern: /\/api\/endpoint/,
   action: async () => {
@@ -454,57 +586,57 @@ expect(status).toBe(200);
 expect(responseBody.success).toBe(true);
 ```
 
-### Manejar Modales/Diálogos
+### Handle Modals/Dialogs
 
 ```typescript
-// Esperar modal e interactuar
+// Wait for modal and interact
 await expect(this.page.locator('[data-testid="confirm-modal"]')).toBeVisible();
 await this.page.locator('[data-testid="confirm-btn"]').click();
 await expect(this.page.locator('[data-testid="confirm-modal"]')).not.toBeVisible();
 ```
 
-### Contenido Dinámico
+### Dynamic Content
 
 ```typescript
-// Esperar a que cargue la lista
+// Wait for list to load
 await this.page.waitForSelector('[data-testid="item-list"] [data-testid="item"]');
 const items = this.page.locator('[data-testid="item-list"] [data-testid="item"]');
 await expect(items).toHaveCount(expectedCount);
 ```
 
-### Formulario con Múltiples Pasos
+### Form with Multiple Steps
 
 ```typescript
-// Paso 1
+// Step 1
 await this.page.locator('[data-testid="step-1-field"]').fill(data.step1Value);
 await this.page.locator('[data-testid="next-btn"]').click();
 
-// Esperar paso 2
+// Wait for step 2
 await expect(this.page.locator('[data-testid="step-2-form"]')).toBeVisible();
 
-// Paso 2
+// Step 2
 await this.page.locator('[data-testid="step-2-field"]').fill(data.step2Value);
 await this.page.locator('[data-testid="submit-btn"]').click();
 ```
 
 ---
 
-## Anti-Patrones a Evitar
+## Anti-Patterns to Avoid
 
-### ❌ Incorrecto: ATC de Interacción Simple
+### ❌ Wrong: Single Interaction ATC
 
 ```typescript
-// Esto NO es un ATC - es solo un click
+// This is NOT an ATC - it's just a click
 @atc('TEST-001')
 async clickSubmit() {
   await this.page.click('#submit');
 }
 ```
 
-### ✅ Correcto: Caso de Test Completo
+### ✅ Correct: Complete Test Case
 
 ```typescript
-// Flujo completo con assertions
+// Complete flow with assertions
 @atc('TEST-001')
 async submitFormSuccessfully(data: FormData) {
   await this.page.fill('#email', data.email);
@@ -514,13 +646,13 @@ async submitFormSuccessfully(data: FormData) {
 }
 ```
 
-### ❌ Incorrecto: Esperas Hardcodeadas
+### ❌ Wrong: Hardcoded Waits
 
 ```typescript
-await this.page.waitForTimeout(3000); // Nunca hacer esto
+await this.page.waitForTimeout(3000); // Never do this
 ```
 
-### ✅ Correcto: Esperas Basadas en Condiciones
+### ✅ Correct: Condition-Based Waits
 
 ```typescript
 await this.page.waitForSelector('[data-loaded="true"]');
@@ -528,43 +660,52 @@ await this.page.waitForLoadState('networkidle');
 await expect(element).toBeVisible();
 ```
 
-### ❌ Incorrecto: ATC Llamando a ATC
+### ❌ Wrong: ATC Calling ATC
 
 ```typescript
 @atc('TEST-001')
 async checkoutFlow() {
-  await this.loginSuccessfully(creds); // ¡Otro ATC!
-  await this.addToCartSuccessfully(product); // ¡Otro ATC!
+  await this.loginSuccessfully(creds); // Another ATC!
+  await this.addToCartSuccessfully(product); // Another ATC!
 }
 ```
 
-### ✅ Correcto: Usar Módulo Flows
+### ✅ Correct: Use Steps Module
 
 ```typescript
-// En archivo de test
-const flows = new CheckoutFlows(ui);
-await flows.setupAuthenticatedUserWithCart(creds, product);
+// In test file (preconditions via Steps)
+await steps.checkout.setupAuthenticatedUserWithCart(creds, product);
 await ui.checkout.completeCheckoutSuccessfully();
 ```
 
 ---
 
-## Checklist de Output
+## PROGRESS UPDATE (Module Workflow Only)
 
-Después de completar la fase de Coding:
+If this ticket is part of a module workflow with `PROGRESS.md`:
 
-- [ ] Componente UI creado: `qa/tests/components/ui/{PageName}Page.ts`
-- [ ] Componente registrado en: `qa/tests/components/UiFixture.ts`
-- [ ] Archivo de test creado: `qa/tests/e2e/{feature}/{feature}.test.ts`
-- [ ] Tipos definidos (si nuevos): `tests/data/types.ts`
-- [ ] Test pasa localmente: `bun run test <archivo-de-test>`
-- [ ] Sin errores TypeScript: `bun run type-check`
-- [ ] Linting pasa: `bun run lint`
+- Update test file path and done count in the ticket progress table
+- Add session log entry with date and summary
+- **Next step**: Run the review using `.prompts/fase-12-test-automation/e2e/e2e-review.md`
 
 ---
 
-## Siguiente Paso
+## Output Checklist
 
-Una vez que la implementación esté completa y los tests pasen:
+After completing the Coding phase:
 
-→ **Proceder a**: `e2e-review.md` (Fase 3)
+- [ ] UI Component created: `tests/components/ui/{PageName}Page.ts`
+- [ ] Component registered in: `tests/components/UiFixture.ts`
+- [ ] Test file created: `tests/e2e/{feature}/{feature}.test.ts`
+- [ ] Types defined (if new): `tests/data/types.ts`
+- [ ] Test passes locally: `bun run test <test-file>`
+- [ ] No TypeScript errors: `bun run type-check`
+- [ ] Linting passes: `bun run lint`
+
+---
+
+## Next Step
+
+Once implementation is complete and tests pass:
+
+→ **Proceed to**: `e2e/e2e-review.md` (Phase 3)

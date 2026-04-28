@@ -1,188 +1,264 @@
-# Regression Testing
+# Stage 6: Regression Testing
 
-> **Propósito**: Ejecutar suites de tests automatizados, analizar resultados y generar reportes de calidad para tomar decisiones GO/NO-GO.
-> **Iteración**: Por release, sprint, o bajo demanda (validación post-deploy).
+> **Purpose**: Execute automated test suites, analyze results, and generate quality reports to make GO/NO-GO decisions.
+> **Iteration**: Per release, sprint, or on-demand (post-deployment validation).
 
 ---
 
 ## Overview
 
-Esta subfase cierra el ciclo de testing ejecutando tests automatizados y analizando resultados. Mientras las otras subfases (E2E, Integration) se enfocan en crear y automatizar tests, **Regression** se enfoca en **ejecutarlos sistemáticamente** y **tomar decisiones basadas en resultados**.
+Stage 6 closes the testing cycle by executing automated tests and analyzing results. While Stages 1-5 focus on creating and automating tests, Stage 6 focuses on **running them systematically** and **making decisions based on results**.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                          CICLO DE TESTING                                    │
+│                          TESTING LIFECYCLE                                   │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-  Fase 10         Fase 11          Fase 12
-  ───────         ───────          ───────────────────────────────────────────
-  Exploratory →   Documentation →  Automation (E2E/Integration/Regression)
-      │                │                                │
-      ▼                ▼                                ▼
-  Tests manuales   ATCs en TMS                    Código + Ejecución + Reportes
-                                                        │
-                  ◄─────────────── Feedback Loop ───────┘
+  Stage 1          Stage 2          Stage 3          Stage 4          Stage 5          Stage 6
+  ───────          ───────          ───────          ───────          ───────          ───────
+  Shift-Left   →   Exploratory  →   Reporting    →   Documentation → Automation   →   REGRESSION
+  (Plan)           (Execute)        (Report)         (Document)       (Implement)      (Execute)
+     │                 │                 │                │                │                │
+     ▼                 ▼                 ▼                ▼                ▼                ▼
+  ATP/TCs        Manual tests      ATR + Bugs      ATCs in TMS     Code in repo    Run & Report
+                                                                          │
+                  ◄────────────── Feedback Loop ────────────────────────◄─┘
 ```
 
 ---
 
-## Flujo de Trabajo
+## Workflow
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                       REGRESSION WORKFLOW                                    │
+│                       STAGE 6: REGRESSION WORKFLOW                          │
 └─────────────────────────────────────────────────────────────────────────────┘
 
                        ┌─────────────────────┐
                        │      TRIGGER        │
                        │  ─────────────────  │
-                       │  • Request manual   │
-                       │  • Schedule diario  │
+                       │  • Manual request   │
+                       │  • Daily schedule   │
                        │  • Post-deploy      │
                        └──────────┬──────────┘
                                   │
                                   ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  1. EJECUCIÓN (regression-execution.md)                                     │
-│  ─────────────────────────────────────────────────────────────────────────  │
-│  • Seleccionar tipo: regression | smoke | sanity                            │
-│  • Disparar workflow via `gh workflow run`                                  │
-│  • Monitorear hasta completar                                               │
-│  • Output: Run ID, status, duración                                         │
+│  1. EXECUTION (regression-execution.md)                                     │
+│  ────────────────────────────────────────────────────────────────────────── │
+│  • Select suite type: regression | smoke | sanity                           │
+│  • Trigger workflow via `gh workflow run`                                   │
+│  • Monitor execution until completion                                       │
+│  • Output: Run ID, status, duration                                         │
 └─────────────────────────────────────────────────────────────────────────────┘
                                   │
                                   ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  2. ANÁLISIS (regression-analysis.md)                                       │
-│  ─────────────────────────────────────────────────────────────────────────  │
-│  • Descargar y parsear resultados                                           │
-│  • Clasificar fallos: REGRESSION | FLAKY | KNOWN | ENVIRONMENT              │
-│  • Calcular métricas: pass rate, duración, tendencias                       │
-│  • Output: Clasificación de fallos, métricas, recomendación preliminar      │
+│  2. ANALYSIS (regression-analysis.md)                                       │
+│  ────────────────────────────────────────────────────────────────────────── │
+│  • Download and parse test results                                          │
+│  • Classify failures: REGRESSION | FLAKY | KNOWN | ENVIRONMENT              │
+│  • Calculate metrics: pass rate, duration, trends                           │
+│  • Output: Failure classification, metrics, preliminary recommendation      │
 └─────────────────────────────────────────────────────────────────────────────┘
                                   │
                                   ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  3. REPORTE (regression-report.md)                                          │
-│  ─────────────────────────────────────────────────────────────────────────  │
-│  • Generar reporte de calidad con decisión GO/NO-GO                         │
-│  • Crear issues para regresiones (opcional)                                 │
-│  • Actualizar estado en TMS (opcional)                                      │
-│  • Output: Reporte de calidad, issues creados, recomendaciones              │
+│  3. REPORT (regression-report.md)                                           │
+│  ────────────────────────────────────────────────────────────────────────── │
+│  • Generate quality report with GO/NO-GO decision                           │
+│  • Create issues for regressions (optional)                                 │
+│  • Update TMS status (optional)                                             │
+│  • Output: Quality report, created issues, recommendations                  │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Prompts Disponibles
+## Available Prompts
 
-| Fase | Prompt                    | Propósito                                      |
-| ---- | ------------------------- | ---------------------------------------------- |
-| 1    | `regression-execution.md` | Ejecutar suite y monitorear hasta completar    |
-| 2    | `regression-analysis.md`  | Analizar resultados y clasificar fallos        |
-| 3    | `regression-report.md`    | Generar reporte de calidad y decisión GO/NO-GO |
+| Phase | Prompt | Purpose |
+|-------|--------|---------|
+| 1 | `regression-execution.md` | Execute test suite and monitor to completion |
+| 2 | `regression-analysis.md` | Analyze results and classify failures |
+| 3 | `regression-report.md` | Generate quality report and GO/NO-GO decision |
 
-### Cuándo Usar Cada Uno
+### When to Use Each
 
-| Escenario                            | Prompt(s) a Usar                              |
-| ------------------------------------ | --------------------------------------------- |
-| Regression completo antes de release | Los tres en secuencia                         |
-| Health check rápido                  | `regression-execution.md` (smoke) solamente   |
-| Investigar fallos                    | `regression-analysis.md` con Run ID existente |
-| Generar reporte para stakeholders    | `regression-report.md` con análisis           |
-
----
-
-## Workflows Disponibles
-
-| Workflow       | Archivo          | Schedule         | Propósito                          |
-| -------------- | ---------------- | ---------------- | ---------------------------------- |
-| **Regression** | `regression.yml` | Diario 00:00 UTC | Suite completa: Integration → E2E  |
-| **Smoke**      | `smoke.yml`      | Diario 02:00 UTC | Solo tests críticos (@critical)    |
-| **Sanity**     | `sanity.yml`     | Solo manual      | Tests específicos por grep/archivo |
+| Scenario | Prompt(s) to Use |
+|----------|------------------|
+| Full regression before release | All three in sequence |
+| Quick health check | `regression-execution.md` (smoke) only |
+| Investigate failures | `regression-analysis.md` with existing Run ID |
+| Generate stakeholder report | `regression-report.md` with analysis |
 
 ---
 
-## Referencia Rápida `gh` CLI
+## Available Workflows
 
-### Ejecutar Workflows
+| Workflow | File | Schedule | Purpose |
+|----------|------|----------|---------|
+| **Regression** | `regression.yml` | Daily 00:00 UTC | Full suite: Integration → E2E |
+| **Smoke** | `smoke.yml` | Daily 02:00 UTC | Critical tests only (@critical tag) |
+| **Sanity** | `sanity.yml` | Manual only | Specific tests by grep/file |
+
+### Workflow Inputs
+
+#### regression.yml
+
+| Input | Type | Default | Description |
+|-------|------|---------|-------------|
+| `environment` | choice | {{DEFAULT_ENV}} | `local` \| `staging` |
+| `video_record` | boolean | false | Enable video recording |
+| `generate_allure` | boolean | true | Generate Allure report |
+
+#### smoke.yml
+
+| Input | Type | Default | Description |
+|-------|------|---------|-------------|
+| `environment` | choice | {{DEFAULT_ENV}} | `local` \| `staging` |
+| `generate_allure` | boolean | true | Generate Allure report |
+
+#### sanity.yml
+
+| Input | Type | Default | Description |
+|-------|------|---------|-------------|
+| `environment` | choice | {{DEFAULT_ENV}} | `local` \| `staging` |
+| `test_type` | choice | all | `all` \| `e2e` \| `integration` |
+| `grep` | string | - | Test name pattern filter |
+| `test_file` | string | - | Specific test file path |
+| `generate_allure` | boolean | true | Generate Allure report |
+| `custom_allure_url` | string | sanity | Custom report URL path |
+
+---
+
+## `gh` CLI Quick Reference
+
+### Execute Workflows
 
 ```bash
-# Regression completo
+# Full regression
 gh workflow run regression.yml -f environment=staging -f generate_allure=true
 
 # Smoke tests
 gh workflow run smoke.yml -f environment=staging
 
-# Sanity con patrón grep
+# Sanity with grep pattern
 gh workflow run sanity.yml -f environment=staging -f grep="@auth" -f test_type=e2e
+
+# Sanity with specific file
+gh workflow run sanity.yml -f environment=staging -f test_file="tests/e2e/auth/login.test.ts"
 ```
 
-### Monitorear Ejecución
+### Monitor Execution
 
 ```bash
-# Listar runs recientes
+# List recent runs
 gh run list --workflow=regression.yml --limit=5
 
-# Ver run en tiempo real
+# Watch run in real-time
 gh run watch <run-id>
 
-# Ver status del run
+# View run status
 gh run view <run-id>
+
+# View run status as JSON (for parsing)
+gh run view <run-id> --json status,conclusion,jobs
 ```
 
-### Analizar Resultados
+### Analyze Results
 
 ```bash
-# Ver solo logs de fallos
+# View failed logs only
 gh run view <run-id> --log-failed
 
-# Descargar artefactos
+# Download artifacts
 gh run download <run-id> -n merged-allure-results-staging
+
+# List available artifacts
+gh run view <run-id> --json artifacts
 ```
 
 ---
 
-## Framework de Decisión
+## Artifacts Reference
 
-### Criterios GO/NO-GO
-
-| Métrica         | GO    | PRECAUCIÓN         | NO-GO                  |
-| --------------- | ----- | ------------------ | ---------------------- |
-| Pass Rate       | ≥ 95% | 90-95%             | < 90%                  |
-| Regresiones     | 0     | 1-2 (bajo impacto) | Cualquier alto impacto |
-| Fallos Críticos | 0     | 0                  | Cualquiera             |
-| Tests Flaky     | ≤ 3   | 4-5                | > 5                    |
-
-### Clasificación de Fallos
-
-| Categoría       | Criterio                          | Acción                   |
-| --------------- | --------------------------------- | ------------------------ |
-| **REGRESSION**  | Test pasaba antes, ahora falla    | Crear issue, bloquear GO |
-| **FLAKY**       | Historial de fallos intermitentes | Marcar para revisión     |
-| **KNOWN ISSUE** | Vinculado a ticket existente      | Documentar, no bloquear  |
-| **ENVIRONMENT** | Issue de infraestructura/timeout  | Re-ejecutar o saltar     |
-| **NEW TEST**    | Sin historial previo              | Verificación manual      |
+| Workflow | Artifact Name | Content |
+|----------|---------------|---------|
+| regression | `integration-allure-results` | API test Allure results |
+| regression | `e2e-allure-results` | E2E test Allure results |
+| regression | `merged-allure-results-{env}` | Combined results |
+| regression | `e2e-playwright-report` | Playwright HTML report |
+| smoke | `smoke-allure-results` | Smoke test results |
+| sanity | `sanity-allure-results` | Sanity test results |
+| all | `*-failure-evidence` | Screenshots, traces on failure |
 
 ---
 
-## Integración con Otras Fases
+## Allure Report URLs
 
-### Feedback a Fase 10 (Exploratory)
+Reports are deployed to GitHub Pages at:
 
-- Identificar áreas poco testeadas por patrones de fallos
-- Sugerir nuevos casos de test basados en regresiones
+```
+https://{owner}.github.io/{repo}/{environment}/{suite}/
 
-### Feedback a E2E/Integration
-
-- Reportar tests flaky para estabilización
-- Identificar tests que necesitan mantenimiento
-
-### Sync con TMS (Fase 11)
-
-- Actualizar estado de ejecución de tests
-- Vincular fallos a casos de test
+Examples:
+- https://<org>.github.io/<repo>/staging/regression/
+- https://<org>.github.io/<repo>/staging/smoke/
+```
 
 ---
 
-**Regression completa el ciclo**: Tests automatizados se ejecutan, analizan y reportan para decisiones informadas de release.
+## Decision Framework
+
+### GO/NO-GO Criteria
+
+| Metric | GO | CAUTION | NO-GO |
+|--------|-----|---------|-------|
+| Pass Rate | ≥ 95% | 90-95% | < 90% |
+| Regressions | 0 | 1-2 (low impact) | Any high impact |
+| Critical Failures | 0 | 0 | Any |
+| Flaky Tests | ≤ 3 | 4-5 | > 5 |
+
+### Failure Classification
+
+| Category | Criteria | Action |
+|----------|----------|--------|
+| **REGRESSION** | Test passed before, now fails | Create issue, block GO |
+| **FLAKY** | Intermittent failure history | Mark for review |
+| **KNOWN ISSUE** | Linked to existing ticket | Document, don't block |
+| **ENVIRONMENT** | Infrastructure/timeout issue | Re-run or skip |
+| **NEW TEST** | No previous history | Manual verification |
+
+---
+
+## Integration with Other Stages
+
+### Feedback to Stage 1 (Shift-Left)
+
+- Identify undertested areas from failure patterns
+- Suggest new test cases based on regressions
+
+### Feedback to Stage 5 (Automation)
+
+- Report flaky tests for stabilization
+- Identify tests needing maintenance
+
+### TMS Sync (Stage 3/4 Integration)
+
+- Update test execution status
+- Link failures to test cases
+
+---
+
+## Related Files
+
+- `.github/workflows/regression.yml` - Full regression workflow
+- `.github/workflows/smoke.yml` - Smoke test workflow
+- `.github/workflows/sanity.yml` - Sanity test workflow
+- `.context/test-management-system.md` - TMS configuration
+- `.context/guidelines/TAE/kata-ai-index.md` - KATA patterns
+
+---
+
+**Stage 6 completes the cycle**: Automated tests from Stage 5 are executed, analyzed, and reported to stakeholders for informed release decisions.

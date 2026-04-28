@@ -20,7 +20,7 @@ Analyze, triage, and fix bugs/defects reported during exploratory testing or pro
 **Prerequisites:**
 
 - Bug reported in Jira (from exploratory testing or production)
-- Access to Atlassian MCP tools (`mcp__atlassian__*`)
+- Access to `[ISSUE_TRACKER_TOOL]` (e.g., Atlassian/Jira MCP)
 - Access to GitHub CLI (`gh`)
 - Optional: Browser testing tools (e.g., Playwright MCP)
 - Optional: API testing tools (e.g., Postman MCP)
@@ -36,7 +36,7 @@ Analyze, triage, and fix bugs/defects reported during exploratory testing or pro
 
 ### Required: Atlassian MCP
 
-**Check if available:** [Verify access to `mcp__atlassian__jira_get_issue`]
+**Check if available:** [Verify access to `[ISSUE_TRACKER_TOOL]`]
 
 **If NOT available:**
 
@@ -50,9 +50,8 @@ This workflow requires Jira integration to:
 - Add documentation comments
 
 **How to connect:**
-1. Review: `.context/guidelines/MCP/atlassian.md`
-2. Add Atlassian MCP to your configuration
-3. Restart the chat session
+1. Add Atlassian MCP to your configuration
+2. Restart the chat session
 
 **Cannot proceed without Atlassian MCP.**
 ```
@@ -159,13 +158,11 @@ This workflow requires GitHub CLI for:
 
 ### Fallback 1: Search for Equivalent Field
 
-When a custom field ID fails, use `mcp__atlassian__jira_search_fields`:
+When a custom field ID fails, use `[ISSUE_TRACKER_TOOL]` to search for fields:
 
 ```
-Tool: mcp__atlassian__jira_search_fields
-{
-  "keyword": "root cause"  // or "severity", "error type", etc.
-}
+Use [ISSUE_TRACKER_TOOL] to search fields:
+  keyword: "root cause"  // or "severity", "error type", etc.
 ```
 
 If found:
@@ -210,21 +207,19 @@ As last resort:
 **Call 1 - Standard fields:**
 
 ```
-Tool: mcp__atlassian__jira_get_issue
-Parameters:
-- issue_key: "PROJ-123"
-- fields: "*all"
-- expand: "changelog"
-- comment_limit: 50
+Use [ISSUE_TRACKER_TOOL] to get issue:
+  issue_key: "PROJ-123"
+  fields: "*all"
+  expand: "changelog"
+  comment_limit: 50
 ```
 
 **Call 2 - Custom fields explicitly:**
 
 ```
-Tool: mcp__atlassian__jira_get_issue
-Parameters:
-- issue_key: "PROJ-123"
-- fields: "customfield_10109,customfield_10110,customfield_10112,customfield_10116,customfield_12210,customfield_10701,customfield_10111,customfield_10607,customfield_12212"
+Use [ISSUE_TRACKER_TOOL] to get issue:
+  issue_key: "PROJ-123"
+  fields: "customfield_10109,customfield_10110,customfield_10112,customfield_10116,customfield_12210,customfield_10701,customfield_10111,customfield_10607,customfield_12212"
 ```
 
 **Extract from combined results:**
@@ -281,21 +276,19 @@ Check issue links for:
 **Call 1 - Standard fields and comments:**
 
 ```
-Tool: mcp__atlassian__jira_get_issue
-Parameters:
-- issue_key: "[BUG_ID]"
-- fields: "*all"
-- expand: "changelog"
-- comment_limit: 50
+Use [ISSUE_TRACKER_TOOL] to get issue:
+  issue_key: "[BUG_ID]"
+  fields: "*all"
+  expand: "changelog"
+  comment_limit: 50
 ```
 
 **Call 2 - Custom fields explicitly (REQUIRED):**
 
 ```
-Tool: mcp__atlassian__jira_get_issue
-Parameters:
-- issue_key: "[BUG_ID]"
-- fields: "customfield_10109,customfield_10110,customfield_10112,customfield_10116,customfield_12210,customfield_10701,customfield_10111,customfield_10607,customfield_12212"
+Use [ISSUE_TRACKER_TOOL] to get issue:
+  issue_key: "[BUG_ID]"
+  fields: "customfield_10109,customfield_10110,customfield_10112,customfield_10116,customfield_12210,customfield_10701,customfield_10111,customfield_10607,customfield_12212"
 ```
 
 **Why two calls?**
@@ -303,7 +296,7 @@ Parameters:
 - Call 2: Explicitly retrieves custom field VALUES (Actual/Expected Result, Severity, Error Type, etc.)
 
 **If custom fields return `null` or "field not found":**
-1. Use `mcp__atlassian__jira_search_fields` to find equivalent fields
+1. Use `[ISSUE_TRACKER_TOOL]` to search for fields by keyword to find equivalent fields
 2. Ask user for correct field IDs (see Fallback Strategy section)
 3. Do NOT assume fields are empty without verifying
 
@@ -348,9 +341,8 @@ Parameters:
 **Step 3: Check for duplicates**
 
 ```
-Tool: mcp__atlassian__jira_search
-JQL: project = [PROJECT] AND type = Bug AND status != Done
-     AND summary ~ "[keywords]" AND key != [CURRENT_BUG]
+Use [ISSUE_TRACKER_TOOL] to search issues:
+  jql: "project = [PROJECT] AND type = Bug AND status != Done AND summary ~ '[keywords]' AND key != [CURRENT_BUG]"
 ```
 
 **If potential duplicate found:**
@@ -503,10 +495,9 @@ Do you want me to:
 **Transition to In Progress (if real bug):**
 
 ```
-Tool: mcp__atlassian__jira_transition_issue
-Parameters:
-- issue_key: "[BUG_ID]"
-- transition: "In Progress"
+Use [ISSUE_TRACKER_TOOL] to transition issue:
+  issue_key: "[BUG_ID]"
+  transition: "In Progress"
 ```
 
 ---
@@ -758,40 +749,36 @@ Next steps:
 **Step 1: Update Custom Fields (Root Cause)**
 
 ```
-Tool: mcp__atlassian__jira_update_issue
-Parameters:
-- issue_key: "[BUG_ID]"
-- fields: {
-    "customfield_10701": {"value": "[Root Cause Category]"},
-    "customfield_12212": {"value": "Bugfix"}  // or "Hotfix"
-  }
+Use [ISSUE_TRACKER_TOOL] to update issue:
+  issue_key: "[BUG_ID]"
+  fields:
+    customfield_10701: {"value": "[Root Cause Category]"}
+    customfield_12212: {"value": "Bugfix"}  // or "Hotfix"
 ```
 
 **Step 2: Add Fix Documentation Comment**
 
 ```
-Tool: mcp__atlassian__jira_add_comment
-Parameters:
-- issue_key: "[BUG_ID]"
-- body: "[Use Fix Documentation Template below]"
+Use [ISSUE_TRACKER_TOOL] to add comment to issue:
+  issue_key: "[BUG_ID]"
+  body: "[Use Fix Documentation Template below]"
 ```
 
 **Step 3: Transition to Ready For QA**
 
 ```
-Tool: mcp__atlassian__jira_transition_issue
-Parameters:
-- issue_key: "[BUG_ID]"
-- transition: "Ready For QA"  // or appropriate transition name
+Use [ISSUE_TRACKER_TOOL] to transition issue:
+  issue_key: "[BUG_ID]"
+  transition: "Ready For QA"  // or appropriate transition name
 ```
 
 **Step 4: Assign to QA (if known)**
 
 ```
-Tool: mcp__atlassian__jira_update_issue
-Parameters:
-- issue_key: "[BUG_ID]"
-- fields: {"assignee": "[qa-email@example.com]"}
+Use [ISSUE_TRACKER_TOOL] to update issue:
+  issue_key: "[BUG_ID]"
+  fields:
+    assignee: "[qa-email@example.com]"
 ```
 
 ---
@@ -817,10 +804,9 @@ Before evaluating whether fields are "missing" or "incomplete":
 4. **Only mark as "missing" if the explicit call returned `null` or empty**
 
 ```
-Tool: mcp__atlassian__jira_get_issue
-Parameters:
-- issue_key: "[BUG_ID]"
-- fields: "customfield_10109,customfield_10110,customfield_10112,customfield_10116,customfield_12210,customfield_10701,customfield_10111,customfield_10607,customfield_12212"
+Use [ISSUE_TRACKER_TOOL] to get issue:
+  issue_key: "[BUG_ID]"
+  fields: "customfield_10109,customfield_10110,customfield_10112,customfield_10116,customfield_12210,customfield_10701,customfield_10111,customfield_10607,customfield_12212"
 ```
 
 **If fields return null after explicit call:** Then it's valid to note as missing in feedback.
@@ -1496,24 +1482,24 @@ Before presenting the final report, verify:
 
 ---
 
-## Quick Reference: MCP Tools
+## Quick Reference: Tools
 
-| Action                    | Tool                                    |
-| ------------------------- | --------------------------------------- |
-| Read bug issue            | `mcp__atlassian__jira_get_issue`        |
-| Search for duplicates     | `mcp__atlassian__jira_search`           |
-| Update custom fields      | `mcp__atlassian__jira_update_issue`     |
-| Add comment               | `mcp__atlassian__jira_add_comment`      |
-| Transition status         | `mcp__atlassian__jira_transition_issue` |
-| Link issues               | `mcp__atlassian__jira_link_issues`      |
-| Search for fields         | `mcp__atlassian__jira_search_fields`    |
-| Navigate browser          | Browser automation tool (if available)  |
-| Take screenshot           | Browser automation tool (if available)  |
-| Check library docs        | `mcp__context7__get-library-docs`       |
+| Action                    | Tool                                              |
+| ------------------------- | ------------------------------------------------- |
+| Read bug issue            | `[ISSUE_TRACKER_TOOL]` to get issue               |
+| Search for duplicates     | `[ISSUE_TRACKER_TOOL]` to search issues            |
+| Update custom fields      | `[ISSUE_TRACKER_TOOL]` to update issue             |
+| Add comment               | `[ISSUE_TRACKER_TOOL]` to add comment              |
+| Transition status         | `[ISSUE_TRACKER_TOOL]` to transition issue         |
+| Link issues               | `[ISSUE_TRACKER_TOOL]` to link issues              |
+| Search for fields         | `[ISSUE_TRACKER_TOOL]` to search fields            |
+| Navigate browser          | `[AUTOMATION_TOOL]` (if available)                 |
+| Take screenshot           | `[AUTOMATION_TOOL]` (if available)                 |
+| Check library docs        | `[DOCS_TOOL]`                                      |
 
 ## Quick Reference: Jira Transition IDs (UPEX Galaxy)
 
-> **Note:** Transition IDs may vary by workspace. Use `mcp__atlassian__jira_get_transitions` to get available transitions for a specific issue.
+> **Note:** Transition IDs may vary by workspace. Use `[ISSUE_TRACKER_TOOL]` to get available transitions for a specific issue.
 
 | ID  | Transition Name | From → To                    |
 | --- | --------------- | ---------------------------- |
@@ -1528,10 +1514,9 @@ Before presenting the final report, verify:
 **Usage:**
 
 ```
-Tool: mcp__atlassian__jira_transition_issue
-Parameters:
-- issue_key: "PROJ-123"
-- transition_id: "121"  // or transition name: "start fixing"
+Use [ISSUE_TRACKER_TOOL] to transition issue:
+  issue_key: "PROJ-123"
+  transition_id: "121"  // or transition name: "start fixing"
 ```
 
 ## Quick Reference: Git Commands
@@ -1584,11 +1569,10 @@ project = [PROJECT_KEY] AND issuetype in (Bug, Defect) AND status = OPEN ORDER B
 **Tool usage:**
 
 ```
-Tool: mcp__atlassian__jira_search
-Parameters:
-- jql: "project = PROJ AND issuetype in (Bug, Defect) AND status = OPEN ORDER BY priority DESC"
-- fields: "summary,priority,status,reporter,created"
-- limit: 20
+Use [ISSUE_TRACKER_TOOL] to search issues:
+  jql: "project = PROJ AND issuetype in (Bug, Defect) AND status = OPEN ORDER BY priority DESC"
+  fields: "summary,priority,status,reporter,created"
+  limit: 20
 ```
 
 ---
@@ -1742,7 +1726,7 @@ To continue a previous session, paste this block with updated data:
 
 **If still not found:**
 
-1. Verify field exists: `mcp__atlassian__jira_search_fields` with keyword
+1. Verify field exists: use `[ISSUE_TRACKER_TOOL]` to search fields with keyword
 2. Ask user for correct field ID
 3. Check if field is only visible to certain roles/projects
 

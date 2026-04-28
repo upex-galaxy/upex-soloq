@@ -25,5 +25,4 @@
 
 **Ver También:**
 
-- `.context/guidelines/MCP/` - Guías de uso de MCP para AI
 - `docs/architectures/` - Configuración específica por arquitectura

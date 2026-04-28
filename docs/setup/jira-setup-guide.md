@@ -555,4 +555,4 @@ Después de completar este setup:
 
 **Documento Creado**: 2026-02-09
 **Versión IQL**: 2.0
-**Compatible Con**: jira-platform.md v1.0, cli/xray.ts v1.0.0
+**Compatible Con**: jira-platform.md v1.0, cli/xray v2.0.0

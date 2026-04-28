@@ -70,7 +70,6 @@ ai-driven-test-automation-boilerplate/
 **Key Files (Fixed Names)**:
 
 - `guidelines/TAE/kata-ai-index.md` - Entry point for test automation
-- `guidelines/MCP/README.md` - MCP decision tree
 
 ### .prompts/ - AI Operations Center
 
@@ -82,11 +81,11 @@ ai-driven-test-automation-boilerplate/
 │   ├── phase-3-infrastructure/
 │   └── phase-4-specification/
 │
-├── stage-1-shift-left/  → Test planning (per story)
-├── stage-2-exploratory/ → Manual testing (per story)
-├── stage-3-documentation/ → TMS documentation (per story)
-├── stage-4-automation/  → Test automation (per story)
-├── stage-5-regression/  → Regression testing (per release)
+├── fase-5-shift-left-testing/  → Test planning (per story)
+├── fase-10-exploratory-testing/ → Manual testing (per story)
+├── fase-11-test-documentation/ → TMS documentation (per story)
+├── fase-12-test-automation/    → Test automation (per story)
+│   └── regression/             → Regression testing (per release)
 │
 ├── utilities/           → Helpers + context generators
 └── us-qa-workflow.md    → QA workflow orchestrator
@@ -136,7 +135,6 @@ These files have stable names and locations. Reference them confidently:
 | ------------------------------------------------- | ------------------------------------ |
 | `CLAUDE.md`                                       | Project memory, loaded every session |
 | `.context/guidelines/TAE/kata-ai-index.md`        | Entry point for writing tests        |
-| `.context/guidelines/MCP/README.md`               | MCP decision tree                    |
 | `.prompts/us-qa-workflow.md`                      | QA workflow orchestrator             |
 | `.prompts/utilities/context-engineering-setup.md` | Generate project documentation       |
 
@@ -191,11 +189,11 @@ Stage 5: Regression     → Execute and report
 
 ### By Role
 
-| Role                      | Primary Context                                 |
-| ------------------------- | ----------------------------------------------- |
-| **TAE (Test Automation)** | `guidelines/TAE/*`                              |
-| **QA (Manual Testing)**   | `guidelines/QA/*` + `stage-2-exploratory/*`     |
-| **DevOps**                | `ci-cd-integration.md` + `stage-5-regression/*` |
+| Role                      | Primary Context                                                 |
+| ------------------------- | --------------------------------------------------------------- |
+| **TAE (Test Automation)** | `guidelines/TAE/*`                                              |
+| **QA (Manual Testing)**   | `guidelines/QA/*` + `fase-10-exploratory-testing/*`             |
+| **DevOps**                | `ci-cd-integration.md` + `fase-12-test-automation/regression/*` |
 
 ---
 

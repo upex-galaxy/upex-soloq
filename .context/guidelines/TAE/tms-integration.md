@@ -145,7 +145,7 @@ AUTO_SYNC=true
 TMS_PROVIDER=jira
 
 # Jira Direct
-JIRA_URL=https://your-domain.atlassian.net
+JIRA_URL={{JIRA_URL}}
 JIRA_USER=your-email@example.com
 JIRA_API_TOKEN=your_api_token_here
 JIRA_TEST_STATUS_FIELD=customfield_10100
@@ -224,8 +224,8 @@ Both approaches use the same test ID format:
 
 **Examples:**
 
-- `UPEX-123` - Maps to <https://your-domain.atlassian.net/browse/UPEX-123>
-- `DEMO-456` - Maps to <https://your-domain.atlassian.net/browse/DEMO-456>
+- `UPEX-123` - Maps to <{{JIRA_URL}}/browse/UPEX-123>
+- `DEMO-456` - Maps to <{{JIRA_URL}}/browse/DEMO-456>
 
 **Requirements:**
 
@@ -254,26 +254,33 @@ Both approaches use the same test ID format:
 
 ---
 
-## 8. Xray CLI Commands
+## 8. TMS Operations
 
-The Xray CLI is available in `cli/xray.ts`:
+Common test management operations:
 
-```bash
-# Authenticate
-bun xray auth --client-id "xxx" --client-secret "xxx"
-
-# Import test results
-bun xray results import --file test-results/results.json
-
-# Create test execution
-bun xray execution create --project UPEX --summary "Sprint 10 Regression"
-
-# Update test status
-bun xray test update UPEX-123 --status PASS
-
-# List tests
-bun xray test list --project UPEX --status FAIL
 ```
+[TMS_TOOL] Authenticate:
+  - credentials: {from environment variables}
+
+[TMS_TOOL] Import Results:
+  - file: {from test execution output}
+
+[TMS_TOOL] Create Execution:
+  - project: {{PROJECT_KEY}}
+  - summary: {from sprint/cycle context}
+
+[TMS_TOOL] Update Test Status:
+  - test: {per TC naming convention}
+  - status: PASS | FAIL
+
+[TMS_TOOL] List Tests:
+  - project: {{PROJECT_KEY}}
+  - status: {from query criteria}
+```
+
+> Resolved via [TMS_TOOL] — see Tool Resolution in CLAUDE.md
+
+> See /xray-cli skill for current CLI syntax.
 
 ---
 
@@ -309,7 +316,7 @@ bun xray test list --project UPEX --status FAIL
 
   ```bash
   curl -u email@example.com:api_token \
-    https://your-domain.atlassian.net/rest/api/3/field | grep -i "test status"
+    {{JIRA_URL}}/rest/api/3/field | grep -i "test status"
   ```
 
 - Update `JIRA_TEST_STATUS_FIELD` in `.env`
@@ -374,7 +381,7 @@ In GitHub Actions, enable sync only on `main` branch:
 - **Jira Cloud API**: <https://developer.atlassian.com/cloud/jira/platform/rest/v3/>
 - **Xray Pricing**: <https://marketplace.atlassian.com/apps/1211769/xray-test-management-for-jira>
 - **Jira API Tokens**: <https://id.atlassian.com/manage-profile/security/api-tokens>
-- **Xray CLI**: `cli/xray.ts` in this repo
+- **TMS CLI**: `cli/xray.ts` in this repo (see /xray-cli skill)
 - **Jira Sync**: `tests/utils/jiraSync.ts` in this repo
 
 ---

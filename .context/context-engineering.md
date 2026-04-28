@@ -57,7 +57,6 @@ aicode-starter/
 │       ├── code-standards.md           Para: DRY, naming, TypeScript strict
 │       ├── error-handling.md           Para: NO hardcodear, error classes, logging
 │       ├── context-loading.md          Para: Que archivos leer en cada fase
-│       ├── mcp-usage-tips.md           Para: Cuando usar Supabase/Atlassian MCP
 │       │
 │       └── TAE/                        Para: FASE 12 - Test Automation Engineering
 │           ├── README.md               Para: Explicar TAE y workflow de uso
@@ -166,8 +165,7 @@ aicode-starter/
         ├── mcp-config-claudecode.md    Para: Configuracion Claude Code
         ├── mcp-config-geminicli.md     Para: Configuracion Gemini CLI
         ├── mcp-config-copilotcli.md    Para: Configuracion GitHub Copilot CLI
-        ├── mcp-config-vscode.md        Para: Configuracion VS Code + Copilot
-        └── mcp-builder-strategy.md     Para: Optimizacion de tokens (session-based)
+        └── mcp-config-vscode.md        Para: Configuracion VS Code + Copilot
 ```
 
 ---
@@ -347,7 +345,7 @@ Quien: QA Engineer
 Input: Tests documentados (Fase 11)
 Usar: .prompts/fase-12-test-automation/
 
-Arquitectura: KATA Framework
+Arquitectura: KATA Architecture
 
 Flujo:
 1. kata-framework-setup.md         → Setup inicial (primera vez)
@@ -623,12 +621,7 @@ Todos los tests automation siguen KATA.
 
 **Configuracion Esencial**:
 
-1. **[MCP Builder Strategy](./docs/mcp-builder-strategy.md)** - EMPIEZA AQUI
-   - Solucion al "Token Hell" (reduccion 80-90% tokens)
-   - Carga de MCPs por sesion/tarea
-   - Setup paso a paso con templates
-
-2. **[MCP - Guia General](./docs/mcp-config-general.md)**
+1. **[MCP - Guia General](./docs/mcp-config-general.md)**
    - Conceptos fundamentales
    - Tipos de transporte (stdio, HTTP, SSE)
    - Seguridad y autenticacion
@@ -652,10 +645,6 @@ cp templates/mcp/gemini.template.json .gemini/settings.catalog.json
 
 # 3. Agrega tus API keys al catalog
 # Edita .gemini/settings.catalog.json con tus claves reales
-
-# 4. Carga MCPs por tarea
-node scripts/mcp-builder.js backend  # Solo supabase + context7
-node scripts/mcp-builder.js frontend  # Solo playwright + context7
 ```
 
 ---

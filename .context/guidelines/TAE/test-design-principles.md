@@ -1,6 +1,6 @@
 # Test Design Principles
 
-> **Purpose**: Defines the testing philosophy, ATC rules, and test structure conventions for the KATA framework.
+> **Purpose**: Defines the testing philosophy, ATC rules, and test structure conventions for the KATA (Component Action Test Architecture).
 > **Audience**: AI agents and team members writing automated tests.
 > **Rule**: Always read this file before writing any test code or creating ATCs.
 
@@ -9,10 +9,11 @@
 ## Quick Summary
 
 1. **ATCs are ACTIONS, not reads.** A simple GET is a helper, not an ATC.
-2. **Tests validate complete FLOWS, not individual properties.** Don't create 6 tests checking 6 fields of the same response.
-3. **Test names use verbs.** Files: camelCase with a verb. Tests: `should [behavior] when [condition]`.
-4. **ATCs are equivalent partitions.** Same ATC with different data must produce the same type of output. Conditionals are allowed sparingly for slight output variations; truly different behavior requires a separate ATC.
-5. **Assertions are micro-validations during a flow**, not standalone tests.
+2. **A TC is defined by its Precondition + Action.** All expected results from the same precondition and action belong to the same TC — regardless of which panel, endpoint, or UI section they validate.
+3. **Tests validate complete FLOWS, not individual properties.** Don't create 6 tests checking 6 fields of the same response.
+4. **Test names use verbs.** Files: camelCase with a verb. Tests: `should [behavior] when [condition]`.
+5. **ATCs are equivalent partitions.** Same ATC with different data must produce the same type of output. Conditionals are allowed sparingly for slight output variations; truly different behavior requires a separate ATC.
+6. **Assertions are micro-validations during a flow**, not standalone tests.
 
 ---
 
@@ -20,7 +21,7 @@
 
 ### ATC = An Action in the System
 
-An ATC (Acceptance Test Case) represents a **complete action** that changes or validates system state. It maps 1:1 with a test case ticket in your issue tracker (Jira, Xray, Coda, etc.) via the `@atc('TICKET-ID')` decorator, where the ID is the real issue ID (e.g., `TK-101`, `UPEX-456`).
+An ATC (Acceptance Test Case) represents a **complete action** that changes or validates system state. It maps 1:1 with a test case ticket in your issue tracker (Jira, Xray, etc.) via the `@atc('TICKET-ID')` decorator, where the ID is the real issue ID (e.g., `TK-101`, `UPEX-456`).
 
 **An ATC is:**
 - An action the user or system performs (create, update, delete, submit, import)
@@ -39,6 +40,66 @@ An ATC (Acceptance Test Case) represents a **complete action** that changes or v
 
 **Rule of thumb**: If the **actions** inside the ATC change, it's a different ATC. If only the **data** changes but the system behaves identically, it's the same ATC with parameterized input.
 
+### TC Identity Rule: Precondition + Action
+
+A Test Case's identity is determined by exactly two elements:
+
+1. **Precondition**: The state the system must be in before the test
+2. **Action**: What the user does (the trigger)
+
+**All expected results** that follow from the same precondition + action are assertions within the **same TC**. This holds true regardless of which panel, section, endpoint, or UI area the assertion validates.
+
+```
+TC Identity = Precondition + Action
+              ↓
+              All expected outputs are assertions of THIS TC
+```
+
+#### Why This Matters
+
+When designing tests, the natural instinct is to organize by **concern** (pricing block, reviews block, inventory block). But this leads to multiple TCs that share the same precondition and action — which means duplicated test execution, duplicated setup, and fundamentally: the same test split across multiple tickets.
+
+#### Anti-Pattern: Splitting by Concern
+
+```
+// WRONG: 3 separate TCs for the same input
+TC-A: Open published product → verify Pricing block values
+TC-B: Open published product → verify Reviews block values
+TC-C: Open published product → verify detail page structure
+
+// These share the SAME precondition (product is published and in stock)
+// and the SAME action (open product detail page)
+// → They are the SAME TC with different assertions
+```
+
+#### Correct Approach: One TC, All Assertions
+
+```
+// CORRECT: One TC with all expected results listed
+TC: Open product detail page for published in-stock product
+  Precondition: Product is published and has stock > 0
+  Action: User navigates to the product detail page
+  Expected Output:
+    - Page structure visible ("Product Details" heading, image gallery, Reviews section)
+    - Pricing values correct (Base - Discount = Final price)
+    - Inventory metrics correct (stock count, delivery estimate)
+    - Add to Cart button enabled
+    - Reviews block shows rating + review count
+    - "Out of Stock" and "Unavailable" banners NOT visible
+```
+
+#### When IS It a Different TC?
+
+A TC is different when the **precondition** or **action** changes — not when you want to check a different aspect of the output:
+
+| Different TC? | Reason |
+|--------------|--------|
+| Yes | Different **precondition**: product out of stock vs product in stock |
+| Yes | Different **action**: open product detail vs click "Add to Cart" |
+| Yes | Different **equivalent partition**: percentage discount vs fixed-amount discount |
+| **No** | Same precondition + same action, but checking pricing block vs reviews block |
+| **No** | Same precondition + same action, but checking one more field in the response |
+
 **An ATC is NOT:**
 - A simple GET endpoint that retrieves data
 - A single assertion on one field
@@ -48,8 +109,8 @@ An ATC (Acceptance Test Case) represents a **complete action** that changes or v
 
 | Type | What It Does | Example | Has `@atc` Decorator |
 |------|-------------|---------|---------------------|
-| **Helper** | Retrieves data (read-only, no state change) | `getBookings(filters)`, `getCurrentUser()` | No |
-| **ATC** | Performs an action that changes system state | `authenticateSuccessfully()`, `importBookingsSuccessfully()` | Yes |
+| **Helper** | Retrieves data (read-only, no state change) | `getOrders(filters)`, `getCurrentUser()` | No |
+| **ATC** | Performs an action that changes system state | `authenticateSuccessfully()`, `createOrderSuccessfully()` | Yes |
 
 ### Edge Case: Authorization/Security GETs
 
@@ -69,9 +130,9 @@ The GET alone doesn't change system state — it only confirms the outcome of th
 A GET is valid **inside** an ATC when it serves as a verification step after an action:
 
 ```
-ATC: importBookingsSuccessfully(file)
-  1. POST /bookings/import (the ACTION)
-  2. GET /bookings?hotelId=X   (VERIFICATION that import worked)
+ATC: createOrderSuccessfully(orderData)
+  1. POST /orders (the ACTION)
+  2. GET /orders/{id}           (VERIFICATION that the order was persisted)
   3. Assertions on both responses
 ```
 
@@ -124,8 +185,8 @@ ATC method:
 
 Format: `{verb}{Resource}{Scenario}`
 
-- Success: `authenticateSuccessfully`, `importBookingsSuccessfully`
-- Error: `loginWithInvalidCredentials`, `importBookingsWithInvalidFile`
+- Success: `authenticateSuccessfully`, `createOrderSuccessfully`
+- Error: `loginWithInvalidCredentials`, `createOrderWithInvalidPayload`
 - The name must clearly describe WHAT ACTION is being performed and WHAT OUTCOME is expected
 
 ---
@@ -137,16 +198,16 @@ Helpers are public methods in components that retrieve data without performing a
 **Placement**: At the top of the component file, before ATCs.
 
 ```
-BookingsApi.ts:
+OrdersApi.ts:
   // --- Helpers (no @atc decorator) ---
-  getBookings(filters)           → GET /bookings
-  getBookingById(id)             → GET /bookings/{id}
-  getAggregates(filters)         → GET /bookings/aggregates
-  getMonthStatus(hotelId, month) → GET /bookings/month-status
+  getOrders(filters)             → GET /orders
+  getOrderById(id)               → GET /orders/{id}
+  getTotals(filters)             → GET /orders/totals
+  getStatus(orderId)             → GET /orders/{id}/status
 
   // --- ATCs (@atc decorator) ---
   @atc('TK-201')
-  importBookingsSuccessfully(file, hotelId) → POST /bookings/import + GET verification
+  createOrderSuccessfully(orderData) → POST /orders + GET verification
 ```
 
 Helpers can be called:
@@ -165,22 +226,22 @@ Helpers can be called:
 
 | Pattern | Example | Why |
 |---------|---------|-----|
-| `{verb}{Feature}.test.ts` | `attributeBookings.test.ts` | Verb makes the purpose clear |
-| `{verb}{Feature}.test.ts` | `calculateCommission.test.ts` | You know exactly what it tests |
-| `{verb}{Feature}.test.ts` | `refreshMonthlyData.test.ts` | Action-oriented naming |
+| `{verb}{Feature}.test.ts` | `createOrder.test.ts` | Verb makes the purpose clear |
+| `{verb}{Feature}.test.ts` | `applyDiscount.test.ts` | You know exactly what it tests |
+| `{verb}{Feature}.test.ts` | `refreshCatalog.test.ts` | Action-oriented naming |
 
-**Avoid generic names** like `bookingAttribution.test.ts` (no verb, too broad) or `userSession.test.ts` (what about the session?).
+**Avoid generic names** like `orderFlow.test.ts` (no verb, too broad) or `userSession.test.ts` (what about the session?).
 
 ### Describe Block
 
 The `describe` block name should match the file purpose. It can optionally include the ticket ID when the file is tied to a single ticket:
 
 ```typescript
-// File: attributeBookings.test.ts
-test.describe('TK-411: Attribute Bookings', () => {
-  test('TK-411: should attribute booking to newsletter when guest books within window', ...)
-  test('TK-411: should mark guest as repeat when EmailHash exists at same hotel', ...)
-  test('TK-411: should NOT mark guest as repeat when EmailHash exists at different hotel', ...)
+// File: applyDiscount.test.ts
+test.describe('TK-411: Apply Discount Code', () => {
+  test('TK-411: should apply percentage discount when code is valid', ...)
+  test('TK-411: should apply fixed-amount discount when code is valid', ...)
+  test('TK-411: should reject discount when code has expired', ...)
 });
 ```
 
@@ -193,37 +254,39 @@ Format: `TK-XXX: should [behavior] when [condition]`
 | Component | Purpose | Example |
 |-----------|---------|---------|
 | `should` | Always starts with "should" | `should` |
-| `[behavior]` | Verb + expected outcome | `attribute booking to newsletter` |
-| `when [condition]` | The specific scenario | `when guest books within attribution window` |
+| `[behavior]` | Verb + expected outcome | `apply percentage discount` |
+| `when [condition]` | The specific scenario | `when the discount code is valid` |
 
 More examples:
-- `should calculate commission correctly when booking is commissionable`
-- `should set IsCommissionable to false when EmailHash exists in history`
-- `should NOT count repeat guest across different hotels`
-- `should apply InvoiceCapDiscount when commission exceeds cap`
+- `should calculate final price correctly when discount is applied`
+- `should set isOutOfStock to true when inventory drops to 0`
+- `should NOT allow checkout when cart is empty`
+- `should apply tax when shipping address is in a taxable region`
 - `should reject state transition when skipping from State 1 to State 3`
 
 ---
 
 ## 4. Tests Validate FLOWS, Not Individual Properties
 
+This section is the code-level application of the **TC Identity Rule** (Section 1). Just as a TC is defined by Precondition + Action at the design level, a test at the code level should validate ALL expected outputs of a given flow — not split them across multiple tests.
+
 ### The Anti-Pattern (WRONG)
 
 ```typescript
 // WRONG: 6 tests checking 6 properties of the same response
-test('should return bookings', async ({ api }) => {
-  const bookings = await api.bookings.getBookings(filters);
-  expect(bookings.length).toBeGreaterThan(0);
+test('should return orders', async ({ api }) => {
+  const orders = await api.orders.getOrders(filters);
+  expect(orders.length).toBeGreaterThan(0);
 });
 
-test('should have newsletterId', async ({ api }) => {
-  const bookings = await api.bookings.getBookings(filters);  // same call!
-  expect(bookings[0].newsletterId).toBeDefined();
+test('should have referenceNumber', async ({ api }) => {
+  const orders = await api.orders.getOrders(filters);  // same call!
+  expect(orders[0].referenceNumber).toBeDefined();
 });
 
-test('should have isCommissionable', async ({ api }) => {
-  const bookings = await api.bookings.getBookings(filters);  // same call again!
-  expect(bookings[0].isCommissionable).toBe(false);
+test('should have totalAmount', async ({ api }) => {
+  const orders = await api.orders.getOrders(filters);  // same call again!
+  expect(orders[0].totalAmount).toBeGreaterThan(0);
 });
 ```
 
@@ -237,19 +300,19 @@ This is wrong because:
 
 ```typescript
 // RIGHT: One test validates the complete flow with multiple assertions
-test('TK-XXX: should attribute booking to newsletter when guest books within window', async ({ api }) => {
+test('TK-XXX: should create order with correct totals when discount is applied', async ({ api }) => {
   // Preconditions
   // ... setup data via API
 
   // Action + Verification (through ATCs and helpers)
-  const bookings = await api.bookings.getBookings(filters);
-  const aggregates = await api.bookings.getAggregates(filters);
+  const [, order] = await api.orders.createOrderSuccessfully(orderData);
+  const totals = await api.orders.getTotals({ orderId: order.id });
 
   // Multiple assertions validating the COMPLETE contract
-  expect(bookings.length).toBeGreaterThan(0);
-  expect(bookings[0].newsletterId).toBeDefined();
-  expect(bookings[0].isCommissionable).toBeDefined();
-  expect(aggregates.totalCommission).toBeGreaterThan(0);
+  expect(order.id).toBeDefined();
+  expect(order.referenceNumber).toBeDefined();
+  expect(order.discountApplied).toBe(true);
+  expect(totals.finalAmount).toBe(totals.baseAmount - totals.discountAmount);
   // ... all related validations in one place
 });
 ```
@@ -269,15 +332,15 @@ Only create separate tests when the **scenario is fundamentally different**:
 Example of correctly separated tests:
 
 ```typescript
-test.describe('TK-411: Detect Repeat Guests', () => {
-  // Scenario 1: Guest IS a repeat (different precondition → different outcome)
-  test('TK-411: should mark as non-commissionable when EmailHash exists at same hotel', ...)
+test.describe('TK-411: Apply Discount Code', () => {
+  // Scenario 1: Valid percentage code (different precondition → different outcome)
+  test('TK-411: should apply percentage discount when code is valid', ...)
 
-  // Scenario 2: Guest is NOT a repeat (different precondition → different outcome)
-  test('TK-411: should mark as commissionable when guest is new to hotel', ...)
+  // Scenario 2: Valid fixed-amount code (different precondition → different outcome)
+  test('TK-411: should apply fixed-amount discount when code is valid', ...)
 
-  // Scenario 3: Cross-hotel check (different precondition → different outcome)
-  test('TK-411: should NOT mark as repeat when EmailHash exists at different hotel', ...)
+  // Scenario 3: Expired code (different precondition → different outcome)
+  test('TK-411: should reject discount when code has expired', ...)
 });
 ```
 
@@ -300,14 +363,14 @@ Think of it like this:
 ```
 Test Flow
   │
-  ├── ATC 1: importBookingsSuccessfully()
-  │     └── [ATC assertions: status 200, bookings created]
+  ├── ATC 1: createOrderSuccessfully()
+  │     └── [ATC assertions: status 201, order persisted]
   │
-  ├── ATC 2: calculateCommissionSuccessfully()
-  │     └── [ATC assertions: commission > 0, rate applied]
+  ├── ATC 2: applyDiscountSuccessfully()
+  │     └── [ATC assertions: discount applied, total recalculated]
   │
   └── Test-level assertions:
-        └── [Final state: total matches sum, cap applied correctly]
+        └── [Final state: final total matches base - discount, tax applied correctly]
 ```
 
 The ATC assertions validate that each individual action worked. The test-level assertions validate the overall outcome of combining multiple actions.
@@ -319,7 +382,7 @@ The ATC assertions validate that each individual action worked. The test-level a
 ### The Relationship
 
 ```
-TMS (Coda)                          Code (KATA)
+TMS (Jira/Xray)                          Code (KATA)
 ──────────                          ──────────
 Test Case ticket (TK-XXX)    ───►   @atc('TK-XXX') method in a Component
                                       │
@@ -337,13 +400,13 @@ ATCs are reusable blocks of actions. They live in **components** (Layer 3) and r
 Test files combine ATCs (and helpers) to form **complete scenarios** — integration or E2E flows. A single test may call multiple ATCs. When the test runs, each ATC reports its own result, giving granular visibility into what passed and what failed within the flow.
 
 ```
-Test File: detectRepeatGuests.test.ts
+Test File: applyDiscount.test.ts
   │
-  └── test('TK-YYY: should mark as non-commissionable when repeat guest')
+  └── test('TK-YYY: should apply percentage discount when code is valid')
         │
         ├── [preconditions via helpers]
-        ├── ATC: importBookingsSuccessfully()    → TK-101 (pass/fail)
-        ├── ATC: processBookingsSuccessfully()   → TK-102 (pass/fail)
+        ├── ATC: createOrderSuccessfully()       → TK-101 (pass/fail)
+        ├── ATC: applyDiscountSuccessfully()     → TK-102 (pass/fail)
         └── [test-level assertions on final state]
 ```
 
@@ -355,10 +418,10 @@ The TMS tracks both levels:
 
 | TMS Artifact | Maps To | Example |
 |-------------|---------|---------|
-| Test Case ticket | `@atc('TK-XXX')` in a component | `TK-101: Import bookings successfully` |
-| Integration/E2E ticket | `test()` block in a test file | `TK-411: Detect repeat guests` |
+| Test Case ticket | `@atc('TK-XXX')` in a component | `TK-101: Create order successfully` |
+| Integration/E2E ticket | `test()` block in a test file | `TK-411: Apply discount code` |
 
-Both are tickets in Coda, but they serve different purposes. Test cases validate individual actions. Integration/E2E tickets validate complete flows that combine those actions.
+Both are tickets in your TMS, but they serve different purposes. Test cases validate individual actions. Integration/E2E tickets validate complete flows that combine those actions.
 
 ### Ticket ID as Prefix (Required)
 
@@ -366,14 +429,14 @@ Every `test()` block must include the ticket ID as a prefix for direct traceabil
 
 ```typescript
 // Format: 'TK-XXX: should [behavior] when [condition]'
-test('TK-411: should mark as non-commissionable when EmailHash exists at same hotel', ...)
-test('TK-411: should mark as commissionable when guest is new to hotel', ...)
+test('TK-411: should apply percentage discount when code is valid', ...)
+test('TK-411: should apply fixed-amount discount when code is valid', ...)
 ```
 
 The `describe` block can optionally include the ticket ID when the entire file is associated with a single ticket:
 
 ```typescript
-test.describe('TK-411: Detect Repeat Guests', () => { ... });
+test.describe('TK-411: Apply Discount Code', () => { ... });
 ```
 
 This ensures that every test result in the report can be traced back to its corresponding ticket in the TMS.
@@ -386,7 +449,7 @@ Each test sets up its own data via API or DB before executing the test scenario:
 
 ```
 Test Execution Flow:
-  1. Preconditions: Manipulate Demo Hotel data via API/DB to create the scenario
+  1. Preconditions: Prepare test data via API/DB to create the scenario
   2. Actions: Perform the test steps (API calls or UI interactions)
   3. Assertions: Validate the expected behavior with the given data
 ```
@@ -395,7 +458,7 @@ Rules:
 - Each test case creates its own scenario independently
 - Tests must NOT depend on or interfere with other tests
 - Preconditions are set via API endpoints or DB connection
-- The Demo Hotel is the shared resource, but data within it is managed per-test
+- Shared environments (staging, dev) are used collaboratively, but data within each test is managed per-test
 
 ---
 

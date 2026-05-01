@@ -12,7 +12,7 @@ Realizar code review estático completo del código implementado para **STORY-{P
 
 ### Context7 MCP (Recomendado)
 
-**¿Está disponible?** [Verificar si puedes acceder a `mcp__context7__get-library-docs`]
+**¿Está disponible?** [Verificar si puedes acceder a `[DOCS_TOOL]`]
 
 **Si NO está disponible:**
 

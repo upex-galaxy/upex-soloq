@@ -32,7 +32,7 @@ bun ai:check
 
 ## Purpose
 
-Execute manual exploratory testing to validate functionality and discover defects BEFORE investing in test automation.
+Execute manual exploratory testing to validate functionality and discover defects BEFORE investing in test automation. This fase consolidates two activities: **execution** (smoke + exploratory testing across UI/API/DB) and **reporting** (bug reports + test report).
 
 **Why exploratory testing first:**
 
@@ -43,13 +43,13 @@ Execute manual exploratory testing to validate functionality and discover defect
 
 ---
 
-## The Trifuerza of Testing
+## The Triforce of Testing
 
-This phase supports **complete feature validation** through three testing layers:
+This fase supports **complete feature validation** through three testing layers:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    TRIFUERZA TESTING                        │
+│                    TRIFORCE TESTING                          │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
@@ -60,8 +60,8 @@ This phase supports **complete feature validation** through three testing layers
 │  │    MCP      │  │ OpenAPI MCP │  │    MCP      │         │
 │  └─────────────┘  └─────────────┘  └─────────────┘         │
 │                                                             │
-│  exploratory-    exploratory-     exploratory-              │
-│  test.md         api-test.md      db-test.md                │
+│  exploratory-     exploratory-      exploratory-            │
+│  test.md          api-test.md       db-test.md              │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -72,7 +72,7 @@ This phase supports **complete feature validation** through three testing layers
 | UI-focused feature   | UI → API → DB                  |
 | API-first feature    | API → DB → UI (if applicable)  |
 | Data-focused feature | DB → API → UI (if applicable)  |
-| Full-stack feature   | All three (Trifuerza completa) |
+| Full-stack feature   | All three (Complete Triforce)  |
 
 ---
 
@@ -80,24 +80,47 @@ This phase supports **complete feature validation** through three testing layers
 
 - Feature deployed to staging
 - User Story in "Ready For QA" status
-- Test cases from Shift-Left Testing (or Acceptance Criteria)
+- Test cases from Shift-Left Testing (Fase 5) or Acceptance Criteria
 - MCPs configured for the testing layer(s) needed
 
 ---
 
-## Prompts in This Phase
+## Entry / Exit Criteria
 
-| Order | Prompt                    | Purpose                                        | MCP Required     |
-| ----- | ------------------------- | ---------------------------------------------- | ---------------- |
-| 1     | `smoke-test.md`           | Quick validation that deployment is functional | playwright       |
-| 2a    | `exploratory-test.md`     | Deep UI exploration                            | playwright       |
-| 2b    | `exploratory-api-test.md` | Deep API exploration                           | postman, openapi |
-| 2c    | `exploratory-db-test.md`  | Deep database verification                     | sql (DBHub)      |
-| 3     | `bug-report.md`           | Report defects found (conditional)             | atlassian        |
+### Entry Criteria
+
+- [ ] Feature deployed to staging environment
+- [ ] User Story in "Ready For QA" status
+- [ ] Test cases or Acceptance Criteria available (from Fase 5 or Jira)
+- [ ] Required MCPs configured (Playwright, Postman, DBHub as needed)
+- [ ] Staging URL accessible
+- [ ] Evidence folder ready (`evidence/` for screenshots, traces, logs)
+
+### Exit Criteria
+
+- [ ] Smoke test PASSED (or blocker reported)
+- [ ] Exploratory testing completed for relevant layers (UI/API/DB)
+- [ ] All TCs have a final Test Status (PASSED or FAILED)
+- [ ] Session notes documented with findings
+- [ ] Bugs reported in Jira (if any found)
+- [ ] ATR (Test Report) filled and marked Complete
+- [ ] Summary comment added to User Story
+- [ ] US transitioned to "QA Approved" / "Tested" (if PASSED) or "Failed" (if issues)
+
+---
+
+## Prompts in This Fase
+
+| Order | Prompt                       | Purpose                                | MCP Required     |
+| ----- | ---------------------------- | -------------------------------------- | ---------------- |
+| 1     | `smoke-test.md`              | Quick validation that deployment works | playwright       |
+| 2a    | `exploratory-test.md`        | Deep UI exploration                    | playwright       |
+| 2b    | `exploratory-api-test.md`    | Deep API exploration                   | postman, openapi |
+| 2c    | `exploratory-db-test.md`     | Deep database verification             | dbhub            |
+| 3     | `bug-report.md`              | Report defects found (conditional)     | atlassian        |
+| 4     | `test-report.md`             | Fill ATR, summarize results, finalize  | atlassian        |
 
 **Note:** 2a, 2b, 2c can be executed in any order or combination based on feature needs.
-
-**Bug Fixing:** When bugs are reported, developers use `.prompts/fase-7-implementation/bug-fix-workflow.md` to implement fixes.
 
 ---
 
@@ -131,33 +154,72 @@ US Status: Ready For QA
     └── Set and verify parent Epic on created ticket
     └── Report to Jira (with human confirmation)
         ↓
+[4] Test Report (test-report.md)
+    └── Fill ATR with all TC results
+    └── Mark ATR Complete
+    └── Add summary comment to US
+        ↓
 Decision: PASSED or FAILED?
-    └── PASSED → Transition US to "QA Approved"
-    └── FAILED → Wait for fixes (DEV uses bug-fix-workflow.md), re-test
+    └── PASSED → Transition US to "QA Approved" / "Tested"
+    └── FAILED → Wait for fixes, re-test
 ```
+
+---
+
+## TCs as Guides
+
+If Test Cases exist from Fase 5 (Shift-Left Testing), use them as a guide but explore freely:
+
+- Update TC **Test Status** (PASSED/FAILED) as you validate
+- Discovering new scenarios **beyond** the TCs is expected and encouraged
+- New scenarios can become candidate TCs in Fase 11 (Test Documentation)
+
+---
+
+## Triage Decisions
+
+After execution, every TC must have a final Test Status:
+
+| TC Outcome     | Action                                                             |
+| -------------- | ------------------------------------------------------------------ |
+| **PASSED**     | TC behaved as expected — proceed to Fase 11                        |
+| **FAILED**     | Bug found — create bug via `bug-report.md`, link to TC             |
+| **BLOCKED**    | Cannot execute due to environment/dependency — escalate, document  |
+| **NEW SCENARIO** | Discovered during exploration — note for Fase 11 documentation   |
+
+---
+
+## Workflow Status Impact
+
+This fase does NOT directly transition TC Workflow Status (Draft → Candidate → Manual/Automated).
+
+TC **Test Status** (PASSED/FAILED) is updated here. The next fase (**Fase 11: Test Documentation**) is responsible for transitioning TC **Workflow Status** to Candidate or Manual based on automation viability.
 
 ---
 
 ## Tools Required
 
-| MCP             | Purpose                                   | Prompt(s)          |
-| --------------- | ----------------------------------------- | ------------------ |
-| `playwright`    | UI exploration, screenshots, interactions | smoke, exploratory |
-| `postman`       | API collections, authenticated flows      | exploratory-api    |
-| `openapi` (api) | API endpoint exploration                  | exploratory-api    |
-| `sql` (DBHub)   | SQL queries, data verification            | exploratory-db     |
-| `atlassian`     | Bug creation, story transitions           | bug-report         |
+| MCP             | Purpose                                   | Prompt(s)              |
+| --------------- | ----------------------------------------- | ---------------------- |
+| `playwright`    | UI exploration, screenshots, interactions | smoke, exploratory     |
+| `postman`       | API collections, authenticated flows      | exploratory-api-test   |
+| `openapi` (api) | API endpoint exploration                  | exploratory-api-test   |
+| `dbhub` (sql)   | SQL queries, data verification            | exploratory-db-test    |
+| `atlassian`     | Bug creation, story transitions, ATR      | bug-report, test-report |
 
 ---
 
-## Output
+## Output / Artifacts Updated
 
-- Smoke test results (PASSED/FAILED)
-- Exploratory session notes (UI, API, DB as applicable)
-- RLS policy verification results (if API tested)
-- Data integrity verification results (if DB tested)
-- Bugs reported in Jira (if any)
-- US transitioned to appropriate status
+| Artifact          | Location                                                              | Description                       |
+| ----------------- | --------------------------------------------------------------------- | --------------------------------- |
+| ATR (TMS)         | Test Results in TMS                                                   | Test Report filled, marked Complete |
+| Bug (TMS)         | Backlog in TMS                                                        | Bug reports (if any)              |
+| US Comment        | User Story in TMS                                                     | Summary of QA results             |
+| `test-report.md`  | `.context/PBI/{module-name}/TK-{number}-{brief-title}/`               | Local mirror of ATR               |
+| Smoke notes       | `.context/PBI/.../STORY-.../smoke-test.md`                            | Smoke test results                |
+| Exploratory notes | `.context/PBI/.../STORY-.../exploratory-notes.md`                     | Session findings                  |
+| Evidence          | `.context/PBI/.../STORY-.../evidence/`                                | Screenshots, traces, logs         |
 
 ---
 
@@ -190,7 +252,7 @@ Decision: PASSED or FAILED?
 
 ## Recommended Combinations
 
-### Full-Stack Feature (Complete Trifuerza)
+### Full-Stack Feature (Complete Triforce)
 
 ```
 1. API Testing → Verify backend works
@@ -216,20 +278,75 @@ Decision: PASSED or FAILED?
 
 ---
 
-## Next Phase
+## Key Concepts
 
-If exploratory testing **PASSED**:
+### Smoke Test vs Exploratory Testing
+
+| Aspect       | Smoke Test         | Exploratory Testing    |
+| ------------ | ------------------ | ---------------------- |
+| **Duration** | 5-10 minutes       | 60-90 minutes          |
+| **Scope**    | Happy path only    | Full coverage          |
+| **Goal**     | Go/No-Go decision  | Find bugs, edge cases  |
+| **Depth**    | Surface validation | Deep investigation     |
+
+### Bug Severity Guidelines
+
+| Severity     | Criteria                              |
+| ------------ | ------------------------------------- |
+| **Critical** | Core functionality blocked, data loss |
+| **High**     | Major feature broken                  |
+| **Medium**   | Feature issue with workaround         |
+| **Low**      | Cosmetic, doesn't affect function     |
+
+---
+
+## When to Re-run
+
+| Situation                    | Action                          |
+| ---------------------------- | ------------------------------- |
+| Smoke test failed            | Wait for fix, re-run smoke      |
+| Bug fixed and redeployed     | Re-run affected exploratory     |
+| New stories added            | Run smoke + exploratory for new |
+| Regression detected          | Full exploratory re-run         |
+
+---
+
+## Output Files Location
+
+```
+.context/PBI/epics/
+└── EPIC-{KEY}-{NUM}-{name}/
+    └── stories/
+        └── STORY-{KEY}-{NUM}-{name}/
+            ├── smoke-test.md           # Smoke test results
+            ├── exploratory-notes.md    # Session findings
+            ├── test-report.md          # Local mirror of ATR
+            └── evidence/               # Screenshots, traces, logs
+```
+
+---
+
+## Next Fase
+
+If exploratory testing **PASSED** (and ATR Complete):
 
 - Proceed to **Fase 11: Test Documentation**
-- Document test cases in Jira
-- Identify automation candidates
+- Document test cases in TMS (Jira/Xray)
+- Identify automation candidates (transition TCs to Candidate / Manual)
+
+If **FAILED**:
+
+- Wait for bug fixes
+- Re-test failed TCs
+- Update ATR after re-test
+- Repeat until all pass
 
 ---
 
 ## Related Documentation
 
 - **QA Workflow:** `.prompts/us-qa-workflow.md`
-- **Bug Fixing (DEV):** `.prompts/fase-7-implementation/bug-fix-workflow.md`
 - **KATA Guidelines:** `.context/guidelines/TAE/`
-- **API Testing Guide:** `docs/testing/api-guide/`
-- **Database Testing Guide:** `docs/testing/database-guide/`
+- **Fase 5 (Shift-Left):** `.prompts/fase-5-shift-left-testing/README.md`
+- **Fase 11 (Documentation):** `.prompts/fase-11-test-documentation/README.md`
+- **Fase 12 (Automation):** `.prompts/fase-12-test-automation/README.md`

@@ -1,671 +1,675 @@
-Actúa como Senior QA Engineer especializado en smoke testing y validación post-deployment.
+# Smoke Test
+
+> Act as a Senior QA Engineer specialized in smoke testing and post-deployment validation.
 
 ---
 
-## 🎯 TAREA
+## Task
 
-**FASE 10: SMOKE TEST EN STAGING**
+**STAGE 2: SMOKE TEST IN STAGING**
 
-Validar que el deployment en staging es funcional ANTES de comenzar exploratory testing completo.
+Validate that the deployment in staging is functional BEFORE beginning full exploratory testing.
 
-**Este prompt se ejecuta INMEDIATAMENTE** después de deployment a staging (Fase 9) y ANTES de test-charter.md.
+**This prompt is executed IMMEDIATELY** after deployment to staging and BEFORE exploratory-test.md.
+
+> **TCs as Guides**: If Test Cases exist from Stage 1 planning, use them as a guide but explore freely. Update TC statuses (PASSED/FAILED) as you validate. Discovering new scenarios beyond the TCs is expected and encouraged.
 
 ---
 
-## 📥 INPUT REQUERIDO
+## Input Required
 
-### 1. Deployment en Staging
+### 1. Staging Deployment
 
-**Verificar:**
+**Verify:**
 
-- Código desplegado en staging (Fase 9 completada)
-- Staging URL accesible
-- CI/CD workflow pasó exitosamente
+- Code deployed to staging
+- Staging URL accessible
+- CI/CD workflow passed successfully
 
-**Información necesaria del usuario:**
+**Information needed from user:**
 
 - Staging URL: `https://[project]-develop.vercel.app`
-- Feature/Story recién desplegada: `STORY-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}`
+- Feature/Story just deployed: `STORY-{PROJECT_KEY}-{ISSUE_NUM}-{name}`
 
-### 2. Story Actual
+### 2. Current Story
 
-**Leer:**
+**Read:**
 
-- `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/stories/STORY-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/story.md` - **CRÍTICO** - Acceptance criteria
-- `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/stories/STORY-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/acceptance-test-plan.md` - Test cases definidos (Fase 5)
+- `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{name}/stories/STORY-{PROJECT_KEY}-{ISSUE_NUM}-{name}/story.md` - **CRITICAL** - Acceptance criteria
+- `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{name}/stories/STORY-{PROJECT_KEY}-{ISSUE_NUM}-{name}/acceptance-test-plan.md` - Test cases defined (Stage 1)
 
-**Qué identificar:**
+**What to identify:**
 
-1. ¿Cuál es el happy path de la story?
-2. ¿Qué funcionalidad crítica debe validarse?
-3. ¿Hay integración con backend/auth que validar?
+1. What is the happy path of the story?
+2. What critical functionality must be validated?
+3. Is there backend/auth integration to validate?
 
 ### 3. Deployment Context
 
-**Leer:**
+**Read:**
 
-- `.context/ci-cd-setup.md` - Workflow de deployment
-- `.context/environment-variables.md` - Variables de staging
-- `.context/infrastructure-setup.md` - URLs y configuración
+- `.context/ci-cd-setup.md` - Deployment workflow
+- `.context/environment-variables.md` - Staging variables
+- `.context/infrastructure-setup.md` - URLs and configuration
 
 ---
 
-## ⚙️ VERIFICACIÓN DE HERRAMIENTAS (MCP)
+## Tool Verification (MCP)
 
-**NO se requieren MCP para esta fase.**
+**NO MCPs required for this phase.**
 
-### Herramientas Manuales
+### Manual Tools
 
 - Browser (Chrome/Firefox/Safari)
-- DevTools (F12) para revisar console/network
-- Acceso a staging URL
+- DevTools (F12) to review console/network
+- Access to staging URL
 
 ---
 
-## 🎯 OBJETIVO
+## Objective
 
-Crear smoke test checklist para validar deployment funcional:
+Create smoke test checklist to validate functional deployment:
 
-**Incluye:**
+**Includes:**
 
-- ✅ Validar que aplicación carga sin errores 500
-- ✅ Verificar assets cargan (CSS, JS, imágenes)
-- ✅ Validar autenticación funciona (si aplica)
-- ✅ Validar happy path de la story funciona end-to-end
-- ✅ Verificar integración con backend (APIs, DB)
-- ✅ Validar navegación básica funciona
+- Validate that application loads without 500 errors
+- Verify assets load (CSS, JS, images)
+- Validate authentication works (if applicable)
+- Validate happy path of the story works end-to-end
+- Verify integration with backend (APIs, DB)
+- Validate basic navigation works
 
-**NO incluye:**
+**Does NOT include:**
 
-- ❌ Exploratory testing completo (eso es test-charter.md + session-notes.md)
-- ❌ Edge cases o negative testing (eso es exploratory testing)
-- ❌ Tests automatizados (eso es Fase 11: Test Automation)
+- Full exploratory testing (that's exploratory-test.md)
+- Edge cases or negative testing (that's exploratory testing)
+- Automated tests (that's Stage 4: Test Automation)
 
-**Resultado:** Checklist que QA ejecuta en **5-10 minutos** para confirmar deployment funcional.
+**Result:** Checklist that QA executes in **5-10 minutes** to confirm functional deployment.
 
 ---
 
-## 📤 OUTPUT GENERADO
+## Output Generated
 
 ### Smoke Test Checklist
 
-- ✅ `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/stories/STORY-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/smoke-test.md` - Checklist ejecutable
+- `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{name}/stories/STORY-{PROJECT_KEY}-{ISSUE_NUM}-{name}/smoke-test.md` - Executable checklist
 
-**Estructura del checklist:**
+**Checklist structure:**
 
 ```markdown
-# Smoke Test: [STORY-{PROJECT_KEY}-{ISSUE_NUM}-{nombre} - Nombre]
+# Smoke Test: [STORY-{PROJECT_KEY}-{ISSUE_NUM}-{name} - Name]
 
 **Staging URL:** https://[project]-develop.vercel.app
-**Fecha:** [Fecha]
-**QA:** [Nombre]
-**Duración:** 5-10 minutos
+**Date:** [Date]
+**QA:** [Name]
+**Duration:** 5-10 minutes
 
 ---
 
-## ✅ Checklist
+## Checklist
 
-### 1. Acceso Básico
+### 1. Basic Access
 
-- [ ] Aplicación carga sin errores 500
-- [ ] No hay errores en console (F12)
-- [ ] Assets cargan (CSS, JS, imágenes)
+- [ ] Application loads without 500 errors
+- [ ] No errors in console (F12)
+- [ ] Assets load (CSS, JS, images)
 
-### 2. Autenticación (si aplica)
+### 2. Authentication (if applicable)
 
-- [ ] Login funciona
-- [ ] Logout funciona
-- [ ] Sesión persiste al refrescar
+- [ ] Login works
+- [ ] Logout works
+- [ ] Session persists on refresh
 
-### 3. Happy Path de Story
+### 3. Story Happy Path
 
-- [ ] [Paso 1 del happy path]
-- [ ] [Paso 2 del happy path]
-- [ ] [Paso 3 del happy path]
+- [ ] [Happy path step 1]
+- [ ] [Happy path step 2]
+- [ ] [Happy path step 3]
 
-### 4. Integración Backend
+### 4. Backend Integration
 
-- [ ] APIs responden correctamente
-- [ ] Datos se guardan en DB
-- [ ] Datos se recuperan correctamente
+- [ ] APIs respond correctly
+- [ ] Data saves to DB
+- [ ] Data retrieves correctly
 
 ---
 
-## ✅ Resultado
+## Result
 
-- [ ] **PASSED:** Deployment funcional, continuar con exploratory testing
-- [ ] **FAILED:** Deployment roto, NO continuar, reportar bug crítico
+- [ ] **PASSED:** Deployment functional, continue with exploratory testing
+- [ ] **FAILED:** Deployment broken, DO NOT continue, report critical bug
 ```
 
 ---
 
-## 🚨 RESTRICCIONES CRÍTICAS
+## Critical Restrictions
 
-### ❌ NO HACER
+### DO NOT
 
-- **NO hacer exploratory testing completo** - Solo smoke test rápido
-- **NO testear edge cases todavía** - Eso es para exploratory testing
-- **NO crear bugs de UX menores** - Solo bugs críticos que bloquean funcionalidad
-- **NO invertir más de 10 minutos** - Smoke test debe ser rápido
-- **NO asumir que deployment funciona** - Validar manualmente
+- **DO NOT do full exploratory testing** - Only quick smoke test
+- **DO NOT test edge cases yet** - That's for exploratory testing
+- **DO NOT create bugs for minor UX issues** - Only critical bugs that block functionality
+- **DO NOT spend more than 10 minutes** - Smoke test must be quick
+- **DO NOT assume deployment works** - Validate manually
 
-### ✅ SÍ HACER
+### DO
 
-- **Validar lo mínimo necesario** - Aplicación carga + happy path funciona
-- **Revisar console y network** - Identificar errores técnicos
-- **Reportar inmediatamente si falla** - No continuar si smoke test falla
-- **Documentar resultado** - PASSED o FAILED con evidencia
-
----
-
-## 🔄 WORKFLOW
+- **Validate the minimum necessary** - Application loads + happy path works
+- **Check console and network** - Identify technical errors
+- **Report immediately if it fails** - Do not continue if smoke test fails
+- **Document result** - PASSED or FAILED with evidence
 
 ---
 
-## 📋 PASO 1: LEER ACCEPTANCE CRITERIA DE LA STORY
+## Workflow
 
-**Objetivo:** Entender qué debe funcionar en staging.
+---
 
-### Paso 1.1: Leer Story
+## STEP 1: READ STORY ACCEPTANCE CRITERIA
 
-**Acción:** Leer `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/stories/STORY-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/story.md`
+**Objective:** Understand what must work in staging.
 
-**Identificar:**
+### Step 1.1: Read Story
+
+**Action:** Read `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{name}/stories/STORY-{PROJECT_KEY}-{ISSUE_NUM}-{name}/story.md`
+
+**Identify:**
 
 1. **Acceptance Criteria (AC):**
-   - ¿Qué debe funcionar?
-   - ¿Cuál es el happy path?
+   - What must work?
+   - What is the happy path?
 
-2. **Funcionalidad crítica:**
-   - ¿Requiere autenticación?
-   - ¿Hay integración con backend?
-   - ¿Hay formularios o inputs?
-
----
-
-### Paso 1.2: Leer Test Cases
-
-**Acción:** Leer `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/stories/STORY-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/acceptance-test-plan.md`
-
-**Identificar:**
-
-- Test case #1 (happy path) → Smoke test debe cubrir esto
-- Funcionalidad mínima que debe funcionar
+2. **Critical functionality:**
+   - Does it require authentication?
+   - Is there backend integration?
+   - Are there forms or inputs?
 
 ---
 
-## 🌐 PASO 2: ABRIR STAGING URL Y VALIDAR ACCESO BÁSICO
+### Step 1.2: Read Test Cases
 
-**Objetivo:** Verificar que aplicación carga sin errores críticos.
+**Action:** Read `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{name}/stories/STORY-{PROJECT_KEY}-{ISSUE_NUM}-{name}/acceptance-test-plan.md`
 
-### Paso 2.1: Abrir Staging URL
+**Identify:**
 
-**Acción:**
-
-1. Abrir browser (Chrome recomendado)
-2. Abrir DevTools (F12)
-3. Navegar a: `https://[project]-develop.vercel.app`
+- Test case #1 (happy path) → Smoke test must cover this
+- Minimum functionality that must work
 
 ---
 
-### Paso 2.2: Validar Acceso Básico
+## STEP 2: OPEN STAGING URL AND VALIDATE BASIC ACCESS
+
+**Objective:** Verify that application loads without critical errors.
+
+### Step 2.1: Open Staging URL
+
+**Action:**
+
+1. Open browser (Chrome recommended)
+2. Open DevTools (F12)
+3. Navigate to: `https://[project]-develop.vercel.app`
+
+---
+
+### Step 2.2: Validate Basic Access
 
 **Checklist:**
 
-**1. Aplicación carga sin errores 500:**
+**1. Application loads without 500 errors:**
 
-- [ ] Landing page carga completamente
-- [ ] No hay pantalla de error 500 o 404
-- [ ] Loading states terminan correctamente
+- [ ] Landing page loads completely
+- [ ] No 500 or 404 error screen
+- [ ] Loading states complete correctly
 
-**2. No hay errores en console:**
+**2. No errors in console:**
 
-- Abrir Console tab (F12)
-- [ ] No hay errores rojos en console
-- [ ] Advertencias amarillas son aceptables (no críticas)
+- Open Console tab (F12)
+- [ ] No red errors in console
+- [ ] Yellow warnings are acceptable (not critical)
 
-**3. Assets cargan correctamente:**
+**3. Assets load correctly:**
 
-- [ ] CSS carga (página se ve con estilos)
-- [ ] JavaScript carga (interacciones funcionan)
-- [ ] Imágenes cargan (no hay placeholders rotos)
+- [ ] CSS loads (page has styles)
+- [ ] JavaScript loads (interactions work)
+- [ ] Images load (no broken placeholders)
 
-**Si algo falla aquí:**
+**If something fails here:**
 
 ```markdown
-## ❌ SMOKE TEST FAILED - Acceso Básico
+## SMOKE TEST FAILED - Basic Access
 
-**Blocker:** [Descripción del error]
+**Blocker:** [Error description]
 
 **Evidence:**
 
-- Screenshot: [Adjuntar]
+- Screenshot: [Attach]
 - Console errors:
-```
 
-[Copiar errores de console]
+[Capture console errors via [AUTOMATION_TOOL]]
 
-```
-
-**Acción:** Reportar a Development inmediatamente, NO continuar.
+**Action:** Report to Development immediately, DO NOT continue.
 ```
 
 ---
 
-## 🔐 PASO 3: VALIDAR AUTENTICACIÓN (Si aplica)
+## STEP 3: VALIDATE AUTHENTICATION (If applicable)
 
-**Objetivo:** Verificar que auth flow funciona.
+**Objective:** Verify that auth flow works.
 
-### Paso 3.1: Login
+### Step 3.1: Login
 
-**Acción:**
+**Action:**
 
-1. Navegar a `/login` (o la ruta de login)
-2. Usar credenciales de test:
-   - Email: `test@example.com` (o según `.env.example`)
+1. Navigate to `/login` (or the login route)
+2. Use test credentials:
+   - Email: `test@example.com` (or per `.env.example`)
    - Password: `Test123!`
 
-**Validar:**
+**Validate:**
 
-- [ ] Login form aparece correctamente
-- [ ] Submit login funciona
-- [ ] Redirect a dashboard/home después de login exitoso
-- [ ] No hay errores en console durante login
-
----
-
-### Paso 3.2: Sesión Persistencia
-
-**Acción:**
-
-1. Después de login exitoso, refrescar página (F5)
-
-**Validar:**
-
-- [ ] Sesión persiste (no te saca de la app)
-- [ ] User info aparece correctamente (avatar, nombre, etc.)
+- [ ] Login form appears correctly
+- [ ] Submit login works
+- [ ] Redirect to dashboard/home after successful login
+- [ ] No errors in console during login
 
 ---
 
-### Paso 3.3: Logout
+### Step 3.2: Session Persistence
 
-**Acción:**
+**Action:**
 
-1. Click en logout button
+1. After successful login, refresh page (F5)
 
-**Validar:**
+**Validate:**
 
-- [ ] Logout funciona
-- [ ] Redirect a landing/login page
-- [ ] Sesión se limpia (no puedes acceder a rutas protegidas)
+- [ ] Session persists (doesn't log you out)
+- [ ] User info appears correctly (avatar, name, etc.)
 
-**Si auth falla:**
+---
+
+### Step 3.3: Logout
+
+**Action:**
+
+1. Click on logout button
+
+**Validate:**
+
+- [ ] Logout works
+- [ ] Redirect to landing/login page
+- [ ] Session is cleared (can't access protected routes)
+
+**If auth fails:**
 
 ```markdown
-## ❌ SMOKE TEST FAILED - Autenticación
+## SMOKE TEST FAILED - Authentication
 
-**Blocker:** [Login/Logout no funciona]
+**Blocker:** [Login/Logout doesn't work]
 
 **Steps to reproduce:**
 
-1. [Paso que falla]
+1. [Step that fails]
 
-**Acción:** Reportar inmediatamente, auth es crítico.
+**Action:** Report immediately, auth is critical.
 ```
 
 ---
 
-## ✅ PASO 4: VALIDAR HAPPY PATH DE LA STORY
+## STEP 4: VALIDATE STORY HAPPY PATH
 
-**Objetivo:** Verificar que funcionalidad principal de la story funciona.
+**Objective:** Verify that main story functionality works.
 
-### Paso 4.1: Ejecutar Happy Path
+### Step 4.1: Execute Happy Path
 
-**Acción:** Ejecutar el flujo principal definido en acceptance criteria.
+**Action:** Execute the main flow defined in acceptance criteria.
 
-**Ejemplo adaptado a TU story:**
+**Example adapted to YOUR story:**
 
 ```markdown
-### Happy Path: [Nombre del flujo según AC]
+### Happy Path: [Flow name per AC]
 
-1. [ ] [Primer paso según acceptance criteria]
-2. [ ] [Segundo paso]
-3. [ ] [Lista de entidades aparece]
-4. [ ] [Cada card muestra: campos relevantes]
-5. [ ] [Click en entidad abre detalle]
-6. [ ] [Detalle muestra información completa]
+1. [ ] [First step per acceptance criteria]
+2. [ ] [Second step]
+3. [ ] [Entity list appears]
+4. [ ] [Each card shows: relevant fields]
+5. [ ] [Click on entity opens detail]
+6. [ ] [Detail shows complete information]
 
-(Donde [entidades/campos] se determinan del AC de tu story.
-Ejemplos: mentors/skills en MYM, products/price en SHOP, posts/author en BLOG)
+(Where [entities/fields] are determined from your story's AC.
+Examples: mentors/skills in MYM, products/price in SHOP, posts/author in BLOG)
 ```
 
-**Para TU story específica, adapta el happy path:**
+**For YOUR specific story, adapt the happy path:**
 
-1. **Paso 1:** [Primer paso del AC]
-   - [ ] [Qué debe pasar]
-   - [ ] [Qué validar visualmente]
+1. **Step 1:** [First AC step]
+   - [ ] [What should happen]
+   - [ ] [What to validate visually]
 
-2. **Paso 2:** [Segundo paso del AC]
-   - [ ] [Qué debe pasar]
-   - [ ] [Qué validar]
+2. **Step 2:** [Second AC step]
+   - [ ] [What should happen]
+   - [ ] [What to validate]
 
-3. **Paso 3:** [Tercer paso del AC]
-   - [ ] [Resultado final esperado]
+3. **Step 3:** [Third AC step]
+   - [ ] [Expected final result]
 
 ---
 
-### Paso 4.2: Validar Visualmente
+### Step 4.2: Visual Validation
 
-**Checklist visual:**
+**Visual checklist:**
 
-- [ ] UI se ve como en diseños (colores, spacing, fonts)
-- [ ] Componentes se renderizan correctamente
-- [ ] Responsive design funciona (resize browser)
-- [ ] Loading states son claros
-- [ ] No hay layouts rotos o overlapping elements
+- [ ] UI looks like designs (colors, spacing, fonts)
+- [ ] Components render correctly
+- [ ] Responsive design works (resize browser)
+- [ ] Loading states are clear
+- [ ] No broken layouts or overlapping elements
 
-**Si happy path falla:**
+**If happy path fails:**
 
 ```markdown
-## ❌ SMOKE TEST FAILED - Happy Path
+## SMOKE TEST FAILED - Happy Path
 
-**Blocker:** [Descripción de qué no funciona]
+**Blocker:** [Description of what doesn't work]
 
-**Expected:** [Qué debería pasar según AC]
+**Expected:** [What should happen per AC]
 
-**Actual:** [Qué pasa actualmente]
+**Actual:** [What actually happens]
 
-**Evidence:** [Screenshot o descripción]
+**Evidence:** [Screenshot or description]
 
-**Acción:** Reportar inmediatamente.
+**Action:** Report immediately.
 ```
 
 ---
 
-## 🔗 PASO 5: VALIDAR INTEGRACIÓN CON BACKEND
+## STEP 5: VALIDATE BACKEND INTEGRATION
 
-**Objetivo:** Verificar que APIs y DB funcionan.
+**Objective:** Verify that APIs and DB work.
 
-### Paso 5.1: Revisar Network Tab
+### Step 5.1: Review Network Tab
 
-**Acción:**
+**Action:**
 
-1. Abrir Network tab en DevTools (F12)
-2. Ejecutar happy path nuevamente
-3. Observar requests
+1. Open Network tab in DevTools (F12)
+2. Execute happy path again
+3. Observe requests
 
-**Validar:**
+**Validate:**
 
-- [ ] API calls a backend retornan 200 OK (no 500, no 404)
-- [ ] Datos se envían correctamente (payload en request)
-- [ ] Datos se reciben correctamente (response tiene data esperada)
-- [ ] No hay requests que fallen continuamente
+- [ ] API calls to backend return 200 OK (not 500, not 404)
+- [ ] Data is sent correctly (payload in request)
+- [ ] Data is received correctly (response has expected data)
+- [ ] No requests failing continuously
 
-**Ejemplo de validación:**
+**Validation example:**
 
 ```
 GET /api/[entities] → 200 OK
-Response: { "data": [...entities] }  ✅
+Response: { "data": [...entities] }
 
 POST /api/[resources] → 201 Created
-Response: { "id": "xxx", "status": "created" }  ✅
+Response: { "id": "xxx", "status": "created" }
 
-(Donde [entities/resources] dependen del dominio de tu proyecto.
-Ejemplos: mentors/sessions en MYM, products/orders en SHOP, posts/comments en BLOG)
+(Where [entities/resources] depend on your project domain.
+Examples: mentors/sessions in MYM, products/orders in SHOP, posts/comments in BLOG)
 ```
 
 ---
 
-### Paso 5.2: Validar Persistencia de Datos
+### Step 5.2: Validate Data Persistence
 
-**Acción (si story modifica datos):**
+**Action (if story modifies data):**
 
-1. Crear/modificar data via UI (ej: crear entidad, editar perfil, etc.)
-2. Refrescar página (F5)
-3. Validar que cambios persisten
+1. Create/modify data via UI (e.g.: create entity, edit profile, etc.)
+2. Refresh page (F5)
+3. Validate that changes persist
 
-**Validar:**
+**Validate:**
 
-- [ ] Datos se guardan en DB (persisten después de refresh)
-- [ ] No hay data loss
-- [ ] Data muestra valores correctos
+- [ ] Data saves to DB (persists after refresh)
+- [ ] No data loss
+- [ ] Data shows correct values
 
 ---
 
-## 📝 PASO 6: GENERAR SMOKE TEST CHECKLIST
+## STEP 6: GENERATE SMOKE TEST CHECKLIST
 
-**Objetivo:** Documentar smoke test para referencia del QA.
+**Objective:** Document smoke test for QA reference.
 
-### Paso 6.1: Crear Archivo
+### Step 6.1: Create File
 
-**Acción:** Crear `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/stories/STORY-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/smoke-test.md`
+**Action:** Create `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{name}/stories/STORY-{PROJECT_KEY}-{ISSUE_NUM}-{name}/smoke-test.md`
 
-**Contenido:**
+**Content:**
 
 ```markdown
-# Smoke Test: [STORY-{PROJECT_KEY}-{ISSUE_NUM}-{nombre} - Nombre]
+# Smoke Test: [STORY-{PROJECT_KEY}-{ISSUE_NUM}-{name} - Name]
 
 **Staging URL:** https://[project]-develop.vercel.app
-**Fecha:** [Fecha actual]
-**QA:** [Nombre del QA]
-**Duración:** 5-10 minutos
+**Date:** [Current date]
+**QA:** [QA name]
+**Duration:** 5-10 minutes
 
 ---
 
-## ✅ Smoke Test Checklist
+## Smoke Test Checklist
 
-### 1. Acceso Básico
+### 1. Basic Access
 
-- [ ] **Aplicación carga sin errores 500**
+- [ ] **Application loads without 500 errors**
   - URL: https://[project]-develop.vercel.app
-  - Landing page debe cargar completamente
+  - Landing page must load completely
 
-- [ ] **No hay errores en console (F12)**
-  - Console tab no debe mostrar errores rojos
-  - Advertencias amarillas son aceptables
+- [ ] **No errors in console (F12)**
+  - Console tab should not show red errors
+  - Yellow warnings are acceptable
 
-- [ ] **Assets cargan correctamente**
-  - [ ] CSS carga (página tiene estilos)
-  - [ ] JavaScript carga (interacciones funcionan)
-  - [ ] Imágenes cargan (no hay placeholders rotos)
+- [ ] **Assets load correctly**
+  - [ ] CSS loads (page has styles)
+  - [ ] JavaScript loads (interactions work)
+  - [ ] Images load (no broken placeholders)
 
 ---
 
-### 2. Autenticación (si aplica)
+### 2. Authentication (if applicable)
 
-- [ ] **Login funciona**
+- [ ] **Login works**
   - Email: `test@example.com`
   - Password: `Test123!`
-  - Debe redirigir a dashboard después de login
+  - Should redirect to dashboard after login
 
-- [ ] **Sesión persiste al refrescar**
-  - Refrescar página (F5) → Sesión debe mantenerse
+- [ ] **Session persists on refresh**
+  - Refresh page (F5) → Session should remain
 
-- [ ] **Logout funciona**
-  - Click en logout → Debe redirigir a landing/login
+- [ ] **Logout works**
+  - Click logout → Should redirect to landing/login
 
 ---
 
-### 3. Happy Path: [Nombre del Happy Path]
+### 3. Happy Path: [Happy Path Name]
 
-**Descripción:** [Breve descripción del flujo principal]
+**Description:** [Brief description of main flow]
 
 **Steps:**
 
-1. [ ] **[Paso 1]**
-   - Acción: [Qué hacer]
-   - Validar: [Qué debe pasar]
+1. [ ] **[Step 1]**
+   - Action: [What to do]
+   - Validate: [What should happen]
 
-2. [ ] **[Paso 2]**
-   - Acción: [Qué hacer]
-   - Validar: [Qué debe pasar]
+2. [ ] **[Step 2]**
+   - Action: [What to do]
+   - Validate: [What should happen]
 
-3. [ ] **[Paso 3]**
-   - Acción: [Qué hacer]
-   - Validar: [Resultado final esperado]
+3. [ ] **[Step 3]**
+   - Action: [What to do]
+   - Validate: [Expected final result]
 
-**Validación visual:**
+**Visual validation:**
 
-- [ ] UI se ve como en diseños
-- [ ] No hay layouts rotos
-- [ ] Loading states son claros
+- [ ] UI looks like designs
+- [ ] No broken layouts
+- [ ] Loading states are clear
 
 ---
 
-### 4. Integración con Backend
+### 4. Backend Integration
 
 **Network Tab Validation:**
 
-- [ ] **API calls retornan 200 OK**
-  - Abrir DevTools → Network tab
-  - Ejecutar happy path
-  - Validar que requests a `/api/*` retornan 200
+- [ ] **API calls return 200 OK**
+  - Open DevTools → Network tab
+  - Execute happy path
+  - Validate that requests to `/api/*` return 200
 
-- [ ] **Datos se guardan en DB (si aplica)**
-  - Crear/modificar data via UI
-  - Refrescar página (F5)
-  - Validar que cambios persisten
+- [ ] **Data saves to DB (if applicable)**
+  - Create/modify data via UI
+  - Refresh page (F5)
+  - Validate that changes persist
 
-- [ ] **Datos se recuperan correctamente**
-  - Data mostrada en UI coincide con lo esperado
-
----
-
-## 📊 Resultado del Smoke Test
-
-**Ejecutado por:** [Nombre]
-**Fecha:** [Fecha]
-**Duración:** [Tiempo real]
-
-### Resultado Final:
-
-- [ ] **✅ PASSED:** Deployment funcional, continuar con exploratory testing
-- [ ] **❌ FAILED:** Deployment roto, reportar bug crítico inmediatamente
+- [ ] **Data retrieves correctly**
+  - Data shown in UI matches expected
 
 ---
 
-### Notas (si aplica):
+## Smoke Test Result
 
-[Cualquier observación adicional]
+**Executed by:** [Name]
+**Date:** [Date]
+**Duration:** [Actual time]
+
+### Final Result:
+
+- [ ] **PASSED:** Deployment functional, continue with exploratory testing
+- [ ] **FAILED:** Deployment broken, report critical bug immediately
 
 ---
 
-### Si FAILED:
+### Notes (if applicable):
 
-**Blocker:** [Descripción del error que bloquea]
+[Any additional observations]
+
+---
+
+### If FAILED:
+
+**Blocker:** [Description of blocking error]
 
 **Evidence:**
 
-- Screenshot: [Adjuntar]
-- Console errors: [Copiar]
+- Screenshot: [Attach]
+- Console errors: [Capture via [AUTOMATION_TOOL]]
 
-**Próximo paso:**
+**Next step:**
 
-- Reportar a Development inmediatamente
-- NO continuar con exploratory testing hasta que se fixee
+- Report to Development immediately
+- DO NOT continue with exploratory testing until fixed
 ```
 
 ---
 
-## 🎉 REPORTE FINAL
+## Final Report
 
-**Mostrar al usuario:**
+**Show to user:**
 
 ````markdown
-# ✅ SMOKE TEST CHECKLIST GENERADO
+# SMOKE TEST CHECKLIST GENERATED
 
-## Archivo Creado:
+## File Created:
 
-`.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/stories/STORY-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/smoke-test.md`
+`.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{name}/stories/STORY-{PROJECT_KEY}-{ISSUE_NUM}-{name}/smoke-test.md`
 
 ---
 
-## Próximos Pasos:
+## Next Steps:
 
-### ✅ Si Smoke Test PASSED:
+### If Smoke Test PASSED:
 
-Continuar con exploratory testing:
+Continue with exploratory testing:
 
 ```bash
-# 1. Crear test charter
-Use: .prompts/fase-10-exploratory-testing/test-charter.md
+# 1. UI Exploration
+Use: .prompts/fase-10-exploratory-testing/exploratory-test.md
 
-# 2. Ejecutar sesión exploratoria
-Use: .prompts/fase-10-exploratory-testing/session-notes.md
+# 2. API Exploration (if applicable)
+Use: .prompts/fase-10-exploratory-testing/exploratory-api-test.md
 
-# 3. Si encuentras bugs
+# 3. DB Exploration (if applicable)
+Use: .prompts/fase-10-exploratory-testing/exploratory-db-test.md
+
+# 4. If you find bugs
 Use: .prompts/fase-10-exploratory-testing/bug-report.md
 ```
 ````
 
 ---
 
-### ❌ Si Smoke Test FAILED
+### If Smoke Test FAILED
 
-**NO continuar con exploratory testing.**
+**DO NOT continue with exploratory testing.**
 
-**Acción inmediata:**
+**Immediate action:**
 
-1. Reportar bug crítico a Development
-2. Incluir evidencia (screenshots, console errors)
-3. Deployment debe corregirse antes de continuar
+1. Report critical bug to Development
+2. Include evidence (screenshots, console errors)
+3. Deployment must be fixed before continuing
 
-**Flujo de fix:**
+**Fix flow:**
 
 ```
-Bug reportado → Development fix → Re-deploy a staging → Re-ejecutar smoke test
-```
-
----
-
-## 📊 Checklist Generado
-
-**Secciones incluidas:**
-
-- ✅ Acceso básico (app carga, console sin errores, assets OK)
-- ✅ Autenticación (login, logout, sesión persiste)
-- ✅ Happy path de la story (steps específicos)
-- ✅ Integración backend (API calls, persistencia de datos)
-
-**Duración estimada:** 5-10 minutos
-
-**Ready para ejecutar!**
-
+Bug reported → Development fix → Re-deploy to staging → Re-execute smoke test
 ```
 
 ---
 
-## 📋 CHECKLIST INTERNO (NO MOSTRAR)
+## Checklist Generated
 
-**Validaciones antes de finalizar:**
+**Sections included:**
 
-### Story Analizada:
-- [ ] Acceptance criteria leídos
-- [ ] Happy path identificado
-- [ ] Funcionalidad crítica clara
+- Basic access (app loads, console without errors, assets OK)
+- Authentication (login, logout, session persists)
+- Story happy path (specific steps)
+- Backend integration (API calls, data persistence)
 
-### Checklist Generado:
-- [ ] Sección "Acceso Básico" incluida
-- [ ] Sección "Autenticación" incluida (si aplica)
-- [ ] Sección "Happy Path" con steps específicos
-- [ ] Sección "Integración Backend" incluida
-- [ ] Resultado PASSED/FAILED incluido
+**Estimated duration:** 5-10 minutes
 
-### Documentación:
-- [ ] Archivo creado en ruta correcta
-- [ ] Staging URL incluida
-- [ ] Duración estimada (5-10 min) mencionada
-- [ ] Próximos pasos claros
+**Ready to execute!**
+
+```
 
 ---
 
-## 💡 MEJORES PRÁCTICAS
+## Internal Checklist (DO NOT SHOW)
+
+**Validations before finishing:**
+
+### Story Analyzed:
+- [ ] Acceptance criteria read
+- [ ] Happy path identified
+- [ ] Critical functionality clear
+
+### Checklist Generated:
+- [ ] "Basic Access" section included
+- [ ] "Authentication" section included (if applicable)
+- [ ] "Happy Path" section with specific steps
+- [ ] "Backend Integration" section included
+- [ ] PASSED/FAILED result included
+
+### Documentation:
+- [ ] File created in correct path
+- [ ] Staging URL included
+- [ ] Estimated duration (5-10 min) mentioned
+- [ ] Next steps clear
+
+---
+
+## Best Practices
 
 ### **1. Smoke Test ≠ Exploratory Testing**
 
 **Smoke test (5-10 min):**
-- Solo happy path
-- Validar que deployment funciona
+- Happy path only
+- Validate that deployment works
 - Go/No-Go decision
 
 **Exploratory testing (60-90 min):**
@@ -674,67 +678,67 @@ Bug reportado → Development fix → Re-deploy a staging → Re-ejecutar smoke 
 - UX review
 - Full coverage
 
-**No confundir:** Smoke test es rápido, exploratory testing es profundo.
+**Don't confuse:** Smoke test is quick, exploratory testing is deep.
 
 ---
 
 ### **2. FAILED Smoke Test = STOP**
 
-**Si smoke test falla:**
-- ❌ NO continuar con exploratory testing
-- ❌ NO invertir tiempo en testing algo roto
-- ✅ Reportar inmediatamente
-- ✅ Development fix → Re-deploy → Re-test
+**If smoke test fails:**
+- DO NOT continue with exploratory testing
+- DO NOT invest time testing something broken
+- Report immediately
+- Development fix → Re-deploy → Re-test
 
-**Beneficio:** No desperdiciar tiempo de QA en deployment roto.
-
----
-
-### **3. Validar Backend Integration SIEMPRE**
-
-**Incluso si UI se ve bien:**
-- Revisar Network tab (F12)
-- Validar que APIs retornan 200
-- Validar que datos persisten
-
-**Por qué:** UI puede renderizar data mock/hardcoded pero backend estar roto.
+**Benefit:** Don't waste QA time on broken deployment.
 
 ---
 
-### **4. Documentar Evidencia Si Falla**
+### **3. ALWAYS Validate Backend Integration**
 
-**Si smoke test falla, incluir:**
-- Screenshot del error
-- Console errors (copiar texto completo)
-- Network tab errors (copiar request/response)
-- Steps exactos que causaron el error
+**Even if UI looks good:**
+- Check Network tab (F12)
+- Validate that APIs return 200
+- Validate that data persists
 
-**Beneficio:** Development puede reproducir y fixear más rápido.
-
----
-
-### **5. Ejecutar en Diferentes Browsers (Si tiempo permite)**
-
-**Si tienes 2-3 minutos extra:**
-- Ejecutar smoke test en Chrome
-- Ejecutar en Firefox o Safari
-
-**Por qué:** Catch browser-specific issues temprano.
+**Why:** UI can render mock/hardcoded data but backend could be broken.
 
 ---
 
-## 📚 REFERENCIAS
+### **4. Document Evidence If It Fails**
+
+**If smoke test fails, include:**
+- Screenshot of the error
+- Console errors (capture via [AUTOMATION_TOOL] console)
+- Network tab errors (capture via [AUTOMATION_TOOL] network)
+- Exact steps that caused the error
+
+**Benefit:** Development can reproduce and fix faster.
+
+---
+
+### **5. Execute in Different Browsers (If time permits)**
+
+**If you have 2-3 extra minutes:**
+- Execute smoke test in Chrome
+- Execute in Firefox or Safari
+
+**Why:** Catch browser-specific issues early.
+
+---
+
+## References
 
 **Smoke testing best practices:**
 - https://www.guru99.com/smoke-testing.html
 
 **Exploratory testing:**
-- `.prompts/fase-10-exploratory-testing/test-charter.md` - Charter de exploración
+- `.prompts/fase-10-exploratory-testing/exploratory-test.md` - UI exploration
 
 **Testing strategy:**
-- `.prompts/fase-11-test-automation/test-strategy.md` - Estrategia completa
+- `.prompts/fase-12-test-automation/README.md` - Complete strategy
 
 ---
 
-**✅ Smoke Test = Validación rápida (5-10 min) + Go/No-Go decision + Fundación para exploratory testing**
+**Smoke Test = Quick validation (5-10 min) + Go/No-Go decision + Foundation for exploratory testing**
 ```

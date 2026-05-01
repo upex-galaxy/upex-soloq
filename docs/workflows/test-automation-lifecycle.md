@@ -572,12 +572,12 @@ Con los tests pasando en CI, creas un **Pull Request para revisión** por otro m
 
 Para ejecutar cada stage con ayuda de AI:
 
-| Stage   | Prompt                                                      |
-| ------- | ----------------------------------------------------------- |
-| Stage 1 | `.prompts/stage-4-automation/e2e-test-automation-plan.md`   |
-| Stage 2 | `.prompts/stage-4-automation/e2e-test-automation-coding.md` |
-| Stage 3 | Verificación manual en CI                                   |
-| Stage 4 | `.prompts/stage-4-automation/e2e-test-code-review.md`       |
+| Stage   | Prompt                                                                  |
+| ------- | ----------------------------------------------------------------------- |
+| Stage 1 | `.prompts/fase-12-test-automation/planning/test-implementation-plan.md` |
+| Stage 2 | `.prompts/fase-12-test-automation/e2e/e2e-coding.md`                    |
+| Stage 3 | Verificación manual en CI                                               |
+| Stage 4 | `.prompts/fase-12-test-automation/e2e/e2e-review.md`                    |
 
 ---
 
@@ -614,7 +614,7 @@ Para ejecutar cada stage con ayuda de AI:
 
 ## Referencias
 
-- [IQL Methodology](../methodology/IQL-methodology.md)
-- [Mid-Game Testing](../methodology/mid-game-testing.md)
-- [TMLC - Manual Lifecycle](./test-manual-lifecycle.md)
-- [KATA Architecture](../../.context/guidelines/TAE/kata-architecture.md)
+- [IQL Methodology](docs/methodology/IQL-methodology.md)
+- [Mid-Game Testing](docs/methodology/mid-game-testing.md)
+- [TMLC - Manual Lifecycle](docs/workflows/test-manual-lifecycle.md)
+- [KATA Architecture](.context/guidelines/TAE/kata-architecture.md)

@@ -1,329 +1,324 @@
-# E2E Test Code Review
+# E2E Test Review
 
-> **Fase**: 3 de 3 (Plan → Coding → Review)
-> **Propósito**: Validar cumplimiento KATA, calidad de código y calidad de test del código implementado.
-> **Output**: Reporte de issues con niveles de severidad y sugerencias de mejora.
-
----
-
-## Carga de Contexto
-
-**Cargar estos archivos de referencia:**
-
-1. `qa/.context/guidelines/TAE/kata-ai-index.md` → Patrones core KATA
-2. `qa/.context/guidelines/TAE/automation-standards.md` → Reglas y anti-patrones
-3. `qa/.context/guidelines/TAE/typescript-patterns.md` → Convenciones TypeScript
+> **Phase**: 3 of 3 (Plan → Coding → Review)
+> **Purpose**: Validate KATA compliance, code quality, and test quality of implemented code.
+> **Output**: Issue report with severity levels and improvement suggestions.
 
 ---
 
-## Input Requerido
+## Context Loading
 
-1. **Código implementado** de la Fase 2:
-   - Archivo de componente UI (`{PageName}Page.ts`)
-   - Archivo de test (`{feature}.test.ts`)
-   - Actualizaciones de fixture (`UiFixture.ts`)
-   - Definiciones de tipos (si hay)
+**Load these files for reference:**
 
-2. **Plan Original** de la Fase 1 (para referencia)
+1. `.context/guidelines/TAE/kata-ai-index.md` → Core KATA patterns
+2. `.context/guidelines/TAE/automation-standards.md` → Rules and anti-patterns
+3. `.context/guidelines/TAE/test-design-principles.md` → ATCs vs helpers, flow-based tests
 
 ---
 
-## Proceso de Review
+## Input Required
 
-### Paso 1: Recolectar Código para Review
+1. **Implemented code** from Phase 2:
+   - UI Component file (`{PageName}Page.ts`)
+   - Test file (`{feature}.test.ts`)
+   - Fixture updates (`UiFixture.ts`)
+   - Type definitions (if any)
 
-Recolectar todos los archivos a revisar:
+2. **Original Plan** from Phase 1 (for reference)
+
+---
+
+## Review Process
+
+### Step 1: Gather Code for Review
+
+Collect all files to review:
 
 ```bash
-# Leer el componente
-cat qa/tests/components/ui/{PageName}Page.ts
+# Read the component
+cat tests/components/ui/{PageName}Page.ts
 
-# Leer el archivo de test
-cat qa/tests/e2e/{feature}/{feature}.test.ts
+# Read the test file
+cat tests/e2e/{feature}/{feature}.test.ts
 
-# Leer cambios de fixture
-cat qa/tests/components/UiFixture.ts
+# Read fixture changes
+cat tests/components/UiFixture.ts
 
-# Verificar definiciones de tipos
+# Check for type definitions
 cat tests/data/types.ts
 ```
 
 ---
 
-### Paso 2: Review de Cumplimiento KATA
+### Step 2: KATA Compliance Review
 
-#### 2.1 Estructura del Componente
+#### 2.1 Component Structure
 
-| Check | Criterio                                             | Estado              |
-| ----- | ---------------------------------------------------- | ------------------- |
-| K-01  | Extiende `UiBase`                                    | [ ] PASS / [ ] FAIL |
-| K-02  | Constructor acepta `TestContextOptions`              | [ ] PASS / [ ] FAIL |
-| K-03  | Decorator `@atc` presente con ID válido              | [ ] PASS / [ ] FAIL |
-| K-04  | ATCs son casos de test completos (no clicks simples) | [ ] PASS / [ ] FAIL |
-| K-05  | Assertions fijas dentro de ATCs                      | [ ] PASS / [ ] FAIL |
-| K-06  | Locators inline (no en archivo separado)             | [ ] PASS / [ ] FAIL |
-| K-07  | Locators compartidos solo si se usan en 2+ ATCs      | [ ] PASS / [ ] FAIL |
-| K-08  | ATCs no llaman a otros ATCs                          | [ ] PASS / [ ] FAIL |
-| K-09  | Método `goto()` separado de ATCs                     | [ ] PASS / [ ] FAIL |
+| Check | Criteria | Status |
+|-------|----------|--------|
+| K-01 | Extends `UiBase` | [ ] PASS / [ ] FAIL |
+| K-02 | Constructor accepts `TestContextOptions` | [ ] PASS / [ ] FAIL |
+| K-03 | `@atc` decorator present with valid ID | [ ] PASS / [ ] FAIL |
+| K-04 | ATCs are complete test cases (not single clicks) | [ ] PASS / [ ] FAIL |
+| K-05 | Fixed assertions inside ATCs | [ ] PASS / [ ] FAIL |
+| K-06 | Locators inline (not in separate file) | [ ] PASS / [ ] FAIL |
+| K-07 | Shared locators only if used in 2+ ATCs | [ ] PASS / [ ] FAIL |
+| K-08 | ATCs don't call other ATCs | [ ] PASS / [ ] FAIL |
+| K-09 | `goto()` method separate from ATCs | [ ] PASS / [ ] FAIL |
 
-#### 2.2 Calidad del ATC
+#### 2.2 ATC Quality
 
-Para cada ATC, verificar:
+For each ATC, verify:
 
 ```markdown
 ### ATC: {methodName}
 
-| Check | Criterio                                                                          | Estado |
-| ----- | --------------------------------------------------------------------------------- | ------ |
-| A-01  | Decorator: `@atc('{TEST-ID}')`                                                    | [ ]    |
-| A-02  | Nombre sigue convención: `{verb}{Resource}Successfully` o `{verb}With{Condition}` | [ ]    |
-| A-03  | Parámetros tienen tipos                                                           | [ ]    |
-| A-04  | Tipo de retorno es `Promise<void>`                                                | [ ]    |
-| A-05  | Contiene al menos una assertion                                                   | [ ]    |
-| A-06  | Assertions usan Playwright expect                                                 | [ ]    |
-| A-07  | Sin datos de test hardcodeados                                                    | [ ]    |
-| A-08  | Sin llamadas a `waitForTimeout()`                                                 | [ ]    |
+| Check | Criteria | Status |
+|-------|----------|--------|
+| A-01 | Decorator: `@atc('{TEST-ID}')` | [ ] |
+| A-02 | Name follows convention: `{verb}{Resource}Successfully` or `{verb}With{Condition}` | [ ] |
+| A-03 | Parameters are typed | [ ] |
+| A-04 | Return type is `Promise<void>` | [ ] |
+| A-05 | Contains at least one assertion | [ ] |
+| A-06 | Assertions use Playwright expect | [ ] |
+| A-07 | No hardcoded test data | [ ] |
+| A-08 | No `waitForTimeout()` calls | [ ] |
 ```
 
 ---
 
-### Paso 3: Review de Calidad de Código
+### Step 3: Code Quality Review
 
-#### 3.1 Calidad TypeScript
+#### 3.1 TypeScript Quality
 
-| Check | Criterio                                           | Estado              |
-| ----- | -------------------------------------------------- | ------------------- |
-| T-01  | Sin tipos `any`                                    | [ ] PASS / [ ] FAIL |
-| T-02  | Todos los parámetros de función tienen tipos       | [ ] PASS / [ ] FAIL |
-| T-03  | Tipos de retorno especificados                     | [ ] PASS / [ ] FAIL |
-| T-04  | Interfaces/tipos exportados para reutilización     | [ ] PASS / [ ] FAIL |
-| T-05  | Tipos definidos después de imports, antes de clase | [ ] PASS / [ ] FAIL |
+| Check | Criteria | Status |
+|-------|----------|--------|
+| T-01 | No `any` types | [ ] PASS / [ ] FAIL |
+| T-02 | All function parameters typed | [ ] PASS / [ ] FAIL |
+| T-03 | Return types specified | [ ] PASS / [ ] FAIL |
+| T-04 | Interfaces/types exported for reuse | [ ] PASS / [ ] FAIL |
+| T-05 | Types defined after imports, before class | [ ] PASS / [ ] FAIL |
 
-#### 3.2 Calidad de Imports
+#### 3.2 Import Quality
 
-| Check | Criterio                                          | Estado              |
-| ----- | ------------------------------------------------- | ------------------- |
-| I-01  | Usando import aliases (`@ui/`, `@utils/`, etc.)   | [ ] PASS / [ ] FAIL |
-| I-02  | Sin imports relativos (`../../../`)               | [ ] PASS / [ ] FAIL |
-| I-03  | Imports de tipo usan `import type`                | [ ] PASS / [ ] FAIL |
-| I-04  | Imports organizados (tipos → externos → internos) | [ ] PASS / [ ] FAIL |
+| Check | Criteria | Status |
+|-------|----------|--------|
+| I-01 | Using import aliases (`@ui/`, `@utils/`, etc.) | [ ] PASS / [ ] FAIL |
+| I-02 | No relative imports (`../../../`) | [ ] PASS / [ ] FAIL |
+| I-03 | Type imports use `import type` | [ ] PASS / [ ] FAIL |
+| I-04 | Imports organized (types → external → internal) | [ ] PASS / [ ] FAIL |
 
-#### 3.3 Calidad de Métodos
+#### 3.3 Method Quality
 
-| Check | Criterio                                                       | Estado              |
-| ----- | -------------------------------------------------------------- | ------------------- |
-| M-01  | Máximo 2 parámetros posicionales (usar objeto si más)          | [ ] PASS / [ ] FAIL |
-| M-02  | Métodos organizados: constructor → navegación → ATCs → helpers | [ ] PASS / [ ] FAIL |
-| M-03  | Helpers privados son realmente privados (no públicos)          | [ ] PASS / [ ] FAIL |
-| M-04  | Comentarios JSDoc en métodos públicos                          | [ ] PASS / [ ] FAIL |
-
----
-
-### Paso 4: Review del Archivo de Test
-
-#### 4.1 Estructura del Test
-
-| Check | Criterio                                        | Estado              |
-| ----- | ----------------------------------------------- | ------------------- |
-| TF-01 | Importa `test` desde `@TestFixture`             | [ ] PASS / [ ] FAIL |
-| TF-02 | Usa `test.describe()` para agrupar              | [ ] PASS / [ ] FAIL |
-| TF-03 | Estructura ARRANGE-ACT-ASSERT                   | [ ] PASS / [ ] FAIL |
-| TF-04 | Nombres de test descriptivos                    | [ ] PASS / [ ] FAIL |
-| TF-05 | Tags apropiados (`@regression`, `@smoke`, etc.) | [ ] PASS / [ ] FAIL |
-
-#### 4.2 Independencia de Tests
-
-| Check | Criterio                                   | Estado              |
-| ----- | ------------------------------------------ | ------------------- |
-| TI-01 | Cada test genera sus propios datos         | [ ] PASS / [ ] FAIL |
-| TI-02 | Sin estado mutable compartido entre tests  | [ ] PASS / [ ] FAIL |
-| TI-03 | Tests pueden ejecutarse en cualquier orden | [ ] PASS / [ ] FAIL |
-| TI-04 | Sin `test.only` o `test.skip` sin razón    | [ ] PASS / [ ] FAIL |
-
-#### 4.3 Datos de Test
-
-| Check | Criterio                                              | Estado              |
-| ----- | ----------------------------------------------------- | ------------------- |
-| TD-01 | Usando Faker o funciones factory                      | [ ] PASS / [ ] FAIL |
-| TD-02 | Sin UUIDs o IDs hardcodeados                          | [ ] PASS / [ ] FAIL |
-| TD-03 | Sin credenciales de usuario reales                    | [ ] PASS / [ ] FAIL |
-| TD-04 | Datos únicos por ejecución de test (timestamps, etc.) | [ ] PASS / [ ] FAIL |
+| Check | Criteria | Status |
+|-------|----------|--------|
+| M-01 | Max 2 positional parameters (use object if more) | [ ] PASS / [ ] FAIL |
+| M-02 | Methods organized: constructor → navigation → ATCs → helpers | [ ] PASS / [ ] FAIL |
+| M-03 | Private helpers are truly private (not public) | [ ] PASS / [ ] FAIL |
+| M-04 | JSDoc comments on public methods | [ ] PASS / [ ] FAIL |
 
 ---
 
-### Paso 5: Review de Registro en Fixture
+### Step 4: Test File Review
 
-| Check | Criterio                                       | Estado              |
-| ----- | ---------------------------------------------- | ------------------- |
-| F-01  | Componente importado en UiFixture              | [ ] PASS / [ ] FAIL |
-| F-02  | Propiedad declarada como `public readonly`     | [ ] PASS / [ ] FAIL |
-| F-03  | Inicializado en constructor con mismas options | [ ] PASS / [ ] FAIL |
-| F-04  | Nombre de propiedad sigue camelCase            | [ ] PASS / [ ] FAIL |
+#### 4.1 Test Structure
 
----
+| Check | Criteria | Status |
+|-------|----------|--------|
+| TF-01 | Imports `test` from `@TestFixture` | [ ] PASS / [ ] FAIL |
+| TF-02 | Uses `test.describe()` for grouping | [ ] PASS / [ ] FAIL |
+| TF-03 | ARRANGE-ACT-ASSERT structure | [ ] PASS / [ ] FAIL |
+| TF-04 | Descriptive test names | [ ] PASS / [ ] FAIL |
+| TF-05 | Appropriate tags (`@regression`, `@smoke`, etc.) | [ ] PASS / [ ] FAIL |
 
-### Paso 6: Review de Estrategia de Locators
+#### 4.2 Test Independence
 
-| Check | Criterio                                      | Estado              |
-| ----- | --------------------------------------------- | ------------------- |
-| L-01  | Prefiere atributos `data-testid`              | [ ] PASS / [ ] FAIL |
-| L-02  | Usa `role` para elementos semánticos          | [ ] PASS / [ ] FAIL |
-| L-03  | Evita selectores frágiles (nth-child, clases) | [ ] PASS / [ ] FAIL |
-| L-04  | Locators son específicos (no muy amplios)     | [ ] PASS / [ ] FAIL |
+| Check | Criteria | Status |
+|-------|----------|--------|
+| TI-01 | Each test generates its own data | [ ] PASS / [ ] FAIL |
+| TI-02 | No shared mutable state between tests | [ ] PASS / [ ] FAIL |
+| TI-03 | Tests can run in any order | [ ] PASS / [ ] FAIL |
+| TI-04 | No `test.only` or `test.skip` without reason | [ ] PASS / [ ] FAIL |
 
----
+#### 4.3 Test Data
 
-## Template de Reporte de Issues
-
-Generar un reporte con todos los hallazgos:
-
-````markdown
-# Reporte de Code Review: {TEST-ID}
-
-## Resumen
-
-| Categoría         | Pass | Fail | Total |
-| ----------------- | ---- | ---- | ----- |
-| Cumplimiento KATA | X    | Y    | 9     |
-| Calidad de Código | X    | Y    | 12    |
-| Calidad de Test   | X    | Y    | 8     |
-| **Total**         | X    | Y    | 29    |
-
-## Veredicto
-
-- [ ] **APROBADO** - Sin issues críticos/altos, listo para merge
-- [ ] **NECESITA REVISIÓN** - Tiene issues críticos/altos que deben corregirse
-- [ ] **CAMBIOS MENORES** - Tiene issues medios/bajos, puede hacer merge después de corregir
+| Check | Criteria | Status |
+|-------|----------|--------|
+| TD-01 | Using Faker or factory functions | [ ] PASS / [ ] FAIL |
+| TD-02 | No hardcoded UUIDs or IDs | [ ] PASS / [ ] FAIL |
+| TD-03 | No real user credentials | [ ] PASS / [ ] FAIL |
+| TD-04 | Unique data per test run (timestamps, etc.) | [ ] PASS / [ ] FAIL |
 
 ---
 
-## Issues Encontrados
+### Step 5: Fixture Registration Review
 
-### Issues CRÍTICOS (Debe Corregir)
-
-| ID   | Ubicación         | Issue         | Sugerencia      |
-| ---- | ----------------- | ------------- | --------------- |
-| C-01 | {archivo}:{línea} | {descripción} | {cómo corregir} |
-
-### Issues ALTOS (Debería Corregir)
-
-| ID   | Ubicación         | Issue         | Sugerencia      |
-| ---- | ----------------- | ------------- | --------------- |
-| H-01 | {archivo}:{línea} | {descripción} | {cómo corregir} |
-
-### Issues MEDIOS (Recomendado)
-
-| ID   | Ubicación         | Issue         | Sugerencia      |
-| ---- | ----------------- | ------------- | --------------- |
-| M-01 | {archivo}:{línea} | {descripción} | {cómo corregir} |
-
-### Issues BAJOS (Nice to Have)
-
-| ID   | Ubicación         | Issue         | Sugerencia      |
-| ---- | ----------------- | ------------- | --------------- |
-| L-01 | {archivo}:{línea} | {descripción} | {cómo corregir} |
+| Check | Criteria | Status |
+|-------|----------|--------|
+| F-01 | Component imported in UiFixture | [ ] PASS / [ ] FAIL |
+| F-02 | Property declared as `public readonly` | [ ] PASS / [ ] FAIL |
+| F-03 | Initialized in constructor with same options | [ ] PASS / [ ] FAIL |
+| F-04 | Property name follows camelCase | [ ] PASS / [ ] FAIL |
 
 ---
 
-## Snippets de Código con Issues
+### Step 6: Locator Strategy Review
 
-### Issue C-01: {Título}
+| Check | Criteria | Status |
+|-------|----------|--------|
+| L-01 | Prefers `data-testid` attributes | [ ] PASS / [ ] FAIL |
+| L-02 | Uses `role` for semantic elements | [ ] PASS / [ ] FAIL |
+| L-03 | Avoids brittle selectors (nth-child, classes) | [ ] PASS / [ ] FAIL |
+| L-04 | Locators are specific (not too broad) | [ ] PASS / [ ] FAIL |
 
-**Ubicación**: `{archivo}:{línea}`
+---
 
-**Código Actual**:
+## Issue Report Template
 
+Generate a report with all findings:
+
+```markdown
+# Code Review Report: {TEST-ID}
+
+## Summary
+
+| Category | Pass | Fail | Total |
+|----------|------|------|-------|
+| KATA Compliance | X | Y | 9 |
+| Code Quality | X | Y | 12 |
+| Test Quality | X | Y | 8 |
+| **Total** | X | Y | 29 |
+
+## Verdict
+
+- [ ] **APPROVED** - No critical/high issues, ready for merge
+- [ ] **NEEDS REVISION** - Has critical/high issues that must be fixed
+- [ ] **MINOR CHANGES** - Has medium/low issues, can merge after fixing
+
+---
+
+## Issues Found
+
+### CRITICAL Issues (Must Fix)
+
+| ID | Location | Issue | Suggestion |
+|----|----------|-------|------------|
+| C-01 | {file}:{line} | {description} | {how to fix} |
+
+### HIGH Issues (Should Fix)
+
+| ID | Location | Issue | Suggestion |
+|----|----------|-------|------------|
+| H-01 | {file}:{line} | {description} | {how to fix} |
+
+### MEDIUM Issues (Recommended)
+
+| ID | Location | Issue | Suggestion |
+|----|----------|-------|------------|
+| M-01 | {file}:{line} | {description} | {how to fix} |
+
+### LOW Issues (Nice to Have)
+
+| ID | Location | Issue | Suggestion |
+|----|----------|-------|------------|
+| L-01 | {file}:{line} | {description} | {how to fix} |
+
+---
+
+## Code Snippets with Issues
+
+### Issue C-01: {Title}
+
+**Location**: `{file}:{line}`
+
+**Current Code**:
 ```typescript
-// Código problemático actual
-```
-````
-
-**Corrección Sugerida**:
-
-```typescript
-// Código corregido
+// Current problematic code
 ```
 
-**Razón**: {explicación de por qué es un issue}
+**Suggested Fix**:
+```typescript
+// Fixed code
+```
+
+**Reason**: {explanation of why this is an issue}
 
 ---
 
-## Checks Pasados
+## Passed Checks
 
-Todos los siguientes checks pasaron:
-
-- [x] K-01: Extiende UiBase correctamente
-- [x] K-02: Patrón de constructor correcto
-- [x] ... (listar todos los checks pasados)
-
----
-
-## Recomendaciones
-
-1. **{Categoría}**: {Recomendación}
-2. **{Categoría}**: {Recomendación}
-
-````
+All the following checks passed:
+- [x] K-01: Extends UiBase correctly
+- [x] K-02: Constructor pattern correct
+- [x] ... (list all passed checks)
 
 ---
 
-## Definiciones de Severidad
+## Recommendations
 
-| Severidad | Definición | Acción |
-|-----------|------------|--------|
-| **CRÍTICO** | Rompe arquitectura KATA, test no funcionará correctamente, issue de seguridad | Debe corregir antes de merge |
-| **ALTO** | Viola estándares importantes, potenciales issues de mantenimiento | Debería corregir antes de merge |
-| **MEDIO** | Violación de best practice, code smell | Recomendado corregir |
-| **BAJO** | Issue de estilo, mejora menor | Nice to have |
-
-### Ejemplos de Issues Críticos
-
-- ATC llama a otro ATC
-- Falta decorator `@atc`
-- Sin assertions en ATC
-- Usando `waitForTimeout()`
-- Credenciales hardcodeadas
-
-### Ejemplos de Issues Altos
-
-- Imports relativos en lugar de aliases
-- Faltan tipos TypeScript
-- Locators en archivo separado
-- ATC de interacción simple
-
-### Ejemplos de Issues Medios
-
-- Faltan comentarios JSDoc
-- Estrategia de locators subóptima
-- Datos de test podrían ser más únicos
-- Faltan tags en tests
-
-### Ejemplos de Issues Bajos
-
-- Orden de imports no óptimo
-- Nombres de variables podrían ser más claros
-- Líneas en blanco extra
+1. **{Category}**: {Recommendation}
+2. **{Category}**: {Recommendation}
+```
 
 ---
 
-## Referencia de Issues Comunes
+## Severity Definitions
 
-### Issue: ATC es Demasiado Simple
+| Severity | Definition | Action |
+|----------|------------|--------|
+| **CRITICAL** | Breaks KATA architecture, test won't work correctly, security issue | Must fix before merge |
+| **HIGH** | Violates important standards, potential maintenance issues | Should fix before merge |
+| **MEDIUM** | Best practice violation, code smell | Recommended to fix |
+| **LOW** | Style issue, minor improvement | Nice to have |
 
-**Patrón**: ATC solo hace una acción sin assertions
+### Critical Issues Examples
+
+- ATC calls another ATC
+- Missing `@atc` decorator
+- No assertions in ATC
+- Using `waitForTimeout()`
+- Hardcoded credentials
+
+### High Issues Examples
+
+- Relative imports instead of aliases
+- Missing TypeScript types
+- Locators in separate file
+- Single-interaction ATC
+
+### Medium Issues Examples
+
+- Missing JSDoc comments
+- Suboptimal locator strategy
+- Test data could be more unique
+- Missing tags on tests
+
+### Low Issues Examples
+
+- Import order not optimal
+- Variable naming could be clearer
+- Extra blank lines
+
+---
+
+## Common Issues Reference
+
+### Issue: ATC is Too Simple
+
+**Pattern**: ATC only does one action without assertions
 
 ```typescript
-// ❌ INCORRECTO
+// ❌ WRONG
 @atc('TEST-001')
 async clickSubmit() {
   await this.page.click('#submit');
 }
-````
+```
 
-**Corrección**: Hacer un caso de test completo con assertions
+**Fix**: Make it a complete test case with assertions
 
 ```typescript
-// ✅ CORRECTO
+// ✅ CORRECT
 @atc('TEST-001')
 async submitFormSuccessfully(data: FormData) {
   await this.page.fill('#email', data.email);
@@ -334,58 +329,58 @@ async submitFormSuccessfully(data: FormData) {
 
 ---
 
-### Issue: Usando waitForTimeout
+### Issue: Using waitForTimeout
 
-**Patrón**: Esperas arbitrarias en lugar de condiciones
+**Pattern**: Arbitrary waits instead of conditions
 
 ```typescript
-// ❌ INCORRECTO
+// ❌ WRONG
 await this.page.waitForTimeout(3000);
 ```
 
-**Corrección**: Usar esperas basadas en condiciones
+**Fix**: Use condition-based waits
 
 ```typescript
-// ✅ CORRECTO
+// ✅ CORRECT
 await this.page.waitForSelector('[data-loaded="true"]');
-// o
+// or
 await this.page.waitForLoadState('networkidle');
-// o
+// or
 await expect(element).toBeVisible();
 ```
 
 ---
 
-### Issue: ATC Llamando a ATC
+### Issue: ATC Calling ATC
 
-**Patrón**: Un ATC invoca a otro
+**Pattern**: One ATC invokes another
 
 ```typescript
-// ❌ INCORRECTO
+// ❌ WRONG
 @atc('TEST-001')
 async checkoutFlow() {
-  await this.loginSuccessfully(creds); // ¡Esto es otro ATC!
+  await this.loginSuccessfully(creds); // This is another ATC!
 }
 ```
 
-**Corrección**: Usar módulo Flows u orquestación desde archivo de test
+**Fix**: Use Flows module or test file orchestration
 
 ```typescript
-// ✅ CORRECTO - En archivo de test
+// ✅ CORRECT - In test file
 await ui.login.loginSuccessfully(creds);
 await ui.checkout.completeCheckoutSuccessfully();
 
-// O usar módulo Flows para setup reutilizable
+// Or use Flows module for reusable setup
 ```
 
 ---
 
-### Issue: Locators en Archivo Separado
+### Issue: Locators in Separate File
 
-**Patrón**: Constantes de locators centralizadas
+**Pattern**: Centralized locator constants
 
 ```typescript
-// ❌ INCORRECTO
+// ❌ WRONG
 // locators/login.ts
 export const LOCATORS = { email: '#email' };
 
@@ -394,30 +389,30 @@ import { LOCATORS } from './locators';
 await this.page.fill(LOCATORS.email, data.email);
 ```
 
-**Corrección**: Locators inline en ATCs
+**Fix**: Inline locators in ATCs
 
 ```typescript
-// ✅ CORRECTO
+// ✅ CORRECT
 await this.page.locator('[data-testid="email-input"]').fill(data.email);
 ```
 
 ---
 
-### Issue: Falta Seguridad de Tipos
+### Issue: Missing Type Safety
 
-**Patrón**: Usando `any` o sin tipos
+**Pattern**: Using `any` or missing types
 
 ```typescript
-// ❌ INCORRECTO
+// ❌ WRONG
 async login(data: any) {
   // ...
 }
 ```
 
-**Corrección**: Definir tipos apropiados
+**Fix**: Define proper types
 
 ```typescript
-// ✅ CORRECTO
+// ✅ CORRECT
 interface LoginCredentials {
   email: string;
   password: string;
@@ -430,34 +425,34 @@ async loginSuccessfully(data: LoginCredentials): Promise<void> {
 
 ---
 
-## Checklist Final
+## Final Checklist
 
-Antes de aprobar:
+Before approving:
 
-- [ ] Todos los issues CRÍTICOS resueltos
-- [ ] Todos los issues ALTOS resueltos (o excepción documentada)
-- [ ] Test ejecuta exitosamente: `bun run test <archivo-de-test>`
-- [ ] Sin errores TypeScript: `bun run type-check`
-- [ ] Linting pasa: `bun run lint`
-- [ ] Componente registrado correctamente en fixture
-- [ ] Test tiene tags apropiados para CI
-
----
-
-## Después del Review
-
-Una vez que el review esté completo:
-
-1. **Si APROBADO**:
-   - Actualizar estado del test en TMS a "Automated"
-   - Commit y push de cambios
-   - Crear PR si se requiere
-
-2. **Si NECESITA REVISIÓN**:
-   - Volver a fase de Coding
-   - Corregir issues identificados
-   - Ejecutar review nuevamente
+- [ ] All CRITICAL issues resolved
+- [ ] All HIGH issues resolved (or documented exception)
+- [ ] Test runs successfully: `bun run test <test-file>`
+- [ ] No TypeScript errors: `bun run type-check`
+- [ ] Linting passes: `bun run lint`
+- [ ] Component properly registered in fixture
+- [ ] Test has appropriate tags for CI
 
 ---
 
-**Review Completo** - Documentar el veredicto y compartir con el equipo.
+## After Review
+
+Once review is complete:
+
+1. **If APPROVED**:
+   - Update TMS test status to "Automated"
+   - Commit and push changes
+   - Create PR if required
+
+2. **If NEEDS REVISION**:
+   - Return to Coding phase
+   - Fix identified issues
+   - Run review again
+
+---
+
+**Review Complete** - Document the verdict and share with the team.

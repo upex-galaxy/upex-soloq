@@ -10,7 +10,15 @@ export interface InvoiceWithClient extends Invoice {
   client: Pick<Client, 'id' | 'name' | 'email' | 'company' | 'tax_id'>;
 }
 
-type InvoiceSortField = 'created_at' | 'updated_at' | 'issue_date' | 'due_date' | 'total' | 'invoice_number' | 'status';
+type InvoiceSortField =
+  | 'created_at'
+  | 'updated_at'
+  | 'issue_date'
+  | 'due_date'
+  | 'total'
+  | 'invoice_number'
+  | 'status'
+  | 'urgency';
 
 interface UseInvoicesOptions {
   status?: InvoiceStatus;

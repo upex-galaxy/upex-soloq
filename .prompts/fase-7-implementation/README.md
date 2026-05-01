@@ -258,7 +258,6 @@ npm run dev
 **Guidelines a leer:**
 - `.context/guidelines/DEV/` - Guidelines de desarrollo (code-standards, error-handling, data-testid)
 - `.context/guidelines/DEV/spec-driven-development.md` - Principio SDD
-- `.context/guidelines/MCP/` - Tips de MCP tools (un archivo por MCP)
 
 **Specs técnicas:**
 - `.context/SRS/architecture-specs.md` - Arquitectura del proyecto

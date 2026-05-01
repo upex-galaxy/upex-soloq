@@ -4,7 +4,7 @@ Actúa como Senior Full-Stack Developer + UI/UX Designer.
 
 - Story: [usar .context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/stories/STORY-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/story.md]
 - **Test Cases (Acceptance Test Plan):** Usar el siguiente orden de descubrimiento:
-  1. **Jira Comments** (preferido): Buscar en comentarios de la US usando `mcp__atlassian__jira_get_issue` con `comment_limit: 50`. Buscar comentarios que contengan "Test Case", "TC-", "Scenario:", o tablas de test cases.
+  1. **Jira Comments** (preferido): Buscar en comentarios de la US usando `[ISSUE_TRACKER_TOOL]` para obtener el issue con `comment_limit: 50`. Buscar comentarios que contengan "Test Case", "TC-", "Scenario:", o tablas de test cases.
   2. **Jira Custom Field**: Campo `customfield_12400` ("Acceptance Test Plan (QA)🧪") usando `fields: "*all"`
   3. **Archivo Local** (fallback): `.context/PBI/epics/.../stories/.../test-cases.md` o `acceptance-test-plan.md`
 - Feature Implementation Plan: [usar .context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/feature-implementation-plan.md]

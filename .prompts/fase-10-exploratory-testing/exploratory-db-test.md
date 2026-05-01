@@ -1,12 +1,14 @@
 # Exploratory Database Testing Session
 
-> AI-guided exploratory testing at the database layer using DBHub MCP for data integrity verification.
+> AI-guided exploratory testing at the database layer for data integrity verification.
 
 ---
 
 ## Purpose
 
 Execute exploratory testing directly on the database to verify data integrity, validate constraints and triggers, confirm business rules at the data level, and discover issues that API/UI testing might miss.
+
+> **TCs as Guides**: If Test Cases exist from Stage 1 planning, use them as a guide but explore freely. Update TC statuses (PASSED/FAILED) as you validate. Discovering new scenarios beyond the TCs is expected and encouraged.
 
 **This prompt is executed:**
 
@@ -28,14 +30,14 @@ Execute exploratory testing directly on the database to verify data integrity, v
 
 ## Prerequisites
 
-**MCPs Required:**
+**Capabilities Required:**
 
-| MCP                | Purpose                         | Required |
-| ------------------ | ------------------------------- | -------- |
-| `sql` (DBHub)      | Execute SQL queries directly    | Yes      |
-| `openapi` (api)    | Execute API calls for setup     | Optional |
-| `postman`          | Execute authenticated API flows | Optional |
-| `mcp__atlassian__` | Bug creation                    | Optional |
+| MCP/Capability      | Purpose                         | Required |
+| ------------------- | ------------------------------- | -------- |
+| `dbhub` / `sql`     | Execute SQL queries directly    | Yes      |
+| `openapi` (api)     | Execute API calls for setup     | Optional |
+| `postman`           | Execute authenticated API flows | Optional |
+| `atlassian`         | Bug creation                    | Optional |
 
 **Database Access:**
 
@@ -135,7 +137,7 @@ Shall I proceed with the database exploration?
 
 ### Phase 2: Schema Exploration
 
-**Using `dbhub` MCP:**
+**Using database query tools:**
 
 ```sql
 -- List all tables in public schema
@@ -201,19 +203,16 @@ WHERE tc.constraint_type = 'FOREIGN KEY'
 
 #### 3.1 Existence Verification
 
-````markdown
+```markdown
 ### Verification: Order was created
 
 **Context:** User created an order via API/UI
 
 **Query:**
 
-```sql
 SELECT id, user_id, status, total, created_at
 FROM orders
 WHERE id = 'order-uuid-here';
-```
-````
 
 **Expected:**
 
@@ -224,8 +223,7 @@ WHERE id = 'order-uuid-here';
 
 **Actual:** [Document result]
 **Status:** [VERIFIED / NOT FOUND / INCORRECT]
-
-````
+```
 
 #### 3.2 Relationship Verification
 
@@ -233,7 +231,7 @@ WHERE id = 'order-uuid-here';
 ### Verification: Order items linked correctly
 
 **Query:**
-```sql
+
 SELECT
     oi.id,
     oi.order_id,
@@ -244,7 +242,6 @@ SELECT
 FROM order_items oi
 JOIN products p ON oi.product_id = p.id
 WHERE oi.order_id = 'order-uuid-here';
-````
 
 **Expected:**
 
@@ -254,8 +251,7 @@ WHERE oi.order_id = 'order-uuid-here';
 
 **Actual:** [Document result]
 **Status:** [VERIFIED / DISCREPANCY]
-
-````
+```
 
 #### 3.3 Trigger Verification
 
@@ -263,7 +259,7 @@ WHERE oi.order_id = 'order-uuid-here';
 ### Verification: Order total calculated by trigger
 
 **Query:**
-```sql
+
 -- Check if total matches sum of items
 SELECT
     o.id,
@@ -273,13 +269,11 @@ FROM orders o
 JOIN order_items oi ON o.id = oi.order_id
 WHERE o.id = 'order-uuid-here'
 GROUP BY o.id, o.total;
-````
 
 **Expected:** stored_total = calculated_total
 **Actual:** [Document result]
 **Status:** [TRIGGER WORKING / TRIGGER FAILED]
-
-````
+```
 
 ---
 
@@ -294,17 +288,14 @@ GROUP BY o.id, o.total;
 
 **Test:** Try to insert order_item with invalid product_id
 
-```sql
 -- This should FAIL
 INSERT INTO order_items (order_id, product_id, quantity, unit_price)
 VALUES ('valid-order-id', 'non-existent-product-id', 1, 10.00);
-````
 
 **Expected:** Error - foreign key violation
 **Actual:** [Document result]
 **Status:** [CONSTRAINT ENFORCED / VULNERABLE]
-
-````
+```
 
 #### 4.2 CHECK Constraints
 
@@ -313,16 +304,13 @@ VALUES ('valid-order-id', 'non-existent-product-id', 1, 10.00);
 
 **Test:** Try to set invalid status
 
-```sql
 -- This should FAIL
 UPDATE orders SET status = 'invalid_status' WHERE id = 'order-id';
-````
 
 **Expected:** Error - check constraint violation
 **Actual:** [Document result]
 **Status:** [CONSTRAINT ENFORCED / VULNERABLE]
-
-````
+```
 
 #### 4.3 UNIQUE Constraints
 
@@ -331,16 +319,13 @@ UPDATE orders SET status = 'invalid_status' WHERE id = 'order-id';
 
 **Test:** Try to insert duplicate email
 
-```sql
 -- This should FAIL if email is unique
 INSERT INTO users (email, name) VALUES ('existing@email.com', 'Duplicate');
-````
 
 **Expected:** Error - unique violation
 **Actual:** [Document result]
 **Status:** [CONSTRAINT ENFORCED / VULNERABLE]
-
-````
+```
 
 #### 4.4 NOT NULL Constraints
 
@@ -349,16 +334,13 @@ INSERT INTO users (email, name) VALUES ('existing@email.com', 'Duplicate');
 
 **Test:** Try to insert with NULL required field
 
-```sql
 -- This should FAIL
 INSERT INTO orders (user_id, total) VALUES (NULL, 100);
-````
 
 **Expected:** Error - not null violation
 **Actual:** [Document result]
 **Status:** [CONSTRAINT ENFORCED / VULNERABLE]
-
-````
+```
 
 ---
 
@@ -380,7 +362,7 @@ SELECT oi.*
 FROM order_items oi
 LEFT JOIN orders o ON oi.order_id = o.id
 WHERE o.id IS NULL;
-````
+```
 
 #### 5.2 Calculation Mismatches
 
@@ -433,7 +415,7 @@ SELECT * FROM products WHERE stock < 0;
 
 **Test Row Level Security policies directly:**
 
-````markdown
+```markdown
 ### RLS Test: Policy enforcement at SQL level
 
 **Setup:**
@@ -441,29 +423,23 @@ Using connection with role that simulates authenticated user.
 
 **Test 1: Can query own data**
 
-```sql
 -- Set session to simulate user
 SET LOCAL request.jwt.claim.sub = 'user-a-uuid';
 SELECT * FROM orders; -- Should only see User A's orders
-```
-````
 
 Result: [Document]
 
 **Test 2: Cannot see other user's data**
 
-```sql
 SET LOCAL request.jwt.claim.sub = 'user-a-uuid';
 SELECT * FROM orders WHERE user_id = 'user-b-uuid';
 -- Should return empty (RLS filters)
-```
 
 Result: [Document]
 
 **Note:** Direct SQL with qa_team role bypasses RLS.
 For true RLS testing, use API layer or set session variables.
-
-````
+```
 
 ---
 
@@ -477,13 +453,12 @@ For true RLS testing, use API layer or set session variables.
 **Deleted via API/UI:** Order abc123
 
 **Verify cascade deletes:**
-```sql
+
 -- Order should not exist
 SELECT * FROM orders WHERE id = 'abc123';
 
 -- Order items should be gone too
 SELECT * FROM order_items WHERE order_id = 'abc123';
-````
 
 **Results:**
 
@@ -491,8 +466,7 @@ SELECT * FROM order_items WHERE order_id = 'abc123';
 - Order items cascaded: [YES/NO]
 
 **Cleanup Status:** [COMPLETE / INCOMPLETE]
-
-````
+```
 
 ---
 
@@ -571,9 +545,8 @@ SELECT * FROM order_items WHERE order_id = 'abc123';
 - **Severity:** [Critical/High/Medium/Low]
 - **Table(s):** [Affected tables]
 - **Query to reproduce:**
-  ```sql
-  [Query that shows the issue]
-````
+
+[Query that shows the issue]
 
 - **Expected:** [What should be]
 - **Actual:** [What is]
@@ -605,8 +578,7 @@ SELECT * FROM order_items WHERE order_id = 'abc123';
 - [ ] Coordinate with dev on constraint fixes
 - [ ] Document for Test Documentation phase
 - [ ] Proceed to UI testing (if applicable)
-
-````
+```
 
 ---
 
@@ -623,15 +595,17 @@ After database exploration, decide:
 
 ---
 
-## MCP Tools Reference
+## Tool Capabilities Reference
 
-### dbhub MCP
+### Database Query & Exploration (`[DB_TOOL]`)
 
-| Tool                  | Use Case                          |
-| --------------------- | --------------------------------- |
-| `mcp__dbhub__query`   | Execute SELECT queries            |
-| `mcp__dbhub__execute` | Execute INSERT/UPDATE/DELETE      |
-| `mcp__dbhub__describe`| Explore schema, tables, columns   |
+| Capability                  | Use Case                          |
+| --------------------------- | --------------------------------- |
+| Query (SELECT)              | Execute SELECT queries            |
+| Execute (INSERT/UPDATE/DELETE) | Execute data modification      |
+| Describe schema             | Explore schema, tables, columns   |
+
+> Resolved via [DB_TOOL] — see Tool Resolution in CLAUDE.md
 
 ### Common Query Patterns
 
@@ -650,7 +624,7 @@ SELECT a.*, b.* FROM table_a a JOIN table_b b ON a.id = b.a_id;
 
 -- Date-based queries
 SELECT * FROM table WHERE created_at >= CURRENT_DATE;
-````
+```
 
 ---
 
@@ -666,21 +640,21 @@ SELECT * FROM table WHERE created_at >= CURRENT_DATE;
 
 ---
 
-## Integration with Trifuerza Testing
+## Integration with Triforce Testing
 
 Database testing completes the verification triangle:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    TRIFUERZA TESTING                        │
+│                    TRIFORCE TESTING                          │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
 │  │     UI      │  │     API     │  │     DB      │         │
 │  │  Testing    │  │  Testing    │  │  Testing    │         │
 │  │             │  │             │  │   (THIS)    │         │
-│  │ Playwright  │  │  Postman/   │  │   DBHub     │         │
-│  │    MCP      │  │ OpenAPI MCP │  │    MCP      │         │
+│  │ [AUTOMATION │  │  [API_TOOL] │  │ [DB_TOOL]   │         │
+│  │    _TOOL]   │  │             │  │             │         │
 │  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘         │
 │         │                │                │                 │
 │         └────────────────┴────────────────┘                 │

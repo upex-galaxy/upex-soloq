@@ -4,7 +4,7 @@
 
 > **Fase:** 12 - Test Automation
 > **Tiempo estimado:** 2-4 horas por test (depende de complejidad)
-> **Herramientas:** Playwright, TypeScript, KATA Framework
+> **Herramientas:** Playwright, TypeScript, KATA Architecture
 
 ---
 
@@ -96,7 +96,7 @@ tests/
 
 - [ ] **Tests documentados en Jira** (Fase 11 completada)
 - [ ] **Tests marcados como "automation-candidate"**
-- [ ] **KATA Framework configurado** en el proyecto
+- [ ] **KATA Architecture configurado** en el proyecto
 - [ ] **Guidelines leídas:**
   ```
   .context/guidelines/TAE/KATA-AI-GUIDE.md
@@ -190,7 +190,7 @@ Scenario: Successful login with valid credentials
 // tests/components/ui/LoginPage.ts
 
 /**
- * KATA Framework - Layer 3: Login Page Component
+ * KATA Architecture - Layer 3: Login Page Component
  */
 import { expect, type Page } from '@playwright/test';
 import { UiBase } from '@components/ui/UiBase';
@@ -375,7 +375,7 @@ export interface ErrorResponse {
 // tests/components/api/OrdersApi.ts
 
 /**
- * KATA Framework - Layer 3: Orders API Component
+ * KATA Architecture - Layer 3: Orders API Component
  */
 import { expect, type APIResponse } from '@playwright/test';
 import { ApiBase } from '@components/api/ApiBase';

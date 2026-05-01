@@ -69,7 +69,7 @@ La estructura actual de prompts usa prefijos numéricos (`fase-1-`, `fase-10-`, 
 │
 ├── setup/
 │   ├── project-init.md
-│   └── kata-framework-setup.md
+│   └── monorepo-for-qa-setup.md
 │
 ├── workflows/
 │   ├── us-dev-workflow.md
@@ -122,24 +122,24 @@ Los usuarios pueden navegar por rol/área en lugar de memorizar números de fase
 
 ## Mapeo Actual → Propuesto
 
-| Ubicación Actual               | Ubicación Propuesta             |
-| ------------------------------ | ------------------------------- |
-| `fase-1-constitution/`         | `spec/constitution/`            |
-| `fase-2-architecture/`         | `spec/architecture/`            |
-| `fase-3-infrastructure/`       | `spec/infrastructure/`          |
-| `fase-4-specification/`        | `spec/specification/`           |
-| `fase-5-shift-left-testing/`   | `qa/shift-left/`                |
-| `fase-6-sprint-planning/`      | `dev/planning/`                 |
-| `fase-7-implementation/`       | `dev/implementation/`           |
-| `fase-8-code-review/`          | `dev/code-review/`              |
-| `fase-9-deployment/`           | `dev/deployment/`               |
-| `fase-10-exploratory-testing/` | `qa/exploratory/`               |
-| `fase-11-test-documentation/`  | `qa/documentation/`             |
-| `fase-12-test-automation/`     | `qa/automation/`                |
-| `utilities/`                   | `utilities/`                    |
-| `us-dev-workflow.md`           | `workflows/us-dev-workflow.md`  |
-| `us-qa-workflow.md`            | `workflows/us-qa-workflow.md`   |
-| `kata-framework-setup.md`      | `setup/kata-framework-setup.md` |
+| Ubicación Actual               | Ubicación Propuesta              |
+| ------------------------------ | -------------------------------- |
+| `fase-1-constitution/`         | `spec/constitution/`             |
+| `fase-2-architecture/`         | `spec/architecture/`             |
+| `fase-3-infrastructure/`       | `spec/infrastructure/`           |
+| `fase-4-specification/`        | `spec/specification/`            |
+| `fase-5-shift-left-testing/`   | `qa/shift-left/`                 |
+| `fase-6-sprint-planning/`      | `dev/planning/`                  |
+| `fase-7-implementation/`       | `dev/implementation/`            |
+| `fase-8-code-review/`          | `dev/code-review/`               |
+| `fase-9-deployment/`           | `dev/deployment/`                |
+| `fase-10-exploratory-testing/` | `qa/exploratory/`                |
+| `fase-11-test-documentation/`  | `qa/documentation/`              |
+| `fase-12-test-automation/`     | `qa/automation/`                 |
+| `utilities/`                   | `utilities/`                     |
+| `us-dev-workflow.md`           | `workflows/us-dev-workflow.md`   |
+| `us-qa-workflow.md`            | `workflows/us-qa-workflow.md`    |
+| `monorepo-for-qa-setup.md`     | `setup/monorepo-for-qa-setup.md` |
 
 ---
 

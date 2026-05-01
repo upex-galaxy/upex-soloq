@@ -1,260 +1,253 @@
-# Fase 12: Test Automation
+# Stage 5: Test Automation
 
-## Propósito
-
-Implementar tests automatizados para **ATCs (Acceptance Test Cases)** documentados usando el framework KATA.
-
-**IMPORTANTE:** Esta fase viene DESPUÉS de:
-
-- Fase 10: Exploratory Testing (feature validada)
-- Fase 11: Test Documentation (ATCs documentados en Jira)
-
-Solo automatizar funcionalidad que ha sido validada manualmente y documentada.
-
-**Conexión IQL:** Esta fase corresponde a los **Steps 7-10 del Mid-Game Testing** - donde los ATCs se evalúan, automatizan con KATA, verifican en CI, y se aprueban vía PR.
+> **Purpose**: Implement automated tests for documented test cases using the KATA architecture.
+> **When to use**: After tests are documented in the TMS and marked as "automation-candidate".
 
 ---
 
-## Prerequisitos
+## Overview
 
-- ATCs documentados en Jira (Fase 11 completada)
-- ATCs marcados como "automation-candidate" (status CANDIDATE)
-- Framework KATA configurado (ejecutar `kata-framework-setup.md` primero)
+Test Automation is the implementation phase where validated test cases become automated tests following the KATA (Component Action Test Architecture).
 
-**Trazabilidad:** Cada ATC usa el decorador `@atc('PROJECT-XXX')` para vincular código con Jira.
+**IMPORTANT:** This stage comes AFTER:
 
----
+- Stage 2: Test Execution (feature validated)
+- Stage 4: Test Documentation (tests documented in TMS)
 
-## Validación de Entorno (OBLIGATORIO)
-
-**Antes de usar cualquier prompt de esta fase, verificar que el directorio `qa/` existe y el framework KATA está instalado:**
-
-```bash
-# 1. Verificar que existe el directorio qa/
-ls -la qa/
-
-# 2. Verificar estructura KATA
-ls qa/tests/components/
-
-# 3. Verificar clases base existen
-cat qa/tests/components/ui/UiBase.ts > /dev/null && echo "✅ UiBase existe"
-cat qa/tests/components/api/ApiBase.ts > /dev/null && echo "✅ ApiBase existe"
-
-# 4. Verificar fixtures
-cat qa/tests/components/UiFixture.ts > /dev/null && echo "✅ UiFixture existe"
-cat qa/tests/components/ApiFixture.ts > /dev/null && echo "✅ ApiFixture existe"
-```
-
-**Si alguna verificación falla:**
-
-→ Ejecutar primero: `.prompts/kata-framework-setup.md`
-
-**Estructura esperada:**
-
-```
-qa/
-├── tests/
-│   ├── components/
-│   │   ├── api/
-│   │   │   └── ApiBase.ts
-│   │   ├── ui/
-│   │   │   └── UiBase.ts
-│   │   ├── ApiFixture.ts
-│   │   └── UiFixture.ts
-│   ├── e2e/
-│   ├── integration/
-│   └── data/
-│       └── types.ts
-├── playwright.config.ts
-└── package.json
-```
+Only automate functionality that has been validated manually and documented.
 
 ---
 
-## CRÍTICO: Leer Guidelines Primero
-
-**Antes de CUALQUIER trabajo de automatización, leer:**
-
-```
-qa/.context/guidelines/TAE/
-├── KATA-AI-GUIDE.md          # Orientación rápida
-├── automation-standards.md    # Reglas y patrones
-└── kata-architecture.md       # Estructura de capas
-```
-
----
-
-## Estructura de Esta Fase
-
-```
-.prompts/fase-12-test-automation/
-├── README.md                    # Este archivo
-│
-├── e2e/                         # Tests End-to-End (UI)
-│   ├── README.md                # Overview de E2E
-│   ├── e2e-plan.md              # Fase 1: Planificación
-│   ├── e2e-coding.md            # Fase 2: Implementación
-│   └── e2e-review.md            # Fase 3: Code Review
-│
-├── integration/                 # Tests de Integración (API)
-│   ├── README.md                # Overview de Integration
-│   ├── integration-plan.md      # Fase 1: Planificación
-│   ├── integration-coding.md    # Fase 2: Implementación
-│   └── integration-review.md    # Fase 3: Code Review
-│
-└── regression/                  # Ejecución y Reportes
-    ├── README.md                # Overview de Regression
-    ├── regression-execution.md  # Fase 1: Ejecutar Suite
-    ├── regression-analysis.md   # Fase 2: Analizar Resultados
-    └── regression-report.md     # Fase 3: Generar Reporte GO/NO-GO
-```
-
----
-
-## Subfases
-
-### E2E Testing (Tests de UI)
-
-Automatización de tests End-to-End que interactúan con la interfaz de usuario.
-
-| Fase | Prompt              | Propósito                                                        |
-| ---- | ------------------- | ---------------------------------------------------------------- |
-| 1    | `e2e/e2e-plan.md`   | Analizar ATC, identificar componentes, planificar implementación |
-| 2    | `e2e/e2e-coding.md` | Implementar componente UI y archivo de test                      |
-| 3    | `e2e/e2e-review.md` | Validar cumplimiento KATA y calidad de código                    |
-
-**Ubicación de tests:** `qa/tests/e2e/{feature}/`
-**Fixture:** `{ kata }` o `{ ui }`
-
----
-
-### Integration Testing (Tests de API)
-
-Automatización de tests de integración para endpoints de API.
-
-| Fase | Prompt                              | Propósito                                    |
-| ---- | ----------------------------------- | -------------------------------------------- |
-| 1    | `integration/integration-plan.md`   | Analizar endpoint, definir ATCs, planificar  |
-| 2    | `integration/integration-coding.md` | Implementar componente API y archivo de test |
-| 3    | `integration/integration-review.md` | Validar cumplimiento KATA y tipos de retorno |
-
-**Ubicación de tests:** `qa/tests/integration/{resource}/`
-**Fixture:** `{ api }`
-
----
-
-### Regression Testing (Ejecución y Reportes)
-
-Ejecución sistemática de suites de tests y toma de decisiones basada en resultados.
-
-| Fase | Prompt                               | Propósito                                |
-| ---- | ------------------------------------ | ---------------------------------------- |
-| 1    | `regression/regression-execution.md` | Disparar workflow y monitorear ejecución |
-| 2    | `regression/regression-analysis.md`  | Analizar resultados y clasificar fallos  |
-| 3    | `regression/regression-report.md`    | Generar reporte de calidad GO/NO-GO      |
-
-**Workflows disponibles:**
-
-- `regression.yml` - Suite completa
-- `smoke.yml` - Tests críticos
-- `sanity.yml` - Tests específicos
-
----
-
-## Flujo de Trabajo 3-Fases
-
-Para E2E e Integration, cada automatización sigue el flujo:
+## Three-Phase Workflow
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           FLUJO DE 3 FASES                                   │
+│                    STAGE 5: AUTOMATION WORKFLOW                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-     ATC documentado           Plan aprobado             Tests pasan
-     (de Fase 11)              (contexto cargado)        (código validado)
-          │                         │                         │
-          ▼                         ▼                         ▼
-    ┌──────────┐              ┌──────────┐              ┌──────────┐
-    │  PLAN    │─────────────▶│  CODING  │─────────────▶│  REVIEW  │
-    │ (Fase 1) │              │ (Fase 2) │              │ (Fase 3) │
-    └──────────┘              └──────────┘              └──────────┘
-         │                         │                         │
-         ▼                         ▼                         ▼
-    • Cargar contexto         • Crear tipos             • Verificar KATA
-    • Analizar ATC            • Implementar componente  • Validar calidad
-    • Identificar Layer 3     • Registrar en fixture    • Ejecutar tests
-    • Planificar ATCs         • Crear archivo de test   • Aprobar/Corregir
+Stage 4 Output (Gherkin + Variables + Test IDs)
+                    │
+                    ▼
+    ┌───────────────────────────────────┐
+    │  PHASE 1: PLANNING               │
+    │  ─────────────────────────        │
+    │  • Analyze test case / ticket     │
+    │  • Architecture decisions         │
+    │  • Identify components needed     │
+    │  • Define ATCs and assertions     │
+    │  • ATC spec (if needed)           │
+    └───────────────┬───────────────────┘
+                    │
+                    ▼
+    ┌───────────────────────────────────┐
+    │  PHASE 2: CODING                  │
+    │  ─────────────────────────        │
+    │  • Implement KATA component       │
+    │  • Create test file               │
+    │  • Register in fixture            │
+    │  • Run and validate               │
+    └───────────────┬───────────────────┘
+                    │
+                    ▼
+    ┌───────────────────────────────────┐
+    │  PHASE 3: REVIEW                  │
+    │  ─────────────────────────        │
+    │  • KATA compliance check          │
+    │  • Code quality validation        │
+    │  • Test quality assessment        │
+    │  • Issue report (if any)          │
+    └───────────────┬───────────────────┘
+                    │
+                    ▼
+    ┌───────────────────────────────────┐
+    │  TMS Update: Status = "Automated" │
+    └───────────────────────────────────┘
 ```
 
 ---
 
-## Arquitectura KATA Overview
+## Directory Structure
 
 ```
-Layer 4: Fixtures (TestFixture, ApiFixture, UiFixture)
-    └── Dependency injection, extensión de tests
-        ↓
-Layer 3: Components (AuthApi, LoginPage)
-    └── ATCs con decorador @atc('PROJECT-XXX') ← Trazabilidad Jira
-        ↓
-Layer 2: Base Classes (ApiBase, UiBase)
-    └── HTTP helpers, Playwright helpers
-        ↓
-Layer 1: TestContext
-    └── Configuración, generación de datos
-```
-
-**Flujo IQL completo:**
-
-```
-ATP (Fase 5) → ATCs en Jira (Fase 11) → KATA Scripts (Fase 12)
-                                              ↓
-                                    @atc('PROJECT-XXX')
+fase-12-test-automation/
+├── README.md                                  # This file
+├── planning/
+│   ├── test-implementation-plan.md            # Unified (E2E + Integration)
+│   └── atc-implementation-plan.md             # ATC spec (API + UI)
+├── coding/
+│   ├── e2e-coding.md                     # UI components + locators
+│   └── integration-coding.md             # API components + tuples
+└── review/
+    ├── e2e-review.md                     # E2E code review checklist
+    └── integration-review.md             # Integration code review checklist
 ```
 
 ---
 
-## Principios KATA Clave
+## Prompts by Phase
 
-| Principio                  | Descripción                                     |
-| -------------------------- | ----------------------------------------------- |
-| **Unique Output**          | Cada ATC representa UN resultado esperado único |
-| **Inline Locators**        | Locators definidos EN el ATC, no separados      |
-| **No Unnecessary Helpers** | No wrappear acciones simples de Playwright      |
-| **Fixed Assertions**       | Assertions dentro de ATCs validan éxito         |
-| **Import Aliases**         | Siempre usar `@components/`, `@utils/`, etc.    |
+### Phase 1: Planning
 
----
+| Prompt | Scope | Purpose |
+|--------|-------|---------|
+| `planning/test-implementation-plan.md` | E2E + Integration | Full implementation plan for a test ticket (scenarios, ATCs, data strategy, file map) |
+| `planning/atc-implementation-plan.md` | API + UI | Detailed spec for a single ATC (contract, assertions, code template) |
 
-## Cuándo Usar Cada Subfase
+### Phase 2: Coding
 
-| Escenario                         | Prompts a Usar                                |
-| --------------------------------- | --------------------------------------------- |
-| Automatizar nuevo test E2E        | `e2e/` (Plan → Coding → Review)               |
-| Automatizar nuevo test de API     | `integration/` (Plan → Coding → Review)       |
-| Ejecutar regression pre-release   | `regression/` (Execution → Analysis → Report) |
-| Health check rápido               | `regression/regression-execution.md` (smoke)  |
-| Investigar fallos de CI           | `regression/regression-analysis.md`           |
-| Generar reporte para stakeholders | `regression/regression-report.md`             |
+| Prompt | Test Type | Purpose |
+|--------|-----------|---------|
+| `e2e/e2e-coding.md` | E2E | Implement UI component and test file |
+| `integration/integration-coding.md` | Integration | Implement API component and test file |
 
----
+### Phase 3: Review
 
-## Output de Esta Fase
-
-- ATCs implementados siguiendo estándares KATA
-- Archivos de test en directorios apropiados
-- Componentes registrados en fixtures
-- Tests pasando en pipeline CI/CD
-- ATCs de Jira marcados como "Automated"
-- Reportes de regression con decisiones GO/NO-GO
-
-**Estado IQL:** Al completar esta fase, los ATCs transitan a status AUTOMATED en Jira (Step 10 del Mid-Game).
+| Prompt | Test Type | Purpose |
+|--------|-----------|---------|
+| `e2e/e2e-review.md` | E2E | Validate KATA compliance and code quality |
+| `integration/integration-review.md` | Integration | Validate KATA compliance and code quality |
 
 ---
 
-## Documentación Relacionada
+## Prerequisites
 
-- **QA Workflow:** `.prompts/us-qa-workflow.md`
-- **KATA Guidelines:** `qa/.context/guidelines/TAE/`
-- **Fase Anterior:** `.prompts/fase-11-test-documentation/`
-- **Docs de Automation:** `docs/testing/automation/`
+Before using these prompts:
+
+1. **Tests documented in TMS** (Stage 4 completed)
+2. **Tests marked as "automation-candidate"**
+3. **KATA architecture configured** (see `.prompts/setup/test-framework-adaptation.md`)
+
+### Context Files Required
+
+```
+.context/guidelines/TAE/
+├── kata-ai-index.md          # Quick orientation (ALWAYS read first)
+├── automation-standards.md    # Rules and patterns
+├── kata-architecture.md       # Layer structure
+├── typescript-patterns.md     # TypeScript conventions
+├── e2e-testing-patterns.md    # E2E specific patterns
+└── api-testing-patterns.md    # API specific patterns
+
+.context/
+├── playwright-automation-system.md  # Code architecture overview
+└── test-management-system.md        # TMS configuration
+```
+
+---
+
+## Input from Stage 4
+
+Each prompt expects documented test cases with:
+
+| Element | Description | Example |
+|---------|-------------|---------|
+| **Gherkin Scenario** | Test steps in Given/When/Then format | `Scenario Outline: Validate login...` |
+| **Variables Table** | Test data with how to obtain | `{user_id}` → SQL query |
+| **Implementation Code** | Files being tested | `src/app/login/page.tsx` |
+| **Test IDs** | Available data-testid attributes | `data-testid="submit-btn"` |
+| **ROI Score** | Automation priority | `4.5 → AUTOMATE` |
+| **Architecture** | Data fetching pattern | SSR / API / Client-side |
+
+---
+
+## KATA Architecture Quick Reference
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ LAYER 4: FIXTURES (Entry Points)                                            │
+│ TestFixture.ts, ApiFixture.ts, UiFixture.ts                                │
+│ └── Dependency injection, test extension                                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ LAYER 3: DOMAIN COMPONENTS (ATCs)                                           │
+│ AuthApi.ts, LoginPage.ts, BookingsApi.ts                                   │
+│ └── @atc decorator, fixed assertions                                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ LAYER 2: BASE COMPONENTS (Helpers)                                          │
+│ ApiBase.ts, UiBase.ts                                                       │
+│ └── HTTP helpers, Playwright helpers                                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ LAYER 1: TEST CONTEXT (Foundation)                                          │
+│ TestContext.ts                                                              │
+│ └── Configuration, data generation (Faker)                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Key KATA Principles
+
+| Principle | Description |
+|-----------|-------------|
+| **ATC = Complete Test Case** | Each ATC is a mini-flow, NOT a single click |
+| **Equivalence Partitioning** | Same output = One parameterized ATC |
+| **Inline Locators** | Locators defined IN the ATC, not separately |
+| **ATCs Don't Call ATCs** | Use Steps module for reusable sequences |
+| **Fixed Assertions** | Assertions inside ATCs validate success |
+| **No Hardcoded Waits** | Use conditions: `waitForSelector`, `waitForResponse` |
+| **Import Aliases** | Always use `@components/`, `@utils/`, etc. |
+
+---
+
+## Ticket ID Convention
+
+The `@atc('{TICKET-ID}')` decorator and `test('{TICKET-ID}: should...')` naming use the **real issue key from your Jira project**. The prefix depends on your project configuration:
+
+| Project | ATC Example | Test Example |
+|---------|-------------|--------------|
+| UPEX | `@atc('UPEX-101')` | `test('UPEX-411: should...')` |
+| MYM | `@atc('MYM-45')` | `test('MYM-200: should...')` |
+| QA | `@atc('QA-33')` | `test('QA-100: should...')` |
+
+See `.context/guidelines/TAE/test-design-principles.md` for the full traceability model.
+
+---
+
+## Fixture Selection
+
+| Test Type | Fixture | Browser Opens? | Use When |
+|-----------|---------|----------------|----------|
+| API only | `{ api }` | No (lazy) | Pure API testing |
+| UI only | `{ ui }` | Yes | UI-focused testing |
+| Hybrid | `{ test }` | Yes | API setup + UI verification |
+
+---
+
+## TMS Workflow Status Transitions
+
+Update the test case status in your TMS as you progress through each phase:
+
+| Phase | Action | Status Transition |
+|-------|--------|-------------------|
+| **Before starting** | Pick up test case for implementation | `Candidate` → `In Automation` |
+| **After Phase 2** | Code complete, PR created | `In Automation` → `In Review` |
+| **After Phase 3** | Review passed, PR merged | `In Review` → `Automated` |
+| **If blocked** | Missing data, unclear spec, environment issue | `In Automation` → `Candidate` (with note) |
+
+**Full lifecycle reference:** `.prompts/README.md` → TC Workflow Status section
+
+---
+
+## Output
+
+After completing all three phases:
+
+- [ ] KATA component implemented (Layer 3)
+- [ ] Test file created (e2e/ or integration/)
+- [ ] Component registered in fixture
+- [ ] Tests passing locally
+- [ ] Code review completed (no critical issues)
+- [ ] TMS test marked as "Automated"
+
+---
+
+## Related Stages
+
+| Stage | Relationship |
+|-------|--------------|
+| **Stage 2: Execution** | Provides validated functionality |
+| **Stage 4: Documentation** | Provides test cases (Gherkin + Variables) |
+| **Stage 6: Regression** | Tests run in CI/CD pipeline |
+
+---
+
+**Next**: Start with `planning/test-implementation-plan.md` to plan your implementation.

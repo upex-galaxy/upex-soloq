@@ -8,6 +8,7 @@ import {
   calculateLineTotal,
   calculateSubtotal,
 } from '@/lib/utils/invoice-calculations';
+import { sanitizePlainText } from '@/lib/utils/sanitize';
 import type { Invoice, Client, InvoiceStatus, InvoiceItem } from '@/lib/types';
 
 // =============================================================================
@@ -227,6 +228,14 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
     const taxAmount = calculateTax(subtotal, discountAmount, taxRate);
     const total = calculateTotal(subtotal, discountAmount, taxAmount);
 
+    // Sanitize free-text fields at the write trust boundary (SQ-156).
+    // `notes` and `terms` are persisted verbatim and would become a stored-XSS
+    // vector the moment any future feature renders them as HTML, so we strip
+    // all HTML/script payloads here before the DB insert. See
+    // .context/reports/incident-SQ-156-investigation.md.
+    const sanitizedNotes = notes ? sanitizePlainText(notes) : null;
+    const sanitizedTerms = terms ? sanitizePlainText(terms) : null;
+
     // Create invoice with status 'draft'
     const { data: invoice, error: insertError } = await supabase
       .from('invoices')
@@ -236,8 +245,8 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
         invoice_number: invoiceNumber,
         due_date: dueDate || getDefaultDueDate(),
         status: 'draft',
-        notes: notes || null,
-        terms: terms || null,
+        notes: sanitizedNotes || null,
+        terms: sanitizedTerms || null,
         subtotal,
         tax_rate: taxRate,
         tax_amount: taxAmount,
@@ -267,6 +276,10 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
     }
 
     // Insert line items if provided (SQ-22)
+    // SQ-142: If item insert fails, delete the parent invoice to prevent a
+    // "ghost subtotal" — a persisted invoice row whose subtotal references
+    // items that never actually persisted. Previously this was a log-and-continue
+    // best-effort insert, which produced orphaned parents with divergent totals.
     let insertedItems: Pick<InvoiceItem, 'id' | 'description' | 'quantity' | 'unit_price' | 'subtotal'>[] = [];
 
     if (items.length > 0) {
@@ -285,12 +298,31 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
         .select('id, description, quantity, unit_price, subtotal');
 
       if (itemsError) {
-        console.error('Error creating invoice items:', itemsError);
-        // Invoice was created but items failed - log but don't fail the request
-        // Items can be added later via edit
-      } else {
-        insertedItems = createdItems || [];
+        console.error('Error creating invoice items (compensating parent delete):', itemsError);
+
+        // SQ-142: Compensating delete — roll back the parent insert so the
+        // invoice is not persisted with a subtotal that references nonexistent
+        // items. Items cascade on delete (FK), so any partial child row is
+        // cleaned up as well.
+        const { error: rollbackError } = await supabase
+          .from('invoices')
+          .delete()
+          .eq('id', invoice.id);
+
+        if (rollbackError) {
+          // Best-effort: log for observability. The DB trigger introduced in
+          // the accompanying migration will still recompute subtotal to 0
+          // if the orphan survives, so user-visible divergence is bounded.
+          console.error('Compensating delete failed for invoice', invoice.id, rollbackError);
+        }
+
+        return NextResponse.json(
+          { error: 'Error al crear los items de la factura. Intenta de nuevo.' },
+          { status: 500 }
+        );
       }
+
+      insertedItems = createdItems || [];
     }
 
     // Return invoice with client data and items
@@ -321,8 +353,13 @@ export async function POST(request: Request): Promise<NextResponse<CreateInvoice
  * - status: InvoiceStatus (optional) - Filter by status
  * - page: number (default: 1) - Page number
  * - limit: number (default: 20, max: 50) - Items per page
- * - sortBy: string (default: 'created_at') - Sort field
- * - sortOrder: 'asc' | 'desc' (default: 'desc') - Sort direction
+ * - sortBy: string (default: 'created_at') - Sort field.
+ *   Accepts: 'created_at' | 'updated_at' | 'issue_date' | 'due_date'
+ *          | 'total' | 'invoice_number' | 'status' | 'urgency'
+ *   'urgency' surfaces the most pressing invoices first (derived-overdue,
+ *   then sent & nearest due, then others). See src/lib/utils/overdue.ts.
+ * - sortOrder: 'asc' | 'desc' (default: 'desc') - Sort direction.
+ *   Ignored when sortBy='urgency' (urgency always ranks most-urgent first).
  *
  * Responses:
  * - 200: List of invoices with pagination
@@ -351,10 +388,30 @@ export async function GET(request: Request): Promise<NextResponse<ListInvoicesRe
     const offset = (page - 1) * limit;
 
     // Sort params
-    const validSortFields = ['created_at', 'updated_at', 'issue_date', 'due_date', 'total', 'invoice_number', 'status'];
+    const validSortFields = ['created_at', 'updated_at', 'issue_date', 'due_date', 'total', 'invoice_number', 'status', 'urgency'];
     const sortByParam = url.searchParams.get('sortBy') || 'created_at';
     const sortBy = validSortFields.includes(sortByParam) ? sortByParam : 'created_at';
     const sortOrder = url.searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc';
+
+    // "urgency" is a derived sort key — expand it into a deterministic,
+    // DB-level ordering: by due_date ASC (earliest-due first — which puts
+    // overdue rows at the top) with created_at DESC as a tiebreaker.
+    // Status filtering is still respected.
+    const isUrgencySort = sortBy === 'urgency';
+
+    // Helper: apply the chosen ordering to a Supabase query builder.
+    // Typed minimally so it works for both the search and standard queries.
+    type Orderable<Q> = {
+      order: (col: string, opts?: { ascending?: boolean; nullsFirst?: boolean }) => Q;
+    };
+    const applyOrdering = <Q extends Orderable<Q>>(q: Q): Q => {
+      if (isUrgencySort) {
+        return q
+          .order('due_date', { ascending: true, nullsFirst: false })
+          .order('created_at', { ascending: false });
+      }
+      return q.order(sortBy, { ascending: sortOrder === 'asc' });
+    };
 
     // Search param
     const search = url.searchParams.get('search')?.trim() || '';
@@ -376,8 +433,9 @@ export async function GET(request: Request): Promise<NextResponse<ListInvoicesRe
           )
         `
         )
-        .is('deleted_at', null)
-        .order(sortBy, { ascending: sortOrder === 'asc' });
+        .is('deleted_at', null);
+
+      searchQuery = applyOrdering(searchQuery);
 
       if (status) {
         searchQuery = searchQuery.eq('status', status);
@@ -431,9 +489,10 @@ export async function GET(request: Request): Promise<NextResponse<ListInvoicesRe
       `,
         { count: 'exact' }
       )
-      .is('deleted_at', null)
-      .order(sortBy, { ascending: sortOrder === 'asc' })
-      .range(offset, offset + limit - 1);
+      .is('deleted_at', null);
+
+    query = applyOrdering(query);
+    query = query.range(offset, offset + limit - 1);
 
     // Apply status filter if provided
     if (status) {

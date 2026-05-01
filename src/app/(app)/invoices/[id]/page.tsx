@@ -3,7 +3,7 @@
 import { use, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { ArrowLeft, Loader2, FileX, CheckCircle, Undo2 } from 'lucide-react';
+import { ArrowLeft, Loader2, FileX, CheckCircle, Undo2, Send } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +21,7 @@ import { useInvoice } from '@/hooks/invoices/use-invoice';
 import { useRevertPayment } from '@/hooks/invoices';
 import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
 import { MarkAsPaidDialog } from '@/components/invoices/mark-as-paid-dialog';
+import { SendInvoiceDialog } from '@/components/invoices/send-invoice-dialog';
 import { isInvoiceOverdue } from '@/lib/utils/overdue';
 
 // =============================================================================
@@ -69,6 +70,7 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   const { data: invoice, isLoading, isError } = useInvoice(invoiceId);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [revertDialogOpen, setRevertDialogOpen] = useState(false);
+  const [sendDialogOpen, setSendDialogOpen] = useState(false);
   const revertPayment = useRevertPayment();
 
   // Loading state
@@ -141,6 +143,7 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   }
 
   // Invoice found - show preview
+  const canSend = invoice.status === 'draft';
   const canMarkAsPaid =
     invoice.status === 'sent' ||
     invoice.status === 'overdue' ||
@@ -176,6 +179,16 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
           </div>
         </div>
         <div className="flex gap-2">
+          {canSend && (
+            <Button
+              onClick={() => setSendDialogOpen(true)}
+              data-testid="send-invoice-button"
+              className="shadow-sm hover:shadow-md transition-shadow"
+            >
+              <Send className="mr-2 h-4 w-4" />
+              Enviar Factura
+            </Button>
+          )}
           {canMarkAsPaid && (
             <Button
               onClick={() => setPaymentDialogOpen(true)}
@@ -217,6 +230,18 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
           invoiceTotal={invoice.total}
           invoiceIssueDate={invoice.issue_date}
           configuredMethods={invoice.payment_methods}
+        />
+      )}
+
+      {/* Send Invoice Dialog */}
+      {canSend && (
+        <SendInvoiceDialog
+          open={sendDialogOpen}
+          onOpenChange={setSendDialogOpen}
+          invoiceId={invoice.id}
+          invoiceNumber={invoice.invoice_number}
+          clientName={invoice.client.name}
+          clientEmail={invoice.client.email}
         />
       )}
 

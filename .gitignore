@@ -18,6 +18,8 @@ next-env.d.ts
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+.playwright/user-data
+.playwright/output
 
 # ===== Auth Storage (Session State) =====
 /.auth/

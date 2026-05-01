@@ -363,17 +363,17 @@ Con la lista priorizada, creas **Test Cases formales** para los escenarios impor
 
 Para ejecutar cada stage con ayuda de AI:
 
-| Stage   | Prompt                                                  |
-| ------- | ------------------------------------------------------- |
-| Stage 1 | `.prompts/stage-1-shift-left/acceptance-test-plan.md`   |
-| Stage 2 | `.prompts/stage-2-exploratory/*.md`                     |
-| Stage 3 | `.prompts/stage-3-documentation/test-prioritization.md` |
-| Stage 4 | `.prompts/stage-3-documentation/test-documentation.md`  |
+| Stage   | Prompt                                                       |
+| ------- | ------------------------------------------------------------ |
+| Stage 1 | `.prompts/fase-5-shift-left-testing/acceptance-test-plan.md` |
+| Stage 2 | `.prompts/fase-10-exploratory-testing/*.md`                  |
+| Stage 3 | `.prompts/fase-11-test-documentation/test-prioritization.md` |
+| Stage 4 | `.prompts/fase-11-test-documentation/test-documentation.md`  |
 
 ---
 
 ## Referencias
 
-- [IQL Methodology](../methodology/IQL-methodology.md)
-- [Early-Game Testing](../methodology/early-game-testing.md)
-- [TALC - Automation Lifecycle](./test-automation-lifecycle.md)
+- [IQL Methodology](docs/methodology/IQL-methodology.md)
+- [Early-Game Testing](docs/methodology/early-game-testing.md)
+- [TALC - Automation Lifecycle](docs/workflows/test-automation-lifecycle.md)

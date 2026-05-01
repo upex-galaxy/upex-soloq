@@ -1,6 +1,6 @@
 # Test Code Overview
 
-## 1. Layer Architecture (KATA Framework)
+## 1. Layer Architecture (KATA Architecture)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐

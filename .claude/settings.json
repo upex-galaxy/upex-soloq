@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Edit",
+      "MultiEdit",
+      "Write",
+      "Bash(npm:*)",
+      "Bash(bun:*)",
+      "Bash(yarn:*)",
+      "Bash(npx:*)",
+      "Bash(node:*)",
+      "Bash(git:*)",
+      "Bash(eslint:*)",
+      "Bash(prettier:*)",
+      "Bash(tsc:*)",
+      "Bash(jest:*)",
+      "Bash(vitest:*)",
+      "Bash(webpack:*)",
+      "Bash(vite:*)",
+      "Bash(next:*)"
+    ],
+    "deny": ["Bash(wget:*)"],
+    "defaultMode": "acceptEdits"
+  },
+  "env": {
+    "BASH_DEFAULT_TIMEOUT_MS": "60000",
+    "BASH_MAX_OUTPUT_LENGTH": "20000",
+    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1"
+  },
+  "includeCoAuthoredBy": false,
+  "cleanupPeriodDays": 30,
+  "disableAllHooks": true
+}

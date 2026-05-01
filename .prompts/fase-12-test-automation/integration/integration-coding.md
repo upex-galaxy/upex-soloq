@@ -1,65 +1,176 @@
-# Integration Test Automation - Coding
+# Integration Test Coding
 
-> **Fase**: 2 de 3 (Plan → Coding → Review)
-> **Propósito**: Implementar el componente API y archivo de test basado en el plan aprobado.
-> **Input**: Plan aprobado de la Fase 1.
-
----
-
-## Carga de Contexto
-
-**Cargar estos archivos antes de proceder:**
-
-1. `qa/.context/guidelines/TAE/kata-ai-index.md` → Patrones core KATA
-2. `qa/.context/guidelines/TAE/typescript-patterns.md` → Convenciones TypeScript
-3. `qa/.context/guidelines/TAE/api-testing-patterns.md` → Patrones de API
-4. `qa/.context/guidelines/TAE/playwright-automation-system.md` → Arquitectura de código
+> **Phase**: 2 of 3 (Plan → Coding → Review)
+> **Purpose**: Implement API Integration test automation following KATA architecture.
+> **Input**: Approved plan from `planning/test-implementation-plan.md`.
 
 ---
 
-## Input Requerido
+## Purpose
 
-1. **Plan Aprobado** de la Fase 1 (`integration-plan.md`)
-2. **Caso de Test Original** (Spec de API de Fase 11)
+Create API Integration automated tests for validated scenarios using the KATA architecture.
+
+**This prompt is executed AFTER:**
+
+- Test documented in TMS (Stage 4)
+- Test marked as "automation-candidate"
+- KATA architecture configured in project
+
+**Prerequisites:**
+
+- KATA architecture configured in project
+- API documentation available (OpenAPI preferred)
+- Test case documented in TMS
 
 ---
 
-## Flujo de Implementación
+## PREREQUISITE CHECK
 
-### Paso 1: Verificar Prerrequisitos
+Before proceeding, verify that an implementation plan exists for this ticket:
 
-Antes de codificar, verificar:
+1. Check for `{ticket-dir}/implementation-plan.md`
+2. If it does **NOT** exist: **STOP**. Create it first using `.prompts/fase-12-test-automation/planning/test-implementation-plan.md`
+3. If it **DOES** exist: Read it and use it as your blueprint for this phase.
 
-```bash
-# Verificar si existen las clases base
-cat qa/tests/components/api/ApiBase.ts
+---
 
-# Verificar estructura de fixture
-cat qa/tests/components/ApiFixture.ts
+## CRITICAL: Read KATA Guidelines First
 
-# Verificar import aliases
-grep -A 10 '"paths"' qa/tsconfig.json
+**Before implementing ANY automation, read:**
 
-# Verificar tipos existentes
-cat qa/tests/data/types.ts
+```
+MANDATORY READING (in order):
+1. .context/guidelines/TAE/kata-ai-index.md       # Quick orientation
+2. .context/guidelines/TAE/automation-standards.md # Rules and patterns
+3. .context/guidelines/TAE/api-testing-patterns.md # API testing specifics
+```
+
+**Key KATA principles for API testing:**
+
+- Use `ApiBase` methods: `apiGET`, `apiPOST`, `apiPUT`, `apiPATCH`, `apiDELETE`
+- Return tuples: `[APIResponse, TBody]` or `[APIResponse, TBody, TPayload]`
+- Type-safe generics for request/response
+- Fixed assertions validate status codes and response structure
+
+---
+
+## Input Required
+
+Provide ONE of the following:
+
+1. **TMS Test ID** - Test case ID to fetch details from TMS
+2. **Test case content** - API spec or traditional format directly
+3. **Multiple Test IDs** - For batch automation
+
+**Also specify:**
+
+- Target component (existing or new)
+- Related User Story ID
+
+---
+
+## Workflow
+
+### Phase 1: Understand the Test Case
+
+**Read the test case from TMS or input:**
+
+```
+Extract:
+├── Test name/summary
+├── Endpoint (method, URL, headers)
+├── Request payload structure
+├── Expected response (status, body shape)
+└── Test data requirements
+```
+
+**Map to KATA structure:**
+
+| Test Element  | KATA Element                               |
+| ------------- | ------------------------------------------ |
+| Endpoint      | ApiBase method (apiGET, apiPOST, etc.)     |
+| Payload       | Typed interface (CreateXPayload)           |
+| Response      | Typed interface (XResponse)                |
+| Assertions    | Fixed assertions in ATC                    |
+
+---
+
+### Phase 1.5: Apply Test Data Strategy
+
+> **Reference**: `.context/guidelines/TAE/test-data-management.md`
+
+**Before writing any test code, verify the data strategy from the implementation plan:**
+
+1. **How is precondition data obtained?** (Discover / Modify / Generate)
+2. **Where is it placed?** (`beforeAll` for read-only, `beforeEach` for mutations)
+3. **Is cleanup needed?** (`afterAll`/`afterEach` for Modify/Generate patterns)
+
+**Precondition validation pattern (CRITICAL):**
+
+```typescript
+// ✅ CORRECT — beforeAll discovers, each test guards with test.skip()
+let testResource: ResourceCandidate | null;
+
+test.beforeAll(async ({ api }) => {
+  // Discovery only — NO assertions here
+  testResource = await api.resources.findResourceWithState('active');
+});
+
+test('TK-XXX: should return resource data', async ({ api }) => {
+  if (!testResource) return test.skip(true, 'No active resource found');
+  const [, body] = await api.resources.getResource(testResource.id);
+  expect(body.status).toBe('active');
+});
+
+// ❌ WRONG — expect in beforeAll kills ALL tests
+test.beforeAll(async ({ api }) => {
+  testResource = await api.resources.findResourceWithState('active');
+  expect(testResource).toBeDefined(); // If fails → ALL tests fail
+});
+```
+
+**Data rules:**
+- NEVER hardcode entity names, IDs, or dates in test files
+- Use `DataFactory` for generated data, API/DB queries for discovered data
+- Each test is responsible for its own precondition via `test.skip()`
+
+---
+
+### Phase 2: Architecture Decision
+
+**Determine what to create/modify:**
+
+```
+Questions:
+1. Does the API component exist? (e.g., ResourceApi.ts)
+   └── YES → Add new ATC to existing component
+   └── NO  → Create new component
+
+2. Do the types exist?
+   └── YES → Import and use existing types
+   └── NO  → Create type definitions first
+
+3. Does the ATC already exist?
+   └── YES → Use existing ATC
+   └── NO  → Create new ATC
 ```
 
 ---
 
-### Paso 2: Crear Definiciones de Tipos
+### Phase 3: Create Type Definitions
 
-Agregar todos los tipos necesarios para el componente API:
+Add all types needed for the API component:
 
 ```typescript
-// qa/tests/data/types.ts
+// tests/data/types.ts
 
 // ============================================================================
-// TIPOS DE {RESOURCE}
+// {RESOURCE} TYPES
 // ============================================================================
 
 /**
- * Payload para crear un nuevo {resource}
- * Usado en POST /api/v1/{resources}
+ * Payload for creating a new {resource}
+ * Used in POST /api/v1/{resources}
  */
 export interface Create{Resource}Payload {
   name: string;
@@ -69,8 +180,8 @@ export interface Create{Resource}Payload {
 }
 
 /**
- * Payload para actualizar un {resource}
- * Usado en PUT/PATCH /api/v1/{resources}/{id}
+ * Payload for updating a {resource}
+ * Used in PUT/PATCH /api/v1/{resources}/{id}
  */
 export interface Update{Resource}Payload {
   name?: string;
@@ -79,7 +190,7 @@ export interface Update{Resource}Payload {
 }
 
 /**
- * Response de endpoints de {resource}
+ * Response from {resource} endpoints
  */
 export interface {Resource}Response {
   id: string;
@@ -91,7 +202,7 @@ export interface {Resource}Response {
 }
 
 /**
- * Response de lista con paginación
+ * List response with pagination
  */
 export interface {Resource}ListResponse {
   data: {Resource}Response[];
@@ -104,7 +215,7 @@ export interface {Resource}ListResponse {
 }
 
 /**
- * Response de error de API estándar
+ * Standard API error response
  */
 export interface ApiErrorResponse {
   error: string;
@@ -116,14 +227,14 @@ export interface ApiErrorResponse {
 
 ---
 
-### Paso 3: Implementar Componente API
+### Phase 4: Implement API Component
 
-Crear el componente KATA API siguiendo estructura de Layer 3:
+Create the KATA API component following Layer 3 structure:
 
-#### Template de Componente
+#### Component Template
 
 ```typescript
-// qa/tests/components/api/{Resource}Api.ts
+// tests/components/api/{Resource}Api.ts
 
 import type { APIResponse } from '@playwright/test';
 import type { TestContextOptions } from '@components/TestContext';
@@ -132,10 +243,10 @@ import { ApiBase } from '@api/ApiBase';
 import { atc } from '@utils/decorators';
 
 // ============================================================================
-// IMPORTS/EXPORTS DE TIPOS
+// TYPE IMPORTS/EXPORTS
 // ============================================================================
 
-// Importar tipos del archivo central de tipos
+// Import types from central types file
 import type {
   Create{Resource}Payload,
   Update{Resource}Payload,
@@ -144,7 +255,7 @@ import type {
   ApiErrorResponse,
 } from '@data/types';
 
-// Re-exportar para conveniencia en archivo de test
+// Re-export for test file convenience
 export type {
   Create{Resource}Payload,
   Update{Resource}Payload,
@@ -152,29 +263,29 @@ export type {
 };
 
 // ============================================================================
-// IMPLEMENTACIÓN DEL COMPONENTE
+// COMPONENT IMPLEMENTATION
 // ============================================================================
 
 /**
- * {Resource}Api - Componente API para endpoints de {resource}
+ * {Resource}Api - API Component for {resource} endpoints
  *
- * Layer: 3 (Componente de Dominio)
- * Extiende: ApiBase
+ * Layer: 3 (Domain Component)
+ * Extends: ApiBase
  * Base URL: /api/v1/{resources}
  *
  * ATCs:
- * - {TEST-001}: create{Resource}Successfully() - Crear nuevo recurso
- * - {TEST-002}: get{Resource}Successfully() - Obtener recurso individual
- * - {TEST-003}: update{Resource}Successfully() - Actualizar recurso
- * - {TEST-004}: delete{Resource}Successfully() - Eliminar recurso
- * - {TEST-005}: get{Resource}WithNonExistentId() - Caso 404
+ * - {TEST-001}: create{Resource}Successfully() - Create new resource
+ * - {TEST-002}: get{Resource}Successfully() - Get single resource
+ * - {TEST-003}: update{Resource}Successfully() - Update resource
+ * - {TEST-004}: delete{Resource}Successfully() - Delete resource
+ * - {TEST-005}: get{Resource}WithNonExistentId() - 404 case
  */
 export class {Resource}Api extends ApiBase {
   // ==========================================================================
-  // CONFIGURACIÓN
+  // CONFIGURATION
   // ==========================================================================
 
-  /** Endpoint base para este recurso */
+  /** Base endpoint for this resource */
   private readonly baseEndpoint = '/api/v1/{resources}';
 
   // ==========================================================================
@@ -186,21 +297,21 @@ export class {Resource}Api extends ApiBase {
   }
 
   // ==========================================================================
-  // ATCs: CASOS DE ÉXITO
+  // ATCs: SUCCESS CASES
   // ==========================================================================
 
   /**
-   * {TEST-001}: Crear un nuevo {resource}
+   * {TEST-001}: Create a new {resource}
    *
    * POST /api/v1/{resources}
    *
-   * Assertions Fijas:
-   * - Status code es 201 Created
-   * - Response body contiene id
-   * - Response refleja valores del payload
+   * Fixed Assertions:
+   * - Status code is 201 Created
+   * - Response body contains id
+   * - Response echoes payload values
    *
-   * @param payload - Datos para crear el recurso
-   * @returns Tupla de [response, body, payload]
+   * @param payload - Data for creating the resource
+   * @returns Tuple of [response, body, payload]
    */
   @atc('{TEST-001}')
   async create{Resource}Successfully(
@@ -215,7 +326,7 @@ export class {Resource}Api extends ApiBase {
     );
 
     // -------------------------------------------------------------------------
-    // ASSERTIONS FIJAS
+    // FIXED ASSERTIONS
     // -------------------------------------------------------------------------
     expect(response.status()).toBe(201);
     expect(body.id).toBeDefined();
@@ -226,16 +337,16 @@ export class {Resource}Api extends ApiBase {
   }
 
   /**
-   * {TEST-002}: Obtener un {resource} individual por ID
+   * {TEST-002}: Get a single {resource} by ID
    *
    * GET /api/v1/{resources}/{id}
    *
-   * Assertions Fijas:
-   * - Status code es 200 OK
-   * - Response body contiene campos esperados
+   * Fixed Assertions:
+   * - Status code is 200 OK
+   * - Response body contains expected fields
    *
-   * @param id - Identificador del recurso
-   * @returns Tupla de [response, body]
+   * @param id - Resource identifier
+   * @returns Tuple of [response, body]
    */
   @atc('{TEST-002}')
   async get{Resource}Successfully(
@@ -249,7 +360,7 @@ export class {Resource}Api extends ApiBase {
     );
 
     // -------------------------------------------------------------------------
-    // ASSERTIONS FIJAS
+    // FIXED ASSERTIONS
     // -------------------------------------------------------------------------
     expect(response.status()).toBe(200);
     expect(body.id).toBe(id);
@@ -260,24 +371,24 @@ export class {Resource}Api extends ApiBase {
   }
 
   /**
-   * {TEST-003}: Obtener todos los {resources} con paginación
+   * {TEST-003}: Get all {resources} with pagination
    *
    * GET /api/v1/{resources}?page=1&limit=10
    *
-   * Assertions Fijas:
-   * - Status code es 200 OK
-   * - Response contiene array de datos
-   * - Info de paginación presente
+   * Fixed Assertions:
+   * - Status code is 200 OK
+   * - Response contains data array
+   * - Pagination info present
    *
-   * @param params - Parámetros de query (page, limit)
-   * @returns Tupla de [response, body]
+   * @param params - Query parameters (page, limit)
+   * @returns Tuple of [response, body]
    */
   @atc('{TEST-003}')
   async getAll{Resources}Successfully(
     params?: { page?: number; limit?: number }
   ): Promise<[APIResponse, {Resource}ListResponse]> {
     // -------------------------------------------------------------------------
-    // CONSTRUIR QUERY STRING
+    // BUILD QUERY STRING
     // -------------------------------------------------------------------------
     const queryParams = new URLSearchParams();
     if (params?.page) queryParams.set('page', params.page.toString());
@@ -293,7 +404,7 @@ export class {Resource}Api extends ApiBase {
     const [response, body] = await this.apiGET<{Resource}ListResponse>(endpoint);
 
     // -------------------------------------------------------------------------
-    // ASSERTIONS FIJAS
+    // FIXED ASSERTIONS
     // -------------------------------------------------------------------------
     expect(response.status()).toBe(200);
     expect(Array.isArray(body.data)).toBe(true);
@@ -304,17 +415,17 @@ export class {Resource}Api extends ApiBase {
   }
 
   /**
-   * {TEST-004}: Actualizar un {resource} existente
+   * {TEST-004}: Update an existing {resource}
    *
    * PUT /api/v1/{resources}/{id}
    *
-   * Assertions Fijas:
-   * - Status code es 200 OK
-   * - Response refleja valores actualizados
+   * Fixed Assertions:
+   * - Status code is 200 OK
+   * - Response reflects updated values
    *
-   * @param id - Identificador del recurso
-   * @param payload - Datos de actualización
-   * @returns Tupla de [response, body, payload]
+   * @param id - Resource identifier
+   * @param payload - Update data
+   * @returns Tuple of [response, body, payload]
    */
   @atc('{TEST-004}')
   async update{Resource}Successfully(
@@ -330,7 +441,7 @@ export class {Resource}Api extends ApiBase {
     );
 
     // -------------------------------------------------------------------------
-    // ASSERTIONS FIJAS
+    // FIXED ASSERTIONS
     // -------------------------------------------------------------------------
     expect(response.status()).toBe(200);
     expect(body.id).toBe(id);
@@ -341,15 +452,15 @@ export class {Resource}Api extends ApiBase {
   }
 
   /**
-   * {TEST-005}: Eliminar un {resource}
+   * {TEST-005}: Delete a {resource}
    *
    * DELETE /api/v1/{resources}/{id}
    *
-   * Assertions Fijas:
-   * - Status code es 204 No Content O 200 OK
+   * Fixed Assertions:
+   * - Status code is 204 No Content OR 200 OK
    *
-   * @param id - Identificador del recurso
-   * @returns Tupla de [response, void]
+   * @param id - Resource identifier
+   * @returns Tuple of [response, void]
    */
   @atc('{TEST-005}')
   async delete{Resource}Successfully(
@@ -361,7 +472,7 @@ export class {Resource}Api extends ApiBase {
     const [response] = await this.apiDELETE(`${this.baseEndpoint}/${id}`);
 
     // -------------------------------------------------------------------------
-    // ASSERTIONS FIJAS
+    // FIXED ASSERTIONS
     // -------------------------------------------------------------------------
     expect([200, 204]).toContain(response.status());
 
@@ -369,20 +480,20 @@ export class {Resource}Api extends ApiBase {
   }
 
   // ==========================================================================
-  // ATCs: CASOS DE ERROR
+  // ATCs: ERROR CASES
   // ==========================================================================
 
   /**
-   * {TEST-006}: Intentar obtener {resource} inexistente
+   * {TEST-006}: Attempt to get non-existent {resource}
    *
-   * GET /api/v1/{resources}/{id-inexistente}
+   * GET /api/v1/{resources}/{non-existent-id}
    *
-   * Assertions Fijas:
-   * - Status code es 404 Not Found
-   * - Mensaje de error presente
+   * Fixed Assertions:
+   * - Status code is 404 Not Found
+   * - Error message present
    *
-   * @param id - ID de recurso inexistente
-   * @returns Tupla de [response, errorBody]
+   * @param id - Non-existent resource ID
+   * @returns Tuple of [response, errorBody]
    */
   @atc('{TEST-006}')
   async get{Resource}WithNonExistentId(
@@ -396,7 +507,7 @@ export class {Resource}Api extends ApiBase {
     );
 
     // -------------------------------------------------------------------------
-    // ASSERTIONS FIJAS
+    // FIXED ASSERTIONS
     // -------------------------------------------------------------------------
     expect(response.status()).toBe(404);
     expect(body.error).toBeDefined();
@@ -405,16 +516,16 @@ export class {Resource}Api extends ApiBase {
   }
 
   /**
-   * {TEST-007}: Intentar crear con payload inválido
+   * {TEST-007}: Attempt to create with invalid payload
    *
-   * POST /api/v1/{resources} con datos inválidos
+   * POST /api/v1/{resources} with invalid data
    *
-   * Assertions Fijas:
-   * - Status code es 400 Bad Request
-   * - Errores de validación presentes
+   * Fixed Assertions:
+   * - Status code is 400 Bad Request
+   * - Validation errors present
    *
-   * @param payload - Datos de payload inválidos
-   * @returns Tupla de [response, errorBody, payload]
+   * @param payload - Invalid payload data
+   * @returns Tuple of [response, errorBody, payload]
    */
   @atc('{TEST-007}')
   async create{Resource}WithInvalidPayload(
@@ -429,7 +540,7 @@ export class {Resource}Api extends ApiBase {
     );
 
     // -------------------------------------------------------------------------
-    // ASSERTIONS FIJAS
+    // FIXED ASSERTIONS
     // -------------------------------------------------------------------------
     expect(response.status()).toBe(400);
     expect(body.error).toBeDefined();
@@ -438,26 +549,26 @@ export class {Resource}Api extends ApiBase {
   }
 
   /**
-   * {TEST-008}: Intentar acceso no autorizado
+   * {TEST-008}: Attempt unauthorized access
    *
-   * GET /api/v1/{resources} sin token de auth
+   * GET /api/v1/{resources} without auth token
    *
-   * Nota: Llamar clearAuthToken() antes de este ATC
+   * Note: Call clearAuthToken() before this ATC
    *
-   * Assertions Fijas:
-   * - Status code es 401 Unauthorized
+   * Fixed Assertions:
+   * - Status code is 401 Unauthorized
    *
-   * @returns Tupla de [response, errorBody]
+   * @returns Tuple of [response, errorBody]
    */
   @atc('{TEST-008}')
   async get{Resources}Unauthorized(): Promise<[APIResponse, ApiErrorResponse]> {
     // -------------------------------------------------------------------------
-    // REQUEST (sin auth - debe llamar clearAuthToken antes)
+    // REQUEST (without auth - must call clearAuthToken before)
     // -------------------------------------------------------------------------
     const [response, body] = await this.apiGET<ApiErrorResponse>(this.baseEndpoint);
 
     // -------------------------------------------------------------------------
-    // ASSERTIONS FIJAS
+    // FIXED ASSERTIONS
     // -------------------------------------------------------------------------
     expect(response.status()).toBe(401);
     expect(body.error).toBeDefined();
@@ -469,35 +580,35 @@ export class {Resource}Api extends ApiBase {
 
 ---
 
-### Paso 4: Registrar Componente en Fixture
+### Phase 5: Register Component in Fixture
 
-Agregar el nuevo componente a `ApiFixture.ts`:
+Add the new component to `ApiFixture.ts`:
 
 ```typescript
-// qa/tests/components/ApiFixture.ts
+// tests/components/ApiFixture.ts
 
 import type { TestContextOptions } from '@components/TestContext';
 import { ApiBase } from '@api/ApiBase';
 
-// Importar componentes existentes
+// Import existing components
 import { AuthApi } from '@api/AuthApi';
-// Agregar nuevo import
+// Add new import
 import { {Resource}Api } from '@api/{Resource}Api';
 
 export class ApiFixture extends ApiBase {
-  // Componentes existentes
+  // Existing components
   public readonly auth: AuthApi;
 
-  // Agregar nuevo componente
+  // Add new component
   public readonly {resource}: {Resource}Api;
 
   constructor(options: TestContextOptions) {
     super(options);
 
-    // Inicializar componentes existentes
+    // Initialize existing components
     this.auth = new AuthApi(options);
 
-    // Inicializar nuevo componente
+    // Initialize new component
     this.{resource} = new {Resource}Api(options);
   }
 }
@@ -505,18 +616,17 @@ export class ApiFixture extends ApiBase {
 
 ---
 
-### Paso 5: Implementar Archivo de Test
+### Phase 6: Implement Test File
 
-Crear el archivo de test siguiendo patrones KATA:
+Create the test file following KATA patterns:
 
-#### Template de Archivo de Test
+#### Test File Template
 
 ```typescript
-// qa/tests/integration/{resource}/{resource}.test.ts
+// tests/integration/{resource}/{resource}.test.ts
 
 import { expect } from '@playwright/test';
 import { test } from '@TestFixture';
-import { faker } from '@faker-js/faker';
 import type {
   Create{Resource}Payload,
   Update{Resource}Payload,
@@ -524,63 +634,34 @@ import type {
 } from '@api/{Resource}Api';
 
 // ============================================================================
-// SUITE DE TESTS: {Resource} API
+// TEST SUITE: {Resource} API
 // ============================================================================
 
 test.describe('{Resource} API', () => {
   // ==========================================================================
-  // SETUP DE AUTENTICACIÓN
+  // PRECONDITION DATA (Discover pattern — see test-data-management.md)
   // ==========================================================================
 
-  /**
-   * Autenticar antes de cada test.
-   * Usa credenciales de variables de entorno.
-   */
-  test.beforeEach(async ({ api }) => {
-    await api.auth.authenticateSuccessfully({
-      email: process.env.TEST_USER_EMAIL!,
-      password: process.env.TEST_USER_PASSWORD!,
-    });
-  });
+  // Discover data in beforeAll — NO assertions
+  let testResource: ResourceCandidate | null;
 
-  // ==========================================================================
-  // FÁBRICAS DE DATOS DE TEST
-  // ==========================================================================
-
-  /**
-   * Generar payload de creación válido usando Faker.
-   * Llamar fresco en cada test para datos únicos.
-   */
-  const createValidPayload = (): Create{Resource}Payload => ({
-    name: faker.person.fullName(),
-    email: faker.internet.email(),
-    roleId: faker.number.int({ min: 1, max: 5 }),
-  });
-
-  /**
-   * Generar payload de actualización con datos parciales.
-   */
-  const createUpdatePayload = (): Update{Resource}Payload => ({
-    name: faker.person.fullName(),
-  });
-
-  /**
-   * Generar payload inválido para tests negativos.
-   */
-  const createInvalidPayload = (): Partial<Create{Resource}Payload> => ({
-    name: '', // Nombre vacío debería fallar validación
-    email: 'not-an-email', // Formato de email inválido
+  test.beforeAll(async ({ api }) => {
+    await api.auth.signInSuccessfully();
+    testResource = await api.resources.findAvailableResource();
   });
 
   // ==========================================================================
   // TESTS: CREATE (POST)
   // ==========================================================================
 
-  test('debería crear {resource} exitosamente @integration @{resource}', async ({ api }) => {
+  test('TK-XXX: should create {resource} successfully @critical', async ({ api }) => {
+    // Guard: skip if precondition data not found
+    if (!testResource) return test.skip(true, 'No available resource found');
+
     // -------------------------------------------------------------------------
-    // ARRANGE
+    // ARRANGE: Dynamic test data via DataFactory
     // -------------------------------------------------------------------------
-    const payload = createValidPayload();
+    const payload = api.data.createResource({ parentId: testResource.id });
 
     // -------------------------------------------------------------------------
     // ACT
@@ -588,17 +669,22 @@ test.describe('{Resource} API', () => {
     const [response, body, sentPayload] = await api.{resource}.create{Resource}Successfully(payload);
 
     // -------------------------------------------------------------------------
-    // ASSERT (opcional - más allá de assertions del ATC)
+    // ASSERT: Additional test-level assertions
     // -------------------------------------------------------------------------
     expect(body.name).toBe(sentPayload.name);
-    expect(body.email).toBe(sentPayload.email);
+    expect(body.parentId).toBe(testResource.id);
   });
 
-  test('debería fallar al crear con payload inválido @integration @{resource}', async ({ api }) => {
+  test('TK-XXX: should reject {resource} with invalid payload @high', async ({ api }) => {
+    if (!testResource) return test.skip(true, 'No available resource found');
+
     // -------------------------------------------------------------------------
-    // ARRANGE
+    // ARRANGE: Invalid data via DataFactory with override
     // -------------------------------------------------------------------------
-    const invalidPayload = createInvalidPayload();
+    const invalidPayload = api.data.createResource({
+      parentId: testResource.id,
+      name: '', // Invalid override
+    });
 
     // -------------------------------------------------------------------------
     // ACT
@@ -615,9 +701,9 @@ test.describe('{Resource} API', () => {
   // TESTS: READ (GET)
   // ==========================================================================
 
-  test('debería obtener {resource} por ID @integration @{resource}', async ({ api }) => {
+  test('should get {resource} by ID @integration @{resource}', async ({ api }) => {
     // -------------------------------------------------------------------------
-    // ARRANGE: Crear recurso primero
+    // ARRANGE: Create resource first
     // -------------------------------------------------------------------------
     const [, created] = await api.{resource}.create{Resource}Successfully(createValidPayload());
 
@@ -633,7 +719,7 @@ test.describe('{Resource} API', () => {
     expect(body.name).toBe(created.name);
   });
 
-  test('debería retornar 404 para {resource} inexistente @integration @{resource}', async ({ api }) => {
+  test('should return 404 for non-existent {resource} @integration @{resource}', async ({ api }) => {
     // -------------------------------------------------------------------------
     // ARRANGE
     // -------------------------------------------------------------------------
@@ -650,7 +736,7 @@ test.describe('{Resource} API', () => {
     expect(response.status()).toBe(404);
   });
 
-  test('debería obtener todos los {resources} con paginación @integration @{resource}', async ({ api }) => {
+  test('should get all {resources} with pagination @integration @{resource}', async ({ api }) => {
     // -------------------------------------------------------------------------
     // ACT
     // -------------------------------------------------------------------------
@@ -671,9 +757,9 @@ test.describe('{Resource} API', () => {
   // TESTS: UPDATE (PUT/PATCH)
   // ==========================================================================
 
-  test('debería actualizar {resource} exitosamente @integration @{resource}', async ({ api }) => {
+  test('should update {resource} successfully @integration @{resource}', async ({ api }) => {
     // -------------------------------------------------------------------------
-    // ARRANGE: Crear recurso primero
+    // ARRANGE: Create resource first
     // -------------------------------------------------------------------------
     const [, created] = await api.{resource}.create{Resource}Successfully(createValidPayload());
     const updatePayload = createUpdatePayload();
@@ -690,16 +776,16 @@ test.describe('{Resource} API', () => {
     // ASSERT
     // -------------------------------------------------------------------------
     expect(updated.name).toBe(updatePayload.name);
-    expect(updated.id).toBe(created.id); // ID sin cambios
+    expect(updated.id).toBe(created.id); // ID unchanged
   });
 
   // ==========================================================================
   // TESTS: DELETE
   // ==========================================================================
 
-  test('debería eliminar {resource} exitosamente @integration @{resource}', async ({ api }) => {
+  test('should delete {resource} successfully @integration @{resource}', async ({ api }) => {
     // -------------------------------------------------------------------------
-    // ARRANGE: Crear recurso para eliminar
+    // ARRANGE: Create resource to delete
     // -------------------------------------------------------------------------
     const [, created] = await api.{resource}.create{Resource}Successfully(createValidPayload());
 
@@ -709,19 +795,19 @@ test.describe('{Resource} API', () => {
     const [response] = await api.{resource}.delete{Resource}Successfully(created.id);
 
     // -------------------------------------------------------------------------
-    // ASSERT: Verificar eliminación
+    // ASSERT: Verify deletion
     // -------------------------------------------------------------------------
     const [getResponse] = await api.{resource}.get{Resource}WithNonExistentId(created.id);
     expect(getResponse.status()).toBe(404);
   });
 
   // ==========================================================================
-  // TESTS: AUTORIZACIÓN
+  // TESTS: AUTHORIZATION
   // ==========================================================================
 
-  test('debería retornar 401 sin autenticación @integration @{resource}', async ({ api }) => {
+  test('should return 401 without authentication @integration @{resource}', async ({ api }) => {
     // -------------------------------------------------------------------------
-    // ARRANGE: Limpiar token de auth
+    // ARRANGE: Clear auth token
     // -------------------------------------------------------------------------
     api.clearAuthToken();
 
@@ -740,91 +826,98 @@ test.describe('{Resource} API', () => {
 
 ---
 
-### Paso 6: Ejecutar y Validar
+### Phase 7: Run and Validate
 
-Ejecutar el test para verificar la implementación:
+Execute the test to verify implementation:
 
 ```bash
-# Ejecutar archivo de test específico
-cd qa && bun run test tests/integration/{resource}/{resource}.test.ts
+# Run specific test file
+bun run test tests/integration/{resource}/{resource}.test.ts
 
-# Ejecutar con output verbose
-cd qa && bun run test --reporter=list tests/integration/{resource}/{resource}.test.ts
+# Run with verbose output
+bun run test --reporter=list tests/integration/{resource}/{resource}.test.ts
 
-# Ejecutar solo test específico
-cd qa && bun run test --grep "debería crear {resource}" tests/integration/{resource}/
+# Run only specific test
+bun run test --grep "should create {resource}" tests/integration/{resource}/
 ```
 
 ---
 
-## Checklist de Calidad de Código
+### Phase 8: Update TMS
 
-Antes de completar la fase de Coding, verificar:
+**Mark test as automated in TMS:**
 
-### Calidad del Componente
-
-- [ ] Extiende `ApiBase` correctamente
-- [ ] Constructor acepta `TestContextOptions`
-- [ ] Decorator `@atc` con Test ID correcto
-- [ ] Retorna tupla: `[APIResponse, TBody]` o `[APIResponse, TBody, TPayload]`
-- [ ] Assertions fijas dentro del ATC
-- [ ] Generics type-safe en métodos de API
-- [ ] Import aliases usados (`@api/`, `@utils/`, etc.)
-
-### Calidad del Archivo de Test
-
-- [ ] Importa `test` desde `@TestFixture`
-- [ ] `beforeEach` con autenticación (si necesario)
-- [ ] Datos de test generados frescos (Faker)
-- [ ] Estructura ARRANGE-ACT-ASSERT
-- [ ] Tags apropiados (`@integration`, `@{resource}`)
-- [ ] Cada test es independiente
-
-### Seguridad de Tipos
-
-- [ ] Tipos de request definidos (Payload)
-- [ ] Tipos de response definidos
-- [ ] Tipo de error response definido
-- [ ] Tipos exportados para uso en archivo de test
-- [ ] Sin tipos `any`
+- Update test case with automation plan (file path and description)
+- Link to test file location
+- Update status if needed
 
 ---
 
-## Patrones Comunes de Implementación
+## Code Quality Checklist
 
-### Uso de Métodos API
+Before completing the Coding phase, verify:
+
+### Component Quality
+- [ ] Extends `ApiBase` correctly
+- [ ] Constructor accepts `TestContextOptions`
+- [ ] `@atc` decorator with correct Test ID
+- [ ] Returns tuple: `[APIResponse, TBody]` or `[APIResponse, TBody, TPayload]`
+- [ ] Fixed assertions inside ATC
+- [ ] Type-safe generics on api methods
+- [ ] Import aliases used (`@api/`, `@utils/`, etc.)
+
+### Test File Quality
+- [ ] Imports `test` from `@TestFixture`
+- [ ] `beforeEach` with authentication (if needed)
+- [ ] Test data generated fresh (Faker)
+- [ ] ARRANGE-ACT-ASSERT structure
+- [ ] Appropriate tags (`@integration`, `@{resource}`)
+- [ ] Each test is independent
+
+### Type Safety
+- [ ] Request types defined (Payload)
+- [ ] Response types defined
+- [ ] Error response type defined
+- [ ] Types exported for test file use
+- [ ] No `any` types
+
+---
+
+## Common Implementation Patterns
+
+### API Method Usage
 
 ```typescript
-// GET - Retorna [response, body]
+// GET - Returns [response, body]
 const [response, body] = await this.apiGET<{Resource}Response>(endpoint);
 
-// POST - Retorna [response, body] pero ATC retorna [response, body, payload]
+// POST - Returns [response, body] but ATC returns [response, body, payload]
 const [response, body] = await this.apiPOST<{Resource}Response, CreatePayload>(
   endpoint,
   payload
 );
 
-// PUT - Igual que POST
+// PUT - Same as POST
 const [response, body] = await this.apiPUT<{Resource}Response, UpdatePayload>(
   endpoint,
   payload
 );
 
-// PATCH - Igual que PUT
+// PATCH - Same as PUT
 const [response, body] = await this.apiPATCH<{Resource}Response, PartialPayload>(
   endpoint,
   payload
 );
 
-// DELETE - Usualmente sin body
+// DELETE - Usually no body
 const [response] = await this.apiDELETE(endpoint);
 ```
 
-### Encadenar Operaciones (en tests)
+### Chaining Operations (in tests)
 
 ```typescript
-test('debería encadenar operaciones', async ({ api }) => {
-  // Crear → Actualizar → Verificar
+test('should chain operations', async ({ api }) => {
+  // Create → Update → Verify
   const [, created] = await api.resource.createSuccessfully(data);
   const [, updated] = await api.resource.updateSuccessfully(created.id, updates);
   const [, fetched] = await api.resource.getSuccessfully(created.id);
@@ -833,14 +926,14 @@ test('debería encadenar operaciones', async ({ api }) => {
 });
 ```
 
-### Testing con Recursos Relacionados
+### Testing with Related Resources
 
 ```typescript
-test('debería crear con foreign key', async ({ api }) => {
-  // Primero crear recurso relacionado
+test('should create with foreign key', async ({ api }) => {
+  // First create related resource
   const [, relatedResource] = await api.related.createSuccessfully(relatedData);
 
-  // Luego crear recurso principal con foreign key
+  // Then create main resource with foreign key
   const payload = {
     ...createValidPayload(),
     relatedId: relatedResource.id,
@@ -853,19 +946,19 @@ test('debería crear con foreign key', async ({ api }) => {
 
 ---
 
-## Anti-Patrones a Evitar
+## Anti-Patterns to Avoid
 
-### ❌ Incorrecto: Falta Tupla de Retorno
+### ❌ Wrong: Missing Return Type Tuple
 
 ```typescript
 @atc('TEST-001')
 async createResource(payload) {
   const response = await this.apiPOST(endpoint, payload);
-  return response; // Falta formato de tupla
+  return response; // Missing tuple format
 }
 ```
 
-### ✅ Correcto: Tupla de Retorno Apropiada
+### ✅ Correct: Proper Tuple Return
 
 ```typescript
 @atc('TEST-001')
@@ -881,28 +974,28 @@ async createResourceSuccessfully(
 }
 ```
 
-### ❌ Incorrecto: Faltan Generics de Tipo
+### ❌ Wrong: Missing Type Generics
 
 ```typescript
-const [response, body] = await this.apiGET(endpoint); // Sin tipo = any
+const [response, body] = await this.apiGET(endpoint); // No type = any
 ```
 
-### ✅ Correcto: Generics Type-Safe
+### ✅ Correct: Type-Safe Generics
 
 ```typescript
 const [response, body] = await this.apiGET<ResourceResponse>(endpoint);
 ```
 
-### ❌ Incorrecto: Datos de Test Hardcodeados
+### ❌ Wrong: Hardcoded Test Data
 
 ```typescript
 const payload = {
-  email: 'test@example.com', // ¡Hardcodeado!
-  id: '123e4567-e89b-12d3-a456-426614174000', // ¡UUID hardcodeado!
+  email: 'test@example.com', // Hardcoded!
+  id: '123e4567-e89b-12d3-a456-426614174000', // Hardcoded UUID!
 };
 ```
 
-### ✅ Correcto: Datos de Test Dinámicos
+### ✅ Correct: Dynamic Test Data
 
 ```typescript
 const payload = {
@@ -913,22 +1006,32 @@ const payload = {
 
 ---
 
-## Checklist de Output
+## PROGRESS UPDATE (Module Workflow Only)
 
-Después de completar la fase de Coding:
+If this ticket is part of a module workflow with `PROGRESS.md`:
 
-- [ ] Componente API creado: `qa/tests/components/api/{Resource}Api.ts`
-- [ ] Componente registrado en: `qa/tests/components/ApiFixture.ts`
-- [ ] Archivo de test creado: `qa/tests/integration/{resource}/{resource}.test.ts`
-- [ ] Tipos definidos: `qa/tests/data/types.ts`
-- [ ] Test pasa localmente: `cd qa && bun run test <archivo-de-test>`
-- [ ] Sin errores TypeScript: `cd qa && bun run type-check`
-- [ ] Linting pasa: `cd qa && bun run lint`
+- Update test file path and done count in the ticket progress table
+- Add session log entry with date and summary
+- **Next step**: Run the review using `.prompts/fase-12-test-automation/integration/integration-review.md`
 
 ---
 
-## Siguiente Paso
+## Output Checklist
 
-Una vez que la implementación esté completa y los tests pasen:
+After completing the Coding phase:
 
-→ **Proceder a**: `integration-review.md` (Fase 3)
+- [ ] API Component created: `tests/components/api/{Resource}Api.ts`
+- [ ] Component registered in: `tests/components/ApiFixture.ts`
+- [ ] Test file created: `tests/integration/{resource}/{resource}.test.ts`
+- [ ] Types defined: `tests/data/types.ts`
+- [ ] Test passes locally: `bun run test <test-file>`
+- [ ] No TypeScript errors: `bun run type-check`
+- [ ] Linting passes: `bun run lint`
+
+---
+
+## Next Step
+
+Once implementation is complete and tests pass:
+
+→ **Proceed to**: `integration/integration-review.md` (Phase 3)

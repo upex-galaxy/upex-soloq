@@ -1,6 +1,6 @@
-# TypeScript Patterns for KATA Framework
+# TypeScript Patterns for KATA Architecture
 
-> **Purpose**: Coding patterns and conventions for the KATA Framework.
+> **Purpose**: Coding patterns and conventions for the KATA Architecture.
 > **Audience**: AI assistants and developers writing code.
 > **Principle**: Consistency, readability, and maintainability.
 

@@ -1,0 +1,21 @@
+{
+  "lastSync": "2026-04-28T15:38:01.209Z",
+  "templateCommit": "00d36dcff0852395440ebd5fe65f4a445ea008a9",
+  "cliVersion": "4.0",
+  "syncedComponents": [
+    "prompts",
+    "books",
+    "docs",
+    "context",
+    "templates",
+    "scripts",
+    "cli",
+    "agents",
+    "claude",
+    "vscode",
+    "husky",
+    "tooling",
+    "examples"
+  ],
+  "variableSystemVersion": true
+}

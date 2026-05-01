@@ -1,0 +1,782 @@
+{
+  "info": {
+    "name": "SoloQ API - EPIC SQ-38 Dashboard Tracking",
+    "description": "Collection organizada por story para retest QA de SQ-48, SQ-50, SQ-51 y SQ-52.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "SQ-48 Filter by status",
+      "description": "Escenarios de filtro por estado, no-results y auth.",
+      "item": [
+        {
+          "name": "Happy - GET invoices all",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{sb_auth_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invoices?page=1&limit=20&sortBy=created_at&sortOrder=desc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "created_at"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const body = pm.response.json();",
+                  "pm.test('Has data and pagination', function () {",
+                  "  pm.expect(body).to.have.property('data');",
+                  "  pm.expect(body).to.have.property('pagination');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Happy - GET invoices status=draft",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{sb_auth_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invoices?status=draft&page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "draft"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const rows = pm.response.json().data || [];",
+                  "pm.test('All rows draft', function () {",
+                  "  rows.forEach(r => pm.expect(r.status).to.eql('draft'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Happy - GET invoices status=sent",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{sb_auth_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invoices?status=sent&page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "sent"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const rows = pm.response.json().data || [];",
+                  "pm.test('All rows sent', function () {",
+                  "  rows.forEach(r => pm.expect(r.status).to.eql('sent'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Happy - GET invoices status=paid",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{sb_auth_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invoices?status=paid&page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "paid"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const rows = pm.response.json().data || [];",
+                  "pm.test('All rows paid', function () {",
+                  "  rows.forEach(r => pm.expect(r.status).to.eql('paid'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negative - No results by search",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{sb_auth_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invoices?search=zzzz-not-found&page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "zzzz-not-found"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const body = pm.response.json();",
+                  "pm.test('No results', function () {",
+                  "  pm.expect(body.pagination.total).to.eql(0);",
+                  "  pm.expect((body.data || []).length).to.eql(0);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Auth - GET invoices unauthorized",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{unauthorized_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invoices?page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 401', function () { pm.response.to.have.status(401); });"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SQ-50 Overdue highlight",
+      "description": "Escenarios API para overdue list + dashboard summary.",
+      "item": [
+        {
+          "name": "Happy - GET dashboard summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{sb_auth_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invoices/dashboard",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices", "dashboard"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const data = pm.response.json().data || {};",
+                  "pm.test('Dashboard fields exist', function () {",
+                  "  ['pending_total','overdue_total','paid_this_month','overdue_count','status_counts','monthly_pending','trend_percentage','trend_label','chart_data'].forEach(k => pm.expect(data).to.have.property(k));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Happy - GET invoices status=overdue",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{sb_auth_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invoices?status=overdue&page=1&limit=20&sortBy=due_date&sortOrder=asc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "overdue"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "due_date"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "asc"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const rows = pm.response.json().data || [];",
+                  "pm.test('All rows overdue', function () {",
+                  "  rows.forEach(r => pm.expect(r.status).to.eql('overdue'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Auth - GET dashboard unauthorized",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{unauthorized_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invoices/dashboard",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices", "dashboard"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 401', function () { pm.response.to.have.status(401); });"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SQ-51 Search invoices",
+      "description": "Escenarios de search por invoice number, cliente, trim y no-results.",
+      "item": [
+        {
+          "name": "Happy - Search by invoice number partial",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{sb_auth_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invoices?search={{search_invoice_partial}}&page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "{{search_invoice_partial}}"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const rows = pm.response.json().data || [];",
+                  "pm.test('At least one result expected in seeded dataset', function () {",
+                  "  pm.expect(rows.length).to.be.greaterThan(0);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Happy - Search by client name/email",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{sb_auth_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invoices?search={{search_client_query}}&page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "{{search_client_query}}"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const rows = pm.response.json().data || [];",
+                  "pm.test('Result has client payload', function () {",
+                  "  rows.forEach(r => pm.expect(r).to.have.property('client'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Boundary - Search trims spaces",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{sb_auth_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invoices?search=%20%20{{search_invoice_partial}}%20%20&page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "  {{search_invoice_partial}}  "
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 200', function () { pm.response.to.have.status(200); });"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negative - Search no-results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{sb_auth_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invoices?search=zzzz-not-found-51&page=1&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "zzzz-not-found-51"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const body = pm.response.json();",
+                  "pm.test('No results payload', function () {",
+                  "  pm.expect(body.pagination.total).to.eql(0);",
+                  "  pm.expect((body.data || []).length).to.eql(0);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SQ-52 Monthly summary",
+      "description": "Escenarios de monthly summary y refresh tras registrar pago.",
+      "item": [
+        {
+          "name": "Happy - GET dashboard monthly summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{sb_auth_cookie}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/invoices/dashboard",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices", "dashboard"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "const data = pm.response.json().data || {};",
+                  "pm.test('Monthly fields numeric/shape', function () {",
+                  "  pm.expect(data.paid_this_month).to.be.a('number');",
+                  "  pm.expect(data.monthly_pending).to.be.a('number');",
+                  "  pm.expect(data.chart_data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Integration - POST payment for sent/overdue invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{sb_auth_cookie}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount_received\": 150.0,\n  \"payment_method\": \"bank_transfer\",\n  \"payment_date\": \"{{payment_date}}\",\n  \"notes\": \"QA retest SQ-52\",\n  \"reference\": \"SQ52-{{run_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/invoices/{{qa_invoice_id_sent}}/payments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices", "{{qa_invoice_id_sent}}", "payments"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "const data = pm.response.json().data || {};",
+                  "pm.collectionVariables.set('last_payment_id', data.id || '');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Negative - POST payment invalid invoice id",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{sb_auth_cookie}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount_received\": 100,\n  \"payment_method\": \"cash\",\n  \"payment_date\": \"{{payment_date}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/invoices/not-a-uuid/payments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices", "not-a-uuid", "payments"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 400', function () { pm.response.to.have.status(400); });"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RLS - POST payment on foreign invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{sb_auth_cookie}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount_received\": 100,\n  \"payment_method\": \"cash\",\n  \"payment_date\": \"{{payment_date}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/invoices/{{qa_invoice_id_foreign}}/payments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices", "{{qa_invoice_id_foreign}}", "payments"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 404 by RLS isolation', function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Auth - POST payment unauthorized",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{auth_cookie_name}}={{unauthorized_cookie}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount_received\": 100,\n  \"payment_method\": \"cash\",\n  \"payment_date\": \"{{payment_date}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/invoices/{{qa_invoice_id_sent}}/payments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "invoices", "{{qa_invoice_id_sent}}", "payments"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('Status 401', function () { pm.response.to.have.status(401); });"]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "auth_cookie_name",
+      "value": "sb-czuusjchqpgvanvbdrnz-auth-token"
+    }
+  ]
+}

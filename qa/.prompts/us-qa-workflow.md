@@ -61,6 +61,34 @@ Before starting, verify:
 - [ ] Access to staging URL is available
 - [ ] Context files are loaded (see Context Loading section)
 
+### Pre-flight mandatory (Tavily + MCPs)
+
+Run this validation before Stage 2 (Exploratory Testing) to ensure Tavily and required MCPs are available.
+
+```bash
+# 1) Load MCPs for UI exploration + research
+bun ai uitest
+
+# 2) Verify MCPs and critical env vars
+bun ai:check
+
+# 3) Quick key check in Bun runtime
+bun -e "console.log(process.env.TAVILY_API_KEY ? 'TAVILY_API_KEY: OK' : 'TAVILY_API_KEY: MISSING')"
+```
+
+**Exit criteria:**
+
+- `bun ai:check` shows `MCP: tavily` with `estado: ok`.
+- Bun command prints `TAVILY_API_KEY: OK`.
+- If any check fails, do not start Stage 2 until fixed.
+
+For full Trifuerza sessions (UI + API + DB):
+
+```bash
+bun ai playwright,postman,openapi,sql,atlassian,tavily
+bun ai:check
+```
+
 ### Context Loading
 
 ```markdown

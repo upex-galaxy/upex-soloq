@@ -17,6 +17,7 @@
     "email:check": "bun scripts/email-checker.js",
     "xray": "bun cli/xray/index.ts",
     "jira-sync": "bun scripts/jira-sync.ts",
+    "jira-transition": "bun scripts/jira-transition.ts",
     "jira:sync-fields": "bun run scripts/sync-jira-fields.ts",
     "jira:check": "bun run scripts/check-jira-setup.ts",
     "lint:agents": "bun run scripts/agents-lint.ts",

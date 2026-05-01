@@ -443,10 +443,16 @@ Propuesta de cierre para desbloquear implementacion. Requiere confirmacion PO/De
 - Prefill: usar siempre invoice.total actual al abrir formulario; valor editable por usuario.
 - Formato UI: currency consistente con locale del negocio, persistiendo valor decimal canonico en backend.
 
-Estado: pendiente confirmacion final del equipo.
+Estado: pendiente confirmacion final del equipo.@@Ely 
+
+---
+
+### Automation for Jira - 2026-04-01T05:22:43.300Z
+
+🔎 Pull Request created. Task is pending to ANALYZE and REVIEW by the team. Waiting for PR Approval.
 
 ---
 
 
 _Synced from Jira by jira-sync_
-_Last sync: 2026-03-29T04:51:25.575Z_
+_Last sync: 2026-04-02T19:25:25.569Z_

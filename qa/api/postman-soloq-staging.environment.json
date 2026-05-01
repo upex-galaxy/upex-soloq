@@ -1,0 +1,60 @@
+{
+  "id": "5f3c13ad-7b80-4d68-aebf-00d4e71cd001",
+  "name": "SoloQ Staging (SQ-38)",
+  "values": [
+    {
+      "key": "base_url",
+      "value": "https://staging-upexsoloq.vercel.app",
+      "enabled": true
+    },
+    {
+      "key": "auth_cookie_name",
+      "value": "sb-czuusjchqpgvanvbdrnz-auth-token",
+      "enabled": true
+    },
+    {
+      "key": "sb_auth_cookie",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "unauthorized_cookie",
+      "value": "invalid-token",
+      "enabled": true
+    },
+    {
+      "key": "search_invoice_partial",
+      "value": "0042",
+      "enabled": true
+    },
+    {
+      "key": "search_client_query",
+      "value": "john",
+      "enabled": true
+    },
+    {
+      "key": "qa_invoice_id_sent",
+      "value": "",
+      "enabled": true
+    },
+    {
+      "key": "qa_invoice_id_foreign",
+      "value": "",
+      "enabled": true
+    },
+    {
+      "key": "payment_date",
+      "value": "2026-04-22",
+      "enabled": true
+    },
+    {
+      "key": "run_id",
+      "value": "local-001",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2026-04-22T00:00:00.000Z",
+  "_postman_exported_using": "OpenCode"
+}

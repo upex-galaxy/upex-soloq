@@ -2,6 +2,37 @@
 
 ## Reinicio rapido (2026-04-22)
 
+### Retoma operativa (2026-05-02)
+
+- Jira live revalidated against `https://upexgalaxy67.atlassian.net` (`SQ` accessible).
+- Historias asignadas a `Fernando Javier Masci` al momento del chequeo:
+  - `QA Approved`: `SQ-54`, `SQ-56`, `SQ-57`, `SQ-58`
+  - `In Test`: `SQ-47`, `SQ-49`, `SQ-53`
+- Cola secundaria revisada y excluida de retest por estado/asignacion:
+  - `SQ-48`: `BLOCKED` (assignee `Ely`)
+  - `SQ-50`: `BLOCKED` (assignee `Ely`)
+
+#### Fase 11 ejecutada (Stage 4 - Test Documentation)
+
+- Esquema vigente confirmado: Jira + Xray (`Test`, `Test Set`, `Test Execution`).
+- Test Set creado para el lote QA Approved: `SQ-196`.
+- Tests creados y vinculados:
+  - `SQ-54`: `SQ-197`, `SQ-198`
+  - `SQ-56`: `SQ-199`, `SQ-200`
+  - `SQ-57`: `SQ-201`, `SQ-202`
+  - `SQ-58`: `SQ-203`, `SQ-204`, `SQ-205`
+- Reporte local de priorizacion: `docs/qa/fase11-sq54-58-2026-05-02.md`.
+
+#### Retest Trifuerza ejecutado (SQ-47, SQ-49, SQ-53)
+
+- Se revisaron comentarios Jira para foco pendiente por historia.
+- Se ejecuto smoke UI + smoke API auth-guard + validacion de conectividad DB.
+- Resultado del pase: `PARTIAL` para las 3 historias por ausencia de credenciales QA/dataset deterministico para exploratory autenticado.
+- Decision: mantener `SQ-47`, `SQ-49`, `SQ-53` en `In Test` hasta contar con:
+  1. Credenciales QA de staging.
+  2. Dataset objetivo por historia (0 invoices / sent-overdue totals / mark-as-paid scenario).
+- Reporte local de ejecucion: `docs/qa/retest-trifuerza-sq47-49-53-2026-05-02.md`.
+
 ### Retoma operativa (2026-04-22, continuacion)
 
 - Validacion local completada en este reinicio:

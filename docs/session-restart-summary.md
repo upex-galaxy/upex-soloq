@@ -1,6 +1,273 @@
 # Session Restart Summary
 
+## Reinicio rapido (2026-05-04 - Xray remediation checkpoint)
+
+### Contexto de la sesion
+
+- Se ejecuto un plan de correccion sobre historias asignadas a `Fernando Javier Masci` en `SQ` para migrar test cases a estructura de Fase 11.
+- Se detecto que la correccion aplicada en Jira no alcanzo el objetivo en capa nativa de Xray.
+- El usuario reporto ejemplos concretos:
+  - `SQ-205`: **Test Details** en blanco.
+  - `SQ-209`: probable mismo problema (y potencialmente otros tests asignados).
+  - `SQ-53`: sin cobertura visible en **Xray Test Coverage**.
+
+### Alcance confirmado (assignee = currentUser)
+
+- Historias objetivo: `SQ-47`, `SQ-53`, `SQ-54`, `SQ-56`, `SQ-57`, `SQ-58`.
+- Tests objetivo: `SQ-197`..`SQ-205` y `SQ-208`..`SQ-213`.
+
+### Lo que SI se hizo
+
+- Se actualizaron campos Jira en los tests (`TEST DESCRIPTION`, `TEST DATA`, `STEPS`).
+- Se removieron links redundantes tipo `Relates` hacia stories (se mantuvo el link de tipo `Test`).
+- Se valido que todos los tests del alcance queden vinculados a sus US por link type `Test` (`Story is tested by Test` / `Test tests Story`).
+
+### Gap detectado (causa probable)
+
+- Actualizar campos Jira no llena necesariamente el objeto nativo **Test Details** de Xray (Step/Data/Expected).
+- La cobertura visible en panel **Xray Test Coverage** requiere operar en capa nativa Xray.
+- `bun xray auth status` durante la sesion devolvio `Not logged in`.
+
+### Bloqueante actual
+
+- Falta autenticacion Xray (credenciales/API en poder de Eli).
+- Dependencia para continuar: `XRAY_CLIENT_ID` y `XRAY_CLIENT_SECRET` (y si aplica, `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`).
+
+### Plan de continuidad al destrabar credenciales
+
+1. Autenticar Xray CLI y validar sesion activa.
+2. Re-barrer todos los tests asignados en `SQ`.
+3. Poblar **Test Details** nativo Xray por test (Step/Data/Expected), incluyendo casos `MANUAL` como `SQ-205`.
+4. Verificar y corregir cobertura por US en panel **Xray Test Coverage** (foco explicito en `SQ-53`).
+5. QA de cierre:
+   - `0` tests con Test Details vacio.
+   - `0` tests huerfanos.
+   - sin duplicados de links innecesarios.
+   - checklist y reporte final por US.
+
+### Nota operativa
+
+- El usuario confirmo que apenas reciba la API key/credenciales de Eli, configurara variables de entorno para retomar esta remediacion.
+
+## Reinicio rapido (2026-05-04 - cierre operativo + plan siguiente)
+
+### Estado global Jira Live (snapshot)
+
+Historias revisadas en `SQ-47,48,49,50,51,52,53,54,56,57,58`:
+
+- **QA Approved**: `SQ-47`, `SQ-53`, `SQ-54`, `SQ-56`, `SQ-57`, `SQ-58`
+- **BLOCKED**: `SQ-48`, `SQ-49`, `SQ-50`, `SQ-51`, `SQ-52`
+
+Defects clave (estado live):
+
+- **Open**: `SQ-169` (impacta SQ-51), `SQ-176` (impacta SQ-50), `SQ-206` (impacta SQ-49)
+- **Closed / VERIFIED**: `SQ-175` (SQ-52), `SQ-177` (SQ-48)
+
+### Fase 11 - estado por historia
+
+**Completadas Fase 11 (ya tenian test cases creados, excluir de nuevo barrido):**
+
+- `SQ-47`
+- `SQ-53` (TCs: `SQ-211`, `SQ-212`, `SQ-213`)
+- `SQ-54`
+- `SQ-56`
+- `SQ-57`
+- `SQ-58`
+
+**Avance nuevo en esta sesion (Fase 11 parcial):**
+
+Se ejecuto **solo**:
+
+1. `test-analysis.md`
+2. `test-prioritization.md`
+
+para:
+
+- `SQ-48`:
+  - `.context/PBI/epics/EPIC-SQ-38-dashboard-tracking/stories/STORY-SQ-48-filter-by-status/test-analysis.md`
+  - `.context/PBI/epics/EPIC-SQ-38-dashboard-tracking/stories/STORY-SQ-48-filter-by-status/test-prioritization.md`
+
+- `SQ-52`:
+  - `.context/PBI/epics/EPIC-SQ-38-dashboard-tracking/stories/STORY-SQ-52-monthly-summary/test-analysis.md`
+  - `.context/PBI/epics/EPIC-SQ-38-dashboard-tracking/stories/STORY-SQ-52-monthly-summary/test-prioritization.md`
+
+### Pendiente principal (bloqueante)
+
+Falta ejecutar **Test Documentation** nativo Xray (Test Details reales + cobertura panel Xray) cuando se habilite Xray CLI:
+
+- Requiere credenciales activas (`XRAY_CLIENT_ID`, `XRAY_CLIENT_SECRET`; y si aplica `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`)
+- Objetivo al retomar:
+  - Completar Stage Test Documentation para `SQ-48` y `SQ-52`
+  - Corregir deuda Xray previa (Test Details en blanco / cobertura Xray)
+  - Verificar `Story is tested by Test` y cobertura visible en `Test Coverage`
+
+### Que esta terminado
+
+- Barrido de estado live de historias y defects.
+- Criterio de exclusion de historias con Fase 11 ya completa.
+- Analisis y priorizacion (Stage previos) para `SQ-48` y `SQ-52`.
+
+### Que queda por hacer
+
+1. Activar autenticacion Xray CLI.
+2. Ejecutar `test-documentation.md` para `SQ-48` y `SQ-52`.
+3. Validar cobertura Xray final por historia.
+4. Revisar reentrada de `SQ-49` cuando cierre `SQ-206` (hoy sigue Open).
+
+### Working tree / Git / PR (snapshot)
+
+**Branch actual**
+
+- `test/SQ-54-58-fase11-and-retest` (tracking remoto activo)
+
+**Open PRs relevantes**
+
+- `#131` `test(SQ-47,SQ-53,SQ-54,SQ-56,SQ-57,SQ-58): complete fase-11 documentation and board consistency` (OPEN)
+- Tambien abiertos historicos: `#130`, `#120`, `#119`, `#116`, `#115`, `#114`, `#91`
+
+**Ultimos commits**
+
+- `0ca9ece` docs(qa): add jira closeout restart summary for fase-11
+- `6702d08` test(...): align phase-11 artifacts and restart summary
+- `9883480` test(...): execute stage-4 documentation and publish retest status updates
+
+**Working tree (resumen)**
+
+- Hay cambios locales modificados y varios untracked (incluyendo nuevos `test-analysis.md` y `test-prioritization.md` de SQ-48/SQ-52).
+- Recomendacion: antes de continuar con Xray stage, ordenar commit por bloque tematico (docs/reports vs scripts vs artifacts fase-11).
+
+## Reinicio rapido (2026-05-03 - cierre)
+
+### Estado live final en Jira
+
+- `QA Approved`: `SQ-47`, `SQ-53`, `SQ-54`, `SQ-56`, `SQ-57`, `SQ-58`.
+- `In Test`: `SQ-49` (se mantiene fuera de Fase 11 hasta pasar a `QA Approved`).
+
+### Cierre Fase 11
+
+- Lote `SQ-54/56/57/58` consolidado en Test Set `SQ-196`.
+  - `Candidate`: `SQ-197`..`SQ-204`
+  - `MANUAL`: `SQ-205`
+- Fase 11 ejecutada para `SQ-47` y `SQ-53`.
+  - Test Set `SQ-207` (SQ-47): `SQ-208`, `SQ-209`, `SQ-210` (`Candidate`)
+  - Tests SQ-53: `SQ-211`, `SQ-212`, `SQ-213` (`Candidate`, vinculados a `SQ-196`)
+
+### Higiene de board/comentarios
+
+- Comentarios finales Fase 11 homogeneizados con formato visual (encabezados, secciones, trazabilidad, links).
+- Comentarios intermedios obsoletos eliminados en `SQ-54/56/57/58`.
+
+### Git/PR
+
+- Rama: `test/SQ-54-58-fase11-and-retest`
+- PR abierto y actualizado con template del proyecto:
+  - `https://github.com/upex-galaxy/upex-soloq/pull/131`
+- Commits de cierre del dia:
+  - `6702d08` - alineacion de artefactos Fase 11 + restart summary
+  - `0ca9ece` - restart summary de cierre Jira
+
+### Archivos de resumen generados
+
+- `docs/qa/restart-summary-2026-05-03-fase11.md`
+- `docs/qa/restart-summary-2026-05-03-jira-closeout.md`
+
+### Siguientes pasos (pendientes)
+
+1. Evaluar integracion con Xray para este flujo:
+   - Verificar conexion/autenticacion con Xray.
+   - Analizar si conviene transicionar/sincronizar test cases via Xray en lugar de Jira-only para el estado actual.
+   - Decidir si se implementa ahora o se mantiene el esquema actual.
+
+2. Ejecutar chequeo global de historias asignadas a Fernando:
+   - Listar todas las stories asignadas en board.
+   - Validar consistencia de status vs estado real de ejecucion.
+   - Confirmar comentarios y trazabilidad actualizados en cada historia.
+   - Identificar brechas pendientes por historia.
+
+3. Iniciar frente de Fase de automatizacion:
+   - Revisar prerequisitos/configuraciones adicionales necesarias.
+   - Definir setup minimo para comenzar automatizacion sobre tests `Candidate`.
+   - Preparar plan de entrada a la fase (alcance inicial + dependencias).
+
 ## Reinicio rapido (2026-04-22)
+
+### Handoff exacto para continuar manana (2026-05-03)
+
+#### Lo que SI quedo completado hoy
+
+- Jira live validado contra tenant correcto: `https://upexgalaxy67.atlassian.net`.
+- Estado live de historias asignadas a Fernando al cierre de sesion:
+  - `QA Approved`: `SQ-54`, `SQ-56`, `SQ-57`, `SQ-58`
+  - `In Test`: `SQ-47`, `SQ-49`, `SQ-53`
+- Cola secundaria revisada y excluida de ejecucion por estado/asignacion:
+  - `SQ-48`: `BLOCKED` (assignee `Ely`)
+  - `SQ-50`: `BLOCKED` (assignee `Ely`)
+- Fase 11 ejecutada para `SQ-54/56/57/58` en esquema Jira+Xray:
+  - Test Set creado: `SQ-196`
+  - Tests creados: `SQ-197`..`SQ-205`
+  - Tests vinculados a stories correspondientes.
+- Comentarios QA publicados en Jira:
+  - Fase 11: `SQ-54`, `SQ-56`, `SQ-57`, `SQ-58`
+  - Retest update: `SQ-47`, `SQ-49`, `SQ-53`
+- Reportes locales creados:
+  - `docs/qa/fase11-sq54-58-2026-05-02.md`
+  - `docs/qa/retest-trifuerza-sq47-49-53-2026-05-02.md`
+
+#### Lo que quedo pendiente (bloqueantes reales)
+
+1. **GitHub auth para crear PR con `gh`**
+   - Push de rama ya hecho: `origin/test/SQ-54-58-fase11-and-retest`.
+   - PR no creado por scopes insuficientes del token (`public_repo` faltante).
+   - Error recibido: `createPullRequest requires public_repo`.
+
+2. **Retest funcional completo de `SQ-47`, `SQ-49`, `SQ-53`**
+   - Solo se ejecuto pase parcial (smoke UI + API auth-guard + DB connectivity).
+   - Falto sesion autenticada y dataset deterministico por historia.
+
+#### Checklist de arranque manana (orden recomendado)
+
+1. **Arreglar GitHub CLI auth** (primero)
+   - Ejecutar localmente:
+     - `gh auth logout`
+     - `gh auth login`
+   - Metodo recomendado: browser login en `GitHub.com` via `HTTPS`.
+   - Verificar:
+     - `gh auth status`
+   - Si usan token manual:
+     - Crear token con permiso `repo` (classic) o `Pull requests: Read/Write` + `Contents: Read/Write` (fine-grained en repo `upex-galaxy/upex-soloq`).
+     - `gh auth login --with-token`.
+
+2. **Crear PR pendiente** (despues de auth)
+   - Desde rama actual `test/SQ-54-58-fase11-and-retest`.
+   - Base: `staging`.
+   - Reusar body preparado en:
+     - `C:\Users\elcui\AppData\Local\Temp\opencode\pr-body-sq54-58.md`
+   - Comando:
+     - `gh pr create --base staging --title "test(SQ-54,SQ-56,SQ-57,SQ-58): fase 11 + retest trifuerza status update" --body-file "C:\Users\elcui\AppData\Local\Temp\opencode\pr-body-sq54-58.md"`
+
+3. **Preparar dataset para retest completo**
+   - Definir/crear usuario(s) y datos minimos:
+     - `SQ-47`: usuario con `0` invoices.
+     - `SQ-49`: usuario con invoices `sent/overdue` y montos conocidos para validar `pending total`.
+     - `SQ-53`: al menos 1 invoice apta para `mark as paid`.
+   - Confirmar credenciales QA de staging para login UI.
+
+4. **Ejecutar retest Trifuerza full (SQ-47/49/53)**
+   - UI: escenarios pendientes de comentarios.
+   - API: endpoints de negocio autenticados (no solo 401).
+   - DB: validacion de persistencia/consistencia por AC.
+   - Publicar comentario final por story y decidir transicion (`QA Approved` o mantener `In Test`).
+
+#### Estado git al cierre (importante)
+
+- Rama activa: `test/SQ-54-58-fase11-and-retest`.
+- Commit ya creado con cambios de esta sesion: `9883480`.
+- Hay cambios locales **no relacionados** que NO se tocaron ni se incluyeron:
+  - `.env.example`, `README.md`, `docs/mcp/builder-strategy.md`, `package.json`, `scripts/mcp-builder.js`, `scripts/sync-opencode-mcp.js`.
+
+#### Nota operativa
+
+- No compartir tokens en chat. Autenticar `gh` localmente y luego continuar con PR + retest.
 
 ### Retoma operativa (2026-05-02)
 

@@ -307,6 +307,12 @@ See [Context Engineering Guide](.context/context-engineering.md) for details.
 
 ### MCP Integration (OpenCode)
 
+Single source of truth for OpenCode:
+
+- Set `MCP_FILE='opencode.json'` in `.env`.
+- Keep `MCP_CATALOG_FILE='.mcp.catalog.json'` (or your chosen catalog).
+- `bun ai <profile>` will now update only the `mcp` section in `opencode.json` and preserve keys like `$schema` and `plugin`.
+
 Load only the MCPs needed for your current task:
 
 ```bash

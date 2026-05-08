@@ -10,6 +10,8 @@
     "typecheck": "tsc --noEmit",
     "ai": "bun scripts/mcp-builder.js",
     "ai:check": "bun scripts/mcp-builder.js check",
+    "ai:sync-opencode": "bun scripts/sync-opencode-mcp.js",
+    "opencode": "opencode",
     "up": "bun cli/update-template.js",
     "kata:manifest": "bun scripts/kata-manifest.ts",
     "api:sync": "bun cli/sync-openapi.ts",

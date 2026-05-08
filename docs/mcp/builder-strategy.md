@@ -148,10 +148,11 @@ User: node scripts/mcp-builder.js backend
 
 Pick your preferred CLI tool:
 
-| Tool       | Template File                        | Catalog File (you create)       | Config File (auto-generated) |
-| ---------- | ------------------------------------ | ------------------------------- | ---------------------------- |
-| **Gemini** | `templates/mcp/gemini.template.json` | `.gemini/settings.catalog.json` | `.gemini/settings.json`      |
-| **Claude** | `templates/mcp/claude.template.json` | `.mcp.catalog.json`             | `.mcp.json`                  |
+| Tool         | Template File                          | Catalog File (you create)       | Config File (auto-generated) |
+| ------------ | -------------------------------------- | ------------------------------- | ---------------------------- |
+| **Gemini**   | `templates/mcp/gemini.template.json`   | `.gemini/settings.catalog.json` | `.gemini/settings.json`      |
+| **Claude**   | `templates/mcp/claude.template.json`   | `.mcp.catalog.json`             | `.mcp.json`                  |
+| **OpenCode** | `templates/mcp/opencode.template.json` | `.mcp.catalog.json`             | `opencode.json`              |
 
 ### Step 2: Copy Template to Create Catalog
 
@@ -170,6 +171,13 @@ cp templates/mcp/gemini.template.json .gemini/settings.catalog.json
 ```bash
 # Copy template to create your catalog
 cp templates/mcp/claude.template.json .mcp.catalog.json
+```
+
+**For OpenCode**:
+
+```bash
+# Copy template to create your catalog
+cp templates/mcp/opencode.template.json .mcp.catalog.json
 ```
 
 ### Step 3: Add Your Real API Keys

@@ -47,6 +47,12 @@ const MCP_CHECKS = {
     critical: false,
     requirements: [],
   },
+  postman: {
+    critical: false,
+    requirements: [
+      { key: 'POSTMAN_API_KEY', path: ['environment', 'POSTMAN_API_KEY'] },
+    ],
+  },
 };
 
 // Perfiles predefinidos (refinados según tus sugerencias)
@@ -144,7 +150,7 @@ function getCatalogServers(catalog) {
 
 function runChecks() {
   const { config, source } = resolveCheckConfig();
-  const targets = ['atlassian', 'github', 'supabase', 'vercel', 'tavily'];
+  const targets = ['atlassian', 'github', 'supabase', 'vercel', 'tavily', 'postman'];
   let hasFailures = false;
 
   console.log('🔎 Verificando MCPs críticos...\n');
@@ -273,10 +279,21 @@ function generateMcpJson(selectedMcps, catalog) {
   const mcpServers = {};
   const servers = getCatalogServers(catalog);
   const rootKey = catalog.rootKey || 'mcpServers';
+  const isOpenCodeTarget = path.basename(mcpFile).toLowerCase() === 'opencode.json';
 
   // Si no hay MCPs seleccionados, generar vacío
   if (selectedMcps.length === 0) {
-    fs.writeFileSync(mcpFile, JSON.stringify({ [rootKey]: {} }, null, 2), 'utf8');
+    const emptyConfig = { [rootKey]: {} };
+
+    if (isOpenCodeTarget) {
+      const current = loadJsonIfExists(mcpFile) || {};
+      current[rootKey] = {};
+      fs.writeFileSync(mcpFile, JSON.stringify(current, null, 2), 'utf8');
+    }
+    else {
+      fs.writeFileSync(mcpFile, JSON.stringify(emptyConfig, null, 2), 'utf8');
+    }
+
     console.log(`✅ ${MCP_FILE} generado (vacío)`);
     return;
   }
@@ -288,8 +305,17 @@ function generateMcpJson(selectedMcps, catalog) {
 
   const config = { [rootKey]: mcpServers };
 
-  // Escribir nuevo .mcp.json
-  fs.writeFileSync(mcpFile, JSON.stringify(config, null, 2), 'utf8');
+  // Escribir config activa MCP
+  // Si el target es opencode.json, preservamos claves no-MCP como $schema/plugin.
+  if (isOpenCodeTarget) {
+    const current = loadJsonIfExists(mcpFile) || {};
+    current[rootKey] = mcpServers;
+    fs.writeFileSync(mcpFile, JSON.stringify(current, null, 2), 'utf8');
+  }
+  else {
+    fs.writeFileSync(mcpFile, JSON.stringify(config, null, 2), 'utf8');
+  }
+
   console.log(`✅ ${MCP_FILE} generado`);
   console.log(`📊 MCPs activos: ${selectedMcps.join(', ')}`);
   console.log(`📈 Total: ${selectedMcps.length} MCPs`);

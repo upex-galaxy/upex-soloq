@@ -32,14 +32,12 @@ Execute exploratory testing directly on the database to verify data integrity, v
 
 **Capabilities Required:**
 
-| Capability                       | Tag                    | Required |
-| -------------------------------- | ---------------------- | -------- |
-| Execute SQL queries directly     | `[DB_TOOL]`            | Yes      |
-| Execute API calls for setup      | `[API_TOOL]`           | Optional |
-| Execute authenticated API flows  | `[API_TOOL]`           | Optional |
-| Bug creation                     | `[ISSUE_TRACKER_TOOL]` | Optional |
-
-> Resolved via respective tags — see Tool Resolution in CLAUDE.md
+| MCP/Capability      | Purpose                         | Required |
+| ------------------- | ------------------------------- | -------- |
+| `dbhub` / `sql`     | Execute SQL queries directly    | Yes      |
+| `openapi` (api)     | Execute API calls for setup     | Optional |
+| `postman`           | Execute authenticated API flows | Optional |
+| `atlassian`         | Bug creation                    | Optional |
 
 **Database Access:**
 

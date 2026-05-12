@@ -17,6 +17,7 @@ export interface RuntimePaymentRecord {
   payment_method?: string
   amount_received?: number
   payment_date?: string
+  notes?: string | null
 }
 
 type CreateInvoicePath = paths['/invoices']['post'];

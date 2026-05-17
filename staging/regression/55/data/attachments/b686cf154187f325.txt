@@ -1,0 +1,7 @@
+---- API OK: 201 - https://staging-upexsoloq.vercel.app/api/clients
+✅ [SQ-XXX] createClientSuccessfully - PASS (359ms)
+---- API OK: 201 - https://staging-upexsoloq.vercel.app/api/invoices
+---- API OK: 200 - https://staging-upexsoloq.vercel.app/api/invoices/4f56b395-e046-49d0-911d-f794a4354ae8/send
+---- API OK: 201 - https://staging-upexsoloq.vercel.app/api/invoices/4f56b395-e046-49d0-911d-f794a4354ae8/payments
+---- API OK: 200 - https://staging-upexsoloq.vercel.app/api/invoices/4f56b395-e046-49d0-911d-f794a4354ae8/revert-payment
+✅ [SQ-203] revertPaymentSuccessfully - PASS (1933ms)

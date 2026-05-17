@@ -1,0 +1,10 @@
+---- API OK: 201 - https://staging-upexsoloq.vercel.app/api/clients
+✅ [SQ-XXX] createClientSuccessfully - PASS (227ms)
+---- API OK: 201 - https://staging-upexsoloq.vercel.app/api/invoices
+---- API OK: 200 - https://staging-upexsoloq.vercel.app/api/invoices/3e72f652-1aaf-40f6-9af4-1a1158091675/send
+---- API NOK: 400 - https://staging-upexsoloq.vercel.app/api/invoices/3e72f652-1aaf-40f6-9af4-1a1158091675/payments
+---- API OK: 201 - https://staging-upexsoloq.vercel.app/api/invoices/3e72f652-1aaf-40f6-9af4-1a1158091675/payments
+❌ [SQ-202] validatePaymentDateRules - FAIL: expect(received).toBe(expected) // Object.is equality
+
+Expected: 400
+Received: 201

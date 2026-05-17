@@ -1,0 +1,13 @@
+---- API OK: 201 - https://staging-upexsoloq.vercel.app/api/clients
+✅ [SQ-XXX] createClientSuccessfully - PASS (223ms)
+---- API OK: 201 - https://staging-upexsoloq.vercel.app/api/invoices
+---- API OK: 200 - https://staging-upexsoloq.vercel.app/api/invoices/31d990a7-550e-453e-b272-88084d7a3e59/send
+---- API OK: 201 - https://staging-upexsoloq.vercel.app/api/invoices/31d990a7-550e-453e-b272-88084d7a3e59/payments
+✅ [SQ-197] registerPaymentMethodSuccessfully - PASS (1352ms)
+---- API OK: 201 - https://staging-upexsoloq.vercel.app/api/invoices
+---- API OK: 200 - https://staging-upexsoloq.vercel.app/api/invoices/6bf0c2f5-2cbc-4d73-b907-e1e55c19efb0/send
+---- API OK: 201 - https://staging-upexsoloq.vercel.app/api/invoices/6bf0c2f5-2cbc-4d73-b907-e1e55c19efb0/payments
+❌ [SQ-200] validatePaymentNotesLength - FAIL: expect(received).toBe(expected) // Object.is equality
+
+Expected: 400
+Received: 201

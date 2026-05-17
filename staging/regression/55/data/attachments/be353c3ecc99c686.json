@@ -1,0 +1,58 @@
+{
+  "data": {
+    "id": "8e9c1982-9f34-4bfb-be7a-3ec3ea8b04d2",
+    "invoice_number": "INV-2026-203783412",
+    "issue_date": "2026-05-17",
+    "due_date": "2030-12-31",
+    "status": "paid",
+    "notes": null,
+    "terms": null,
+    "subtotal": 1000,
+    "discount_type": null,
+    "discount_value": 0,
+    "tax_rate": 0,
+    "tax_amount": 0,
+    "total": 1000,
+    "currency": "USD",
+    "client": {
+      "id": "77b3fbe7-0c43-4439-af2b-ce8fea6dfe6a",
+      "name": "SQ Pay Client 1779054114459",
+      "email": "sq.pay.1779054114459@example.com",
+      "phone": null,
+      "tax_id": null,
+      "address": null,
+      "company": "SoloQ QA"
+    },
+    "items": [
+      {
+        "id": "aa42aac0-0ab3-49f3-b471-c483b015bc1e",
+        "description": "Service package",
+        "quantity": 1,
+        "unit_price": 1000,
+        "subtotal": 1000
+      }
+    ],
+    "business_profile": {
+      "business_name": "UPEX Staging Business",
+      "contact_email": "demo@soloq.app",
+      "contact_phone": "+525598765432",
+      "address": {
+        "city": "Ciudad de México",
+        "state": "CDMX",
+        "street": "Av. Reforma 123, Col. Centro",
+        "country": "MX",
+        "postal_code": "6600"
+      },
+      "tax_id": null,
+      "logo_url": "https://czuusjchqpgvanvbdrnz.supabase.co/storage/v1/object/public/logos/27f619da-56a0-4442-81cc-cc5b2e77f23f/1773417173710.png",
+      "default_terms": null
+    },
+    "payment_methods": [
+      {
+        "type": "bank_transfer",
+        "label": "BBVA México",
+        "value": "{\"bank_name\":\"BBVA\",\"account_number\":\"\",\"clabe\":\"012345678901234567\",\"cbu\":\"\"}"
+      }
+    ]
+  }
+}

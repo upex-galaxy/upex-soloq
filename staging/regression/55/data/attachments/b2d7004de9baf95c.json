@@ -1,0 +1,9 @@
+{
+  "data": {
+    "id": "3c1e6033-0400-4d7b-b63b-e0fb69954c2a",
+    "invoice_number": "INV-2026-203783410",
+    "status": "sent",
+    "sent_at": "2026-05-17T21:41:51.446+00:00",
+    "email_message_id": "c2affd96-d1a1-435f-870e-5d8353abba04"
+  }
+}

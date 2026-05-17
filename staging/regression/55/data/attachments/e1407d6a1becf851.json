@@ -1,0 +1,14 @@
+{
+  "clientId": "801f6f7a-de90-4c06-af45-3fc49688e98f",
+  "dueDate": "2030-12-31",
+  "items": [
+    {
+      "description": "Service package",
+      "quantity": 1,
+      "unitPrice": 1000
+    }
+  ],
+  "taxRate": 0,
+  "status": "draft",
+  "currency": "USD"
+}

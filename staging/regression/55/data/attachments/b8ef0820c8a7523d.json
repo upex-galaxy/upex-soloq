@@ -1,0 +1,7 @@
+{
+  "payment_method": "bank_transfer",
+  "amount_received": 1000,
+  "payment_date": "2026-05-17",
+  "reference": "SQ199-1779054097186",
+  "notes": "Line one\nLine two\nSpecial chars: !@#$%^&*()_+-=[]{}"
+}

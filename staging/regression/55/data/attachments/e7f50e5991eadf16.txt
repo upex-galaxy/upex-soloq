@@ -1,0 +1,5 @@
+---- API OK: 201 - https://staging-upexsoloq.vercel.app/api/clients
+✅ [SQ-XXX] createClientSuccessfully - PASS (224ms)
+---- API OK: 201 - https://staging-upexsoloq.vercel.app/api/invoices
+---- API NOK: 400 - https://staging-upexsoloq.vercel.app/api/invoices/6523f11f-aa10-46a5-8ce3-9bb177c43a13/payments
+---- API NOK: 404 - https://staging-upexsoloq.vercel.app/api/invoices/6523f11f-aa10-46a5-8ce3-9bb177c43a13/cancel

@@ -1,0 +1,11 @@
+{
+  "error": "Datos inválidos",
+  "details": {
+    "formErrors": [],
+    "fieldErrors": {
+      "payment_date": [
+        "Fecha inválida (YYYY-MM-DD)"
+      ]
+    }
+  }
+}

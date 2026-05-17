@@ -1,0 +1,42 @@
+{
+  "data": {
+    "id": "31d990a7-550e-453e-b272-88084d7a3e59",
+    "user_id": "27f619da-56a0-4442-81cc-cc5b2e77f23f",
+    "client_id": "801f6f7a-de90-4c06-af45-3fc49688e98f",
+    "invoice_number": "INV-2026-203783405",
+    "issue_date": "2026-05-17",
+    "due_date": "2030-12-31",
+    "status": "draft",
+    "currency": "USD",
+    "subtotal": 1000,
+    "discount_value": 0,
+    "discount_type": null,
+    "tax_rate": 0,
+    "tax_amount": 0,
+    "total": 1000,
+    "notes": null,
+    "reminder_count": 0,
+    "sent_at": null,
+    "paid_at": null,
+    "created_at": "2026-05-17T21:41:39.448719+00:00",
+    "updated_at": "2026-05-17T21:41:39.448719+00:00",
+    "deleted_at": null,
+    "terms": null,
+    "client": {
+      "id": "801f6f7a-de90-4c06-af45-3fc49688e98f",
+      "name": "SQ Pay Client 1779054098962",
+      "email": "sq.pay.1779054098962@example.com",
+      "company": "SoloQ QA",
+      "tax_id": null
+    },
+    "items": [
+      {
+        "id": "942efd51-dd73-4148-98a1-58692880b2c9",
+        "description": "Service package",
+        "quantity": 1,
+        "unit_price": 1000,
+        "subtotal": 1000
+      }
+    ]
+  }
+}

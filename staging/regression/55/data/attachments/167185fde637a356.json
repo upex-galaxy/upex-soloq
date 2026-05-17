@@ -1,0 +1,16 @@
+{
+  "data": {
+    "id": "9bb13d96-e86a-47c7-82e2-c42d169ab5aa",
+    "user_id": "27f619da-56a0-4442-81cc-cc5b2e77f23f",
+    "name": "SQ Pay Client 1779054094310",
+    "email": "sq.pay.1779054094310@example.com",
+    "company": "SoloQ QA",
+    "phone": null,
+    "address": null,
+    "tax_id": null,
+    "notes": null,
+    "created_at": "2026-05-17T21:41:34.482131+00:00",
+    "updated_at": "2026-05-17T21:41:34.482131+00:00",
+    "deleted_at": null
+  }
+}

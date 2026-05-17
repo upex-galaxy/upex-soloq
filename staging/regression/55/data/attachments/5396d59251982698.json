@@ -1,0 +1,44 @@
+{
+  "data": {
+    "pending_total": 25918.22,
+    "overdue_total": 13918.22,
+    "paid_this_month": 46000,
+    "overdue_count": 9,
+    "status_counts": {
+      "draft": 28,
+      "sent": 12,
+      "paid": 52,
+      "overdue": 9,
+      "cancelled": 0
+    },
+    "monthly_pending": 12000,
+    "trend_percentage": 9,
+    "trend_label": "up",
+    "chart_data": [
+      {
+        "month": "Dec 2025",
+        "paid": 0
+      },
+      {
+        "month": "Jan 2026",
+        "paid": 0
+      },
+      {
+        "month": "Feb 2026",
+        "paid": 0
+      },
+      {
+        "month": "Mar 2026",
+        "paid": 0
+      },
+      {
+        "month": "Apr 2026",
+        "paid": 42047.27
+      },
+      {
+        "month": "May 2026",
+        "paid": 46000
+      }
+    ]
+  }
+}

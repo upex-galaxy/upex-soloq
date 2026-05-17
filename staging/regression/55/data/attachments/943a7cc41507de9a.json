@@ -1,0 +1,7 @@
+{
+  "payment_method": "mercado_pago",
+  "amount_received": 1000,
+  "payment_date": "2026-05-17",
+  "reference": "SQ197-1779054092611",
+  "notes": "payment-method-persistence"
+}

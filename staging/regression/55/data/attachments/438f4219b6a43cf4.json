@@ -1,0 +1,13 @@
+{
+  "data": {
+    "id": "76c71933-aa44-47a0-af6a-21f7bdcd618f",
+    "invoice_id": "3e72f652-1aaf-40f6-9af4-1a1158091675",
+    "payment_method": "bank_transfer",
+    "amount_received": 1000,
+    "payment_date": "2026-05-18",
+    "reference": null,
+    "notes": null,
+    "created_at": "2026-05-17T21:41:46.493116+00:00",
+    "deleted_at": null
+  }
+}

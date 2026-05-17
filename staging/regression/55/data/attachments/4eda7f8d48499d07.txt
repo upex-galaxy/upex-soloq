@@ -1,0 +1,6 @@
+---- API OK: 201 - https://staging-upexsoloq.vercel.app/api/clients
+✅ [SQ-XXX] createClientSuccessfully - PASS (380ms)
+---- API OK: 201 - https://staging-upexsoloq.vercel.app/api/invoices
+---- API OK: 200 - https://staging-upexsoloq.vercel.app/api/invoices/deef9440-d031-4540-8134-3903d7c2ef2c/send
+---- API OK: 201 - https://staging-upexsoloq.vercel.app/api/invoices/deef9440-d031-4540-8134-3903d7c2ef2c/payments
+✅ [SQ-197] registerPaymentMethodSuccessfully - PASS (1360ms)

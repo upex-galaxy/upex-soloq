@@ -1,0 +1,13 @@
+{
+  "data": {
+    "id": "2621e6c1-2b2c-49bf-b756-3415279a2e81",
+    "invoice_id": "0c8ccdb0-897a-4104-b486-da93ccb372f8",
+    "payment_method": "wire_crypto",
+    "amount_received": 1000,
+    "payment_date": "2026-05-17",
+    "reference": null,
+    "notes": null,
+    "created_at": "2026-05-17T21:41:35.760849+00:00",
+    "deleted_at": null
+  }
+}

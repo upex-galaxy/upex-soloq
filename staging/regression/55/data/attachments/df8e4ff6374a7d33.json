@@ -1,0 +1,7 @@
+{
+  "payment_method": "bank_transfer",
+  "amount_received": 1500,
+  "payment_date": "2026-05-17",
+  "reference": "SQ211-PAY-1779054090213",
+  "notes": "Automated integration payment registration"
+}

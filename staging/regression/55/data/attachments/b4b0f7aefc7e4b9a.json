@@ -1,0 +1,13 @@
+{
+  "data": {
+    "id": "0f8e3d5a-520e-41e8-8a53-f41c020a93e4",
+    "invoice_id": "9a173511-2364-4ec7-9c8d-c63ecdbefca1",
+    "payment_method": "mercado_pago",
+    "amount_received": 1000,
+    "payment_date": "2026-05-17",
+    "reference": "SQ197-1779054092611",
+    "notes": "payment-method-persistence",
+    "created_at": "2026-05-17T21:41:34.169392+00:00",
+    "deleted_at": null
+  }
+}

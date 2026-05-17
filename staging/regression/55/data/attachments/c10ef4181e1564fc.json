@@ -1,0 +1,13 @@
+{
+  "data": {
+    "id": "e1c43f7b-14c4-44c3-ab74-9f068b3fd34c",
+    "invoice_id": "b47e6b0f-7f69-4b66-a5e0-6a0d2d5861e3",
+    "payment_method": "bank_transfer",
+    "amount_received": 1500,
+    "payment_date": "2026-05-17",
+    "reference": "SQ211-PAY-1779054090213",
+    "notes": "Automated integration payment registration",
+    "created_at": "2026-05-17T21:41:32.030282+00:00",
+    "deleted_at": null
+  }
+}

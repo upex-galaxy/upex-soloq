@@ -1,0 +1,58 @@
+{
+  "data": {
+    "id": "b47e6b0f-7f69-4b66-a5e0-6a0d2d5861e3",
+    "invoice_number": "INV-2026-203783401",
+    "issue_date": "2026-05-17",
+    "due_date": "2030-12-31",
+    "status": "paid",
+    "notes": null,
+    "terms": null,
+    "subtotal": 1500,
+    "discount_type": null,
+    "discount_value": 0,
+    "tax_rate": 0,
+    "tax_amount": 0,
+    "total": 1500,
+    "currency": "USD",
+    "client": {
+      "id": "5fef7f55-194a-47a6-b313-412690348046",
+      "name": "SQ211 Client 1779054090213",
+      "email": "sq211.client.1779054090213@example.com",
+      "phone": null,
+      "tax_id": null,
+      "address": null,
+      "company": "SoloQ QA"
+    },
+    "items": [
+      {
+        "id": "7e07d0f1-ac56-49a2-b09a-6cc645274128",
+        "description": "Integration service retainer",
+        "quantity": 1,
+        "unit_price": 1500,
+        "subtotal": 1500
+      }
+    ],
+    "business_profile": {
+      "business_name": "UPEX Staging Business",
+      "contact_email": "demo@soloq.app",
+      "contact_phone": "+525598765432",
+      "address": {
+        "city": "Ciudad de México",
+        "state": "CDMX",
+        "street": "Av. Reforma 123, Col. Centro",
+        "country": "MX",
+        "postal_code": "6600"
+      },
+      "tax_id": null,
+      "logo_url": "https://czuusjchqpgvanvbdrnz.supabase.co/storage/v1/object/public/logos/27f619da-56a0-4442-81cc-cc5b2e77f23f/1773417173710.png",
+      "default_terms": null
+    },
+    "payment_methods": [
+      {
+        "type": "bank_transfer",
+        "label": "BBVA México",
+        "value": "{\"bank_name\":\"BBVA\",\"account_number\":\"\",\"clabe\":\"012345678901234567\",\"cbu\":\"\"}"
+      }
+    ]
+  }
+}

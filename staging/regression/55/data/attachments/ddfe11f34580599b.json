@@ -1,0 +1,14 @@
+{
+  "clientId": "5fef7f55-194a-47a6-b313-412690348046",
+  "dueDate": "2030-12-31",
+  "items": [
+    {
+      "description": "Integration service retainer",
+      "quantity": 1,
+      "unitPrice": 1500
+    }
+  ],
+  "taxRate": 0,
+  "status": "draft",
+  "currency": "USD"
+}

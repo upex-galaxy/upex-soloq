@@ -1,0 +1,44 @@
+{
+  "id": "27f619da-56a0-4442-81cc-cc5b2e77f23f",
+  "aud": "authenticated",
+  "role": "authenticated",
+  "email": "demo@soloq.app",
+  "email_confirmed_at": "2026-02-17T01:17:30.209698Z",
+  "phone": "",
+  "confirmed_at": "2026-02-17T01:17:30.209698Z",
+  "recovery_sent_at": "2026-03-28T19:11:40.857477Z",
+  "last_sign_in_at": "2026-05-18T03:20:24.871924Z",
+  "app_metadata": {
+    "provider": "email",
+    "providers": [
+      "email"
+    ]
+  },
+  "user_metadata": {
+    "email": "demo@soloq.app",
+    "email_verified": true,
+    "phone_verified": false,
+    "sub": "27f619da-56a0-4442-81cc-cc5b2e77f23f"
+  },
+  "identities": [
+    {
+      "identity_id": "deef999f-7661-49de-8410-432ae71cc1da",
+      "id": "27f619da-56a0-4442-81cc-cc5b2e77f23f",
+      "user_id": "27f619da-56a0-4442-81cc-cc5b2e77f23f",
+      "identity_data": {
+        "email": "demo@soloq.app",
+        "email_verified": false,
+        "phone_verified": false,
+        "sub": "27f619da-56a0-4442-81cc-cc5b2e77f23f"
+      },
+      "provider": "email",
+      "last_sign_in_at": "2026-02-17T01:17:30.20428Z",
+      "created_at": "2026-02-17T01:17:30.204329Z",
+      "updated_at": "2026-02-17T01:17:30.204329Z",
+      "email": "demo@soloq.app"
+    }
+  ],
+  "created_at": "2026-02-17T01:17:30.173481Z",
+  "updated_at": "2026-05-18T03:20:24.876569Z",
+  "is_anonymous": false
+}

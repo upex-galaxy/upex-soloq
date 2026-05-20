@@ -1,13 +1,28 @@
 'use client';
 
-import { use } from 'react';
+import { use, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { ArrowLeft, Loader2, FileX } from 'lucide-react';
+import { ArrowLeft, Loader2, FileX, CheckCircle, Undo2, Send } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useInvoice } from '@/hooks/invoices/use-invoice';
+import { useRevertPayment } from '@/hooks/invoices';
+import { InvoiceStatusBadge } from '@/components/invoices/invoice-status-badge';
+import { MarkAsPaidDialog } from '@/components/invoices/mark-as-paid-dialog';
+import { SendInvoiceDialog } from '@/components/invoices/send-invoice-dialog';
+import { isInvoiceOverdue } from '@/lib/utils/overdue';
 
 // =============================================================================
 // Dynamic Imports - Avoid SSR issues with react-pdf
@@ -53,6 +68,10 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   const invoiceId = resolvedParams.id;
 
   const { data: invoice, isLoading, isError } = useInvoice(invoiceId);
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [revertDialogOpen, setRevertDialogOpen] = useState(false);
+  const [sendDialogOpen, setSendDialogOpen] = useState(false);
+  const revertPayment = useRevertPayment();
 
   // Loading state
   if (isLoading) {
@@ -124,6 +143,12 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
   }
 
   // Invoice found - show preview
+  const canSend = invoice.status === 'draft';
+  const canMarkAsPaid =
+    invoice.status === 'sent' ||
+    invoice.status === 'overdue' ||
+    isInvoiceOverdue(invoice.status, invoice.due_date);
+
   return (
     <div className="space-y-8" data-testid="invoice-detail-page">
       {/* Header */}
@@ -135,14 +160,56 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight" data-testid="invoice-number-title">
-              {invoice.invoice_number}
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold tracking-tight" data-testid="invoice-number-title">
+                {invoice.invoice_number}
+              </h1>
+              <InvoiceStatusBadge
+                status={
+                  isInvoiceOverdue(invoice.status, invoice.due_date)
+                    ? 'overdue'
+                    : (invoice.status ?? 'draft')
+                }
+              />
+            </div>
             <p className="text-muted-foreground">
               {invoice.client.name}
               {invoice.client.company && ` - ${invoice.client.company}`}
             </p>
           </div>
+        </div>
+        <div className="flex gap-2">
+          {canSend && (
+            <Button
+              onClick={() => setSendDialogOpen(true)}
+              data-testid="send-invoice-button"
+              className="shadow-sm hover:shadow-md transition-shadow"
+            >
+              <Send className="mr-2 h-4 w-4" />
+              Enviar Factura
+            </Button>
+          )}
+          {canMarkAsPaid && (
+            <Button
+              onClick={() => setPaymentDialogOpen(true)}
+              data-testid="mark-as-paid-button"
+              className="shadow-sm hover:shadow-md transition-shadow"
+            >
+              <CheckCircle className="mr-2 h-4 w-4" />
+              Marcar como Pagada
+            </Button>
+          )}
+          {invoice.status === 'paid' && (
+            <Button
+              variant="outline"
+              onClick={() => setRevertDialogOpen(true)}
+              disabled={revertPayment.isPending}
+              data-testid="revert-payment-button"
+            >
+              <Undo2 className="mr-2 h-4 w-4" />
+              Revertir Pago
+            </Button>
+          )}
         </div>
       </div>
 
@@ -152,6 +219,60 @@ export default function InvoiceDetailPage({ params }: InvoiceDetailPageProps) {
           <InvoicePreview invoice={invoice} />
         </CardContent>
       </Card>
+
+      {/* Mark as Paid Dialog */}
+      {canMarkAsPaid && (
+        <MarkAsPaidDialog
+          open={paymentDialogOpen}
+          onOpenChange={setPaymentDialogOpen}
+          invoiceId={invoice.id}
+          invoiceNumber={invoice.invoice_number}
+          invoiceTotal={invoice.total}
+          invoiceIssueDate={invoice.issue_date}
+          configuredMethods={invoice.payment_methods}
+        />
+      )}
+
+      {/* Send Invoice Dialog */}
+      {canSend && (
+        <SendInvoiceDialog
+          open={sendDialogOpen}
+          onOpenChange={setSendDialogOpen}
+          invoiceId={invoice.id}
+          invoiceNumber={invoice.invoice_number}
+          clientName={invoice.client.name}
+          clientEmail={invoice.client.email}
+        />
+      )}
+
+      {/* Revert Payment Confirmation Dialog */}
+      <AlertDialog open={revertDialogOpen} onOpenChange={setRevertDialogOpen}>
+        <AlertDialogContent data-testid="revert-payment-dialog">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Revertir Pago</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción revertirá el pago registrado para la factura {invoice.invoice_number}.
+              La factura volverá al estado pendiente. Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={revertPayment.isPending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                revertPayment.mutate(
+                  { invoiceId: invoice.id },
+                  { onSuccess: () => setRevertDialogOpen(false) }
+                );
+              }}
+              disabled={revertPayment.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="confirm-revert-button"
+            >
+              {revertPayment.isPending ? 'Revirtiendo...' : 'Revertir Pago'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

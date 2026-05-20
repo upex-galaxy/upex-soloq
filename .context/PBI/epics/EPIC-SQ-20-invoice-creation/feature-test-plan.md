@@ -786,7 +786,7 @@ Epic is considered "Done" from QA perspective when:
 
 1. Team discusses critical questions and ambiguities in refinement
 2. PO/Dev provide answers and clarifications
-3. QA begins test case design per story (use story-test-cases.md prompt)
+3. QA begins test case design per story (use acceptance-test-plan.md prompt)
 4. Team validates entry/exit criteria before sprint starts
 5. Dev starts implementation ONLY after critical questions resolved
 

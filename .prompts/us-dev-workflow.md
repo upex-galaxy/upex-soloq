@@ -41,12 +41,12 @@ El Acceptance Test Plan contiene los **test cases** que validan cada Acceptance 
 
 **Orden de busqueda (usar el primero que exista):**
 
-1. **Jira Comments** - Buscar en comentarios de la US usando `mcp__atlassian__jira_get_issue` con `comment_limit: 50`
+1. **Jira Comments** - Buscar en comentarios de la US usando `[ISSUE_TRACKER_TOOL]` para obtener el issue con `comment_limit: 50`
    - Buscar comentarios que contengan "Test Case", "TC-", "Scenario:", o tablas de test cases
    - Los QA suelen dejar el acceptance test plan como comentario durante Shift-Left
 
 2. **Jira Custom Field** - Campo `customfield_12400` ("Acceptance Test Plan (QA)🧪")
-   - Usar `mcp__atlassian__jira_get_issue` con `fields: "*all"` para obtener custom fields
+   - Usar `[ISSUE_TRACKER_TOOL]` para obtener el issue con `fields: "*all"` para obtener custom fields
    - Este campo contiene el plan de pruebas aprobado por QA
 
 3. **Archivo Local** (fallback) - Solo si Jira no tiene la informacion:
@@ -55,21 +55,15 @@ El Acceptance Test Plan contiene los **test cases** que validan cada Acceptance 
 
 **Ejemplo de obtencion desde Jira:**
 
-```javascript
-// Primero obtener issue con comentarios
-const issue = await mcp__atlassian__jira_get_issue({
-  issue_key: 'SQ-15',
-  fields: '*all',
-  comment_limit: 50,
-});
+```
+// Primero: usar [ISSUE_TRACKER_TOOL] para obtener el issue con comentarios
+//   issue_key: 'SQ-15', fields: '*all', comment_limit: 50
 
 // Buscar en comentarios primero
-const testPlanComment = issue.comments?.find(
-  c => c.body.includes('Test Case') || c.body.includes('TC-')
-);
+// Buscar comentarios que contengan 'Test Case' o 'TC-'
 
 // Si no hay en comentarios, buscar en custom field
-const testPlanField = issue.fields?.customfield_12400;
+// Revisar campo customfield_12400
 
 // Si ninguno existe, usar archivo local como fallback
 ```
@@ -127,10 +121,10 @@ El Epic {EPIC-{PROJECT_KEY}-N} no tiene los siguientes artefactos:
 
 **Acciones:**
 
-1. Obtener detalles de la US en Jira usando `mcp__atlassian__getJiraIssue`
+1. Obtener detalles de la US en Jira usando `[ISSUE_TRACKER_TOOL]` para leer el issue
 2. Verificar que el status sea `Ready For Dev`
 3. Si no esta en `Ready For Dev`, transitar al estado correcto
-4. Transitar a `In Progress` usando `mcp__atlassian__transitionJiraIssue`
+4. Transitar a `In Progress` usando `[ISSUE_TRACKER_TOOL]` para hacer la transicion del issue
 
 **Criterio de exito:** US en Jira con status `In Progress`
 
@@ -211,7 +205,7 @@ El Epic {EPIC-{PROJECT_KEY}-N} no tiene los siguientes artefactos:
 **Acciones:**
 
 1. Esperar ~30 segundos para que la automation se ejecute
-2. Verificar status de la US en Jira con `mcp__atlassian__getJiraIssue`
+2. Verificar status de la US en Jira con `[ISSUE_TRACKER_TOOL]` para leer el issue
 3. El status deberia ser `In Review` automaticamente
 
 **Si el status NO cambio:**
@@ -295,7 +289,7 @@ El Epic {EPIC-{PROJECT_KEY}-N} no tiene los siguientes artefactos:
 **Acciones:**
 
 1. Esperar ~30 segundos para que la automation se ejecute
-2. Verificar status de la US en Jira con `mcp__atlassian__getJiraIssue`
+2. Verificar status de la US en Jira con `[ISSUE_TRACKER_TOOL]` para leer el issue
 3. El status deberia ser `Ready For QA` automaticamente
 
 **Si el status NO cambio:**
@@ -314,7 +308,7 @@ El Epic {EPIC-{PROJECT_KEY}-N} no tiene los siguientes artefactos:
 **Acciones:**
 
 1. Identificar quien realizo el Shift-Left Testing (buscar en comentarios de Jira)
-2. Agregar comentario en Jira usando `mcp__atlassian__addCommentToJiraIssue`:
+2. Agregar comentario en Jira usando `[ISSUE_TRACKER_TOOL]` para agregar un comentario al issue:
 
    ```
    Feature implementada y desplegada en staging.

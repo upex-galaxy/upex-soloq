@@ -8,11 +8,24 @@
 
 ## Quick Summary
 
-1. **ATCs originate in Jira** as test cases during Stage 3 (Test Documentation)
+1. **ATCs originate in the TMS** as test cases during Stage 3 (Test Documentation)
 2. **ATCs are implemented in code** via the `@atc('TK-XXX')` decorator in KATA components
-3. **An ATC = one acceptance criterion** — a short, precise action with a verifiable outcome
+3. **A TC is defined by Precondition + Action** — all expected results from the same combination belong to the same TC
 4. **E2E and Integration tests combine multiple ATCs** into complete flows
-5. **Traceability is end-to-end**: Jira ticket ↔ `@atc` decorator ↔ test report ↔ back to Jira
+5. **Traceability is end-to-end**: TMS ticket ↔ `@atc` decorator ↔ test report ↔ back to TMS
+
+## Terminology
+
+Before diving in, clarify these terms — they are often confused:
+
+| Term | What It Is | What It Is NOT |
+|------|-----------|----------------|
+| **Test Ticket** | A **task tracking item** (like any Jira task) used to group and track the creation/automation of a set of TCs | NOT a test artifact. It's an organizational unit for project management |
+| **Test Case (TC)** | An individual acceptance test defined by a unique **Precondition + Action** combination, with one or more expected results | NOT defined by what it validates. Two checks on different panels from the same action = same TC |
+| **Test Scenario (TS)** | A multi-step flow that chains 2+ actions with intermediate verifications | NOT a single action with multiple assertions (that's a TC) |
+| **ATC** | The code implementation of a TC as a method with the `@atc` decorator | NOT a helper method (helpers are read-only, ATCs are actions) |
+
+**Key insight**: A test ticket is like a Jira task titled "Automate Monthly Statement page state tests." It contains 3-7 TCs. The ticket tracks the work; the TCs define what to test.
 
 ---
 
@@ -37,8 +50,8 @@ Each ATC:
 | Concept | What it is | Where it lives | Example |
 |---------|-----------|----------------|---------|
 | **ATC** | Single action + verification | `@atc('TK-XXX')` method in a Component | `authenticateSuccessfully()` |
-| **E2E Test** | Complete user journey combining multiple ATCs | `test()` block in a `.test.ts` file | Login → Navigate → Create Booking → Verify |
-| **Integration Test** | API endpoint chain (2-3 endpoints) | `test()` block in a `.test.ts` file | POST /bookings → GET /bookings → Assert |
+| **E2E Test** | Complete user journey combining multiple ATCs | `test()` block in a `.test.ts` file | Login → Navigate → Create Order → Verify |
+| **Integration Test** | API endpoint chain (2-3 endpoints) | `test()` block in a `.test.ts` file | POST /orders → GET /orders → Assert |
 
 ### Analogy: Xray Shared Steps
 
@@ -90,9 +103,43 @@ For full IQL details, see `docs/methodology/IQL-methodology.md`.
 
 ## 3. How to Define an ATC
 
-### Step 1: Start from User Story Acceptance Criteria
+### Step 1: Identify Unique Precondition + Action Combinations
 
-Each acceptance criterion is a potential ATC:
+**Do NOT start by listing assertions.** Start by identifying the **unique actions** a user performs under **different preconditions**. Each unique combination is a potential TC.
+
+```
+User Story: US-101 - User Authentication
+
+Step 1a: What are the user ACTIONS?
+  → Submit login form
+
+Step 1b: What PRECONDITIONS create different behaviors?
+  → Valid credentials (active account)          → TC: authenticateSuccessfully
+  → Invalid credentials (wrong email/password)  → TC: loginWithInvalidCredentials
+  → Valid credentials but account locked         → TC: loginWithLockedAccount
+```
+
+Each TC above has a different precondition that produces a different system behavior. That's why they are separate TCs.
+
+**What about multiple assertions?** Each TC should list ALL expected outputs:
+
+```
+TC: authenticateSuccessfully
+  Precondition: User has valid credentials and active account
+  Action: Submit login form
+  Expected Output:
+    - Redirect to dashboard
+    - Auth token is present in response
+    - User profile info is accessible via GET /auth/me
+    - Session cookie is set
+    - Welcome message shows user's name
+```
+
+All of these are assertions of the **same TC** because the precondition and action are identical.
+
+#### From Acceptance Criteria to TCs
+
+Each acceptance criterion maps to one or more TCs:
 
 ```
 User Story: US-101 - User Authentication
@@ -149,9 +196,9 @@ Prioritize ATCs by regression risk:
 
 | ATC Type | When to use | Example |
 |----------|------------|---------|
-| **Action ATC** | State-changing operation (POST, PUT, DELETE, form submit) | `createBookingSuccessfully` |
-| **Error ATC** | Same action but with invalid input → error response | `createBookingWithInvalidData` |
-| **NOT an ATC** | Read-only GET, single UI check, navigation alone | `getBookings()` → this is a **helper** |
+| **Action ATC** | State-changing operation (POST, PUT, DELETE, form submit) | `createOrderSuccessfully` |
+| **Error ATC** | Same action but with invalid input → error response | `createOrderWithInvalidData` |
+| **NOT an ATC** | Read-only GET, single UI check, navigation alone | `getOrders()` → this is a **helper** |
 
 **Key rule**: A simple GET endpoint is a **helper**, not an ATC. See `test-design-principles.md` for details.
 
@@ -163,7 +210,7 @@ Prioritize ATCs by regression risk:
 |-----------|-----------|---------|
 | `TS_ID` / `US_ID` | Test Set or User Story ID | `GX-150`, `US-101` |
 | `TC#` | Sequential number | `TC1`, `TC2` |
-| `CORE` | Main behavior (verb + object) | `successful login`, `booking creation` |
+| `CORE` | Main behavior (verb + object) | `successful login`, `order creation` |
 | `CONDITIONAL` | Unique condition | `with valid credentials`, `when data is invalid` |
 
 **Examples**:
@@ -178,6 +225,18 @@ Prioritize ATCs by regression risk:
 | `TC1: Validate successful login with valid credentials` | `authenticateSuccessfully(credentials)` |
 | `TC2: Validate authentication error when credentials are invalid` | `loginWithInvalidCredentials(credentials)` |
 | `TC3: Validate account lockout after 5 failed attempts` | `loginWithLockedAccount(credentials)` |
+
+### ID Management (Jira/Xray as Source of Truth)
+
+The canonical identifier for every TC is the ID generated by the TMS (Jira issue key or Xray test key — e.g., `UPEX-47`). This ID is what appears in:
+
+- The `@atc('UPEX-47')` decorator in code
+- The `test()` function name: `test('UPEX-47: should ... when ...')`
+- The spec.md heading: `### UPEX-47: Validate <CORE> <CONDITIONAL>`
+
+**Module prefixes** (e.g., `AUTH-`, `ORD-`) are used ONLY for local folder/file organization within `test-specs/` directories — they provide module context but are NOT the canonical ID. Example folder name: `AUTH-TC47-lockout-after-5-failed-attempts/`.
+
+**Workflow rule:** Every ATC must exist in Jira/Xray BEFORE it is implemented in code. The TC issue must be created first; the generated issue key is then used in the `@atc` decorator.
 
 ---
 
@@ -379,6 +438,7 @@ Example:
 | Anti-Pattern | Why it's wrong | Correct approach |
 |-------------|---------------|-----------------|
 | One ATC per field check | 6 ATCs checking 6 fields of same response | One ATC with multiple assertions |
+| Splitting by UI concern | 3 TCs for same action: "check panel A", "check panel B", "check panel C" | One TC with assertions for all panels |
 | GET-only ATC | A simple read is not an action | Make it a helper method |
 | Hardcoded test data | Data changes across environments | Use variables pattern |
 | ATC without Jira ticket | No traceability | Always create ticket first |
@@ -391,6 +451,7 @@ Example:
 ## References
 
 - **Test Design Principles** (source of truth for ATC rules): `.context/guidelines/TAE/test-design-principles.md`
+- **Test Spec Standards** (TC discovery, design, and documentation): `.context/guidelines/QA/test-spec-standards.md`
 - **KATA Architecture**: `.context/guidelines/TAE/kata-architecture.md`
 - **Automation Standards**: `.context/guidelines/TAE/automation-standards.md`
 - **IQL Methodology**: `docs/methodology/IQL-methodology.md`

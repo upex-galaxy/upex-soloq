@@ -834,7 +834,7 @@ Epic is considered "Done" from QA perspective when:
 
 1. Team discusses critical questions and ambiguities in refinement
 2. PO/Dev provide answers and clarifications
-3. QA begins test case design per story (use story-test-cases.md prompt)
+3. QA begins test case design per story (use acceptance-test-plan.md prompt)
 4. Team validates entry/exit criteria before sprint starts
 5. Dev starts implementation ONLY after critical questions resolved
 
@@ -1019,7 +1019,7 @@ Epic is considered "Done" from QA perspective when:
 
 5. **All:** Ensure all critical questions are answered
 6. **PO:** Approve or provide feedback on suggested improvements
-7. **QA:** Begin test case design for each story using `story-test-cases.md` prompt
+7. **QA:** Begin test case design for each story using `acceptance-test-plan.md` prompt
 8. **Team:** Validate entry criteria can be met for each story
 
 **During Epic Implementation:**
@@ -1189,7 +1189,7 @@ Epic Path: .context/PBI/epics/EPIC-UPEX-13-feature-name/
    - Review test strategy and estimates
    - Wait for PO/Dev answers before starting test case design
    - Prepare test environments and tools
-   - Begin test case design per story using `story-test-cases.md` prompt
+   - Begin test case design per story using `acceptance-test-plan.md` prompt
 
 4. **User (who executed the prompt) must:**
    - Share Jira epic link with team
@@ -1204,7 +1204,7 @@ Epic Path: .context/PBI/epics/EPIC-UPEX-13-feature-name/
 
 1. ✅ **Execute `feature-test-plan.md` prompt** for complete epic
 2. ⏸️ **Wait for feedback** from PO/Dev on critical questions
-3. ✅ **Execute `story-test-cases.md` prompt** for each individual story
+3. ✅ **Execute `acceptance-test-plan.md` prompt** for each individual story
 4. ⏸️ **Wait for feedback** from PO/Dev on each story
 5. ✅ **Begin sprint** only when all questions are resolved
 
@@ -1225,4 +1225,4 @@ Epic Path: .context/PBI/epics/EPIC-UPEX-13-feature-name/
 - ✅ Integration with Atlassian MCP
 - ✅ Test plan in comments (not separate artifacts)
 - ✅ Automatic epic refinement in Jira
-- ✅ Consistency with `story-test-cases.md` prompt
+- ✅ Consistency with `acceptance-test-plan.md` prompt

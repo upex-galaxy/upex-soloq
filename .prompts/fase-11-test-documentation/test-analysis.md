@@ -1,390 +1,394 @@
 # Test Analysis
 
-> Analizar el contexto completo de una User Story para identificar candidatos de pruebas de regresión.
+> Analyze the complete context of a User Story to identify regression test candidates.
+
+> **Note**: If you completed Stage 1 planning (`acceptance-test-plan.md`), the test analysis was already performed during shift-left testing. You can **skip this prompt** and proceed directly to `test-prioritization.md`. Use this prompt only if Stage 1 was skipped or if additional analysis is needed.
 
 ---
 
-## Propósito
+## Purpose
 
-Recopilar y analizar toda la información disponible sobre una funcionalidad para identificar qué escenarios deben convertirse en pruebas de regresión (manuales o automatizadas).
+Gather and analyze all available information about a feature to identify which scenarios should become regression tests (manual or automated).
 
-**⚠️ CONTEXTO CRÍTICO:**
+**CRITICAL CONTEXT:**
 
-La User Story ya está en estado **QA Approved**, lo que significa:
+The User Story is already in **QA Approved** status, which means:
 
-- ✅ Exploratory testing COMPLETADO
-- ✅ TODAS las pruebas YA PASARON
-- ✅ Los bugs encontrados YA SE CERRARON
-- ✅ La funcionalidad es ESTABLE
+- All exploratory testing COMPLETED
+- ALL tests ALREADY PASSED
+- Bugs found have BEEN CLOSED
+- The functionality is STABLE
 
-**NO estamos diseñando tests para ejecutar**. Estamos decidiendo **cuáles de las pruebas ya ejecutadas valen la pena mantener en regresión** para proteger contra cambios futuros.
+**We are NOT designing tests to execute**. We are deciding **which of the tests already executed are worth keeping in regression** to protect against future changes.
 
 ---
 
-## Pre-requisitos
+## Prerequisites
 
-**Cargar contexto obligatorio:**
+**Load required context:**
 
 ```
-Leer: .context/guidelines/QA/jira-test-management.md
+Read: .context/guidelines/QA/jira-test-management.md
 ```
 
-**Herramientas requeridas:**
+**Required tools:**
 
-- MCP Atlassian (para leer Jira)
-
----
-
-## Input Requerido
-
-Proveer **al menos uno** de los siguientes:
-
-1. **User Story ID** - Para análisis completo desde Jira
-2. **Epic ID** - Para análisis de múltiples stories
-3. **Exploratory session notes** - Path o contenido
+- `[ISSUE_TRACKER_TOOL]` (to read Jira)
 
 ---
 
-## Nomenclatura Obligatoria de Tests
+## Input Required
 
-**Formato:** `Validar <CORE> <CONDITIONAL>`
+Provide **at least one** of the following:
 
-| Componente    | Qué es                                       | Ejemplos                                             |
-| ------------- | -------------------------------------------- | ---------------------------------------------------- |
-| `CORE`        | El comportamiento principal (verbo + objeto) | `login exitoso`, `visualización de reviews`          |
-| `CONDITIONAL` | La condición que hace único este escenario   | `con credenciales válidas`, `cuando hay 10+ reseñas` |
+1. **User Story ID** - For complete analysis from Jira
+2. **Epic ID** - For analysis of multiple stories
+3. **Exploratory session notes** - Path or content
 
-**Ejemplos correctos:**
+---
 
-- ✅ `Validar visualización de reviews cuando el mentor tiene múltiples reseñas`
-- ✅ `Validar mensaje de error con opción de reintento cuando la API retorna 500`
-- ❌ `Empty state` (muy vago, no es un flujo)
-- ❌ `API error handling` (característica, no escenario)
-- ❌ `Mobile responsive` (transversal, no es test separado)
+## Required Test Nomenclature
 
-**Referencia completa:** `.context/guidelines/QA/jira-test-management.md`
+**Format:** `Validate <CORE> <CONDITIONAL>`
+
+| Component     | What it is                                         | Examples                                             |
+| ------------- | -------------------------------------------------- | ---------------------------------------------------- |
+| `CORE`        | The main behavior (verb + object)                  | `successful login`, `reviews display`                |
+| `CONDITIONAL` | The condition that makes this scenario unique      | `with valid credentials`, `when there are 10+ reviews` |
+
+**Correct examples:**
+
+- `Validate reviews display when mentor has multiple reviews`
+- `Validate error message with retry option when API returns 500`
+- `Empty state` (too vague, not a flow)
+- `API error handling` (feature, not scenario)
+- `Mobile responsive` (cross-cutting, not a separate test)
+
+**Complete reference:** `.context/guidelines/QA/jira-test-management.md`
 
 ---
 
 ## Workflow
 
-### Fase 1: Recopilar Contexto desde Jira
+### Phase 1: Gather Context from Jira
 
-**Usar MCP Atlassian para obtener:**
+**Obtain from issue tracker:**
 
 ```
-1. User Story completa:
-   Tool: mcp__atlassian__jira_get_issue
+[ISSUE_TRACKER_TOOL] Get Issue:
+  - issue: {STORY-ID}
+  - include: description, comments, linked issues
+```
+> Resolved via [ISSUE_TRACKER_TOOL] — see Tool Resolution in CLAUDE.md
+
+Extract the following:
+
+1. **Complete User Story:**
    - Summary, Description, Acceptance Criteria
-   - Status actual (debe ser QA Approved)
-   - Labels y componentes
+   - Current status (must be QA Approved)
+   - Labels and components
 
-2. Comentarios de la US:
-   Tool: mcp__atlassian__jira_get_issue (incluye comentarios)
-   - Notas de desarrollo
-   - Feedback de QA
-   - Discusiones técnicas
+2. **US Comments:**
+   - Development notes
+   - QA feedback
+   - Technical discussions
 
-3. Issues enlazadas:
-   - Bugs relacionados (is blocked by, causes) ← CRÍTICO para riesgo
+3. **Linked Issues:**
+   - Related bugs (is blocked by, causes) -- CRITICAL for risk
    - Sub-tasks
-   - Otras stories relacionadas (relates to)
-   - Tests existentes (is tested by)
+   - Other related stories (relates to)
+   - Existing tests (is tested by)
 
-4. Epic padre (si aplica):
-   - Contexto de negocio más amplio
-   - Otras stories del mismo epic
-```
+4. **Parent Epic (if applicable):**
+   - Broader business context
+   - Other stories from the same epic
 
-**Extraer de cada fuente:**
+**Extract from each source:**
 
-| Fuente            | Qué buscar                                 |
-| ----------------- | ------------------------------------------ |
-| Description       | Acceptance Criteria, reglas de negocio     |
-| Comentarios US    | Edge cases discutidos, decisiones técnicas |
-| Comentarios Bugs  | Problemas conocidos, áreas de riesgo       |
-| Sub-tasks         | Detalle de implementación                  |
-| Exploratory notes | Escenarios validados, observaciones        |
-
----
-
-### Fase 1.5: Recopilar Tests Ya Documentados
-
-**⚠️ IMPORTANTE:** NO inventar tests nuevos. Buscar los que YA existen:
-
-**Fuentes de tests existentes:**
-
-| Fuente                   | Path/Ubicación                                               | Qué contiene                        |
-| ------------------------ | ------------------------------------------------------------ | ----------------------------------- |
-| **Acceptance Test Plan** | `.context/PBI/epics/.../stories/.../acceptance-test-plan.md` | Test cases de Shift-Left            |
-| **Comentarios en Jira**  | Comentario "🧪 Acceptance Test Plan" en la US                | Test cases documentados             |
-| **Session Notes**        | Notas de exploratory testing                                 | Escenarios validados                |
-| **Bugs cerrados**        | Issues enlazadas con status CLOSED                           | Áreas que fallaron y se corrigieron |
-
-**Reutilizar nomenclatura existente:**
-
-Si un test ya fue documentado en Shift-Left como:
-
-```
-Validar visualización completa de reviews cuando el mentor tiene múltiples reseñas
-```
-
-Usar ESA MISMA nomenclatura en todo el análisis para mantener trazabilidad.
+| Source           | What to look for                             |
+| ---------------- | -------------------------------------------- |
+| Description      | Acceptance Criteria, business rules          |
+| US Comments      | Edge cases discussed, technical decisions    |
+| Bug Comments     | Known issues, risk areas                     |
+| Sub-tasks        | Implementation details                       |
+| Exploratory notes| Validated scenarios, observations            |
 
 ---
 
-### Fase 2: Separar Características Transversales vs Escenarios Reales
+### Phase 1.5: Gather Already Documented Tests
 
-**⚠️ CRÍTICO:** Antes de listar escenarios, identificar qué es un TEST REAL vs qué es una CARACTERÍSTICA que se valida DENTRO de los tests.
+**IMPORTANT:** DO NOT invent new tests. Look for ones that ALREADY exist:
 
-#### Características Transversales (NO son tests separados)
+**Sources of existing tests:**
 
-Estas se validan **DENTRO** de cada test, no como tests independientes:
+| Source                   | Path/Location                                                | What it contains                   |
+| ------------------------ | ------------------------------------------------------------ | ---------------------------------- |
+| **Acceptance Test Plan** | `.context/PBI/epics/.../stories/.../acceptance-test-plan.md` | Test cases from Shift-Left         |
+| **Jira Comments**        | Comment "Acceptance Test Plan" in the US                     | Documented test cases              |
+| **Session Notes**        | Exploratory testing notes                                    | Validated scenarios                |
+| **Closed Bugs**          | Linked issues with status CLOSED                             | Areas that failed and were fixed   |
 
-| Característica        | Cómo se valida                                         | Ejemplo                                 |
-| --------------------- | ------------------------------------------------------ | --------------------------------------- |
-| **Mobile responsive** | Ejecutar cada test en viewport mobile Y desktop        | No crear test "Mobile responsive"       |
-| **XSS prevention**    | Incluir datos con caracteres especiales en test data   | No crear test "XSS prevention"          |
-| **Performance**       | Medir tiempo de carga en cada test                     | No crear test "Performance"             |
-| **Accesibilidad**     | Assertions de a11y en tests UI                         | No crear test "Accessibility"           |
-| **API contract**      | Verificar responses en cada test con API               | No crear test "API validation"          |
-| **Error handling**    | Validar como parte de escenarios negativos específicos | No crear test genérico "Error handling" |
+**Reuse existing nomenclature:**
 
-#### Escenarios Reales (SÍ son tests)
+If a test was already documented in Shift-Left as:
 
-Un escenario real es un **FLUJO de usuario** con:
+```
+Validate complete reviews display when mentor has multiple reviews
+```
 
-- Objetivo de negocio claro
-- Inicio, acción y resultado verificable
-- Nomenclatura: `Validar <CORE> <CONDITIONAL>`
-
-**Ejemplo de separación:**
-
-| ❌ Característica (NO es test) | ✅ Escenario Real (SÍ es test)                                     |
-| ------------------------------ | ------------------------------------------------------------------ |
-| `Empty state`                  | `Validar mensaje informativo cuando el mentor no tiene reseñas`    |
-| `API error handling`           | `Validar mensaje de error con reintento cuando la API retorna 500` |
-| `Mobile responsive`            | Se valida ejecutando TODOS los tests en mobile                     |
-| `Pagination`                   | `Validar navegación entre páginas cuando hay más de 10 reseñas`    |
+Use THAT SAME nomenclature throughout the analysis to maintain traceability.
 
 ---
 
-### Fase 2.5: Clasificar Escenarios Identificados
+### Phase 2: Separate Cross-Cutting Characteristics vs Real Scenarios
 
-**Para cada escenario REAL encontrado, clasificar:**
+**CRITICAL:** Before listing scenarios, identify what is a REAL TEST vs what is a CHARACTERISTIC validated WITHIN tests.
 
-#### Por Prioridad de Negocio
+#### Cross-Cutting Characteristics (NOT separate tests)
 
-| Clasificación | Criterios                            |
-| ------------- | ------------------------------------ |
-| **Critical**  | Flujo core de negocio, alto impacto  |
-| **High**      | Feature importante, uso frecuente    |
-| **Medium**    | Feature secundaria, impacto moderado |
-| **Low**       | Edge case, uso raro                  |
+These are validated **WITHIN** each test, not as independent tests:
 
-#### Por Automatizabilidad
+| Characteristic        | How it's validated                                 | Example                           |
+| --------------------- | -------------------------------------------------- | --------------------------------- |
+| **Mobile responsive** | Execute each test in mobile AND desktop viewports  | Don't create "Mobile responsive" test |
+| **XSS prevention**    | Include data with special characters in test data  | Don't create "XSS prevention" test |
+| **Performance**       | Measure load time in each test                     | Don't create "Performance" test   |
+| **Accessibility**     | A11y assertions in UI tests                        | Don't create "Accessibility" test |
+| **API contract**      | Verify responses in each API test                  | Don't create "API validation" test|
+| **Error handling**    | Validate as part of specific negative scenarios    | Don't create generic "Error handling" test |
 
-| Automatizable              | No Automatizable       |
-| -------------------------- | ---------------------- |
-| Resultados determinísticos | Requiere juicio humano |
-| Locators/APIs estables     | Solo validación visual |
-| Pasos repetibles           | Setup complejo/manual  |
-| Assertions claras          | Integraciones terceros |
-| Pocas dependencias         | Datos muy dinámicos    |
+#### Real Scenarios (ARE tests)
 
-#### Por Tipo de Test
+A real scenario is a **USER FLOW** with:
 
-| Tipo            | Descripción                           | Ejemplo                       |
-| --------------- | ------------------------------------- | ----------------------------- |
-| **E2E**         | Flujo completo de usuario             | Login → Compra → Confirmación |
-| **Integration** | Comunicación entre sistemas/APIs      | API Auth → API Productos      |
-| **Functional**  | Funcionalidad específica aislada      | Validación de formulario      |
-| **Smoke**       | Verificación básica de funcionamiento | App carga, login funciona     |
+- Clear business objective
+- Start, action, and verifiable result
+- Nomenclature: `Validate <CORE> <CONDITIONAL>`
 
-#### Detección de Necesidad E2E/Integration
+**Separation example:**
 
-**Preguntar:**
-
-1. ¿Esta story es parte de un flujo más grande que cruza múltiples módulos?
-   - SÍ → Considerar test E2E que integre con otras stories
-
-2. ¿Esta story consume o provee APIs que otras features usan?
-   - SÍ → Considerar test de Integration
-
-3. ¿Esta story es atómica y autocontenida?
-   - SÍ → Solo tests Functional/Smoke
+| Characteristic (NOT a test)    | Real Scenario (IS a test)                                      |
+| ------------------------------ | -------------------------------------------------------------- |
+| `Empty state`                  | `Validate informative message when mentor has no reviews`      |
+| `API error handling`           | `Validate error message with retry when API returns 500`       |
+| `Mobile responsive`            | Validated by executing ALL tests in mobile                     |
+| `Pagination`                   | `Validate navigation between pages when there are 10+ reviews` |
 
 ---
 
-### Fase 3: Identificar Componentes Reutilizables
+### Phase 2.5: Classify Identified Scenarios
 
-**Concepto "Lego":** Cada test atómico puede ser componente de tests más grandes.
+**For each REAL scenario found, classify:**
+
+#### By Business Priority
+
+| Classification | Criteria                              |
+| -------------- | ------------------------------------- |
+| **Critical**   | Core business flow, high impact       |
+| **High**       | Important feature, frequent usage     |
+| **Medium**     | Secondary feature, moderate impact    |
+| **Low**        | Edge case, rare usage                 |
+
+#### By Automatability
+
+| Automatable                | Not Automatable            |
+| -------------------------- | -------------------------- |
+| Deterministic outcomes     | Requires human judgment    |
+| Stable locators/APIs       | Visual-only validation     |
+| Repeatable steps           | Complex/manual setup       |
+| Clear assertions           | Third-party integrations   |
+| Few dependencies           | Very dynamic data          |
+
+#### By Test Type
+
+| Type            | Description                    | Example                        |
+| --------------- | ------------------------------ | ------------------------------ |
+| **E2E**         | Complete user flow             | Login → Purchase → Confirmation|
+| **Integration** | Communication between systems  | Auth API → Products API        |
+| **Functional**  | Specific isolated functionality| Form validation                |
+| **Smoke**       | Basic functionality check      | App loads, login works         |
+
+#### E2E/Integration Detection
+
+**Ask:**
+
+1. Is this story part of a larger flow that crosses multiple modules?
+   - YES → Consider E2E test that integrates with other stories
+
+2. Does this story consume or provide APIs that other features use?
+   - YES → Consider Integration test
+
+3. Is this story atomic and self-contained?
+   - YES → Only Functional/Smoke tests
+
+---
+
+### Phase 3: Identify Reusable Components
+
+**"Lego" Concept:** Each atomic test can be a component of larger tests.
 
 ```
-Analizar si el escenario:
+Analyze if the scenario:
 
-1. Es un COMPONENTE de un flujo E2E más grande
-   Ejemplo: "Login exitoso" → componente de "Flujo de compra completo"
+1. Is a COMPONENT of a larger E2E flow
+   Example: "Successful login" → component of "Complete checkout flow"
 
-2. Puede REUTILIZAR componentes existentes
-   Ejemplo: Test de "Editar perfil" puede reutilizar "Login exitoso"
+2. Can REUSE existing components
+   Example: "Edit profile" test can reuse "Successful login"
 
-3. Es un flujo E2E COMPLETO que agrupa varios componentes
-   Ejemplo: "Checkout completo" = Login + Carrito + Pago + Confirmación
+3. Is a COMPLETE E2E flow that groups several components
+   Example: "Complete checkout" = Login + Cart + Payment + Confirmation
 ```
 
-**Documentar relaciones:**
+**Document relationships:**
 
 ```
-Escenario: Login exitoso
-├── Tipo: Functional (atómico)
-├── Componente de: [Checkout E2E, Profile E2E, Admin E2E]
-└── Valor: Alto (reutilizable en múltiples flujos)
+Scenario: Successful login
+├── Type: Functional (atomic)
+├── Component of: [Checkout E2E, Profile E2E, Admin E2E]
+└── Value: High (reusable in multiple flows)
 ```
 
 ---
 
-### Fase 4: Generar Reporte de Análisis
+### Phase 4: Generate Analysis Report
 
 ```markdown
 # Test Analysis Report
 
 **User Story:** [STORY-XXX] [Summary]
 **Epic:** [EPIC-XXX] [Epic name]
-**Fecha:** [Date]
-**Analista:** AI Assistant
+**Date:** [Date]
+**Analyst:** AI Assistant
 
 ---
 
-## Fuentes Analizadas
+## Sources Analyzed
 
-| Fuente            | Issues/Docs         | Insights Clave           |
-| ----------------- | ------------------- | ------------------------ |
-| User Story        | STORY-XXX           | [Resumen de AC]          |
-| Comentarios US    | [N] comentarios     | [Edge cases mencionados] |
-| Bugs relacionados | BUG-XXX, BUG-YYY    | [Áreas de riesgo]        |
-| Exploratory notes | [Path o referencia] | [Escenarios validados]   |
-| Stories enlazadas | STORY-YYY           | [Contexto adicional]     |
+| Source           | Issues/Docs          | Key Insights              |
+| ---------------- | -------------------- | ------------------------- |
+| User Story       | STORY-XXX            | [AC summary]              |
+| US Comments      | [N] comments         | [Edge cases mentioned]    |
+| Related Bugs     | BUG-XXX, BUG-YYY     | [Risk areas]              |
+| Exploratory notes| [Path or reference]  | [Validated scenarios]     |
+| Linked Stories   | STORY-YYY            | [Additional context]      |
 
 ---
 
-## Escenarios Identificados
+## Identified Scenarios
 
 ### Critical Priority
 
-| #   | Escenario           | Tipo       | Automatizable | Componente de |
-| --- | ------------------- | ---------- | ------------- | ------------- |
-| 1   | [Login exitoso]     | Functional | Sí            | Checkout E2E  |
-| 2   | [Checkout completo] | E2E        | Sí            | -             |
+| #   | Scenario            | Type       | Automatable | Component of  |
+| --- | ------------------- | ---------- | ----------- | ------------- |
+| 1   | [Successful login]  | Functional | Yes         | Checkout E2E  |
+| 2   | [Complete checkout] | E2E        | Yes         | -             |
 
 ### High Priority
 
-| #   | Escenario             | Tipo        | Automatizable | Componente de |
-| --- | --------------------- | ----------- | ------------- | ------------- |
-| 3   | [Validación password] | Functional  | Sí            | Login         |
-| 4   | [Error en pago]       | Integration | Sí            | Checkout E2E  |
+| #   | Scenario              | Type        | Automatable | Component of  |
+| --- | --------------------- | ----------- | ----------- | ------------- |
+| 3   | [Password validation] | Functional  | Yes         | Login         |
+| 4   | [Payment error]       | Integration | Yes         | Checkout E2E  |
 
 ### Medium Priority
 
-| #   | Escenario       | Tipo       | Automatizable | Notas            |
-| --- | --------------- | ---------- | ------------- | ---------------- |
-| 5   | [Editar perfil] | Functional | Sí            | Flujo secundario |
+| #   | Scenario        | Type       | Automatable | Notes            |
+| --- | --------------- | ---------- | ----------- | ---------------- |
+| 5   | [Edit profile]  | Functional | Yes         | Secondary flow   |
 
 ### Low Priority / Deferred
 
-| #   | Escenario                   | Razón para Diferir |
-| --- | --------------------------- | ------------------ |
-| 6   | [Feature X raramente usada] | Uso < 1% usuarios  |
+| #   | Scenario                    | Reason to Defer        |
+| --- | --------------------------- | ---------------------- |
+| 6   | [Rarely used feature X]     | < 1% user usage        |
 
 ---
 
-## Mapa de Componentes (Lego)
-```
+## Component Map (Lego)
 
-E2E: Flujo de Compra Completo
-├── [1] Login exitoso (Functional)
-├── [NEW] Buscar producto (Functional)
-├── [NEW] Agregar al carrito (Functional)
-├── [4] Proceso de pago (Integration)
-└── [NEW] Confirmación de orden (Functional)
+E2E: Complete Purchase Flow
+├── [1] Successful login (Functional)
+├── [NEW] Search product (Functional)
+├── [NEW] Add to cart (Functional)
+├── [4] Payment process (Integration)
+└── [NEW] Order confirmation (Functional)
 
-E2E: Gestión de Perfil
-├── [1] Login exitoso (reutilizado)
-├── [5] Editar perfil (Functional)
-└── [NEW] Cambiar password (Functional)
-
-```
+E2E: Profile Management
+├── [1] Successful login (reused)
+├── [5] Edit profile (Functional)
+└── [NEW] Change password (Functional)
 
 ---
 
-## Resumen de Candidatos
+## Candidate Summary
 
-| Categoría                    | Cantidad |
-| ---------------------------- | -------- |
-| Total escenarios reales      | [N]      |
-| Características transversales| [N] (NO son tests)|
-| Candidatos regresión         | [N]      |
-| Con bugs previos (riesgo)    | [N]      |
-| Automatizables               | [N]      |
-| Manual-only                  | [N]      |
-| Diferidos                    | [N]      |
-
----
-
-## Análisis de Bugs Previos (Riesgo)
-
-**⚠️ CRÍTICO:** Los bugs cerrados indican áreas que fallaron antes y PUEDEN volver a fallar.
-
-| Bug ID | Descripción | Área Afectada | ¿Escenario relacionado? | ¿Mayor riesgo? |
-|--------|-------------|---------------|------------------------|----------------|
-| BUG-XXX | [Descripción] | [Área] | [Escenario #N] | SÍ/NO |
-
-**Regla:** Si un escenario está relacionado con un bug previo, tiene **mayor prioridad** para regresión.
+| Category                      | Count              |
+| ----------------------------- | ------------------ |
+| Total real scenarios          | [N]                |
+| Cross-cutting characteristics | [N] (NOT tests)    |
+| Regression candidates         | [N]                |
+| With prior bugs (risk)        | [N]                |
+| Automatable                   | [N]                |
+| Manual-only                   | [N]                |
+| Deferred                      | [N]                |
 
 ---
 
-## Recomendaciones
+## Prior Bug Analysis (Risk)
 
-### Para Priorización (siguiente paso):
+**CRITICAL:** Closed bugs indicate areas that failed before and CAN fail again.
 
-- Escenarios [X, Y] tienen bugs previos → Mayor prioridad
-- Escenario [Z] es flujo principal → Considerar
-- Escenarios [A, B, C] son edge cases → Probablemente diferir
+| Bug ID  | Description   | Affected Area | Related Scenario? | Higher Risk? |
+| ------- | ------------- | ------------- | ----------------- | ------------ |
+| BUG-XXX | [Description] | [Area]        | [Scenario #N]     | YES/NO       |
 
-### Áreas de Riesgo Detectadas:
+**Rule:** If a scenario is related to a prior bug, it has **higher priority** for regression.
 
-- [Área X] tuvo bugs previos (BUG-XXX) → **Incluir en regresión**
-- [Área Y] mencionada en comentarios como compleja → **Evaluar**
+---
 
-### Necesidad de Tests E2E/Integration:
+## Recommendations
 
-| ¿Necesita E2E? | Razón |
-|----------------|-------|
-| SÍ / NO | [Esta story es parte de flujo X que cruza Y y Z] |
+### For Prioritization (next step):
 
-| ¿Necesita Integration? | Razón |
-|------------------------|-------|
-| SÍ / NO | [Esta story consume/provee API X usada por Y] |
+- Scenarios [X, Y] have prior bugs → Higher priority
+- Scenario [Z] is main flow → Consider
+- Scenarios [A, B, C] are edge cases → Probably defer
+
+### Risk Areas Detected:
+
+- [Area X] had prior bugs (BUG-XXX) → **Include in regression**
+- [Area Y] mentioned in comments as complex → **Evaluate**
+
+### Need for E2E/Integration Tests:
+
+| Needs E2E? | Reason |
+| ---------- | ------ |
+| YES / NO   | [This story is part of flow X that crosses Y and Z] |
+
+| Needs Integration? | Reason |
+| ------------------ | ------ |
+| YES / NO           | [This story consumes/provides API X used by Y] |
 ```
 
 ---
 
-## Decisión Point
+## Decision Point
 
-Después del análisis, proceder a:
+After analysis, proceed to:
 
-| Resultado                       | Siguiente Paso             |
+| Result                          | Next Step                  |
 | ------------------------------- | -------------------------- |
-| Candidatos identificados        | → `test-prioritization.md` |
-| Sin candidatos (feature simple) | → Cerrar o ir a Fase 12    |
-| Necesita más exploración        | → Volver a Fase 10         |
+| Candidates identified           | → `test-prioritization.md` |
+| No candidates (simple feature)  | → Close or go to Stage 4   |
+| Needs more exploration          | → Return to Stage 2        |
 
 ---
 
 ## Output
 
-- Reporte de análisis con escenarios clasificados
-- Lista de candidatos de regresión
-- Mapa de componentes (relaciones lego)
-- Recomendaciones para priorización
-- Áreas de riesgo identificadas
+- Analysis report with classified scenarios
+- List of regression candidates
+- Component map (lego relationships)
+- Recommendations for prioritization
+- Identified risk areas

@@ -199,6 +199,34 @@ export type PaymentMethodValue =
   | OtherPaymentValue;
 
 // =============================================================================
+// Dashboard Types
+// =============================================================================
+
+/** Dashboard summary data from GET /api/invoices/dashboard */
+export interface MonthlyChartData {
+  month: string; // e.g. "Oct 2025"
+  paid: number;
+}
+
+export interface DashboardSummary {
+  pending_total: number;
+  overdue_total: number;
+  paid_this_month: number;
+  overdue_count: number;
+  status_counts: {
+    draft: number;
+    sent: number;
+    paid: number;
+    overdue: number;
+    cancelled: number;
+  };
+  monthly_pending: number;
+  trend_percentage: number | null; // null = no comparison available (first month or both zero)
+  trend_label: 'up' | 'down' | 'flat' | 'new' | null;
+  chart_data: MonthlyChartData[];
+}
+
+// =============================================================================
 // Constants (for UI selects, filters, etc.)
 // =============================================================================
 

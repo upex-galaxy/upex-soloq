@@ -1,6 +1,6 @@
 # KATA AI Guide
 
-> Entry point for AI agents to understand and implement KATA framework.
+> Entry point for AI agents to understand and implement KATA (Component Action Test Architecture).
 
 ---
 
@@ -8,7 +8,7 @@
 
 **What is KATA?**
 
-KATA (Komponent Action Test Architecture) is a test automation framework where:
+KATA (Component Action Test Architecture) is a test automation architecture where:
 
 - **ATCs** (Acceptance Test Cases) are **complete test steps**, NOT single clicks
 - Each ATC = **One unique expected output** (Equivalence Partitioning)
@@ -44,6 +44,9 @@ KATA (Komponent Action Test Architecture) is a test automation framework where:
 | Configure TMS integration          | `tms-integration.md`                                              |
 | Configure CI/CD                    | `ci-cd-integration.md`                                            |
 | Configure OpenAPI/MCP              | `openapi-integration.md`                                          |
+| Understand `@step` decorator       | `kata-architecture.md` (section 7)                                |
+| Understand ATC tracing & results   | `atc-tracing-system.md`                                           |
+| Debug ATC report or TMS sync       | `atc-tracing-system.md` (section 9)                               |
 | See existing components/ATCs       | Run `bun run kata:manifest`                                       |
 
 ---
@@ -244,19 +247,19 @@ These files are marked as **EXAMPLE COMPONENT** and demonstrate all KATA princip
 
 ```typescript
 // API test - no browser overhead
-test('TK-XXX: should get bookings', async ({ api }) => {
-  await api.bookings.getAll();
+test('TK-XXX: should get orders', async ({ api }) => {
+  await api.orders.getAll();
 });
 
 // E2E test - browser opens
-test('TK-XXX: should view bookings', async ({ ui }) => {
-  await ui.bookings.navigateTo();
+test('TK-XXX: should view orders', async ({ ui }) => {
+  await ui.orders.navigateTo();
 });
 
 // Hybrid - shared context between API and UI
 test('TK-XXX: should create via API and verify via UI', async ({ test: fixture }) => {
-  const booking = await fixture.api.bookings.create(data);
-  await fixture.ui.bookings.verifyExists(booking.id);
+  const order = await fixture.api.orders.create(data);
+  await fixture.ui.orders.verifyExists(order.id);
 });
 ```
 
@@ -265,7 +268,7 @@ test('TK-XXX: should create via API and verify via UI', async ({ test: fixture }
 All components receive `TestContextOptions`:
 
 ```typescript
-export class BookingsPage extends UiBase {
+export class OrdersPage extends UiBase {
   constructor(options: TestContextOptions) {
     super(options); // Pass to parent
   }
@@ -359,15 +362,17 @@ Phase 5: Validation & Git Commit
        Run tests, verify KATA compliance, push & PR
 ```
 
-### Key Tools Used
+### Key Capabilities
 
-| Tool                            | Purpose                        |
+| Capability                      | Tag                            |
 | ------------------------------- | ------------------------------ |
-| `mcp__playwright__*`            | UI exploration and interaction |
-| `mcp__atlassian__*`             | Fetch US from Jira             |
-| `Read/Write/Edit`               | File operations                |
-| `Glob/Grep`                     | Search codebase                |
-| `AskUserQuestion`               | Clarify requirements           |
+| UI exploration and interaction  | `[AUTOMATION_TOOL]`            |
+| Fetch US from issue tracker     | `[ISSUE_TRACKER_TOOL]`         |
+| File operations                 | `Read/Write/Edit`              |
+| Search codebase                 | `Glob/Grep`                    |
+| Clarify requirements            | `AskUserQuestion`              |
+
+> Resolved via [AUTOMATION_TOOL] / [ISSUE_TRACKER_TOOL] — see Tool Resolution in CLAUDE.md
 
 ---
 

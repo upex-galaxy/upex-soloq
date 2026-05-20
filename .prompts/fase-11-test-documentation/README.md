@@ -1,196 +1,294 @@
-# Fase 11: Test Documentation
+# Stage 4: Test Documentation & Prioritization
 
-## Propósito
-
-Documentación asincrónica de **ATCs (Acceptance Test Cases)** en Jira **DESPUÉS** de que la funcionalidad ha pasado exploratory testing.
-
-**Por qué existe esta fase:**
-
-- Las features se validan primero (feedback rápido)
-- La documentación ocurre cuando la feature es estable
-- Los ATCs se documentan para regresión (manual o automatizada)
-- Trazabilidad clara: **ATP (Fase 5) → ATCs (Fase 11) → KATA (Fase 12)**
-- Decisiones de automatización basadas en ROI
-
-**Conexión IQL:**
-Esta fase corresponde al **Step 6 del Mid-Game Testing** - donde los escenarios del ATP se convierten en ATCs formales.
+> **Purpose**: Prioritize Test Cases for regression and formally document candidates.
+> **When**: After Stage 3 (Reporting) is complete and the User Story is tested.
+> **Prerequisite**: All TCs created and tested in Stage 2, results reported in Stage 3.
 
 ---
 
-## Pre-requisitos
+## Overview
 
-- US status: "QA Approved" (exploratory testing pasado)
-- Exploratory session notes con escenarios validados
-- Acceso a herramientas:
-  - MCP Atlassian (obligatorio)
-  - Xray CLI (`bun xray`) si el proyecto usa Xray
+Stage 4 is an **asynchronous documentation phase** following IQL methodology. The User Story is already tested and approved — now we decide which Test Cases are worth maintaining in regression.
 
-**Contexto obligatorio:**
+**Key Principle:**
+> Not all tests belong in regression. Most TCs are one-time validations that won't protect against future regressions.
+
+This stage:
+1. **Evaluates** TCs with ROI analysis
+2. **Prioritizes** which TCs should be maintained
+3. **Documents** formal specifications only for candidates
+4. **Transitions** Workflow Status to Candidate/Manual
+
+**IQL Connection:**
+This stage corresponds to **Step 6 of Mid-Game Testing** — where scenarios from the ATP become formal ATCs.
+
+---
+
+## Prerequisites
+
+- US status: "QA Approved" (exploratory testing passed)
+- Exploratory session notes with validated scenarios
+- Access to tools:
+  - `[ISSUE_TRACKER_TOOL]` (required)
+  - `[TMS_TOOL]` if the project uses Xray
+
+**Required context:**
 
 ```
-Leer primero: .context/guidelines/QA/jira-test-management.md
+Read first: .context/guidelines/QA/jira-test-management.md
 ```
 
 ---
 
-## Prompts en Esta Fase
+## Prompts in This Stage
 
-| Orden | Prompt                   | Propósito                                      |
-| ----- | ------------------------ | ---------------------------------------------- |
-| 1     | `test-analysis.md`       | Analizar US, comentarios y contexto completo   |
-| 2     | `test-prioritization.md` | Calcular ROI y decidir path (Candidate/Manual) |
-| 3     | `test-documentation.md`  | Crear Tests en Jira, transitar workflow        |
+| Order | Prompt | Purpose |
+|-------|--------|---------|
+| 1 | `test-analysis.md` | Analyze US, comments, and complete context |
+| 2 | `test-prioritization.md` | Calculate ROI and decide path |
+| 3 | `test-documentation.md` | Create Tests in TMS, transit workflow |
 
 ---
 
-## Flujo de Ejecución
+## Workflow Status Transitions
+
+**This stage affects TC Workflow Status:**
+
+| Action | Workflow Status Transition |
+|--------|---------------------------|
+| TC evaluated, high ROI, automatable | Ready → **Candidate** |
+| TC evaluated, not automatable but needed | Ready → **Manual** |
+| TC evaluated, low ROI | Stays as Ready (deferred) |
+
+**Workflow Status Values:**
+
+| Status | Description |
+|--------|-------------|
+| **Draft** | TC created, minimal info |
+| **Ready** | TC has Name + AC + Status, tested |
+| **Candidate** | TC approved for automation, formally documented |
+| **Manual** | TC in manual regression (not automatable) |
+| **In Automation** | TC being automated (Stage 5) |
+| **In Review** | Automation PR created |
+| **Automated** | Automation merged and running |
+
+---
+
+## Prioritization Framework
+
+### ROI Formula
+
+```
+ROI = (Frequency × Impact × Stability) / (Effort × Dependencies)
+```
+
+### Decision Tree
+
+1. **Does it protect against FUTURE regressions?**
+   - NO → Defer (one-time validation)
+   - YES → Continue
+
+2. **Are there prior bugs related?**
+   - YES → Prioritize (higher risk)
+   - NO → Continue
+
+3. **Is ROI > 3.0?**
+   - YES → Candidate
+   - NO → Continue
+
+4. **Is it the main/critical flow?**
+   - YES → Consider 1 happy path test
+   - NO → Defer
+
+### Expected Outcome
+
+**Most TCs should be DEFERRED.** If more than 50% go to regression, review if being too permissive.
+
+Target per User Story:
+- Simple feature: 1-3 TCs for regression
+- Complex feature: 3-5 TCs for regression
+
+### Path Decisions (ROI Score)
+
+| ROI Score | Path | Final Status |
+|-----------|------|--------------|
+| > 1.5 | → Candidate | CANDIDATE |
+| 0.5 - 1.5 | → Evaluate / In Review | IN REVIEW |
+| < 0.5 | → Manual or Defer | MANUAL |
+
+---
+
+## Execution Flow
 
 ```
 US Status: QA Approved
         ↓
 [1] Test Analysis
-    ├── Leer US, comentarios, issues enlazadas (MCP Atlassian)
-    ├── Identificar escenarios de prueba
-    ├── Clasificar por tipo (E2E, Integration, Functional)
-    └── Mapear componentes reutilizables (Lego)
+    ├── Read US, comments, linked issues ([ISSUE_TRACKER_TOOL])
+    ├── Identify test scenarios
+    ├── Classify by type (E2E, Integration, Functional)
+    └── Map reusable components (Lego)
         ↓
 [2] Test Prioritization
-    ├── Calcular ROI por escenario
-    ├── Aplicar bonus por reutilización
-    ├── Decidir path: Candidate vs Manual vs Deferred
-    └── Ordenar por prioridad de implementación
+    ├── Calculate ROI per scenario
+    ├── Apply reusability bonus
+    ├── Decide path: Candidate vs Manual vs Deferred
+    └── Order by implementation priority
         ↓
 [3] Test Documentation
-    ├── Verificar modalidad (Jira nativo vs Xray)
-    ├── Verificar/crear épica de regresión
-    ├── Crear Tests (MCP Atlassian o Xray CLI)
-    ├── Vincular a User Story
-    └── Transitar workflow: Draft → In Design → Ready → [Manual|Candidate]
+    ├── Verify modality (native Jira vs Xray)
+    ├── Verify/create regression epic
+    ├── Create Tests ([ISSUE_TRACKER_TOOL] or [TMS_TOOL])
+    ├── Link to User Story
+    └── Transit workflow: Draft → In Design → Ready → [Manual|Candidate]
         ↓
 Output:
-    ├── Candidates → Fase 12: Test Automation
-    └── Manual → Suite de regresión manual
+    ├── Candidates → Stage 5: Test Automation
+    └── Manual → Manual regression suite
 ```
 
 ---
 
-## Modalidades de Test Management
+## Test Management Modalities
 
-### Pregunta Clave
+### Key Question
 
 ```
-¿El proyecto utiliza Xray como plugin?
+Does the project use Xray as a plugin?
 
-- SÍ → Xray CLI (`bun xray`) + MCP Atlassian
-- NO → Solo MCP Atlassian con Issue Type "Test"
+- YES → [TMS_TOOL] + [ISSUE_TRACKER_TOOL]
+- NO → Only [ISSUE_TRACKER_TOOL] with Issue Type "Test"
 ```
 
-### Herramientas por Modalidad
+### Tools by Modality
 
-| Modalidad   | Herramientas               |
-| ----------- | -------------------------- |
-| Jira nativo | MCP Atlassian              |
-| Jira + Xray | MCP Atlassian + `bun xray` |
+| Modality | Tools |
+|----------|-------|
+| Native Jira | `[ISSUE_TRACKER_TOOL]` |
+| Jira + Xray | `[ISSUE_TRACKER_TOOL]` + `[TMS_TOOL]` |
 
 ---
 
-## Workflow de ATCs
+## Test Classification
+
+| Type | Description | Automatable |
+|------|-------------|-------------|
+| **E2E** | Complete user flow | Yes |
+| **Integration** | Communication between systems | Yes |
+| **Functional** | Specific isolated functionality | Yes |
+| **Smoke** | Basic verification | Yes |
+| **Visual** | Visual validation | No (manual) |
+
+---
+
+## ATC Workflow
 
 ```
 DRAFT → IN DESIGN → READY → [MANUAL | IN REVIEW → CANDIDATE]
 
-Estados finales de regresión:
-- MANUAL: ATC para regresión manual
-- AUTOMATED: ATC automatizado con KATA (después de Fase 12)
+Final regression states:
+- MANUAL: ATC for manual regression
+- AUTOMATED: ATC automated with KATA (after Stage 5)
 ```
 
-**Trazabilidad KATA:** Cada ATC marcado como CANDIDATE usa el decorador `@atc('PROJECT-XXX')` en Fase 12.
+**KATA Traceability:** Each ATC marked as CANDIDATE uses the `@atc('PROJECT-XXX')` decorator in Stage 5.
 
-Referencia visual completa en: `.context/guidelines/QA/jira-test-management.md`
+Complete visual reference in: `.context/guidelines/QA/jira-test-management.md`
 
 ---
 
-## Épica de Regresión
+## Regression Epic
 
-**OBLIGATORIO:** Todos los tests deben pertenecer a una épica de regresión.
+**REQUIRED:** All tests must belong to a regression epic.
 
 ```
-Buscar: project = PROJ AND issuetype = Epic AND (summary ~ "regression" OR labels = "test-repository")
+Search: project = PROJ AND issuetype = Epic AND (summary ~ "regression" OR labels = "test-repository")
 
-Si no existe → Crear "{PROJECT} Test Repository"
-```
-
----
-
-## Clasificación de Tests
-
-| Tipo            | Descripción                           | Automatizable |
-| --------------- | ------------------------------------- | ------------- |
-| **E2E**         | Flujo completo de usuario             | Sí            |
-| **Integration** | Comunicación entre sistemas/APIs      | Sí            |
-| **Functional**  | Funcionalidad específica aislada      | Sí            |
-| **Smoke**       | Verificación básica de funcionamiento | Sí            |
-| **Visual**      | Validación visual                     | No (manual)   |
-
----
-
-## Decisiones de Path
-
-| ROI Score | Path                  | Status Final |
-| --------- | --------------------- | ------------ |
-| > 1.5     | → Candidate           | CANDIDATE    |
-| 0.5 - 1.5 | → Evaluar / In Review | IN REVIEW    |
-| < 0.5     | → Manual o Diferir    | MANUAL       |
-
----
-
-## Comandos Xray CLI
-
-```bash
-# Autenticación
-bun xray auth login --client-id "$XRAY_CLIENT_ID" --client-secret "$XRAY_CLIENT_SECRET"
-bun xray auth status
-
-# Crear test
-bun xray test create --project PROJ --summary "Test name" \
-  --step "Action|Expected"
-
-# Crear test Cucumber
-bun xray test create --project PROJ --type Cucumber \
-  --summary "Feature" --gherkin "Feature: X\n  Scenario: Y"
-
-# Listar tests
-bun xray test list --project PROJ
+If not exists → Create "{PROJECT} Test Repository"
 ```
 
 ---
 
-## Output de Esta Fase
+## TMS Action Reference
 
-- Tests creados en Jira como Issue Type "Test"
-- Tests vinculados a User Stories relacionadas
-- Tests dentro de Épica de Regresión
-- Estados transitados según workflow
-- Candidatos de automatización listos para Fase 12
-- Tests manuales en suite de regresión
+```
+# Authentication
+[TMS_TOOL] Authenticate
+
+# Create test (Manual)
+[TMS_TOOL] Create Test:
+  - project: {{PROJECT_KEY}}
+  - title: {per TC naming convention}
+  - type: Manual
+  - steps: {from test design}
+
+# Create test (Cucumber)
+[TMS_TOOL] Create Test:
+  - project: {{PROJECT_KEY}}
+  - title: {per TC naming convention}
+  - type: Cucumber
+  - gherkin: {from test design}
+
+# List tests
+[TMS_TOOL] List Tests:
+  - project: {{PROJECT_KEY}}
+```
+
+> See /xray-cli skill for current CLI syntax.
 
 ---
 
-## Siguiente Fase
+## Entry Criteria
 
-Para ATCs marcados como **Candidate**:
-
-- Proceder a **Fase 12: Test Automation**
-- Implementar ATCs siguiendo arquitectura KATA
-- Cada ATC se vincula con `@atc('PROJECT-XXX')` para trazabilidad
-
-**Conexión IQL:** Esta transición corresponde a los Steps 7-10 del Mid-Game Testing (evaluación, automatización, CI y PR).
+- [ ] Stage 3 completed (ATR filled, ticket tested)
+- [ ] All TCs in Ready status
+- [ ] No pending re-tests (all bugs fixed)
 
 ---
 
-## Documentación Relacionada
+## Exit Criteria
+
+- [ ] All TCs evaluated with ROI
+- [ ] Candidates identified and transitioned to "Candidate" status
+- [ ] Manual tests identified and transitioned to "Manual" status
+- [ ] Candidate TCs formally documented:
+  - Precondition (complete)
+  - Specification (step-by-step)
+  - Test Automation Plan (filled)
+
+---
+
+## Next Stage
+
+After completing Stage 4:
+
+**For Candidate TCs:**
+→ Proceed to **Stage 5: Automation** to implement automated tests
+
+**For Manual TCs:**
+→ Add to manual regression suite (run before releases)
+
+**For Deferred TCs:**
+→ No further action needed (validation already done)
+
+---
+
+## Output from This Stage
+
+- Tests created in TMS as Issue Type "Test"
+- Tests linked to related User Stories
+- Tests within Regression Epic
+- States transitioned according to workflow
+- Automation candidates ready for Stage 5
+- Manual tests in regression suite
+
+---
+
+## Related Documentation
 
 - **Guidelines:** `.context/guidelines/QA/jira-test-management.md`
 - **QA Workflow:** `.prompts/us-qa-workflow.md`
 - **KATA Guidelines:** `.context/guidelines/TAE/`
 - **TMS Integration:** `.context/guidelines/TAE/tms-integration.md`
+- **Stage 3 - Reporting:** `.prompts/fase-10-exploratory-testing/README.md`
+- **Stage 5 - Automation:** `.prompts/fase-12-test-automation/README.md`

@@ -25,7 +25,7 @@ This folder contains the guidelines for **general Quality Engineering**, focused
 | **Focus**        | Manual Testing           | Automated Testing          |
 | **Stages**       | 2, 3                     | 4                          |
 | **Activities**   | Exploratory, bugs, docs  | E2E, Integration, CI/CD    |
-| **Tools**        | Jira, manual browser     | Playwright, KATA framework |
+| **Tools**        | Jira, manual browser     | Playwright, KATA architecture |
 
 ---
 
@@ -37,6 +37,8 @@ This folder contains the guidelines for **general Quality Engineering**, focused
 | `jira-test-management.md`  | Test management in Jira                                 |
 | `spec-driven-testing.md`   | Spec-driven testing principle                           |
 | `atc-definition-strategy.md` | **How to define, name, and document ATCs** (QA↔TAE bridge) |
+| `test-spec-standards.md`  | **Test spec standards: TC discovery, design, and documentation** |
+| `test-hierarchy.md`       | **KATA test hierarchy: 5 levels from Module to ATC, doc↔code mapping** |
 
 **Note**: For `data-testid` usage in automation, see `TAE/data-testid-usage.md`.
 

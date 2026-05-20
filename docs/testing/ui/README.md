@@ -104,8 +104,6 @@ UI Testing es una de las tres capas del Trifuerza:
 
 ### Guidelines
 
-- `.context/guidelines/MCP/playwright.md` - Referencia rapida del MCP
-- `.context/guidelines/MCP/devtools.md` - Referencia rapida del MCP
 - `.context/guidelines/QA/exploratory-testing.md` - Tecnicas de exploracion
 
 ### Automatizacion (TAE)

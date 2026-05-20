@@ -1,50 +1,50 @@
-# Estrategia de Inyección de Dependencias KATA
+# KATA Dependency Injection Strategy
 
-> **Propósito:** Explica cómo los drivers de Playwright fluyen a través de la arquitectura KATA y por qué este diseño permite un rendimiento óptimo de tests.
+> **Purpose**: Explains how Playwright drivers flow through the KATA architecture and why this design enables optimal test performance.
 >
-> **Audiencia:** QA Engineers, Agentes de IA implementando componentes KATA.
+> **Audience**: QA Engineers, AI Agents implementing KATA components.
 >
-> **Prerrequisitos:** Leer `kata-fundamentals.md` para la filosofía KATA.
+> **Prerequisites**: Read `kata-fundamentals.md` for KATA philosophy.
 
 ---
 
-## Resumen
+## Overview
 
-KATA utiliza **inyección de dependencias basada en constructor** para propagar los drivers de Playwright (`page` y `request`) a través de la jerarquía de componentes. Este diseño, combinado con la **inicialización lazy de fixtures de Playwright**, asegura:
+KATA uses **constructor-based dependency injection** to propagate Playwright drivers (`page` and `request`) through the component hierarchy. This design, combined with **Playwright's lazy fixture initialization**, ensures:
 
-1. **Tests E2E** comparten el mismo contexto de navegador para operaciones UI y API
-2. **Tests solo API** nunca abren un navegador (cero overhead)
-3. **Componentes permanecen desacoplados** del sistema de fixtures de Playwright
+1. **E2E tests** share the same browser context for UI and API operations
+2. **API-only tests** never open a browser (zero overhead)
+3. **Components remain decoupled** from Playwright's fixture system
 
 ---
 
-## El Problema que Resuelve
+## The Problem This Solves
 
-### Anti-Patrón: Acceso Directo a Fixtures
+### Anti-Pattern: Direct Fixture Access
 
 ```typescript
-// MALO: Componente depende directamente del sistema de fixtures de Playwright
+// BAD: Component directly depends on Playwright fixture system
 class BookingsPage {
-  constructor(private page: Page) {} // ¿De dónde viene page?
+  constructor(private page: Page) {} // Where does page come from?
 }
 
-// El test debe cablear todo manualmente
+// Test must wire everything manually
 test('example', async ({ page }) => {
   const bookingsPage = new BookingsPage(page);
-  // ¿Qué pasa con las llamadas API? ¿Necesita otra instancia?
+  // What about API calls? Need another instance?
 });
 ```
 
-**Problemas:**
+**Issues:**
 
-- Componentes están acoplados a Playwright
-- No hay contexto compartido entre operaciones UI y API
-- Los tests se vuelven pesados en boilerplate
+- Components are tightly coupled to Playwright
+- No shared context between UI and API operations
+- Tests become boilerplate-heavy
 
-### Anti-Patrón: Inyección por Setter
+### Anti-Pattern: Setter Injection
 
 ```typescript
-// MALO: Patrón setter rompe la inmutabilidad
+// BAD: Setter pattern breaks immutability
 class ApiClient {
   private request?: APIRequestContext;
 
@@ -54,30 +54,30 @@ class ApiClient {
 }
 ```
 
-**Problemas:**
+**Issues:**
 
-- El objeto puede usarse antes de inicializarse
-- El estado mutable complica el debugging
-- No hay seguridad en tiempo de compilación
+- Object can be used before initialization
+- Mutable state complicates debugging
+- No compile-time safety
 
 ---
 
-## La Solución KATA
+## The KATA Solution
 
-### Principio Core: Único Punto de Entrada, Contexto Compartido
+### Core Principle: Single Entry Point, Shared Context
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                     Playwright Test Runner                          │
 │                                                                      │
 │  ┌─────────┐     ┌─────────┐                                        │
-│  │  page   │     │ request │  ← Playwright crea estos de forma lazy │
+│  │  page   │     │ request │  ← Playwright creates these lazily     │
 │  └────┬────┘     └────┬────┘                                        │
 │       │               │                                              │
 │       └───────┬───────┘                                              │
 │               ▼                                                      │
 │  ┌────────────────────────┐                                          │
-│  │   TestContextOptions   │  ← Interface para pasar drivers         │
+│  │   TestContextOptions   │  ← Interface for driver passing         │
 │  │  { page?, request? }   │                                          │
 │  └───────────┬────────────┘                                          │
 │              │                                                       │
@@ -85,45 +85,45 @@ class ApiClient {
                │
                ▼
 ┌──────────────────────────────────────────────────────────────────────┐
-│                        Arquitectura KATA                             │
+│                        KATA Architecture                             │
 │                                                                      │
 │  Layer 1: TestContext                                                │
 │  ┌────────────────────────────────────────────────────────────────┐  │
-│  │  _page?: Page          (almacenado, no usado directamente)     │  │
+│  │  _page?: Page          (stored, not used directly)             │  │
 │  │  _request?: APIRequestContext                                  │  │
-│  │  config, faker, env    (utilidades compartidas)                │  │
+│  │  config, faker, env    (shared utilities)                      │  │
 │  └────────────────────────────────────────────────────────────────┘  │
 │              │ extends                                               │
 │              ▼                                                       │
-│  Layer 2: Clases Base                                                │
+│  Layer 2: Base Classes                                               │
 │  ┌────────────────────────┐    ┌────────────────────────┐           │
 │  │       UiBase           │    │       ApiBase          │           │
 │  │  get page(): Page      │    │  get request(): API... │           │
-│  │  (valida + retorna)    │    │  (valida + retorna)    │           │
+│  │  (validates + returns) │    │  (validates + returns) │           │
 │  └────────────────────────┘    └────────────────────────┘           │
 │              │ extends                    │ extends                  │
 │              ▼                            ▼                          │
-│  Layer 3: Componentes (ATCs)                                         │
+│  Layer 3: Components (ATCs)                                          │
 │  ┌────────────────────────┐    ┌────────────────────────┐           │
 │  │     LoginPage          │    │     BookingsApi        │           │
 │  │     BookingsPage       │    │     InvoicesApi        │           │
-│  │  (usa this.page)       │    │  (usa this.request)    │           │
+│  │  (uses this.page)      │    │  (uses this.request)   │           │
 │  └────────────────────────┘    └────────────────────────┘           │
-│              │ compuesto por              │ compuesto por            │
+│              │ composed by                │ composed by              │
 │              ▼                            ▼                          │
 │  Layer 4: Fixtures                                                   │
 │  ┌────────────────────────┐    ┌────────────────────────┐           │
 │  │      UiFixture         │    │      ApiFixture        │           │
 │  │  .login, .bookings     │    │  .bookings, .invoices  │           │
 │  └────────────────────────┘    └────────────────────────┘           │
-│              │ combinado en               │                          │
+│              │ combined in                │                          │
 │              └──────────┬─────────────────┘                          │
 │                         ▼                                            │
 │  ┌────────────────────────────────────────────────────────────────┐  │
 │  │                    FullTestFixture                             │  │
 │  │  .ui  → UiFixture                                              │  │
 │  │  .api → ApiFixture                                             │  │
-│  │  .page → Acceso directo para assertions                        │  │
+│  │  .page → Direct access for assertions                          │  │
 │  └────────────────────────────────────────────────────────────────┘  │
 │                                                                      │
 └──────────────────────────────────────────────────────────────────────┘
@@ -131,11 +131,11 @@ class ApiClient {
 
 ---
 
-## Detalles de Implementación
+## Implementation Details
 
-### 1. Interface TestContextOptions
+### 1. TestContextOptions Interface
 
-El puente entre Playwright y KATA:
+The bridge between Playwright and KATA:
 
 ```typescript
 // tests/components/TestContext.ts
@@ -147,21 +147,21 @@ export interface TestContextOptions {
 }
 ```
 
-**¿Por qué opcional (`?`)?**
+**Why optional (`?`)?**
 
-- Tests de API no necesitan `page`
-- Scripts de setup pueden no necesitar `request`
-- Flexibilidad para diferentes escenarios de test
+- API tests don't need `page`
+- Setup scripts might not need `request`
+- Flexibility for different test scenarios
 
-### 2. TestContext: La Fundación
+### 2. TestContext: The Foundation
 
 ```typescript
 export class TestContext {
-  // Protected: accesible por subclases, no por código externo
+  // Protected: accessible by subclasses, not external code
   protected readonly _page?: Page;
   protected readonly _request?: APIRequestContext;
 
-  // Utilidades públicas disponibles para todos los componentes
+  // Public utilities available to all components
   readonly env: Environment;
   readonly config = config;
   readonly faker = faker;
@@ -174,13 +174,13 @@ export class TestContext {
 }
 ```
 
-**Decisiones de Diseño Clave:**
+**Key Design Decisions:**
 
-- `_page` y `_request` son **protected**: Solo las clases base los exponen via getters
-- `readonly`: Inmutable después de construcción
-- `options = {}`: Objeto vacío por defecto permite instanciación sin argumentos
+- `_page` and `_request` are **protected**: Only base classes expose them via getters
+- `readonly`: Immutable after construction
+- `options = {}`: Default empty object allows instantiation without arguments
 
-### 3. Clases Base: Acceso Validado
+### 3. Base Classes: Validated Access
 
 ```typescript
 // tests/components/ui/UiBase.ts
@@ -193,8 +193,8 @@ export class UiBase extends TestContext {
   get page(): Page {
     if (!this._page) {
       throw new Error(
-        'Page no está disponible. Asegúrate de usar el fixture `ui` ' +
-          'o pasar { page } en TestContextOptions.'
+        'Page is not available. Ensure you are using the `ui` fixture ' +
+          'or passed { page } in TestContextOptions.'
       );
     }
     return this._page;
@@ -213,8 +213,8 @@ export class ApiBase extends TestContext {
   get request(): APIRequestContext {
     if (!this._request) {
       throw new Error(
-        'Request context no está disponible. Asegúrate de usar el fixture `api` ' +
-          'o pasar { request } en TestContextOptions.'
+        'Request context is not available. Ensure you are using the `api` fixture ' +
+          'or passed { request } in TestContextOptions.'
       );
     }
     return this._request;
@@ -222,51 +222,202 @@ export class ApiBase extends TestContext {
 }
 ```
 
-**¿Por qué getters en lugar de acceso directo a propiedades?**
+**Why getters instead of direct property access?**
 
-1. **Validación en runtime**: Mensajes de error claros cuando hay mala configuración
-2. **Encapsulación**: Código externo no puede setear estas propiedades
-3. **Narrowing de tipo**: El tipo de retorno es `Page`, no `Page | undefined`
+1. **Runtime validation**: Clear error messages when misconfigured
+2. **Encapsulation**: External code cannot set these properties
+3. **Type narrowing**: Return type is `Page`, not `Page | undefined`
+
+### 4. TestFixture: The Entry Point
+
+```typescript
+// tests/components/TestFixture.ts
+
+export const test = base.extend<{
+  test: FullTestFixture;
+  api: ApiFixture;
+  ui: UiFixture;
+}>({
+  // Full fixture: UI + API with shared context
+  test: async ({ page, request }, use) => {
+    const fixture = new FullTestFixture(page, request);
+    await use(fixture);
+  },
+
+  // API-only fixture: NO browser opened
+  api: async ({ request }, use) => {
+    const apiFixture = new ApiFixture({ request });
+    await use(apiFixture);
+  },
+
+  // UI fixture: Has both page and request for hybrid tests
+  ui: async ({ page, request }, use) => {
+    const uiFixture = new UiFixture({ page, request });
+    await use(uiFixture);
+  },
+});
+```
 
 ---
 
-## Inicialización Lazy de Fixtures de Playwright
+## Playwright Lazy Fixture Initialization
 
-### Cómo Funciona
+### How It Works
 
-De la [documentación de Playwright Test Fixtures](https://playwright.dev/docs/test-fixtures):
+From [Playwright Test Fixtures documentation](https://playwright.dev/docs/test-fixtures):
 
-> "Los fixtures se crean bajo demanda. Solo los fixtures que realmente requiere un test son creados."
+> "Fixtures are created on demand. Only fixtures that are actually required by a test are created."
 
-Esto significa:
+This means:
 
 ```typescript
-// Este test NUNCA abre un navegador
+// This test NEVER opens a browser
 test('API test', async ({ api }) => {
-  // Solo `request` es inicializado, no `page`
+  // Only `request` is initialized, not `page`
   await api.bookings.getAll();
 });
 
-// Este test abre un navegador
+// This test opens a browser
 test('E2E test', async ({ ui }) => {
-  // Tanto `page` como `request` son inicializados
+  // Both `page` and `request` are initialized
   await ui.login.authenticate(user, password);
 });
 ```
 
-**Impacto en Rendimiento:**
+### Proof of Lazy Loading
 
-- Tests de API: ~50ms de startup (sin navegador)
-- Tests de UI: ~2-5s de startup (lanzamiento del navegador)
+```typescript
+// In TestFixture.ts
+
+api: async ({ request }, use) => {
+  //        ^^^^^^^^^ Only request is requested from Playwright
+  //                  No `page` dependency = no browser
+  const apiFixture = new ApiFixture({ request });
+  await use(apiFixture);
+},
+```
+
+**Performance Impact:**
+
+- API tests: ~50ms startup (no browser)
+- UI tests: ~2-5s startup (browser launch)
+
+### Test Runner Output Comparison
+
+```bash
+# API tests only
+$ bun run test:integration
+Running 50 tests...
+Finished in 4.2s  # Fast: no browser
+
+# E2E tests
+$ bun run test:e2e
+Running 20 tests...
+Finished in 45s  # Slower: browser operations
+```
 
 ---
 
-## Buenas Prácticas
+## Shared Context in E2E Tests
 
-### HACER: Pasar Opciones a Través de Constructores
+### The Problem: Separate Contexts
 
 ```typescript
-// Componente siempre recibe opciones en constructor
+// BAD: API and UI have different contexts
+test('create via API, verify via UI', async ({ api, ui }) => {
+  // API uses one request context
+  const booking = await api.bookings.create(data);
+
+  // UI uses a different session - might not see the booking!
+  await ui.bookings.navigateTo();
+});
+```
+
+### The Solution: Unified Fixture
+
+```typescript
+// GOOD: Same context for both operations
+test('create via API, verify via UI', async ({ test: fixture }) => {
+  // Both use the same request context (same auth token)
+  const booking = await fixture.api.bookings.create(data);
+
+  // UI shares the context - guaranteed to see the booking
+  await fixture.ui.bookings.navigateToBooking(booking.id);
+});
+```
+
+### How Shared Context Works
+
+```typescript
+class FullTestFixture extends TestContext {
+  api: ApiFixture;
+  ui: UiFixture;
+
+  constructor(page: Page, request: APIRequestContext, environment?: Environment) {
+    super({ page, request, environment });
+
+    // SAME options object passed to both fixtures
+    const options = { page, request, environment: this.env };
+    this.api = new ApiFixture(options);
+    this.ui = new UiFixture(options);
+  }
+}
+```
+
+---
+
+## Instance Flow Visualization
+
+### For an E2E Test
+
+```
+1. Playwright creates `page` and `request`
+   │
+2. TestFixture.ts receives them in fixture function
+   │
+   └─► const fixture = new FullTestFixture(page, request)
+       │
+3. FullTestFixture constructor
+   │
+   ├─► super({ page, request }) → TestContext stores _page, _request
+   │
+   ├─► const options = { page, request, environment }
+   │
+   ├─► new ApiFixture(options)
+   │   │
+   │   └─► Passes same options to ApiBase → BookingsApi, InvoicesApi...
+   │
+   └─► new UiFixture(options)
+       │
+       └─► Passes same options to UiBase → LoginPage, BookingsPage...
+
+4. All components share the SAME page and request instances
+```
+
+### For an API Test
+
+```
+1. Playwright creates ONLY `request` (no browser)
+   │
+2. TestFixture.ts receives request
+   │
+   └─► const apiFixture = new ApiFixture({ request })
+       │
+3. ApiFixture constructor
+   │
+   └─► Passes { request } to all API components
+
+4. No page involved → No browser opened → Fast execution
+```
+
+---
+
+## Best Practices
+
+### DO: Pass Options Through Constructors
+
+```typescript
+// Component always receives options in constructor
 export class BookingsPage extends UiBase {
   constructor(options: TestContextOptions) {
     super(options);
@@ -274,43 +425,43 @@ export class BookingsPage extends UiBase {
 }
 ```
 
-### NO HACER: Crear Componentes Sin Contexto
+### DON'T: Create Components Without Context
 
 ```typescript
-// MALO: ¿De dónde vendrá page?
+// BAD: Where will page come from?
 const bookings = new BookingsPage();
 ```
 
-### HACER: Usar el Fixture Apropiado
+### DO: Use Appropriate Fixture
 
 ```typescript
-// Test de API → usar fixture `api`
+// API test → use `api` fixture
 test('get bookings', async ({ api }) => {
   await api.bookings.getAll();
 });
 
-// Test E2E → usar fixture `ui`
+// E2E test → use `ui` fixture
 test('view bookings page', async ({ ui }) => {
   await ui.bookings.navigateTo();
 });
 
-// Test híbrido → usar fixture `test`
+// Hybrid test → use `test` fixture
 test('create via API, verify via UI', async ({ test: fixture }) => {
   const booking = await fixture.api.bookings.create(data);
   await fixture.ui.bookings.verifyExists(booking.id);
 });
 ```
 
-### NO HACER: Solicitar Fixtures No Usados
+### DON'T: Request Unused Fixtures
 
 ```typescript
-// MALO: Solicita page pero nunca lo usa
+// BAD: Requests page but never uses it
 test('API only', async ({ ui }) => {
-  // ui solicita page!
-  await ui.request.get('/api/bookings'); // Solo usa request
+  // ui requests page!
+  await ui.request.get('/api/bookings'); // Only uses request
 });
 
-// BUENO: Usar fixture api para tests solo API
+// GOOD: Use api fixture for API-only tests
 test('API only', async ({ api }) => {
   await api.bookings.getAll();
 });
@@ -318,46 +469,92 @@ test('API only', async ({ api }) => {
 
 ---
 
-## Solución de Problemas
+## Troubleshooting
 
 ### Error: "Page is not available"
 
-**Causa**: Usando componente UI sin `page` en opciones.
+**Cause**: Using UI component without `page` in options.
 
-**Solución**: Usar fixture `ui` o `test` en lugar de `api`.
+**Fix**: Use `ui` or `test` fixture instead of `api`:
+
+```typescript
+// Before (wrong)
+test('example', async ({ api }) => {
+  await api.page.goto('/'); // Error: api doesn't have page
+});
+
+// After (correct)
+test('example', async ({ ui }) => {
+  await ui.page.goto('/');
+});
+```
 
 ### Error: "Request context is not available"
 
-**Causa**: Usando componente API sin `request` en opciones.
+**Cause**: Using API component without `request` in options.
 
-**Solución**: Asegurarse de usar fixture `api`, `ui`, o `test`.
+**Fix**: Ensure you're using `api`, `ui`, or `test` fixture:
 
-### El Navegador Se Abre para Tests de API
+```typescript
+// All three fixtures provide request
+test('example', async ({ api }) => {
+  await api.bookings.getAll(); // Works
+});
+```
 
-**Causa**: El fixture está solicitando `page` aunque el test no lo use.
+### Browser Opens for API Tests
 
-**Verificar**: Tu definición de fixture en TestFixture.ts.
+**Cause**: Fixture is requesting `page` even if test doesn't use it.
+
+**Check**: Your fixture definition in TestFixture.ts:
+
+```typescript
+// WRONG: Requests page unnecessarily
+api: async ({ page, request }, use) => {  // <-- page here triggers browser
+  const apiFixture = new ApiFixture({ request });
+  await use(apiFixture);
+},
+
+// CORRECT: Only request needed
+api: async ({ request }, use) => {  // <-- No page, no browser
+  const apiFixture = new ApiFixture({ request });
+  await use(apiFixture);
+},
+```
 
 ---
 
-## Resumen
+## Summary
 
-| Principio                     | Implementación                                   |
-| ----------------------------- | ------------------------------------------------ |
-| **Única fuente de verdad**    | Playwright crea drivers una vez                  |
-| **Inyección por constructor** | Opciones pasadas en instanciación                |
-| **Inmutabilidad**             | Propiedades `readonly`, sin setters              |
-| **Acceso validado**           | Getters con chequeos en runtime                  |
-| **Inicialización lazy**       | Solo los fixtures solicitados son creados        |
-| **Contexto compartido**       | Mismo objeto de opciones a todos los componentes |
+| Principle                  | Implementation                        |
+| -------------------------- | ------------------------------------- |
+| **Single source of truth** | Playwright creates drivers once       |
+| **Constructor injection**  | Options passed at instantiation       |
+| **Immutability**           | `readonly` properties, no setters     |
+| **Validated access**       | Getters with runtime checks           |
+| **Lazy initialization**    | Only requested fixtures are created   |
+| **Shared context**         | Same options object to all components |
 
 ---
 
-## Documentos Relacionados
+## Related Documents
 
-| Documento           | Ubicación                                              | Propósito                                     |
-| ------------------- | ------------------------------------------------------ | --------------------------------------------- |
-| KATA Fundamentals   | `/docs/testing/test-architecture/kata-fundamentals.md` | Filosofía KATA y diseño de componentes        |
-| KATA Architecture   | `/.context/guidelines/TAE/kata-architecture.md`        | Estructura de capas y referencia del proyecto |
-| TypeScript Patterns | `/.context/guidelines/TAE/typescript-patterns.md`      | Patrones de código y principios DRY           |
-| KATA AI Guide       | `/.context/guidelines/TAE/KATA-AI-GUIDE.md`            | Referencia rápida para agentes de IA          |
+| Document            | Location                                               | Purpose                               |
+| ------------------- | ------------------------------------------------------ | ------------------------------------- |
+| KATA Fundamentals   | `/docs/testing/test-architecture/kata-fundamentals.md` | KATA philosophy and component design  |
+| KATA Architecture   | `/.context/guidelines/TAE/kata-architecture.md`        | Layer structure and project reference |
+| TypeScript Patterns | `/.context/guidelines/TAE/typescript-patterns.md`      | Coding patterns and DRY principles    |
+| KATA AI Guide       | `/.context/guidelines/TAE/kata-ai-index.md`            | Quick reference for AI agents         |
+
+### Source Code
+
+| File                              | Purpose                                 |
+| --------------------------------- | --------------------------------------- |
+| `tests/components/TestContext.ts` | Layer 1: TestContextOptions interface   |
+| `tests/components/ui/UiBase.ts`   | Layer 2: Page getter with validation    |
+| `tests/components/api/ApiBase.ts` | Layer 2: Request getter with validation |
+| `tests/components/TestFixture.ts` | Layer 4: Playwright fixture definitions |
+
+---
+
+**Last Updated**: February 2026

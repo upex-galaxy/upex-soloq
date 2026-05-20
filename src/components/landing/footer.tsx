@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { FileText, Twitter, Linkedin, Github, Mail, Heart } from 'lucide-react';
+import { Twitter, Linkedin, Github, Mail, Heart } from 'lucide-react';
 
 const footerLinks = {
   producto: [
@@ -46,9 +47,13 @@ export function Footer() {
           >
             {/* Logo */}
             <Link href="/" className="inline-flex items-center gap-3 group">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 text-white shadow-lg shadow-blue-500/25 group-hover:shadow-blue-500/40 transition-shadow">
-                <FileText className="h-5 w-5" />
-              </div>
+              <Image
+                src="/images/branding/logo-icon-only-transparent.png"
+                alt="SoloQ"
+                width={40}
+                height={40}
+                className="rounded-xl group-hover:scale-105 transition-transform"
+              />
               <span className="font-bold text-xl text-white">SoloQ</span>
             </Link>
 

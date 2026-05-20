@@ -1,180 +1,160 @@
 # Test Documentation
 
-> Crear Test issues en Jira (con o sin Xray) siguiendo el workflow de estados y transiciones.
+> Create Test issues in Jira (with or without Xray) following the workflow states and transitions.
 
 ---
 
-## Propósito
+## Purpose
 
-Documentar en Jira los tests que pasaron el filtro de priorización para mantenerlos en regresión.
+Document in Jira the tests that passed the prioritization filter to maintain them in regression.
 
-**⚠️ CONTEXTO CRÍTICO:**
+**⚠️ CRITICAL CONTEXT:**
 
-- La User Story está en estado **QA Approved**
-- Los tests que documentamos aquí **YA PASARON** durante exploratory testing
-- **NO estamos diseñando tests nuevos**, estamos formalizando tests ya validados
-- Solo documentamos los tests que pasaron el filtro estricto de priorización
+- The User Story is in **QA Approved** status
+- The tests we document here **ALREADY PASSED** during exploratory testing
+- **We are NOT designing new tests**, we are formalizing already validated tests
+- We only document tests that passed the strict prioritization filter
 
-**Este prompt se ejecuta DESPUÉS de:**
+**This prompt is executed AFTER:**
 
-- Test analysis completado
-- Tests priorizados con filtro estricto (Fase 0 + ROI)
-- Decisión de path (Candidate/Manual/Deferred) por cada test
-
----
-
-## Pre-requisitos
-
-**Cargar contexto obligatorio:**
-
-```
-Leer: .context/guidelines/QA/jira-test-management.md
-```
-
-**Herramientas según modalidad:**
-
-- **Jira nativo:** MCP Atlassian
-- **Jira + Xray:** MCP Atlassian + Xray CLI (`bun xray`)
-
-**Xray CLI - Documentación y Configuración:**
-
-```
-Archivo: scripts/xray.ts
-```
-
-El CLI de Xray es self-documented. **OBLIGATORIO leerlo** antes de usar para:
-
-- Conocer comandos disponibles y sus opciones
-- Verificar variables de entorno requeridas (`XRAY_CLIENT_ID`, `XRAY_CLIENT_SECRET`)
-- Entender el formato de output de cada comando
+- Test analysis completed
+- Tests prioritized with strict filter (Phase 0 + ROI)
+- Path decision (Candidate/Manual/Deferred) for each test
 
 ---
 
-## Input Requerido
+## Prerequisites
 
-1. **Lista priorizada de tests** - De `test-prioritization.md` (solo los que pasaron filtro)
-2. **User Story ID relacionada** - Para trazabilidad
-3. **Project Key de Jira** - Para crear issues
-4. **Nomenclatura existente** - Usar nombres de tests del acceptance-test-plan.md o session notes
+**Load required context:**
+
+```
+Read: .context/guidelines/QA/jira-test-management.md
+```
+
+**Tools by modality:**
+
+- **Native Jira:** `[ISSUE_TRACKER_TOOL]`
+- **Jira + Xray:** `[TMS_TOOL]` + `[ISSUE_TRACKER_TOOL]`
+
+> See /xray-cli skill for current CLI syntax. Tool Resolution in CLAUDE.md handles priority.
 
 ---
 
-## Preservar Nomenclatura
+## Input Required
 
-**⚠️ OBLIGATORIO:** Usar la MISMA nomenclatura que se usó en fases anteriores.
+1. **Prioritized test list** - From `test-prioritization.md` (only those that passed filter)
+2. **Related User Story ID** - For traceability
+3. **Jira Project Key** - To create issues
+4. **Existing nomenclature** - Use test names from acceptance-test-plan.md or session notes
 
-**Fuentes de nomenclatura (en orden de prioridad):**
+---
 
-1. **Test Prioritization Report** → Nombres finales con formato `Validar <CORE> <CONDITIONAL>`
+## Preserve Nomenclature
+
+**⚠️ MANDATORY:** Use the SAME nomenclature that was used in previous phases.
+
+**Sources of nomenclature (in priority order):**
+
+1. **Test Prioritization Report** → Final names with `Validate <CORE> <CONDITIONAL>` format
 2. **Acceptance Test Plan** → `.context/PBI/epics/.../stories/.../acceptance-test-plan.md`
-3. **Session Notes** → Notas de exploratory testing
+3. **Session Notes** → Exploratory testing notes
 
-**Ejemplo de trazabilidad:**
+**Traceability example:**
 
 ```
-Shift-Left (Fase 5):
-  → "Validar visualización de reviews cuando el mentor tiene múltiples reseñas"
+Shift-Left (Stage 1):
+  → "Validate reviews display when mentor has multiple reviews"
 
-Test Analysis (Fase 11):
-  → "Validar visualización de reviews cuando el mentor tiene múltiples reseñas" (mismo)
+Test Analysis (Stage 3):
+  → "Validate reviews display when mentor has multiple reviews" (same)
 
-Test Prioritization (Fase 11):
-  → "Validar visualización de reviews cuando el mentor tiene múltiples reseñas" (mismo)
+Test Prioritization (Stage 3):
+  → "Validate reviews display when mentor has multiple reviews" (same)
 
-Test Documentation (Fase 11):
-  → "MYM-35: TC1: Validar visualización de reviews cuando el mentor tiene múltiples reseñas"
+Test Documentation (Stage 3):
+  → "MYM-35: TC1: Validate reviews display when mentor has multiple reviews"
 ```
 
-El único cambio es agregar el prefijo `{US_ID}: TC#:` al documentar en Jira.
+The only change is adding the `{US_ID}: TC#:` prefix when documenting in Jira.
 
 ---
 
-## Workflow Completo
+## Complete Workflow
 
-### Fase 0: Determinar Modalidad y Formato
+### Phase 0: Determine Modality and Format
 
-**Preguntas obligatorias si no se conocen:**
-
-```
-PREGUNTA 1: ¿Qué herramienta de Test Management utiliza el proyecto?
-
-1. Xray (plugin de Jira) → Usar Xray CLI (`bun xray`) + MCP Atlassian
-2. Solo Jira nativo → Usar solo MCP Atlassian con Issue Type "Test"
-```
+**Mandatory questions if not known:**
 
 ```
-PREGUNTA 2: ¿En qué formato deseas documentar los test cases?
+QUESTION 1: What Test Management tool does the project use?
 
-1. Gherkin (Given/When/Then) → Recomendado para automatización
-2. Steps tradicionales (Paso/Acción/Datos/Resultado) → Formato clásico de QA
+1. Xray (Jira plugin) → Use [TMS_TOOL] + [ISSUE_TRACKER_TOOL]
+2. Only native Jira → Use only [ISSUE_TRACKER_TOOL] with Issue Type "Test"
 ```
 
-**Combinaciones válidas:**
+```
+QUESTION 2: In what format do you want to document the test cases?
 
-| Herramienta | Formato | Cómo se crea                                           |
-| ----------- | ------- | ------------------------------------------------------ |
-| Xray        | Gherkin | `bun xray test create --type Cucumber --gherkin "..."` |
-| Xray        | Steps   | `bun xray test create --step "Action\|Data\|Expected"` |
-| Jira nativo | Gherkin | MCP Atlassian con Gherkin en Description               |
-| Jira nativo | Steps   | MCP Atlassian con tabla de steps en Description        |
-
-**Verificar autenticación Xray (si aplica):**
-
-```bash
-bun xray auth status
+1. Gherkin (Given/When/Then) → Recommended for automation
+2. Traditional steps (Step/Action/Data/Result) → Classic QA format
 ```
 
-Si no está autenticado:
+**Valid combinations:**
 
-```bash
-bun xray auth login --client-id "$XRAY_CLIENT_ID" --client-secret "$XRAY_CLIENT_SECRET"
+| Tool        | Format  | How to create                                                    |
+| ----------- | ------- | ---------------------------------------------------------------- |
+| Xray        | Gherkin | `[TMS_TOOL] Create Test:` type: Cucumber, gherkin: {from test design} |
+| Xray        | Steps   | `[TMS_TOOL] Create Test:` type: Manual, steps: {from test design}    |
+| Native Jira | Gherkin | `[ISSUE_TRACKER_TOOL] Create Issue:` with Gherkin in description |
+| Native Jira | Steps   | `[ISSUE_TRACKER_TOOL] Create Issue:` with steps table in description |
+
+**Verify TMS authentication (if applicable):**
+
 ```
+[TMS_TOOL] Authenticate
+```
+
+> Resolved via [TMS_TOOL] — see Tool Resolution in CLAUDE.md. See /xray-cli skill for current CLI syntax.
 
 ---
 
-### Fase 1: Verificar/Crear Épica de Regresión
+### Phase 1: Verify/Create Regression Epic
 
-**OBLIGATORIO antes de crear cualquier test.**
+**MANDATORY before creating any test.**
 
-**Buscar épica existente:**
+**Search for existing epic:**
 
 ```
-Tool: mcp__atlassian__searchJiraIssues
-
-JQL: project = {PROJECT_KEY} AND issuetype = Epic AND (
-  summary ~ "regression" OR
-  summary ~ "test repository" OR
-  labels = "test-repository"
-)
+[ISSUE_TRACKER_TOOL] Search Issues:
+  - project: {{PROJECT_KEY}}
+  - issueType: Epic
+  - query: summary contains "regression" OR "test repository" OR label "test-repository"
 ```
 
-**Si NO existe épica:**
+**If epic does NOT exist:**
 
-1. Preguntar al usuario:
-
-   ```
-   No encontré una épica de regresión en el proyecto {PROJECT_KEY}.
-
-   ¿Deseas que cree una con el nombre "{PROJECT_KEY} Test Repository"?
-
-   Esta épica será el contenedor de todos los tests de regresión.
-   ```
-
-2. Si acepta, crear:
+1. Ask the user:
 
    ```
-   Tool: mcp__atlassian__createJiraIssue
+   I didn't find a regression epic in project {PROJECT_KEY}.
 
-   {
-     "project": "{PROJECT_KEY}",
-     "issueType": "Epic",
-     "summary": "{PROJECT_KEY} Test Repository",
-     "description": "Épica contenedora de todos los tests de regresión del proyecto.",
-     "labels": ["test-repository", "regression", "qa"]
-   }
+   Would you like me to create one named "{PROJECT_KEY} Test Repository"?
+
+   This epic will be the container for all regression tests.
    ```
 
-**Guardar referencia:**
+2. If accepted, create:
+
+   ```
+   [ISSUE_TRACKER_TOOL] Create Issue:
+     - project: {{PROJECT_KEY}}
+     - issueType: Epic
+     - title: "{{PROJECT_KEY}} Test Repository"
+     - description: "Container epic for all project regression tests."
+     - labels: test-repository, regression, qa
+   ```
+
+**Save reference:**
 
 ```
 REGRESSION_EPIC_KEY = {EPIC-XXX}
@@ -182,326 +162,284 @@ REGRESSION_EPIC_KEY = {EPIC-XXX}
 
 ---
 
-### Fase 2: Validación contra Código Fuente
+### Phase 2: Source Code Validation
 
-**⚠️ CRÍTICO:** Antes de documentar cualquier test, validar que el diseño coincida con la implementación real.
+**⚠️ CRITICAL:** Before documenting any test, validate that the design matches the actual implementation.
 
-**Por qué es necesario:**
+**Why this is necessary:**
 
-- Los tests priorizados vienen del Acceptance Test Plan (Fase 5), que se escribió ANTES de la implementación
-- El código real puede diferir del plan original
-- Detectar discrepancias AHORA evita tests inválidos en automatización
+- Prioritized tests come from the Acceptance Test Plan (Stage 1), which was written BEFORE implementation
+- Actual code may differ from the original plan
+- Detecting discrepancies NOW prevents invalid tests in automation
 
-#### 2.1 Localizar Plan de Implementación (Fuente Primaria)
+#### 2.1 Locate Implementation Plan (Primary Source)
 
-**PRIMERO: Buscar el plan de implementación de la User Story:**
+**FIRST: Look for the User Story implementation plan:**
 
 ```
-Ruta: .context/PBI/epics/EPIC-{PROJECT}-{NUM}-{nombre}/stories/STORY-{US_ID}-{nombre}/implementation-plan.md
+Path: .context/PBI/epics/EPIC-{PROJECT}-{NUM}-{name}/stories/STORY-{US_ID}-{name}/implementation-plan.md
 ```
 
-**Del plan de implementación extraer:**
+**From the implementation plan extract:**
 
-- Archivos creados/modificados (lista de rutas)
-- Arquitectura decidida (SSR vs API vs Client)
-- Componentes principales
-- Decisiones técnicas relevantes
+- Files created/modified (list of paths)
+- Architecture decisions (SSR vs API vs Client)
+- Main components
+- Relevant technical decisions
 
-**SI no existe plan de implementación:**
+**IF implementation plan doesn't exist:**
 
-- Documentar: "No existe plan de implementación, validando directamente desde código"
-- Proceder a búsqueda directa en código fuente
+- Document: "No implementation plan exists, validating directly from code"
+- Proceed to direct search in source code
 
-#### 2.2 Validar contra Código Fuente (Fuente de Verdad)
+#### 2.2 Validate Against Source Code (Source of Truth)
 
-**DESPUÉS: Validar que el plan coincida con la implementación real:**
+**AFTER: Validate that the plan matches the actual implementation:**
 
-1. Verificar que los archivos listados en el plan existen
-2. Buscar archivos adicionales no mencionados en el plan
-3. Leer componentes para extraer información crítica
+1. Verify that files listed in the plan exist
+2. Search for additional files not mentioned in the plan
+3. Read components to extract critical information
 
-**Archivos a buscar:**
+**Files to search:**
 
-- Páginas: `src/app/**/page.tsx`
-- Componentes: `src/components/**/*.tsx`
-- APIs (si existen): `src/app/api/**/*.ts`
-- Servicios/libs: `src/lib/`, `src/services/`
-- Tipos: `src/types/`
+- Pages: `src/app/**/page.tsx`
+- Components: `src/components/**/*.tsx`
+- APIs (if they exist): `src/app/api/**/*.ts`
+- Services/libs: `src/lib/`, `src/services/`
+- Types: `src/types/`
 
-#### 2.3 Extraer Información Crítica
+#### 2.3 Extract Critical Information
 
-| Información          | Por qué es importante               | Cómo obtenerla                                     |
-| -------------------- | ----------------------------------- | -------------------------------------------------- |
-| **Arquitectura**     | Saber si es SSR, API, o Client-side | Leer page.tsx, buscar `fetch`, `use client`, hooks |
-| **Test IDs**         | Para automatización E2E             | `grep -r "data-testid=" src/components/`           |
-| **Formatos de UI**   | Validar expected results exactos    | Leer JSX de componentes                            |
-| **Validaciones**     | Confirmar reglas de negocio         | Leer lógica de componentes                         |
-| **Database queries** | Para sección de variables           | Leer queries en pages/services                     |
+| Information      | Why it's important                  | How to obtain it                                   |
+| ---------------- | ----------------------------------- | -------------------------------------------------- |
+| **Architecture** | Know if it's SSR, API, or Client-side | Read page.tsx, search for `fetch`, `use client`, hooks |
+| **Test IDs**     | For E2E automation                  | `grep -r "data-testid=" src/components/`           |
+| **UI Formats**   | Validate exact expected results     | Read component JSX                                 |
+| **Validations**  | Confirm business rules              | Read component logic                               |
+| **Database queries** | For variables section           | Read queries in pages/services                     |
 
-#### 2.4 Checklist de Validación
+#### 2.4 Validation Checklist
 
-**Para cada test case, verificar:**
+**For each test case, verify:**
 
-- [ ] ¿Los endpoints/APIs mencionados existen?
-- [ ] ¿Los formatos de texto coinciden con la UI real?
-- [ ] ¿Los test-ids están disponibles en el código?
-- [ ] ¿La arquitectura es correcta (SSR/API/Client)?
-- [ ] ¿Las queries para obtener datos funcionan?
+- [ ] Do the mentioned endpoints/APIs exist?
+- [ ] Do text formats match the real UI?
+- [ ] Are test-ids available in the code?
+- [ ] Is the architecture correct (SSR/API/Client)?
+- [ ] Do queries to fetch data work?
 
-#### 2.5 Documentar Discrepancias
+#### 2.5 Document Discrepancies
 
-**Si se encuentran diferencias entre el diseño original y la implementación:**
+**If differences are found between original design and implementation:**
 
-1. Corregir el diseño del test case
-2. Añadir sección "Notas de Refinamiento" al test:
+1. Correct the test case design
+2. Add "Refinement Notes" section to the test:
 
 ```markdown
-h2. Notas de Refinamiento
+h2. Refinement Notes
 
-_Refinado:_ {fecha}
-_Motivo:_ Validación pre-documentación
-_Cambios:_
+_Refined:_ {date}
+_Reason:_ Pre-documentation validation
+_Changes:_
 
-- {Cambio 1}
-- {Cambio 2}
+- {Change 1}
+- {Change 2}
 ```
 
-**Ejemplos de discrepancias comunes:**
+**Examples of common discrepancies:**
 
-- API `/api/reviews` → No existe, se usa SSR con Supabase directo
-- Formato "based on N reviews" → UI real muestra "(N reviews)"
-- UUID hardcodeado → Debe ser variable `{mentor_id}`
+- API `/api/reviews` → Doesn't exist, uses SSR with direct Supabase
+- Format "based on N reviews" → Real UI shows "(N reviews)"
+- Hardcoded UUID → Should be variable `{mentor_id}`
 
-#### 2.6 Output de esta Fase
+#### 2.6 Phase Output
 
-Documentar para cada test:
+Document for each test:
 
 ```markdown
-## Código de Implementación
+## Implementation Code
 
-| Archivo                                    | Propósito              |
-| ------------------------------------------ | ---------------------- |
-| src/app/(main)/mentors/[id]/page.tsx       | Página principal (SSR) |
-| src/components/reviews/reviews-section.tsx | Contenedor de reviews  |
-| src/components/reviews/rating-display.tsx  | Rating promedio        |
+| File                                       | Purpose              |
+| ------------------------------------------ | -------------------- |
+| src/app/(main)/mentors/[id]/page.tsx       | Main page (SSR)      |
+| src/components/reviews/reviews-section.tsx | Reviews container    |
+| src/components/reviews/rating-display.tsx  | Average rating       |
 
-## Arquitectura
+## Architecture
 
 - **Data Fetching:** {SSR via Supabase | API REST | Client-side}
-- **Componente principal:** {ComponentName}
-- **Validaciones:** {Descripción}
+- **Main component:** {ComponentName}
+- **Validations:** {Description}
 
-## Test IDs Disponibles
+## Available Test IDs
+
 ```
-
 data-testid="component-name"
-data-testid="otro-component"
-
+data-testid="other-component"
 ```
 
 ```
 
 ---
 
-### Fase 3: Crear Tests
+### Phase 3: Create Tests
 
-#### Modalidad A: Con Xray CLI
+#### Modality A: With Xray ([TMS_TOOL])
 
-**⚠️ IMPORTANTE:** Xray requiere 2 pasos para documentación completa:
+**⚠️ IMPORTANT:** Xray requires 2 steps for complete documentation:
 
-1. **Paso 1:** Crear el Test con Xray CLI (registra en Xray)
-2. **Paso 2:** Actualizar Description del issue con template completo (backup + contexto)
+1. **Step 1:** Create the Test with `[TMS_TOOL]` (registers in Xray)
+2. **Step 2:** Update issue Description with `[ISSUE_TRACKER_TOOL]` (backup + context)
 
-##### Paso 1: Crear Test en Xray
+##### Step 1: Create Test in TMS
 
-**Para cada test priorizado:**
+**For each prioritized test:**
 
-```bash
-# Test Manual con steps
-bun xray test create \
-  --project {PROJECT_KEY} \
-  --summary "[{PRIORITY}] {Test Name}" \
-  --labels "regression,{test-type},{priority}" \
-  --step "{Paso 1}|{Resultado esperado 1}" \
-  --step "{Paso 2}|{Datos}|{Resultado esperado 2}"
+```
+# Manual test with steps
+[TMS_TOOL] Create Test:
+  - project: {{PROJECT_KEY}}
+  - title: {per TC naming convention}
+  - type: Manual
+  - labels: regression, {from test analysis: test-type}, {from test analysis: priority}
+  - steps: {from test design}
 
-# Test Cucumber (para automation) - Ver formato Gherkin de alta calidad abajo
-bun xray test create \
-  --project {PROJECT_KEY} \
-  --type Cucumber \
-  --summary "[{PRIORITY}] {Test Name}" \
-  --labels "regression,automation-candidate,{test-type}" \
-  --gherkin "{GHERKIN_DE_ALTA_CALIDAD}"
+# Cucumber test (for automation) - See high-quality Gherkin format below
+[TMS_TOOL] Create Test:
+  - project: {{PROJECT_KEY}}
+  - title: {per TC naming convention}
+  - type: Cucumber
+  - labels: regression, automation-candidate, {from test analysis: test-type}
+  - gherkin: {from test design}
 ```
 
-**Guardar el TEST_KEY retornado por Xray CLI** para el siguiente paso.
+> See /xray-cli skill for current CLI syntax.
 
-##### Formato Gherkin de Alta Calidad para Xray
+**Save the TEST_KEY returned by the tool** for the next step.
 
-**⚠️ OBLIGATORIO:** El Gherkin de Xray debe ser completo y de alta calidad:
+##### High-Quality Gherkin Format for Xray
+
+**⚠️ MANDATORY:** Xray Gherkin must be complete and high quality:
 
 ```gherkin
 Feature: {Feature Name}
 
   Background:
-    # Contexto común para todos los escenarios de esta feature
-    Given {contexto_comun_si_aplica}
+    # Common context for all scenarios in this feature
+    Given {common_context_if_applicable}
 
   @{priority} @regression @automation-candidate @{test-id}
-  Scenario Outline: {Scenario Name con <variable>}
+  Scenario Outline: {Scenario Name with <variable>}
     """
-    Bugs cubiertos: {BUG-ID1}, {BUG-ID2}
+    Bugs covered: {BUG-ID1}, {BUG-ID2}
     Related Story: {US_ID}
     """
 
-    # === PRECONDICIONES (Variables - el tester/script las construye) ===
-    Given existe un <entidad> con <identificador> en la base de datos
-    And <entidad> tiene <cantidad> <elementos> donde <cantidad> <condicion>
-    And el usuario <estado_autenticacion>
+    # === PRECONDITIONS (Variables - tester/script builds them) ===
+    Given a <entity> exists with <identifier> in the database
+    And <entity> has <quantity> <elements> where <quantity> <condition>
+    And the user <authentication_state>
 
-    # === ACCIÓN ===
-    When el usuario navega a "<ruta>"
-    And el usuario <accion_principal>
+    # === ACTION ===
+    When the user navigates to "<route>"
+    And the user <main_action>
 
-    # === VALIDACIONES ===
-    Then se muestra <elemento_ui> con formato "<formato_esperado>"
-    And <validacion_adicional>
+    # === VALIDATIONS ===
+    Then <ui_element> is displayed with format "<expected_format>"
+    And <additional_validation>
 
-    # === PARTICIONES EQUIVALENTES ===
-    Examples: Caso con datos válidos (Happy Path)
-      | entidad | identificador | cantidad | elementos | condicion | estado_autenticacion | ruta | accion_principal | elemento_ui | formato_esperado | validacion_adicional |
-      | mentor verificado | {mentor_id} | {N} | reviews | > 0 | NO está autenticado | /mentors/{mentor_id} | espera carga completa | rating display | "{promedio}/5.0" | histograma visible |
+    # === EQUIVALENT PARTITIONS ===
+    Examples: Case with valid data (Happy Path)
+      | entity | identifier | quantity | elements | condition | authentication_state | route | main_action | ui_element | expected_format | additional_validation |
+      | verified mentor | {mentor_id} | {N} | reviews | > 0 | is NOT authenticated | /mentors/{mentor_id} | waits for full load | rating display | "{average}/5.0" | histogram visible |
 
-    Examples: Caso sin datos (Edge Case)
-      | entidad | identificador | cantidad | elementos | condicion | estado_autenticacion | ruta | accion_principal | elemento_ui | formato_esperado | validacion_adicional |
-      | mentor verificado | {mentor_id} | 0 | reviews | = 0 | NO está autenticado | /mentors/{mentor_id} | espera carga completa | empty state | "No reviews yet" | histograma oculto |
+    Examples: Case without data (Edge Case)
+      | entity | identifier | quantity | elements | condition | authentication_state | route | main_action | ui_element | expected_format | additional_validation |
+      | verified mentor | {mentor_id} | 0 | reviews | = 0 | is NOT authenticated | /mentors/{mentor_id} | waits for full load | empty state | "No reviews yet" | histogram hidden |
 
-    Examples: Caso singular vs plural
-      | entidad | identificador | cantidad | elementos | condicion | estado_autenticacion | ruta | accion_principal | elemento_ui | formato_esperado | validacion_adicional |
-      | mentor verificado | {mentor_id} | 1 | review | = 1 | NO está autenticado | /mentors/{mentor_id} | espera carga completa | conteo | "(1 review)" | sin "s" |
-      | mentor verificado | {mentor_id} | 5 | reviews | > 1 | NO está autenticado | /mentors/{mentor_id} | espera carga completa | conteo | "(5 reviews)" | con "s" |
+    Examples: Singular vs plural case
+      | entity | identifier | quantity | elements | condition | authentication_state | route | main_action | ui_element | expected_format | additional_validation |
+      | verified mentor | {mentor_id} | 1 | review | = 1 | is NOT authenticated | /mentors/{mentor_id} | waits for full load | count | "(1 review)" | no "s" |
+      | verified mentor | {mentor_id} | 5 | reviews | > 1 | is NOT authenticated | /mentors/{mentor_id} | waits for full load | count | "(5 reviews)" | with "s" |
 ```
 
-**Elementos clave del Gherkin de alta calidad:**
+**Key elements of high-quality Gherkin:**
 
-| Elemento              | Propósito                       | Ejemplo                                       |
+| Element               | Purpose                         | Example                                       |
 | --------------------- | ------------------------------- | --------------------------------------------- |
-| `Background`          | Contexto común reutilizable     | `Given el sistema está en estado inicial`     |
-| `Scenario Outline`    | Parametrización con Examples    | Permite iterar múltiples casos                |
-| `Examples` con nombre | Particiones equivalentes claras | `Examples: Happy Path`, `Examples: Edge Case` |
-| `<variables>`         | Placeholders para datos         | `<mentor_id>`, `<cantidad>`, `<formato>`      |
-| Comentarios `# ===`   | Estructura visual clara         | `# === PRECONDICIONES ===`                    |
-| Docstring `"""`       | Metadata del test               | Bugs cubiertos, Story relacionada             |
-| Tags múltiples        | Categorización y filtrado       | `@critical @regression @MYM-35`               |
+| `Background`          | Reusable common context         | `Given the system is in initial state`        |
+| `Scenario Outline`    | Parameterization with Examples  | Allows iterating multiple cases               |
+| `Examples` with name  | Clear equivalent partitions     | `Examples: Happy Path`, `Examples: Edge Case` |
+| `<variables>`         | Placeholders for data           | `<mentor_id>`, `<quantity>`, `<format>`       |
+| `# ===` comments      | Clear visual structure          | `# === PRECONDITIONS ===`                     |
+| `"""` docstring       | Test metadata                   | Bugs covered, Related story                   |
+| Multiple tags         | Categorization and filtering    | `@critical @regression @MYM-35`               |
 
-**Cuándo usar cada tipo:**
+**When to use each type:**
 
-| Tipo                            | Usar cuando...                                    |
-| ------------------------------- | ------------------------------------------------- |
-| `Scenario` simple               | Solo hay 1 caso, sin variaciones                  |
-| `Scenario Outline` + `Examples` | Hay múltiples particiones equivalentes que probar |
-| `Background`                    | Varios scenarios comparten precondiciones         |
+| Type                            | Use when...                                      |
+| ------------------------------- | ------------------------------------------------ |
+| Simple `Scenario`               | There's only 1 case, no variations               |
+| `Scenario Outline` + `Examples` | There are multiple equivalent partitions to test |
+| `Background`                    | Several scenarios share preconditions            |
 
-##### Paso 2: Actualizar Description con Template Completo
+##### Step 2: Update Description with Complete Template
 
-**OBLIGATORIO después de crear cada test en Xray:**
-
-```
-Tool: mcp__atlassian__jira_update_issue
-
-{
-  "issue_key": "{TEST_KEY}",
-  "fields": {
-    "description": "{GHERKIN_DE_XRAY + TEMPLATE_ADICIONAL}"
-  }
-}
-```
-
-**La Description de Jira contiene:**
-
-1. **Copia del Gherkin de Xray** (el mismo que se pasó a `--gherkin`)
-2. **Secciones adicionales del template:** Variables, Código de Implementación, Arquitectura, Test IDs, etc.
-
-**Usar el "Formato de Description - Template Completo" documentado en Modalidad B.**
-
-##### Ejemplo concreto (ambos pasos):
-
-```bash
-# Paso 1: Crear en Xray con Gherkin de alta calidad
-bun xray test create \
-  --project MYM \
-  --type Cucumber \
-  --summary "[Critical] MYM-35: TC1: Validar visualización de reviews y rating promedio" \
-  --labels "regression,automation-candidate,e2e,critical" \
-  --gherkin "Feature: Visualización de Reviews en Perfil de Mentor
-
-  @critical @regression @automation-candidate @MYM-35-TC1
-  Scenario Outline: Usuario visualiza perfil de mentor con reviews y rating promedio
-    \"\"\"
-    Bugs cubiertos: MYM-99, MYM-100
-    Related Story: MYM-35
-    \"\"\"
-
-    # === PRECONDICIONES ===
-    Given existe un mentor verificado con <mentor_id> en la base de datos
-    And el mentor tiene <N> reviews donde <N> <condicion>
-    And el rating promedio es <promedio>
-    And el usuario NO está autenticado
-
-    # === ACCIÓN ===
-    When el usuario navega a \"/mentors/<mentor_id>\"
-    And la página completa su carga
-
-    # === VALIDACIONES ===
-    Then el rating display muestra \"<promedio>/5.0\"
-    And el conteo muestra \"<formato_conteo>\"
-    And el histograma de distribución es <estado_histograma>
-
-    Examples: Con múltiples reviews (Happy Path)
-      | mentor_id | N | condicion | promedio | formato_conteo | estado_histograma |
-      | {mentor_id} | {N} | > 1 | {promedio} | ({N} reviews) | visible con 5 barras |
-
-    Examples: Con una sola review (Singular)
-      | mentor_id | N | condicion | promedio | formato_conteo | estado_histograma |
-      | {mentor_id} | 1 | = 1 | {promedio} | (1 review) | visible con 5 barras |
-
-    Examples: Sin reviews (Edge Case)
-      | mentor_id | N | condicion | promedio | formato_conteo | estado_histograma |
-      | {mentor_id} | 0 | = 0 | N/A | Sin reviews | oculto |"
-
-# Output: Created test MYM-138
-```
+**MANDATORY after creating each test in Xray:**
 
 ```
-# Paso 2: Actualizar Description con Gherkin + Template
-Tool: mcp__atlassian__jira_update_issue
-
-{
-  "issue_key": "MYM-138",
-  "fields": {
-    "description": "h2. Test Case Information\n\n_Related Story:_ MYM-35\n_Type:_ E2E\n...\n\nh2. Diseño del Test\n\n{code:language=gherkin}\n[COPIA DEL GHERKIN DE ARRIBA]\n{code}\n\nh2. Variables del Test Case\n\n|| Variable || Descripción || Cómo obtenerla ||\n| {mentor_id} | UUID mentor verificado | SELECT id FROM profiles WHERE role='mentor' LIMIT 1 |\n...\n\nh2. Código de Implementación\n\n|| Archivo || Propósito ||\n| src/app/(main)/mentors/[id]/page.tsx | Página principal |\n..."
-  }
-}
+[ISSUE_TRACKER_TOOL] Update Issue:
+  - issue: {TEST_KEY}
+  - description: {from test design gherkin + additional template sections}
 ```
+
+**The Jira Description contains:**
+
+1. **Copy of Xray Gherkin** (same as the gherkin parameter in Step 1)
+2. **Additional template sections:** Variables, Implementation Code, Architecture, Test IDs, etc.
+
+**Use the "Description Format - Complete Template" documented in Modality B.**
+
+##### Concrete example (both steps):
+
+```
+# Step 1: Create in TMS with high-quality Gherkin
+[TMS_TOOL] Create Test:
+  - project: {{PROJECT_KEY}}
+  - type: Cucumber
+  - title: {per TC naming convention}
+  - labels: regression, automation-candidate, e2e, critical
+  - gherkin: {from test design — see High-Quality Gherkin Format above}
+
+# Output: Created test {TEST_KEY}
+```
+
+> See /xray-cli skill for current CLI syntax.
+
+```
+# Step 2: Update Description with Gherkin + Template
+[ISSUE_TRACKER_TOOL] Update Issue:
+  - issue: {TEST_KEY}
+  - description: {from test design gherkin + complete template with variables, implementation code, architecture}
+```
+
+> Use the "Description Format - Complete Template" documented in Modality B below.
 
 ---
 
-#### Modalidad B: Solo Jira (sin Xray)
+#### Modality B: Jira Only (without Xray)
 
 ```
-Tool: mcp__atlassian__createJiraIssue
-
-{
-  "project": "{PROJECT_KEY}",
-  "issueType": "Test",
-  "summary": "[{PRIORITY}] {Test Name}",
-  "description": "{Contenido en Gherkin o formato tradicional}",
-  "labels": ["regression", "{test-type}", "{priority}"],
-  "parent": "{REGRESSION_EPIC_KEY}"
-}
+[ISSUE_TRACKER_TOOL] Create Issue:
+  - project: {{PROJECT_KEY}}
+  - issueType: Test
+  - title: {per TC naming convention}
+  - description: {from test design in Gherkin or traditional format}
+  - labels: regression, {from test analysis: test-type}, {from test analysis: priority}
+  - parent: {REGRESSION_EPIC_KEY}
 ```
 
-**Formato de Description (Gherkin) - Template Completo:**
+**Description Format (Gherkin) - Complete Template:**
 
 ```
 h2. Test Case Information
@@ -509,14 +447,14 @@ h2. Test Case Information
 _Related Story:_ {US_ID}
 _Type:_ {E2E | Functional | Integration}
 _Priority:_ {Critical | High | Medium | Low}
-_Status:_ Candidate (para automatización)
+_Status:_ Candidate (for automation)
 _ROI Score:_ {X.X}
 
-h2. Bugs Previos Cubiertos
+h2. Prior Bugs Covered
 
-* {BUG-ID}: {Descripción del bug corregido}
+* {BUG-ID}: {Description of fixed bug}
 
-h2. Diseño del Test (Patrón de Variables)
+h2. Test Design (Variable Pattern)
 
 {code:language=gherkin}
 Feature: {Feature Name}
@@ -524,125 +462,128 @@ Feature: {Feature Name}
   @{priority} @regression @automation-candidate
   Scenario: {Scenario Name}
 
-    # === PRECONDICIONES (Variables - el tester las construye) ===
-    Given {precondición con {variable_1}}
-    And {precondición con {variable_2}}
+    # === PRECONDITIONS (Variables - tester builds them) ===
+    Given {precondition with {variable_1}}
+    And {precondition with {variable_2}}
 
-    # === ACCIÓN ===
-    When {acción del usuario}
+    # === ACTION ===
+    When {user action}
 
-    # === VALIDACIONES ===
-    Then {validación 1}
-    And {validación 2}
+    # === VALIDATIONS ===
+    Then {validation 1}
+    And {validation 2}
 {code}
 
-h2. Variables del Test Case
+h2. Test Case Variables
 
-|| Variable || Descripción || Cómo obtenerla ||
-| {variable_1} | Descripción | Query SQL o instrucción |
-| {variable_2} | Descripción | Query SQL o instrucción |
+|| Variable || Description || How to obtain ||
+| {variable_1} | Description | SQL query or instruction |
+| {variable_2} | Description | SQL query or instruction |
 
-h2. Código de Implementación
+h2. Implementation Code
 
-|| Archivo || Propósito ||
-| src/app/.../page.tsx | Página principal |
-| src/components/... | Componente de UI |
+|| File || Purpose ||
+| src/app/.../page.tsx | Main page |
+| src/components/... | UI Component |
 
-h2. Arquitectura
+h2. Architecture
 
 * *Data Fetching:* {SSR via Supabase | API REST | Client-side fetch}
-* *Componente principal:* {ComponentName}
+* *Main component:* {ComponentName}
 
-h2. Test IDs Disponibles para Automatización
+h2. Test IDs Available for Automation
 
 {code}
 data-testid="component-1"
 data-testid="component-2"
 {code}
 
-h2. Precondiciones
+h2. Preconditions
 
-* {Precondición 1}
-* {Precondición 2}
+* {Precondition 1}
+* {Precondition 2}
 
 h2. Expected Results
 
-* *UI:* {Descripción de lo que se espera ver}
-* *Data:* {Cómo se cargan los datos}
-* *Database:* {Cambios esperados en DB, si aplica}
+* *UI:* {Description of what should be visible}
+* *Data:* {How data loads}
+* *Database:* {Expected DB changes, if applicable}
 
-h2. Notas de Refinamiento
+h2. Refinement Notes
 
-_Refinado:_ {fecha}
-_Motivo:_ Validación pre-automatización
-_Cambios:_
-* {Cambio realizado}
+_Refined:_ {date}
+_Reason:_ Pre-automation validation
+_Changes:_
+* {Change made}
 ```
 
 ---
 
-### Fase 4: Vincular a User Story
+### Phase 4: Link to User Story
 
-**Después de crear cada Test:**
-
-```
-Tool: mcp__atlassian__updateJiraIssue
-
-Agregar link:
-- Type: "is tested by" / "tests"
-- Outward: Test issue
-- Inward: User Story
-```
-
-**O agregar comentario en la US:**
+**After creating each Test:**
 
 ```
-Tool: mcp__atlassian__addCommentToJiraIssue
+[ISSUE_TRACKER_TOOL] Link Issues:
+  - linkType: "tests" / "is tested by"
+  - outward: {TEST_KEY}
+  - inward: {STORY_KEY}
+```
 
-Issue: {STORY-XXX}
-Comment: "Test case documentado: [{TEST-XXX}] - {Test Name}"
+**Or add comment to the US:**
+
+```
+[ISSUE_TRACKER_TOOL] Add Comment:
+  - issue: {STORY_KEY}
+  - comment: "Test case documented: [{TEST_KEY}] - {from test design: test name}"
 ```
 
 ---
 
-### Fase 5: Transitar Estados del Workflow
+### Phase 5: Transition Workflow States
 
-**Secuencia de transiciones por cada test:**
+**Transition sequence for each test:**
 
 ```
-1. Test creado → Status: DRAFT (automático al crear)
+1. Test created → Status: DRAFT (automatic on creation)
 
-2. Iniciar documentación:
-   Tool: mcp__atlassian__transitionJiraIssue
-   Transition: "start design"
+2. Start documentation:
+   [ISSUE_TRACKER_TOOL] Transition Issue:
+     - issue: {TEST_KEY}
+     - transition: "start design"
    → Status: IN DESIGN
 
-3. Completar documentación:
-   Tool: mcp__atlassian__transitionJiraIssue
-   Transition: "ready to run"
+3. Complete documentation:
+   [ISSUE_TRACKER_TOOL] Transition Issue:
+     - issue: {TEST_KEY}
+     - transition: "ready to run"
    → Status: READY
 
-4. Decidir path según priorización:
+4. Decide path based on prioritization:
 
-   SI (Path = Candidate):
-     Tool: mcp__atlassian__transitionJiraIssue
-     Transition: "automation review"
+   IF (Path = Candidate):
+     [ISSUE_TRACKER_TOOL] Transition Issue:
+       - issue: {TEST_KEY}
+       - transition: "automation review"
      → Status: IN REVIEW
 
-     Luego (si ROI confirmado):
-     Transition: "approve to automate"
+     Then (if ROI confirmed):
+     [ISSUE_TRACKER_TOOL] Transition Issue:
+       - issue: {TEST_KEY}
+       - transition: "approve to automate"
      → Status: CANDIDATE
 
-   SI (Path = Manual):
-     Tool: mcp__atlassian__transitionJiraIssue
-     Transition: "for manual"
+   IF (Path = Manual):
+     [ISSUE_TRACKER_TOOL] Transition Issue:
+       - issue: {TEST_KEY}
+       - transition: "for manual"
      → Status: MANUAL
 ```
 
-**Flujo visual:**
+**Visual flow:**
 
 ```
-[Crear Test]
+[Create Test]
      │
      ▼
   DRAFT ──"start design"──► IN DESIGN ──"ready to run"──► READY
@@ -659,99 +600,98 @@ Comment: "Test case documentado: [{TEST-XXX}] - {Test Name}"
                                                                                     ▼
                                                                                CANDIDATE
                                                                                     │
-                                                                        (Fase 12 continúa)
+                                                                        (Stage 4 continues)
 ```
 
 ---
 
-### Fase 6: Resumen y Confirmación
+### Phase 6: Summary and Confirmation
 
-**Generar reporte final:**
+**Generate final report:**
 
 ```markdown
 # Test Documentation Complete
 
-**Proyecto:** {PROJECT_KEY}
-**Épica de Regresión:** {REGRESSION_EPIC_KEY}
+**Project:** {PROJECT_KEY}
+**Regression Epic:** {REGRESSION_EPIC_KEY}
 **User Story:** {STORY-XXX}
-**Fecha:** {Date}
+**Date:** {Date}
 
 ---
 
-## Tests Creados
+## Tests Created
 
-| Test ID  | Nombre                 | Tipo       | Status Final | Path     |
-| -------- | ---------------------- | ---------- | ------------ | -------- |
-| TEST-001 | Login exitoso          | E2E        | Candidate    | Automate |
-| TEST-002 | Validación password    | Functional | Candidate    | Automate |
-| TEST-003 | Visual alignment check | Manual     | Manual       | Manual   |
+| Test ID  | Name                     | Type       | Final Status | Path     |
+| -------- | ------------------------ | ---------- | ------------ | -------- |
+| TEST-001 | Successful login         | E2E        | Candidate    | Automate |
+| TEST-002 | Password validation      | Functional | Candidate    | Automate |
+| TEST-003 | Visual alignment check   | Manual     | Manual       | Manual   |
 
 ---
 
-## Resumen
+## Summary
 
-| Métrica               | Valor |
+| Metric                | Value |
 | --------------------- | ----- |
-| Tests creados         | [N]   |
+| Tests created         | [N]   |
 | Automation Candidates | [N]   |
 | Manual Only           | [N]   |
-| Vinculados a US       | [N]   |
+| Linked to US          | [N]   |
 
 ---
 
-## Trazabilidad
-```
+## Traceability
 
+```
 STORY-XXX: {Story Summary}
-├── TEST-001: Login exitoso [Candidate]
-├── TEST-002: Validación password [Candidate]
+├── TEST-001: Successful login [Candidate]
+├── TEST-002: Password validation [Candidate]
 └── TEST-003: Visual alignment [Manual]
-
 ```
 
 ---
 
-## Próximos Pasos
+## Next Steps
 
-### Para Candidates (Automation):
-Los siguientes tests están listos para **Fase 12: Test Automation**:
+### For Candidates (Automation):
+The following tests are ready for **Stage 4: Test Automation**:
 - TEST-001 (E2E)
 - TEST-002 (Functional)
 
-### Para Manual:
-Los siguientes tests entran en la **Regresión Manual**:
+### For Manual:
+The following tests enter **Manual Regression**:
 - TEST-003
 
 ---
 
-¿Deseas proceder a Fase 12 con los candidates identificados?
+Would you like to proceed to Stage 4 with the identified candidates?
 ```
 
 ---
 
-### Fase 7: Documentar Localmente (Caché)
+### Phase 7: Document Locally (Cache)
 
-**OBLIGATORIO:** Crear archivos markdown locales como caché de los tests documentados.
+**MANDATORY:** Create local markdown files as cache for documented tests.
 
-**Propósito:**
+**Purpose:**
 
-- Evitar re-leer Jira/Xray en futuras sesiones
-- Proveer contexto inmediato para Fase 12 (Automation)
-- Mantener trazabilidad local ↔ Jira
+- Avoid re-reading Jira/Xray in future sessions
+- Provide immediate context for Stage 4 (Automation)
+- Maintain local ↔ Jira traceability
 
-**Estructura de directorio:**
+**Directory structure:**
 
 ```
-.context/PBI/epics/EPIC-XXX-{nombre}/stories/STORY-YYY-{nombre}/
-├── story.md                    # (existente)
-├── acceptance-test-plan.md               # (existente - de Fase 5)
-├── implementation-plan.md      # (existente)
-└── tests/                      # ← NUEVO directorio
-    ├── {TEST-ID}-{nombre}.md
+.context/PBI/epics/EPIC-XXX-{name}/stories/STORY-YYY-{name}/
+├── story.md                    # (existing)
+├── acceptance-test-plan.md     # (existing - from Stage 1)
+├── implementation-plan.md      # (existing)
+└── tests/                      # ← NEW directory
+    ├── {TEST-ID}-{name}.md
     └── ...
 ```
 
-**Template de archivo (uno por test):**
+**File template (one per test):**
 
 ```markdown
 # {TEST-ID}: {Test Name}
@@ -764,48 +704,47 @@ Los siguientes tests entran en la **Regresión Manual**:
 
 ---
 
-## Código de Implementación
+## Implementation Code
 
-| Archivo              | Propósito         |
+| File                 | Purpose           |
 | -------------------- | ----------------- |
-| src/app/.../page.tsx | Página principal  |
-| src/components/...   | Componentes de UI |
+| src/app/.../page.tsx | Main page         |
+| src/components/...   | UI Components     |
 
-## Arquitectura
+## Architecture
 
 - **Data Fetching:** {SSR via Supabase | API REST | Client-side}
-- **Componente principal:** {ComponentName}
+- **Main component:** {ComponentName}
 
-## Test IDs Disponibles
+## Available Test IDs
+
 ```
-
 data-testid="component-1"
 data-testid="component-2"
-
 ```
 
 ---
 
-## Variables del Test Case
+## Test Case Variables
 
-| Variable | Descripción | Cómo obtenerla |
-|----------|-------------|----------------|
-| {var_1} | Descripción | Query SQL |
-| {var_2} | Descripción | Query SQL |
+| Variable | Description | How to obtain |
+|----------|-------------|---------------|
+| {var_1} | Description | SQL Query |
+| {var_2} | Description | SQL Query |
 
 ---
 
-## Diseño del Test
+## Test Design
 
-{Contenido del test según el formato elegido: Gherkin o Steps tradicionales}
+{Test content in chosen format: Gherkin or Traditional Steps}
 ```
 
-**Ejemplo con formato Gherkin:**
+**Example with Gherkin format:**
 
 ```markdown
-# GX-101-TC1: Validar login exitoso con credenciales válidas
+# GX-101-TC1: Validate successful login with valid credentials
 
-**Jira:** [GX-101-TC1](https://company.atlassian.net/browse/GX-101-TC1)
+**Jira:** [GX-101-TC1]({{JIRA_URL}}/browse/GX-101-TC1)
 **Status:** CANDIDATE
 **Type:** Functional
 **Related Story:** GX-100
@@ -813,7 +752,7 @@ data-testid="component-2"
 
 ---
 
-## Diseño del Test
+## Test Design
 
 Feature: User Login
 
@@ -826,12 +765,12 @@ And I click the submit button
 Then I should be redirected to the dashboard
 ```
 
-**Ejemplo con formato Steps tradicional:**
+**Example with traditional Steps format:**
 
 ```markdown
-# GX-101-TC2: Validar error al ingresar password incorrecto
+# GX-101-TC2: Validate error when entering incorrect password
 
-**Jira:** [GX-101-TC2](https://company.atlassian.net/browse/GX-101-TC2)
+**Jira:** [GX-101-TC2]({{JIRA_URL}}/browse/GX-101-TC2)
 **Status:** MANUAL
 **Type:** Functional
 **Related Story:** GX-100
@@ -839,167 +778,182 @@ Then I should be redirected to the dashboard
 
 ---
 
-## Diseño del Test
+## Test Design
 
-| Paso | Acción                     | Datos            | Resultado Esperado          |
-| ---- | -------------------------- | ---------------- | --------------------------- |
-| 1    | Navegar a /login           | -                | Formulario de login visible |
-| 2    | Ingresar email válido      | user@example.com | Campo poblado               |
-| 3    | Ingresar password inválido | wrongpass        | Campo enmascarado           |
-| 4    | Click en Submit            | -                | Mensaje de error visible    |
+| Step | Action                       | Data             | Expected Result             |
+| ---- | ---------------------------- | ---------------- | --------------------------- |
+| 1    | Navigate to /login           | -                | Login form visible          |
+| 2    | Enter valid email            | user@example.com | Field populated             |
+| 3    | Enter invalid password       | wrongpass        | Field masked                |
+| 4    | Click Submit                 | -                | Error message visible       |
 ```
 
 ---
 
-## Referencia de Comandos Xray CLI
+## TMS Action Reference
 
-### Crear Tests
+### Create Tests
 
-```bash
-# Manual con steps
-bun xray test create --project PROJ --summary "Test name" \
-  --step "Action|Expected" \
-  --step "Action|Data|Expected"
+```
+# Manual with steps
+[TMS_TOOL] Create Test:
+  - project: {{PROJECT_KEY}}
+  - title: {per TC naming convention}
+  - type: Manual
+  - steps: {from test design}
 
 # Cucumber
-bun xray test create --project PROJ --type Cucumber \
-  --summary "Feature name" \
-  --gherkin "Feature: X\n  Scenario: Y\n    Given Z"
+[TMS_TOOL] Create Test:
+  - project: {{PROJECT_KEY}}
+  - title: {per TC naming convention}
+  - type: Cucumber
+  - gherkin: {from test design}
 
-# Generic (para scripts)
-bun xray test create --project PROJ --type Generic \
-  --summary "Automation script" \
-  --definition "path/to/script.ts"
+# Generic (for scripts)
+[TMS_TOOL] Create Test:
+  - project: {{PROJECT_KEY}}
+  - title: {per TC naming convention}
+  - type: Generic
+  - definition: {from automation script path}
 ```
 
-### Listar y Consultar
+### List and Query
 
-```bash
-# Listar tests
-bun xray test list --project PROJ --limit 50
+```
+# List tests
+[TMS_TOOL] List Tests:
+  - project: {{PROJECT_KEY}}
 
-# Ver detalles
-bun xray test get PROJ-123
+# View details
+[TMS_TOOL] Get Test:
+  - issue: {TEST_KEY}
 
-# Agregar step a test existente
-bun xray test add-step --test {issueId} \
-  --action "Step action" \
-  --data "Test data" \
-  --result "Expected result"
+# Add step to existing test
+[TMS_TOOL] Add Step:
+  - issue: {TEST_KEY}
+  - action: {from test design: step action}
+  - data: {from test design: test data}
+  - result: {from test design: expected result}
 ```
 
-### Test Executions (para regresión)
+### Test Executions (for regression)
 
-```bash
-# Crear ejecución
-bun xray exec create --project PROJ --summary "Sprint X Regression" \
-  --tests "123,456,789"
-
-# Agregar tests a ejecución existente
-bun xray exec add-tests --execution {execId} --tests "123,456"
 ```
+# Create execution
+[TMS_TOOL] Create Execution:
+  - project: {{PROJECT_KEY}}
+  - title: {per execution naming convention}
+  - tests: {from regression candidate list}
+
+# Add tests to existing execution
+[TMS_TOOL] Add Tests to Execution:
+  - execution: {EXEC_KEY}
+  - tests: {from regression candidate list}
+```
+
+> See /xray-cli skill for current CLI syntax.
 
 ---
 
-## Nomenclatura de Test Cases
+## Test Case Nomenclature
 
-**OBLIGATORIO:** Seguir la convención estándar de nomenclatura para test cases formales en Jira/Xray.
+**MANDATORY:** Follow the standard naming convention for formal test cases in Jira/Xray.
 
-### Formato según Herramienta
+### Format by Tool
 
-| Herramienta     | Formato                                      |
-| --------------- | -------------------------------------------- |
-| **Xray**        | `<TS_ID>: TC#: Validar <CORE> <CONDITIONAL>` |
-| **Jira nativo** | `<US_ID>: TC#: Validar <CORE> <CONDITIONAL>` |
+| Tool            | Format                                         |
+| --------------- | ---------------------------------------------- |
+| **Xray**        | `<TS_ID>: TC#: Validate <CORE> <CONDITIONAL>`  |
+| **Native Jira** | `<US_ID>: TC#: Validate <CORE> <CONDITIONAL>`  |
 
-### Definición de Componentes
+### Component Definitions
 
-| Componente    | Qué es                                                                 | Ejemplos                                                                         |
-| ------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `TS_ID`       | **Test Set ID** - ID del Test Set en Xray (solo si usa Xray)           | `GX-150` (donde GX-150 es un Test Set)                                           |
-| `US_ID`       | **User Story ID** - ID de la US relacionada (si usa Jira nativo)       | `GX-101` (donde GX-101 es una User Story)                                        |
-| `TC#`         | Número secuencial del test case                                        | `TC1`, `TC2`, `TC3`...                                                           |
-| `CORE`        | **El comportamiento principal** que se está validando (verbo + objeto) | `login exitoso`, `error de validación`, `creación de usuario`                    |
-| `CONDITIONAL` | **La condición o contexto** que hace único este escenario              | `con credenciales válidas`, `cuando el campo está vacío`, `al exceder el límite` |
+| Component     | What it is                                                              | Examples                                                                            |
+| ------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `TS_ID`       | **Test Set ID** - Xray Test Set ID (only if using Xray)                 | `GX-150` (where GX-150 is a Test Set)                                               |
+| `US_ID`       | **User Story ID** - Related US ID (if using native Jira)                | `GX-101` (where GX-101 is a User Story)                                             |
+| `TC#`         | Sequential test case number                                              | `TC1`, `TC2`, `TC3`...                                                              |
+| `CORE`        | **The main behavior** being validated (verb + object)                   | `successful login`, `validation error`, `user creation`                             |
+| `CONDITIONAL` | **The condition or context** that makes this scenario unique            | `with valid credentials`, `when field is empty`, `when exceeding limit`             |
 
-### Fórmula Mental
+### Mental Formula
 
 ```
-"[ID]: TC#: Validar [QUÉ comportamiento] [BAJO QUÉ condición]"
+"[ID]: TC#: Validate [WHAT behavior] [UNDER WHAT condition]"
 ```
 
-### Ejemplos por Tipo de Test
+### Examples by Test Type
 
-| Tipo     | CORE                         | CONDITIONAL                          | Título Completo                                                                      |
-| -------- | ---------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------ |
-| Positive | `login exitoso`              | `con credenciales válidas`           | `GX-101: TC1: Validar login exitoso con credenciales válidas`                        |
-| Negative | `error de autenticación`     | `cuando el password es incorrecto`   | `GX-101: TC2: Validar error de autenticación cuando el password es incorrecto`       |
-| Boundary | `límite de caracteres`       | `al ingresar exactamente 50 chars`   | `GX-101: TC3: Validar límite de caracteres al ingresar exactamente 50 chars`         |
-| Edge     | `comportamiento del carrito` | `cuando hay múltiples ítems iguales` | `GX-101: TC4: Validar comportamiento del carrito cuando hay múltiples ítems iguales` |
+| Type     | CORE                         | CONDITIONAL                           | Complete Title                                                                          |
+| -------- | ---------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------- |
+| Positive | `successful login`           | `with valid credentials`              | `GX-101: TC1: Validate successful login with valid credentials`                         |
+| Negative | `authentication error`       | `when password is incorrect`          | `GX-101: TC2: Validate authentication error when password is incorrect`                 |
+| Boundary | `character limit`            | `when entering exactly 50 chars`      | `GX-101: TC3: Validate character limit when entering exactly 50 chars`                  |
+| Edge     | `cart behavior`              | `when there are multiple same items`  | `GX-101: TC4: Validate cart behavior when there are multiple same items`                |
 
-### Anti-patrones (evitar)
+### Anti-patterns (avoid)
 
-| ❌ Incorrecto            | ✅ Correcto                                                         | Por qué                           |
-| ------------------------ | ------------------------------------------------------------------- | --------------------------------- |
-| `Test de login`          | `GX-101: TC1: Validar login exitoso con credenciales válidas`       | Falta ID, TC#, CORE y CONDITIONAL |
-| `Login - error`          | `GX-101: TC2: Validar error de autenticación con password inválido` | Demasiado vago                    |
-| `TC1: Probar formulario` | `GX-101: TC1: Validar envío de formulario con todos los campos`     | Falta ID, CORE no es específico   |
+| ❌ Incorrect             | ✅ Correct                                                             | Why                              |
+| ------------------------ | --------------------------------------------------------------------- | -------------------------------- |
+| `Login test`             | `GX-101: TC1: Validate successful login with valid credentials`       | Missing ID, TC#, CORE and CONDITIONAL |
+| `Login - error`          | `GX-101: TC2: Validate authentication error with invalid password`    | Too vague                        |
+| `TC1: Test form`         | `GX-101: TC1: Validate form submission with all fields`               | Missing ID, CORE not specific    |
 
-### Para Proyectos en Inglés
+### For English Projects
 
 ```
 [Should] [Feature-Expected-Behavior] [Condition(If/When/With/At)]
 ```
 
-| Tipo     | Título                                                    |
+| Type     | Title                                                     |
 | -------- | --------------------------------------------------------- |
 | Positive | Should login successfully with valid credentials          |
 | Negative | Should display error message when password is incorrect   |
 | Boundary | Should accept exactly 50 characters in name field         |
 | Edge     | Should calculate total correctly with multiple same items |
 
-**Referencia completa:** `.context/guidelines/QA/jira-test-management.md` → Sección "Nomenclatura de Tickets en Jira"
+**Complete reference:** `.context/guidelines/QA/jira-test-management.md` → Section "Ticket Nomenclature in Jira"
 
 ---
 
-## Patrón de Variables para Test Data
+## Variable Pattern for Test Data
 
-**⚠️ CRÍTICO:** Los test cases NO deben contener datos hardcodeados de la aplicación real.
+**⚠️ CRITICAL:** Test cases must NOT contain hardcoded data from the real application.
 
-### Principio Fundamental
+### Fundamental Principle
 
-Un test case se ejecuta **repetidamente a lo largo de la vida del proyecto**. Los datos de producción/staging **cambian, iteran, se destruyen**. Por tanto:
+A test case is executed **repeatedly throughout the project's life**. Production/staging data **changes, iterates, gets destroyed**. Therefore:
 
-- ❌ **NO usar valores reales específicos** (UUIDs, IDs, emails de usuarios reales)
-- ✅ **Usar variables/placeholders** que describan el TIPO de dato requerido
-- ✅ **El tester construye las precondiciones** buscando o creando los datos necesarios
+- ❌ **DO NOT use specific real values** (UUIDs, IDs, emails of real users)
+- ✅ **Use variables/placeholders** that describe the TYPE of data required
+- ✅ **The tester builds the preconditions** by searching or creating the necessary data
 
-### Cuándo SÍ usar datos específicos
+### When TO use specific data
 
-Solo cuando el **criterio de aceptación** define un valor explícito ligado a una regla de negocio:
+Only when the **acceptance criterion** defines an explicit value tied to a business rule:
 
 ```gherkin
-# ✅ CORRECTO - La regla de negocio define el límite
-Then el campo debe aceptar máximo 500 caracteres
+# ✅ CORRECT - The business rule defines the limit
+Then the field must accept maximum 500 characters
 
-# ✅ CORRECTO - El formato es parte del requerimiento
-Then el rating se muestra en formato "X.X/5.0"
+# ✅ CORRECT - The format is part of the requirement
+Then the rating is displayed in "X.X/5.0" format
 ```
 
-### Formato de Variables
+### Variable Format
 
-Usar llaves `{variable}` para indicar datos parametrizables:
+Use braces `{variable}` to indicate parameterizable data:
 
-| Variable      | Descripción                  | Cómo la obtiene el tester                                          |
-| ------------- | ---------------------------- | ------------------------------------------------------------------ |
-| `{user_id}`   | UUID de un usuario existente | Consultar DB o crear usuario de prueba                             |
-| `{mentor_id}` | UUID de un mentor verificado | `SELECT id FROM profiles WHERE role='mentor' AND is_verified=true` |
-| `{N}`         | Cantidad de elementos        | Contar en DB o definir en setup                                    |
-| `{promedio}`  | Valor calculado              | Se deriva de los datos del setup                                   |
+| Variable      | Description                  | How the tester obtains it                                             |
+| ------------- | ---------------------------- | --------------------------------------------------------------------- |
+| `{user_id}`   | UUID of an existing user     | Query DB or create test user                                          |
+| `{mentor_id}` | UUID of a verified mentor    | `SELECT id FROM profiles WHERE role='mentor' AND is_verified=true`    |
+| `{N}`         | Quantity of elements         | Count in DB or define in setup                                        |
+| `{average}`   | Calculated value             | Derived from setup data                                               |
 
-### Ejemplo: Antes vs Después
+### Example: Before vs After
 
-**❌ INCORRECTO (datos hardcodeados):**
+**❌ INCORRECT (hardcoded data):**
 
 ```gherkin
 Given a mentor exists with user_id "550e8400-e29b-41d4-a716-446655440000"
@@ -1007,114 +961,114 @@ And the mentor has 23 reviews with average rating 4.7/5.0
 And rating distribution is: 15 five-star, 5 four-star, 2 three-star, 0 two-star, 1 one-star
 ```
 
-**✅ CORRECTO (patrón de variables):**
+**✅ CORRECT (variable pattern):**
 
 ```gherkin
-Given existe un mentor verificado con {mentor_id} en la base de datos
-And el mentor tiene {N} reviews donde {N} > 0
-And cada review tiene un rating entre 1 y 5 estrellas
-And el rating promedio {promedio} = suma de ratings / {N}
-And la distribución de ratings es calculable desde los {N} reviews
+Given a verified mentor exists with {mentor_id} in the database
+And the mentor has {N} reviews where {N} > 0
+And each review has a rating between 1 and 5 stars
+And the average rating {average} = sum of ratings / {N}
+And the rating distribution is calculable from the {N} reviews
 ```
 
-### Particiones Equivalentes
+### Equivalent Partitions
 
-Cuando una regla de negocio acepta un **rango de valores**, documentar la partición, no un valor específico:
+When a business rule accepts a **range of values**, document the partition, not a specific value:
 
-| Partición           | Clase               | Ejemplo de dato                        |
-| ------------------- | ------------------- | -------------------------------------- |
-| Cantidad de reviews | N > 0 (con reviews) | Cualquier mentor con al menos 1 review |
-| Cantidad de reviews | N = 0 (sin reviews) | Mentor nuevo sin reviews               |
-| Rating promedio     | 1.0 ≤ X ≤ 5.0       | El promedio calculado                  |
-| Pluralización       | N = 1 (singular)    | "1 review"                             |
-| Pluralización       | N > 1 (plural)      | "N reviews"                            |
+| Partition            | Class               | Data example                           |
+| -------------------- | ------------------- | -------------------------------------- |
+| Review count         | N > 0 (with reviews)| Any mentor with at least 1 review      |
+| Review count         | N = 0 (no reviews)  | New mentor without reviews             |
+| Average rating       | 1.0 ≤ X ≤ 5.0       | The calculated average                 |
+| Pluralization        | N = 1 (singular)    | "1 review"                             |
+| Pluralization        | N > 1 (plural)      | "N reviews"                            |
 
-### Sección de Variables en el Test Case
+### Variables Section in Test Case
 
-**OBLIGATORIO:** Incluir una tabla de variables con queries para obtenerlas:
+**MANDATORY:** Include a variables table with queries to obtain them:
 
 ```markdown
-## Variables del Test Case
+## Test Case Variables
 
-| Variable    | Descripción               | Cómo obtenerla                                                             |
+| Variable    | Description               | How to obtain                                                              |
 | ----------- | ------------------------- | -------------------------------------------------------------------------- |
-| {mentor_id} | UUID de mentor verificado | `SELECT id FROM profiles WHERE role='mentor' AND is_verified=true LIMIT 1` |
-| {N}         | Cantidad de reviews       | `SELECT COUNT(*) FROM reviews WHERE subject_id = {mentor_id}`              |
-| {promedio}  | Rating promedio           | `SELECT AVG(rating) FROM reviews WHERE subject_id = {mentor_id}`           |
+| {mentor_id} | Verified mentor UUID      | `SELECT id FROM profiles WHERE role='mentor' AND is_verified=true LIMIT 1` |
+| {N}         | Review count              | `SELECT COUNT(*) FROM reviews WHERE subject_id = {mentor_id}`              |
+| {average}   | Average rating            | `SELECT AVG(rating) FROM reviews WHERE subject_id = {mentor_id}`           |
 ```
 
-### Notas para el Tester
+### Notes for the Tester
 
-Incluir siempre una sección que explique cómo construir las precondiciones:
+Always include a section explaining how to build preconditions:
 
 ```gherkin
-# === NOTAS PARA EL TESTER ===
-# - {mentor_id}: Consultar en DB un mentor con is_verified=true y role='mentor'
-# - {N}: Contar reviews existentes para ese mentor donde is_hidden=false
-# - {promedio}: Se calcula automáticamente, validar contra DB o UI
-# - Si no hay data suficiente, crear precondiciones insertando datos de prueba
+# === NOTES FOR THE TESTER ===
+# - {mentor_id}: Query DB for a mentor with is_verified=true and role='mentor'
+# - {N}: Count existing reviews for that mentor where is_hidden=false
+# - {average}: Calculated automatically, validate against DB or UI
+# - If there's not enough data, create preconditions by inserting test data
 ```
 
-### Beneficios de Este Patrón
+### Benefits of This Pattern
 
-1. **Durabilidad:** El test case no necesita actualizarse cuando cambia la data
-2. **Portabilidad:** Funciona en cualquier ambiente (local, staging, QA)
-3. **Claridad:** El tester entiende QUÉ necesita, no depende de un valor mágico
-4. **Automatización:** El script puede parametrizar los valores dinámicamente
+1. **Durability:** The test case doesn't need updates when data changes
+2. **Portability:** Works in any environment (local, staging, QA)
+3. **Clarity:** The tester understands WHAT they need, doesn't depend on a magic value
+4. **Automation:** The script can parameterize values dynamically
 
 ---
 
-## Labels Estándar
+## Standard Labels
 
-| Label                            | Uso                          |
+| Label                            | Use                          |
 | -------------------------------- | ---------------------------- |
-| `regression`                     | Todos los tests de regresión |
-| `smoke`                          | Tests de humo (críticos)     |
+| `regression`                     | All regression tests         |
+| `smoke`                          | Smoke tests (critical)       |
 | `e2e`                            | End-to-end tests             |
-| `integration`                    | Tests de integración API     |
-| `functional`                     | Tests funcionales unitarios  |
-| `automation-candidate`           | Marcado para automatizar     |
-| `manual-only`                    | No automatizable             |
-| `critical`/`high`/`medium`/`low` | Prioridad                    |
+| `integration`                    | API integration tests        |
+| `functional`                     | Unit functional tests        |
+| `automation-candidate`           | Marked for automation        |
+| `manual-only`                    | Not automatable              |
+| `critical`/`high`/`medium`/`low` | Priority                     |
 
 ---
 
-## Errores Comunes
+## Common Errors
 
-| Error                       | Solución                          |
-| --------------------------- | --------------------------------- |
-| "Not logged in"             | Ejecutar `bun xray auth login`    |
-| "Issue type Test not found" | Verificar que Xray está instalado |
-| "Epic not found"            | Crear épica de regresión primero  |
-| "Transition not allowed"    | Verificar status actual del issue |
+| Error                       | Solution                                     |
+| --------------------------- | -------------------------------------------- |
+| "Not logged in"             | `[TMS_TOOL] Authenticate` (reads from .env)  |
+| "Issue type Test not found" | Verify Xray is installed in the project      |
+| "Epic not found"            | Create regression epic first (Phase 1)       |
+| "Transition not allowed"    | Verify current issue status                  |
 
 ---
 
 ## Output
 
-### Si se usa Xray CLI (`bun xray`):
+### If using [TMS_TOOL] (Xray):
 
-- Tests creados en Jira con Issue Type "Test" de Xray
-- Steps estructurados (si formato Steps) o Gherkin embebido (si formato Cucumber)
-- Tests vinculados a User Story
-- Tests dentro de Épica de Regresión
-- Estados transitados según workflow
+- Tests created in Jira with Xray "Test" Issue Type
+- Structured steps (if Steps format) or embedded Gherkin (if Cucumber format)
+- Tests linked to User Story
+- Tests within Regression Epic
+- States transitioned according to workflow
 
-### Si se usa solo Jira nativo (MCP Atlassian):
+### If using [ISSUE_TRACKER_TOOL] only (native Jira):
 
-- Tests creados en Jira con Issue Type "Test" (custom)
-- Contenido en Description (Gherkin o tabla de Steps)
-- Tests vinculados a User Story
-- Tests dentro de Épica de Regresión
-- Estados transitados según workflow
+- Tests created in Jira with "Test" Issue Type (custom)
+- Content in Description (Gherkin or Steps table)
+- Tests linked to User Story
+- Tests within Regression Epic
+- States transitioned according to workflow
 
-### Output Local (Caché):
+### Local Output (Cache):
 
-- Directorio `tests/` en carpeta de la story
-- Un archivo `.md` por cada test documentado
-- Formato según lo elegido (Gherkin o Steps)
+- `tests/` directory in story folder
+- One `.md` file per documented test
+- Format according to chosen option (Gherkin or Steps)
 
-### Para siguientes fases:
+### For next stages:
 
-- Tests con status **CANDIDATE** → Listos para Fase 12 (Automation)
-- Tests con status **MANUAL** → Suite de regresión manual
+- Tests with **CANDIDATE** status → Ready for Stage 4 (Automation)
+- Tests with **MANUAL** status → Manual regression suite

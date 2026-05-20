@@ -139,6 +139,71 @@ type UserRole = 'admin' | 'user' | 'guest';
 
 ---
 
+## 🔧 Function Parameters
+
+### Max 2 Positional Parameters Rule
+
+When a function has 3+ parameters, use an object:
+
+```typescript
+// ❌ BAD - Hard to read, easy to confuse order
+createUser('John', 'john@test.com', 'password', true, 30);
+
+// What is `true`? What is `30`? Nobody knows without checking the signature.
+
+// ✅ GOOD - Self-documenting
+createUser({
+  name: 'John',
+  email: 'john@test.com',
+  password: 'password',
+  isActive: true,
+  age: 30,
+});
+```
+
+### Interface Definition
+
+```typescript
+// Define the interface for the object parameter
+interface CreateUserArgs {
+  name: string;
+  email: string;
+  password: string;
+  isActive?: boolean; // Optional with ?
+  age?: number;
+}
+
+// Function signature is clean
+function createUser(args: CreateUserArgs): User {
+  const { name, email, password, isActive = true, age } = args;
+  // ...
+}
+```
+
+### Benefits
+
+| Benefit                  | Explanation                                  |
+| ------------------------ | -------------------------------------------- |
+| **Self-documenting**     | Parameter names visible at call site         |
+| **Order doesn't matter** | `{ age: 30, name: 'John' }` works fine       |
+| **Easy to extend**       | Add optional params without breaking changes |
+| **IDE support**          | Autocomplete shows all available options     |
+
+### When 2 Positional is OK
+
+```typescript
+// ✅ OK - 2 params are manageable
+function getUser(id: string, includeDeleted: boolean) { ... }
+
+// ✅ OK - 1 param is obvious
+function deleteUser(id: string) { ... }
+
+// ❌ NOT OK - 3+ params, use object
+function getUser(id: string, includeDeleted: boolean, expand: string) { ... }
+```
+
+---
+
 ## 🏗️ TypeScript Strict Mode
 
 **SIEMPRE usar TypeScript en modo strict**:

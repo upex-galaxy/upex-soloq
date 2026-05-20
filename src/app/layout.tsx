@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: 'SoloQ - Facturación para Freelancers',
   description:
     'Plataforma de facturación profesional diseñada para freelancers y trabajadores independientes en Latinoamérica.',
+  other: {
+    'apple-mobile-web-app-title': 'SoloQ',
+  },
 };
 
 export default function RootLayout({

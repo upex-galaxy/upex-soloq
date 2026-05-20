@@ -6,7 +6,7 @@
 
 ---
 
-> **Note**: This is the **conceptual fundamentals document** for KATA Framework.
+> **Note**: This is the **conceptual fundamentals document** for KATA Architecture.
 > This document is for **reference only** - it provides philosophical and conceptual context.
 > **AI agents should NOT load this automatically** - use TAE guidelines instead.
 >
@@ -917,7 +917,7 @@ def _sync_to_xray_cloud(results: dict):
         "info": {
             "project": project_key,
             "summary": f"KATA Execution - {os.getenv('BUILD_ID', datetime.now().strftime('%Y%m%d-%H%M%S'))}",
-            "description": "Automated test execution via KATA Framework"
+            "description": "Automated test execution via KATA Architecture"
         },
         "tests": []
     }
@@ -993,7 +993,7 @@ def _sync_to_xray_cloud(results: dict):
 #     if not run_id:
 #         run_payload = {
 #             "name": f"KATA Execution - {datetime.now().strftime('%Y-%m-%d %H:%M')}",
-#             "description": "Automated execution via KATA Framework",
+#             "description": "Automated execution via KATA Architecture",
 #             "include_all": True
 #         }
 #
@@ -1855,7 +1855,7 @@ def test_multi_section_form(fixture):
 
 ### Articles and Presentations
 
-- "Introduction to KATA Framework" _(pending)_
+- "Introduction to KATA Architecture" _(pending)_
 - "Migrating from Page Object Model to KATA" _(pending)_
 - "Automated Traceability with KATA" _(pending)_
 
@@ -1868,7 +1868,7 @@ def test_multi_section_form(fixture):
 
 ## 13. Conclusion
 
-KATA Framework is more than a design pattern: it's a complete philosophy for test automation that:
+KATA Architecture is more than a design pattern: it's a complete philosophy for test automation that:
 
 ✅ **Structures your code** in clear layers with defined responsibilities
 ✅ **Reuses actions** through ATCs shared across multiple tests
@@ -1878,7 +1878,7 @@ KATA Framework is more than a design pattern: it's a complete philosophy for tes
 ✅ **Flexibility** to handle complex scenarios with soft-fail
 ✅ **Keeps your suite clean** by avoiding duplication and promoting composition
 
-Like a kata in martial arts, KATA Framework invites you to practice good habits repeatedly until building maintainable and traceable tests becomes natural.
+Like a kata in martial arts, KATA Architecture invites you to practice good habits repeatedly until building maintainable and traceable tests becomes natural.
 
 ---
 

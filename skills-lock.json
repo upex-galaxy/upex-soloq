@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "skills": {
+    "acli": {
+      "source": "upex-galaxy/agentic-qa-boilerplate",
+      "sourceType": "github",
+      "computedHash": "44311df86697092575599ffd20a7f60db1a889b2903664b8b2471eccde12435b"
+    },
+    "sprint-testing": {
+      "source": "upex-galaxy/agentic-qa-boilerplate",
+      "sourceType": "github",
+      "computedHash": "a0e3c08d0141979d79417810b13e735a9ce0ecd4607e9b6694fec32183f24740"
+    },
+    "xray-cli": {
+      "source": "upex-galaxy/agentic-qa-boilerplate",
+      "sourceType": "github",
+      "computedHash": "714613c251210ba5c3d582eeda75a8af61ab2c74ad17f7bd7408746f42ff89d1"
+    }
+  }
+}

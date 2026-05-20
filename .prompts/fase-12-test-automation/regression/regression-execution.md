@@ -1,76 +1,76 @@
 # Regression Execution
 
-> **Fase**: 1 de 3 (Execution → Analysis → Report)
-> **Propósito**: Ejecutar suites de tests automatizados via GitHub Actions y monitorear hasta completar.
-> **Output**: Run ID, estado de ejecución y resumen listo para análisis.
+> **Phase**: 1 of 3 (Execution → Analysis → Report)
+> **Purpose**: Execute automated test suites via GitHub Actions and monitor to completion.
+> **Output**: Run ID, execution status, and summary ready for analysis.
 
 ---
 
-## Carga de Contexto
+## Context Loading
 
-**Cargar estos archivos de referencia:**
+**Load these files for reference:**
 
-1. `.github/workflows/regression.yml` → Estructura del workflow de regresión completa
-2. `.github/workflows/smoke.yml` → Workflow de smoke tests
-3. `.github/workflows/sanity.yml` → Workflow de sanity tests
-4. `.context/test-management-system.md` → Configuración de TMS (si se sincroniza)
+1. `.github/workflows/regression.yml` → Full regression workflow structure
+2. `.github/workflows/smoke.yml` → Smoke test workflow
+3. `.github/workflows/sanity.yml` → Sanity test workflow
+4. `.context/test-management-system.md` → TMS configuration (if syncing)
 
 ---
 
-## Input Requerido
+## Input Required
 
-Especificar qué tipo de regresión ejecutar:
+Specify what type of regression to execute:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ PARÁMETROS DE EJECUCIÓN                                                      │
+│ EXECUTION PARAMETERS                                                        │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
-│ Tipo de Suite:   ○ regression (completo)  ○ smoke (crítico)  ○ sanity      │
+│ Suite Type:      ○ regression (full)    ○ smoke (critical)    ○ sanity     │
 │                                                                             │
-│ Ambiente:        ○ staging (default)      ○ local                          │
+│ Environment:     ○ {{DEFAULT_ENV}} (default)    ○ local                            │
 │                                                                             │
-│ Generar Allure:  ○ sí (default)           ○ no                             │
+│ Generate Allure: ○ yes (default)        ○ no                               │
 │                                                                             │
-│ [Solo para sanity]                                                          │
+│ [For sanity only]                                                           │
 │ ─────────────────────────────────────────────────────────────────────────  │
-│ Tipo de Test:    ○ all    ○ e2e    ○ integration                           │
-│ Patrón Grep:     _________________________________ (ej: @auth, login)      │
-│ Archivo Test:    _________________________________ (ej: qa/tests/e2e/...)  │
+│ Test Type:       ○ all    ○ e2e    ○ integration                           │
+│ Grep Pattern:    _________________________________ (e.g., @auth, login)    │
+│ Test File:       _________________________________ (e.g., tests/e2e/...)   │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Ejemplos de Selección Rápida
+### Quick Selection Examples
 
-| Escenario | Suite | Parámetros |
-|-----------|-------|------------|
-| Regresión completa antes de release | `regression` | `environment=staging` |
-| Health check diario | `smoke` | `environment=staging` |
-| Validar feature específico | `sanity` | `grep="@booking"`, `test_type=e2e` |
-| Ejecutar archivo de test único | `sanity` | `test_file="qa/tests/e2e/auth/login.test.ts"` |
-| Solo tests de API | `sanity` | `test_type=integration` |
+| Scenario | Suite | Parameters |
+|----------|-------|------------|
+| Full regression before release | `regression` | `environment=staging` |
+| Daily health check | `smoke` | `environment=staging` |
+| Validate specific feature | `sanity` | `grep="@booking"`, `test_type=e2e` |
+| Run single test file | `sanity` | `test_file="tests/e2e/auth/login.test.ts"` |
+| API tests only | `sanity` | `test_type=integration` |
 
 ---
 
-## Flujo de Ejecución
+## Execution Workflow
 
-### Paso 1: Validar Prerrequisitos
+### Step 1: Validate Prerequisites
 
-Antes de disparar, verificar:
+Before triggering, verify:
 
 ```bash
-# Verificar que gh CLI está autenticado
+# Check gh CLI is authenticated
 gh auth status
 
-# Verificar acceso al repositorio
+# Verify repository access
 gh repo view --json name,owner
 
-# Listar workflows disponibles
+# List available workflows
 gh workflow list
 ```
 
-Output esperado:
+Expected output:
 ```
 NAME              STATE   ID
 Regression Tests  active  12345678
@@ -80,11 +80,11 @@ Sanity Tests      active  12345680
 
 ---
 
-### Paso 2: Disparar Workflow
+### Step 2: Trigger Workflow
 
-Ejecutar el workflow apropiado según el input:
+Execute the appropriate workflow based on input:
 
-#### Para Regresión Completa
+#### For Full Regression
 
 ```bash
 gh workflow run regression.yml \
@@ -93,7 +93,7 @@ gh workflow run regression.yml \
   -f generate_allure=true
 ```
 
-#### Para Smoke Tests
+#### For Smoke Tests
 
 ```bash
 gh workflow run smoke.yml \
@@ -101,23 +101,23 @@ gh workflow run smoke.yml \
   -f generate_allure=true
 ```
 
-#### Para Sanity Tests
+#### For Sanity Tests
 
 ```bash
-# Con patrón grep
+# With grep pattern
 gh workflow run sanity.yml \
   -f environment=staging \
   -f test_type=e2e \
   -f grep="@auth" \
   -f generate_allure=true
 
-# Con archivo específico
+# With specific file
 gh workflow run sanity.yml \
   -f environment=staging \
-  -f test_file="qa/tests/e2e/auth/login.test.ts" \
+  -f test_file="tests/e2e/auth/login.test.ts" \
   -f generate_allure=true
 
-# Solo tests de integración
+# Integration tests only
 gh workflow run sanity.yml \
   -f environment=staging \
   -f test_type=integration \
@@ -126,19 +126,19 @@ gh workflow run sanity.yml \
 
 ---
 
-### Paso 3: Capturar Run ID
+### Step 3: Capture Run ID
 
-Inmediatamente después de disparar, obtener el run ID:
+Immediately after triggering, get the run ID:
 
 ```bash
-# Esperar unos segundos para que aparezca el run
+# Wait a few seconds for the run to appear
 sleep 5
 
-# Obtener el run ID más reciente
+# Get the most recent run ID
 gh run list --workflow={workflow}.yml --limit=1 --json databaseId,status,createdAt
 ```
 
-Output esperado:
+Expected output:
 ```json
 [
   {
@@ -149,41 +149,41 @@ Output esperado:
 ]
 ```
 
-Extraer y guardar el `databaseId` como `RUN_ID` para los pasos siguientes.
+Extract and store the `databaseId` as `RUN_ID` for subsequent steps.
 
 ---
 
-### Paso 4: Monitorear Ejecución
+### Step 4: Monitor Execution
 
-#### Opción A: Watch en Tiempo Real
+#### Option A: Watch in Real-Time
 
 ```bash
 gh run watch <RUN_ID>
 ```
 
-Esto bloquea hasta que el run complete, mostrando progreso en vivo.
+This blocks until the run completes, showing live progress.
 
-#### Opción B: Polling de Estado (No Bloqueante)
+#### Option B: Poll Status (Non-Blocking)
 
 ```bash
-# Verificar estado
+# Check status
 gh run view <RUN_ID> --json status,conclusion
 
-# Esperado durante ejecución:
+# Expected during execution:
 # {"status":"in_progress","conclusion":null}
 
-# Esperado después de completar:
+# Expected after completion:
 # {"status":"completed","conclusion":"success"}
 # {"status":"completed","conclusion":"failure"}
 ```
 
-#### Opción C: Obtener Estado Detallado de Jobs
+#### Option C: Get Detailed Job Status
 
 ```bash
 gh run view <RUN_ID> --json jobs --jq '.jobs[] | {name, status, conclusion}'
 ```
 
-Output esperado:
+Expected output:
 ```json
 {"name":"Integration Tests","status":"completed","conclusion":"success"}
 {"name":"E2E Tests","status":"in_progress","conclusion":null}
@@ -192,183 +192,183 @@ Output esperado:
 
 ---
 
-### Paso 5: Capturar Estado Final
+### Step 5: Capture Final Status
 
-Una vez completado, obtener resumen completo de ejecución:
+Once completed, get full execution summary:
 
 ```bash
 gh run view <RUN_ID> --json status,conclusion,jobs,createdAt,updatedAt,url
 ```
 
-Parsear la respuesta para extraer:
+Parse the response to extract:
 
-| Campo | Descripción | Ejemplo |
+| Field | Description | Example |
 |-------|-------------|---------|
-| `status` | Estado del run | `completed` |
-| `conclusion` | Resultado final | `success` \| `failure` |
-| `url` | URL de GitHub Actions | `https://github.com/.../runs/...` |
-| `createdAt` | Hora de inicio | `2026-02-11T14:30:00Z` |
-| `updatedAt` | Hora de fin | `2026-02-11T14:45:32Z` |
-| `jobs` | Array de resultados de jobs | Ver abajo |
+| `status` | Run status | `completed` |
+| `conclusion` | Final result | `success` \| `failure` |
+| `url` | GitHub Actions URL | `https://github.com/.../runs/...` |
+| `createdAt` | Start time | `2026-02-11T14:30:00Z` |
+| `updatedAt` | End time | `2026-02-11T14:45:32Z` |
+| `jobs` | Array of job results | See below |
 
 ---
 
-## Template de Output
+## Output Template
 
-Generar el siguiente resumen de ejecución:
+Generate the following execution summary:
 
 ```markdown
-## Resumen de Ejecución
+## Execution Summary
 
-| Atributo | Valor |
-|----------|-------|
+| Attribute | Value |
+|-----------|-------|
 | **Workflow** | {workflow_name} |
 | **Run ID** | {run_id} |
-| **Ambiente** | {environment} |
-| **Estado** | ✅ Completado / ❌ Fallido / 🔄 En Progreso |
-| **Conclusión** | success / failure / cancelled |
-| **Duración** | {calculated_duration} |
-| **Disparado Por** | {actor} |
+| **Environment** | {environment} |
+| **Status** | ✅ Completed / ❌ Failed / 🔄 Running |
+| **Conclusion** | success / failure / cancelled |
+| **Duration** | {calculated_duration} |
+| **Triggered By** | {actor} |
 | **Timestamp** | {createdAt} |
 | **URL** | [{run_id}]({url}) |
 
-### Estado de Jobs
+### Jobs Status
 
-| Job | Estado | Conclusión | Duración |
+| Job | Status | Conclusion | Duration |
 |-----|--------|------------|----------|
 | Integration Tests | completed | ✅ success | 5m 12s |
 | E2E Tests | completed | ❌ failure | 8m 45s |
 | Build & Deploy Allure Report | completed | ✅ success | 1m 35s |
 
-### Artefactos Generados
+### Artifacts Generated
 
-| Artefacto | Disponible |
-|-----------|------------|
+| Artifact | Available |
+|----------|-----------|
 | integration-allure-results | ✅ |
 | e2e-allure-results | ✅ |
 | merged-allure-results-staging | ✅ |
 | e2e-playwright-report | ✅ |
 | e2e-failure-evidence | ✅ |
 
-### URL del Allure Report
+### Allure Report URL
 
 https://{owner}.github.io/{repo}/{environment}/{suite}/
 
 ---
 
-## Siguientes Pasos
+## Next Steps
 
-→ **Si Estado = SUCCESS**: Proceder a `regression-analysis.md` para revisión de métricas
-→ **Si Estado = FAILURE**: Proceder a `regression-analysis.md` para investigación de fallos
-→ **Run ID para Análisis**: {run_id}
+→ **If Status = SUCCESS**: Proceed to `regression-analysis.md` for metrics review
+→ **If Status = FAILURE**: Proceed to `regression-analysis.md` for failure investigation
+→ **Run ID for Analysis**: {run_id}
 ```
 
 ---
 
-## Manejo de Errores
+## Error Handling
 
-### Workflow No Se Encuentra
+### Workflow Not Found
 
 ```bash
 # Error: could not find workflow 'regression.yml'
-# Solución: Listar workflows disponibles
+# Solution: List available workflows
 gh workflow list
 
-# Verificar si el workflow está habilitado
+# Check if workflow is enabled
 gh workflow view regression.yml
 ```
 
-### Problemas de Autenticación
+### Authentication Issues
 
 ```bash
 # Error: HTTP 401
-# Solución: Re-autenticar
+# Solution: Re-authenticate
 gh auth login
 ```
 
-### Run No Inicia
+### Run Failed to Start
 
 ```bash
-# Verificar que los inputs son válidos
+# Verify inputs are valid
 gh workflow view regression.yml --yaml | grep -A 20 "inputs:"
 
-# Verificar secrets requeridos
-# (Esto requiere acceso admin o ver el archivo de workflow)
+# Check for required secrets
+# (This requires admin access or viewing workflow file)
 ```
 
-### Timeout Durante Monitoreo
+### Timeout During Monitoring
 
 ```bash
-# Si gh run watch hace timeout, verificar estado manualmente
+# If gh run watch times out, check status manually
 gh run view <RUN_ID> --json status,conclusion
 
-# Re-ejecutar si es necesario
+# Re-run if needed
 gh run rerun <RUN_ID>
 ```
 
 ---
 
-## Decisiones de Ejecución
+## Execution Decisions
 
-### ¿Cuál Suite Elegir?
+### Which Suite to Choose?
 
-| Situación | Suite Recomendada |
+| Situation | Recommended Suite |
 |-----------|-------------------|
-| Validación pre-release | `regression` (completo) |
-| Verificación post-deployment | `smoke` (solo críticos) |
-| Validar feature específico | `sanity` con grep |
-| Debuggear test fallido | `sanity` con test_file |
-| Health check nocturno | `smoke` o `regression` (programado) |
+| Pre-release validation | `regression` (full) |
+| Post-deployment check | `smoke` (critical only) |
+| Validate specific feature | `sanity` with grep |
+| Debug a failing test | `sanity` with test_file |
+| Nightly health check | `smoke` or `regression` (scheduled) |
 
-### Cuándo Usar Grabación de Video
+### When to Use Video Recording
 
-Habilitar `video_record=true` cuando:
-- Debuggeando tests flaky
-- Investigando issues visuales
-- Se necesita evidencia para bug reports
+Enable `video_record=true` when:
+- Debugging flaky tests
+- Investigating visual issues
+- Need evidence for bug reports
 
-Nota: La grabación de video aumenta el tiempo de ejecución y el tamaño de artefactos.
+Note: Video recording increases execution time and artifact size.
 
 ---
 
-## Ejecución Programada vs Manual
+## Scheduled vs Manual Execution
 
-| Tipo | Trigger | Caso de Uso |
-|------|---------|-------------|
-| **Programada** | Cron (diario) | Regresión nocturna, monitoreo continuo |
-| **Manual** | `workflow_dispatch` | Pre-release, testing ad-hoc |
+| Type | Trigger | Use Case |
+|------|---------|----------|
+| **Scheduled** | Cron (daily) | Nightly regression, continuous monitoring |
+| **Manual** | `workflow_dispatch` | Pre-release, ad-hoc testing |
 
-Verificar runs programados:
+Check scheduled runs:
 ```bash
 gh run list --workflow=regression.yml --event=schedule --limit=5
 ```
 
 ---
 
-## Comandos de Referencia Rápida
+## Quick Reference Commands
 
 ```bash
-# Disparar regresión completa
+# Trigger full regression
 gh workflow run regression.yml -f environment=staging
 
-# Obtener último run ID
+# Get latest run ID
 gh run list --workflow=regression.yml --limit=1 --json databaseId -q '.[0].databaseId'
 
-# Watch de ejecución
+# Watch execution
 gh run watch $(gh run list --workflow=regression.yml --limit=1 --json databaseId -q '.[0].databaseId')
 
-# Verificar si completó
+# Check if completed
 gh run view <RUN_ID> --json conclusion -q '.conclusion'
 
-# Obtener URL de GitHub Actions
+# Get GitHub Actions URL
 gh run view <RUN_ID> --json url -q '.url'
 ```
 
 ---
 
-## Siguiente Paso
+## Next Step
 
-Una vez que complete la ejecución:
+Once execution completes:
 
-→ **Proceder a**: `regression-analysis.md` (Fase 2)
-→ **Con**: Run ID de esta ejecución
+→ **Proceed to**: `regression-analysis.md` (Phase 2)
+→ **With**: Run ID from this execution

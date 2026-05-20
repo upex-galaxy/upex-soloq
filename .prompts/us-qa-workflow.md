@@ -1,375 +1,513 @@
 # US QA Workflow
 
-> **Propósito**: Workflow completo de QA para un User Story, desde testing exploratorio hasta automatización.
-> **Alcance**: Un US a la vez - completar todas las etapas antes de pasar al siguiente US.
-> **Output**: Feature testeado, casos de test documentados, tests automatizados.
+> **Purpose**: Complete In-Sprint Testing workflow for a single User Story, from planning to test automation.
+> **Scope**: One US at a time - complete all stages before moving to the next US.
+> **Output**: Tested feature, documented test cases, automated tests.
+> Based on IQL (Integrated Quality Lifecycle) methodology.
 
 ---
 
 ## Overview
 
-Este orquestador guía el proceso completo de QA para **un User Story**. Ejecutar las etapas secuencialmente, completando cada una antes de avanzar.
+This orchestrator guides the complete QA process for **one User Story**, from session initialization to automation. It integrates with your TMS (Jira, Xray, etc.) for full traceability and uses local PBI documentation for AI context persistence.
+
+**Entry Point + 6 Stages:**
+0. **Session Start** (REQUIRED): Initialize session, load context, create PBI folder
+1. **Planning (Shift-Left)**: Triage + Create ATP/ATR/TCs with full traceability
+2. **Execution**: Execute TCs, update statuses (PASSED/FAILED)
+3. **Reporting**: Complete ATR Test Report, report bugs
+4. **Documentation**: Prioritize TCs for regression (ROI analysis)
+5. **Automation**: Implement automated tests for Candidate TCs
+6. **Regression**: Execute automated suites, analyze results, GO/NO-GO
+
+**Key Principle:**
+- **Stage 1 creates ALL TMS artifacts** (ATP, ATR, TCs) with complete traceability
+- **Stage 2 executes** what was planned (no TC creation)
+- **Stage 3 reports** results and bugs
+
+Execute stages sequentially, completing each before moving to the next.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                     QA WORKFLOW PARA UN USER STORY                          │
+│                     QA WORKFLOW FOR ONE USER STORY                          │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
-  │ Stage 1  │───►│ Stage 2  │───►│ Stage 3  │───►│ Stage 4  │───►│ Stage 5  │
-  │ Shift-   │    │ Explora- │    │ Document │    │ Automate │    │ Regres-  │
-  │ Left     │    │ tory     │    │ ation    │    │          │    │ sion     │
-  └──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘
-       │               │               │               │               │
-       ▼               ▼               ▼               ▼               ▼
-    ATP/Test        Bugs +         ATCs en        Tests           Reporte
-    Plan            Hallazgos      TMS            Automatizados   Ejecución
+  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+  │ Stage 1  │───►│ Stage 2  │───►│ Stage 3  │───►│ Stage 4  │───►│ Stage 5  │───►│ Stage 6  │
+  │ Planning │    │ Execu-   │    │ Report-  │    │ Document │    │ Automate │    │ Regres-  │
+  │          │    │ tion     │    │ ing      │    │ ation    │    │          │    │ sion     │
+  └──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘
+       │               │               │               │               │               │
+       ▼               ▼               ▼               ▼               ▼               ▼
+    ATP/Test        Bugs +          Bug           ATCs in        Automated      Execution
+    Plan            Findings        Reports        TMS           Tests          Report
 
   ◄────────────────── FEEDBACK LOOP ──────────────────────────────────────────►
 ```
 
 ---
 
-## Input Requerido
+## Input Required
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ INFORMACIÓN DEL USER STORY                                                  │
+│ USER STORY INFORMATION                                                      │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
-│ Story ID:        _________________________________ (ej: PROJ-123)          │
+│ Story ID:        _________________________________ (e.g., {{PROJECT_KEY}}123)        │
 │                                                                             │
-│ Story Title:     _________________________________ (descripción breve)     │
+│ Story Title:     _________________________________ (brief description)     │
 │                                                                             │
 │ Status:          ○ Ready For QA    ○ In Testing    ○ QA Approved           │
 │                                                                             │
-│ Staging URL:     _________________________________ (para testing)          │
+│ Staging URL:     _________________________________ (for testing)           │
 │                                                                             │
-│ Source:          ○ Jira (usar MCP)    ○ Input manual                       │
+│ Source:          ○ Jira (use MCP)    ○ Manual input                        │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Prerrequisitos
+## Prerequisites
 
-Antes de empezar, verificar:
+> **Run `session-start.md` FIRST** to initialize the testing session.
+>
+> Session Start provides:
+> - Project context loaded (business-data-map, api-architecture, project-test-guide)
+> - Module context loaded/created
+> - PBI folder created: `.context/PBI/{module-name}/TK-{number}-{brief-title}/`
+> - Skills loaded (TMS CLI, Playwright CLI)
+> - Initial context.md with ACs and code locations
+>
+> **If session not initialized:** Run `session-start.md` before continuing.
 
-- [ ] User Story está en status "Ready For QA"
-- [ ] Feature desplegado en ambiente de staging
-- [ ] Acceso a staging URL disponible
-- [ ] Archivos de contexto cargados (ver sección Context Loading)
+Before starting, verify:
+
+- [ ] Session Start executed (`session-start.md`)
+- [ ] User Story is in "Ready For QA" status
+- [ ] Feature is deployed to staging environment
+- [ ] Access to staging URL is available
+- [ ] Context files are loaded (see Context Loading section)
 
 ### Context Loading
 
 ```markdown
-Cargar estos archivos antes de empezar:
+Load these files before starting (ordered by priority):
 
-1. `qa/.context/guidelines/TAE/KATA-AI-GUIDE.md` → Patrones KATA
-2. `qa/.context/guidelines/TAE/automation-standards.md` → Estándares de código
-3. `.context/test-management-system.md` → Configuración TMS (si existe)
-4. `.context/project-test-guide.md` → Qué testear (si existe)
+1. `.context/business-data-map.md` → Business flows and state machines
+2. `.context/api-architecture.md` → API endpoints and authentication
+3. `.context/project-test-guide.md` → What to test (if exists)
+4. `.context/guidelines/TAE/kata-ai-index.md` → KATA patterns (for automation)
+5. `.context/guidelines/TAE/automation-standards.md` → Coding standards (for automation)
+6. `.context/test-management-system.md` → TMS configuration (if exists)
 ```
 
 ---
 
-## Stage 1: Shift-Left Testing
+## Stage 1: Planning
 
 > **Prompt**: `.prompts/fase-5-shift-left-testing/acceptance-test-plan.md`
-> **Cuándo**: Antes o durante desarrollo (opcional si US ya está en QA)
-> **Output**: Acceptance Test Plan (ATP) con escenarios de test
+> **When**: Before or during development (optional if US is already in QA)
+> **Output**: Acceptance Test Plan (ATP) with test scenarios
 
-### Acciones
+### Actions
 
-1. **Leer el User Story**
-   - Obtener detalles de Jira (si MCP disponible) o input manual
-   - Extraer Criterios de Aceptación
-   - Identificar reglas de negocio
+1. **Read the User Story**
+   - Get story details from Jira (if MCP available) or manual input
+   - Extract Acceptance Criteria
+   - Identify business rules
 
-2. **Crear ATP**
-   - Usar prompt para generar escenarios de test
-   - Aplicar nomenclatura: `{US_ID}: TC#: Validar <CORE> <CONDITIONAL>`
-   - Identificar variables y necesidades de datos de test
+2. **Create ATP**
+   - Use prompt to generate test scenarios
+   - Apply nomenclature: `{US_ID}: TC#: Validate <CORE> <CONDITIONAL>`
+   - Identify variables and test data needs
 
-3. **Decisión**
-   - Skip si US ya tiene casos de test documentados
-   - Continuar si se planean nuevos tests
+3. **Decision**
+   - Skip if US already has documented test cases
+   - Continue if planning new tests
 
 ### Output Checkpoint
 
 ```markdown
-## Stage 1 Completo
+## Stage 1 Complete
 
-- [ ] ATP creado con N escenarios de test
-- [ ] Nomenclatura de test aplicada
-- [ ] Variables identificadas
-- [ ] Listo para testing exploratorio
+- [ ] ATP created with N test scenarios
+- [ ] Test nomenclature applied
+- [ ] Variables identified
+- [ ] Ready for execution testing
 ```
 
 ---
 
-## Stage 2: Exploratory Testing
+## Stage 2: Execution Testing
 
 > **Prompts**: `.prompts/fase-10-exploratory-testing/*.md`
-> **Cuándo**: Feature desplegado en staging
-> **Output**: Hallazgos de exploración, bugs reportados
+> **When**: Feature deployed to staging
+> **Output**: Exploration findings, bugs reported
 
-### Acciones
+### Actions
 
 1. **Smoke Test** (5-10 min)
-   - Usar: `.prompts/fase-10-exploratory-testing/smoke-test.md`
-   - Verificar que funcionalidad básica funciona
-   - Verificar que no hay errores bloqueantes
+   - Use: `.prompts/fase-10-exploratory-testing/smoke-test.md`
+   - Verify basic functionality works
+   - Check no blocking errors
 
-2. **Exploración Profunda** (varía)
-   - Usar: `.prompts/fase-10-exploratory-testing/exploratory-test.md`
-   - Testear happy paths y edge cases
-   - Documentar hallazgos
+2. **Deep Exploration** (varies)
+   - Use: `.prompts/fase-10-exploratory-testing/exploratory-test.md` (for UI)
+   - Use: `.prompts/fase-10-exploratory-testing/exploratory-api-test.md` (for API)
+   - Use: `.prompts/fase-10-exploratory-testing/exploratory-db-test.md` (for data validation)
+   - Test happy paths and edge cases
+   - Document findings
 
-3. **Reporte de Bugs** (si se encuentran issues)
-   - Usar: `.prompts/fase-10-exploratory-testing/bug-report.md`
-   - Crear bugs en Jira (confirmar con usuario primero)
-   - Linkear bugs al User Story
+3. **Bug Reporting** (if issues found)
+   - Use: `.prompts/fase-10-exploratory-testing/bug-report.md`
+   - Create bugs in Jira (confirm with user first)
+   - Link bugs to User Story
 
-4. **Punto de Decisión**
-   - **PASSED**: Continuar a Stage 3
-   - **BLOCKED**: Esperar fixes, retornar al Step 1
-   - **FAILED**: Reportar issues, escalar
+4. **Decision Point**
+   - **PASSED**: Continue to Stage 3 (Reporting)
+   - **BLOCKED**: Wait for fixes, return to Step 1
+   - **FAILED**: Report issues, escalate
 
-### Herramientas MCP (si disponibles)
+### Tool Capabilities
 
-```
-- mcp__playwright__* → Automatización de browser para UI testing
-- mcp__atlassian__* → Jira para creación de bugs
-```
+| Capability | Tag |
+|------------|-----|
+| Browser automation for UI testing | `[AUTOMATION_TOOL]` |
+| Issue tracking for bug creation | `[ISSUE_TRACKER_TOOL]` |
+
+> Resolved via [AUTOMATION_TOOL] / [ISSUE_TRACKER_TOOL] — see Tool Resolution in CLAUDE.md
 
 ### Output Checkpoint
 
 ```markdown
-## Stage 2 Completo
+## Stage 2 Complete
 
 - [ ] Smoke test: PASSED / FAILED
-- [ ] Testing exploratorio: PASSED / FAILED / BLOCKED
-- [ ] Bugs creados: N (o ninguno)
-- [ ] Recomendación: APROBAR / RECHAZAR / ESPERAR
+- [ ] Exploratory testing: PASSED / FAILED / BLOCKED
+- [ ] Bugs created: N (or none)
+- [ ] Recommendation: APPROVE / REJECT / WAIT
 ```
 
 ---
 
-## Stage 3: Test Documentation
+## Stage 3: Reporting
 
-> **Prompts**: `.prompts/fase-11-test-documentation/*.md`
-> **Cuándo**: Después de que testing exploratorio pasa
-> **Output**: Casos de test documentados en TMS
+> **Prompts**: `.prompts/fase-10-exploratory-testing/*.md`
+> **When**: After execution testing, when bugs are found
+> **Output**: Formal bug reports, defect documentation
 
-### Acciones
+### Actions
 
-1. **Analizar Candidatos de Test**
-   - Usar: `.prompts/fase-11-test-documentation/test-analysis.md`
-   - Revisar hallazgos de exploración
-   - Identificar escenarios para suite de regresión
-   - Separar: automatizable vs solo-manual
+1. **Document Bugs**
+   - Use: `.prompts/fase-10-exploratory-testing/bug-report.md`
+   - Create formal bug reports for all issues found during execution
+   - Include reproduction steps, expected vs actual behavior
+   - Attach screenshots/evidence
 
-2. **Priorizar para Automatización**
-   - Usar: `.prompts/fase-11-test-documentation/test-prioritization.md`
-   - Aplicar fórmula ROI
-   - Rankear por impacto de negocio
+2. **Classify and Prioritize**
+   - Assign severity and priority to each bug
+   - Link bugs to User Story
+   - Create bugs in Jira (confirm with user first)
 
-3. **Documentar en TMS**
-   - Usar: `.prompts/fase-11-test-documentation/test-documentation.md`
-   - Crear casos de test con formato Gherkin
-   - Usar patrón de variables (no datos hardcodeados)
-   - Linkear al User Story
+3. **Decision Point**
+   - **All bugs reported**: Continue to Stage 4 (Documentation)
+   - **Critical bugs found**: Wait for fixes, return to Stage 2
 
 ### Output Checkpoint
 
 ```markdown
-## Stage 3 Completo
+## Stage 3 Complete
 
-- [ ] Análisis de test completado
-- [ ] N tests identificados para automatización
-- [ ] N tests marcados como solo-manual
-- [ ] Casos de test creados en TMS: TEST-001, TEST-002, ...
-- [ ] Tests linkeados al US
+- [ ] All bugs formally documented
+- [ ] Bugs linked to User Story
+- [ ] Bugs created in Jira (if applicable)
+- [ ] Ready for test documentation
 ```
 
 ---
 
-## Stage 4: Test Automation
+## Stage 4: Test Documentation
+
+> **Prompts**: `.prompts/fase-11-test-documentation/*.md`
+> **When**: After execution testing passes
+> **Output**: Test cases documented in TMS
+
+### Actions
+
+1. **Analyze Test Candidates**
+   - Use: `.prompts/fase-11-test-documentation/test-analysis.md`
+   - Review exploration findings
+   - Identify scenarios for regression suite
+   - Separate: automatable vs manual-only
+
+2. **Prioritize for Automation**
+   - Use: `.prompts/fase-11-test-documentation/test-prioritization.md`
+   - Apply ROI formula
+   - Rank by business impact
+
+3. **Document in TMS**
+   - Use: `.prompts/fase-11-test-documentation/test-documentation.md`
+   - Create test cases with Gherkin format
+   - Use variable pattern (no hardcoded data)
+   - Link to User Story
+
+### Output Checkpoint
+
+```markdown
+## Stage 4 Complete
+
+- [ ] Test analysis completed
+- [ ] N tests identified for automation
+- [ ] N tests marked as manual-only
+- [ ] Test cases created in TMS: TEST-001, TEST-002, ...
+- [ ] Tests linked to US
+```
+
+---
+
+## Stage 5: Test Automation
 
 > **Prompts**: `.prompts/fase-12-test-automation/*.md`
-> **Cuándo**: Después de casos de test documentados
-> **Output**: Tests automatizados siguiendo arquitectura KATA
+> **When**: After test cases documented
+> **Output**: Automated tests following KATA architecture
 
 ### Workflow: Plan → Coding → Review
 
-Para cada caso de test a automatizar:
+For each test case to automate:
 
-#### Fase 1: Plan
-
-```markdown
-# Para tests E2E (UI):
-Usar: `.prompts/fase-12-test-automation/e2e/e2e-plan.md`
-
-# Para tests Integration (API):
-Usar: `.prompts/fase-12-test-automation/integration/integration-plan.md`
-```
-
-#### Fase 2: Coding
+#### Phase 1: Plan
 
 ```markdown
-# Para tests E2E (UI):
-Usar: `.prompts/fase-12-test-automation/e2e/e2e-coding.md`
+# For E2E (UI) or Integration (API) tests:
+Use: `.prompts/fase-12-test-automation/planning/test-implementation-plan.md`
 
-# Para tests Integration (API):
-Usar: `.prompts/fase-12-test-automation/integration/integration-coding.md`
+# For ATC spec planning:
+Use: `.prompts/fase-12-test-automation/planning/atc-implementation-plan.md`
 ```
 
-#### Fase 3: Review
+#### Phase 2: Coding
 
 ```markdown
-# Para tests E2E (UI):
-Usar: `.prompts/fase-12-test-automation/e2e/e2e-review.md`
+# For E2E (UI) tests:
+Use: `.prompts/fase-12-test-automation/e2e/e2e-coding.md`
 
-# Para tests Integration (API):
-Usar: `.prompts/fase-12-test-automation/integration/integration-review.md`
+# For Integration (API) tests:
+Use: `.prompts/fase-12-test-automation/integration/integration-coding.md`
 ```
 
-### Validación
+#### Phase 3: Review
+
+```markdown
+# For E2E (UI) tests:
+Use: `.prompts/fase-12-test-automation/e2e/e2e-review.md`
+
+# For Integration (API) tests:
+Use: `.prompts/fase-12-test-automation/integration/integration-review.md`
+```
+
+### Validation
 
 ```bash
-# Ejecutar desde la carpeta qa/
-cd qa
-
-# Ejecutar el nuevo test
+# Run the new test
 bun run test tests/e2e/{module}/{test}.test.ts
 
-# O para integration
+# Or for integration
 bun run test tests/integration/{module}/{test}.test.ts
 
-# Verificar linting
+# Check linting
 bun run lint
 
-# Verificar tipos
+# Check types
 bun run type-check
 ```
 
 ### Output Checkpoint
 
 ```markdown
-## Stage 4 Completo
+## Stage 5 Complete
 
-- [ ] Plan creado para cada test
-- [ ] Componente implementado (si necesario)
-- [ ] Archivo de test creado
-- [ ] Fixture actualizado (si necesario)
-- [ ] Code review: APROBADO
-- [ ] Test pasa localmente
-- [ ] Lint/type-check pasan
+- [ ] Test plan created
+- [ ] Component implemented (if needed)
+- [ ] Test file created
+- [ ] Fixture updated (if needed)
+- [ ] Code review: APPROVED
+- [ ] Test passes locally
+- [ ] Lint/type-check pass
 ```
 
 ---
 
-## Stage 5: Regression (Opcional por US)
+## Stage 6: Regression (Optional per US)
 
 > **Prompts**: `.prompts/fase-12-test-automation/regression/*.md`
-> **Cuándo**: Después de automatización completa O al momento de release
-> **Output**: Reporte de ejecución, decisión GO/NO-GO
+> **When**: After automation complete OR at release time
+> **Output**: Execution report, GO/NO-GO decision
 
-### Cuándo Ejecutar
+### When to Execute
 
-| Trigger | Acción |
+| Trigger | Action |
 |---------|--------|
-| US individual completo | Ejecutar sanity con nuevo test |
-| Sprint completo | Ejecutar regresión completa |
-| Pre-release | Ejecutar regresión completa + reporte |
+| Single US complete | Run sanity with new test |
+| Sprint complete | Run full regression |
+| Pre-release | Run full regression + report |
 
-### Acciones
+### Actions
 
-1. **Ejecutar Tests**
-   - Usar: `.prompts/fase-12-test-automation/regression/regression-execution.md`
-   - Disparar workflow apropiado via `gh` CLI
-   - Monitorear hasta completar
+1. **Execute Tests**
+   - Use: `.prompts/fase-12-test-automation/regression/regression-execution.md`
+   - Trigger appropriate workflow via `gh` CLI
+   - Monitor to completion
 
-2. **Analizar Resultados**
-   - Usar: `.prompts/fase-12-test-automation/regression/regression-analysis.md`
-   - Clasificar cualquier fallo
-   - Calcular métricas
+2. **Analyze Results**
+   - Use: `.prompts/fase-12-test-automation/regression/regression-analysis.md`
+   - Classify any failures
+   - Calculate metrics
 
-3. **Generar Reporte** (para releases)
-   - Usar: `.prompts/fase-12-test-automation/regression/regression-report.md`
-   - Crear recomendación GO/NO-GO
-   - Compartir con stakeholders
+3. **Generate Report** (for releases)
+   - Use: `.prompts/fase-12-test-automation/regression/regression-report.md`
+   - Create GO/NO-GO recommendation
+   - Share with stakeholders
 
-### Sanity Rápido para US Individual
+### Quick Sanity for Single US
 
 ```bash
-# Ejecutar desde raíz del proyecto
-# Ejecutar solo el nuevo test
+# Run only the new test(s)
 gh workflow run sanity.yml \
-  -f environment=staging \
+  -f environment={{DEFAULT_ENV}} \
   -f test_file="tests/e2e/{module}/{test}.test.ts"
 ```
 
 ### Output Checkpoint
 
 ```markdown
-## Stage 5 Completo
+## Stage 6 Complete
 
-- [ ] Tests ejecutados exitosamente
-- [ ] Nuevo test pasa en CI
-- [ ] No se introdujeron regresiones
-- [ ] (Opcional) Reporte de regresión completo generado
+- [ ] Tests executed successfully
+- [ ] New test passes in CI
+- [ ] No regressions introduced
+- [ ] (Optional) Full regression report generated
 ```
 
 ---
 
-## Resumen del Workflow
+## Workflow Summary
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                    WORKFLOW COMPLETO PARA US: {US-ID}                       │
+│                    COMPLETE WORKFLOW FOR US: {US-ID}                        │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
-│  Stage 1: Shift-Left                                                        │
-│  ├─ [ ] ATP creado con escenarios de test                                  │
-│  └─ [ ] Variables y datos de test identificados                            │
+│  Stage 1: Planning                                                          │
+│  ├─ [ ] ATP created with test scenarios                                    │
+│  └─ [ ] Variables and test data identified                                 │
 │                                                                             │
-│  Stage 2: Exploratory                                                       │
+│  Stage 2: Execution                                                         │
 │  ├─ [ ] Smoke test PASSED                                                  │
-│  ├─ [ ] Exploración profunda completa                                      │
-│  ├─ [ ] Bugs reportados (si hay)                                           │
-│  └─ [ ] Decisión: APROBAR / RECHAZAR                                       │
+│  ├─ [ ] Deep exploration complete                                          │
+│  └─ [ ] Decision: APPROVE / REJECT                                         │
 │                                                                             │
-│  Stage 3: Documentation                                                     │
-│  ├─ [ ] Análisis de test completo                                          │
-│  ├─ [ ] Tests priorizados para automatización                              │
-│  └─ [ ] Casos de test creados en TMS                                       │
+│  Stage 3: Reporting                                                         │
+│  ├─ [ ] Bugs formally documented                                           │
+│  └─ [ ] Bugs reported in Jira (if any)                                     │
 │                                                                             │
-│  Stage 4: Automation                                                        │
-│  ├─ [ ] Plan creado para cada test                                         │
-│  ├─ [ ] Código implementado (componente + test)                            │
-│  ├─ [ ] Code review APROBADO                                               │
-│  └─ [ ] Tests pasan localmente                                             │
+│  Stage 4: Documentation                                                     │
+│  ├─ [ ] Test analysis complete                                             │
+│  ├─ [ ] Tests prioritized for automation                                   │
+│  └─ [ ] Test cases created in TMS                                          │
 │                                                                             │
-│  Stage 5: Regression                                                        │
-│  ├─ [ ] Sanity ejecutado con nuevo(s) test(s)                              │
-│  └─ [ ] No se introdujeron regresiones                                     │
+│  Stage 5: Automation                                                        │
+│  ├─ [ ] Plan created for each test                                         │
+│  ├─ [ ] Code implemented (component + test)                                │
+│  ├─ [ ] Code review APPROVED                                               │
+│  └─ [ ] Tests pass locally                                                 │
 │                                                                             │
-│  ✅ US COMPLETO                                                             │
+│  Stage 6: Regression                                                        │
+│  ├─ [ ] Sanity run with new test(s)                                        │
+│  └─ [ ] No regressions introduced                                          │
+│                                                                             │
+│  ✅ US COMPLETE                                                             │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Template de Tracking de Progreso
+## Traceability Model
 
-Copiar este template para trackear progreso de un US específico:
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    TRACEABILITY HIERARCHY                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  USER STORY (US-XXX)                                            │
+│       │                                                          │
+│       ├──► ATP (Test Plan: US-XXX)                              │
+│       │         │                                                │
+│       │         └──► ATR (Test Results: US-XXX)                 │
+│       │                    │                                     │
+│       └──► TCs ────────────┘                                    │
+│            (linked to Story + ATP + ATR)                        │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**All artifacts are created in Stage 1 with complete links.**
+
+---
+
+## TC Workflow Status Lifecycle
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        TC WORKFLOW STATUS LIFECYCLE                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  Stage 1                Stage 4                    Stage 5                   │
+│  ─────────              ─────────                  ─────────                 │
+│  (Planning)             (Prioritize)               (Automate)                │
+│                                                                              │
+│  ┌──────┐   ┌──────┐   ┌───────────┐              ┌──────────────┐          │
+│  │ Draft│──►│ Ready│──►│ Candidate │ ──────────►  │ In Automation│          │
+│  └──────┘   └──────┘   └───────────┘              └──────────────┘          │
+│     ↑           ↑            │                           │                   │
+│   (create)  (traceability    │     ┌──────────┐          ▼                  │
+│              verified)       └───► │  Manual  │   ┌──────────────┐          │
+│                                    └──────────┘   │  In Review   │          │
+│                                                   └──────────────┘          │
+│                              │     (deferred)            │                   │
+│                              └───► stays Ready           ▼                  │
+│                                                   ┌──────────────┐          │
+│                                                   │  Automated   │          │
+│                                                   └──────────────┘          │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Stage 1 transitions:** Draft → Ready (after TC has full traceability: Story + ATP + ATR)
+
+---
+
+## TMS Artifacts Summary
+
+| Stage | Artifact | Name Format |
+|-------|----------|-------------|
+| 1 | ATP | `Test Plan: US-{number}` |
+| 1 | ATR | `Test Results: US-{number}` |
+| 1 | TCs | `Should X when Y` |
+| 3 | Bug | Bug report linked to US |
+| 4 | TC Docs | Precondition, Spec, Automation Plan |
+| 5 | Code | `tests/e2e/{module}/{test}.test.ts` |
+
+---
+
+## Progress Tracking Template
+
+Generate the progress tracking structure below using the ticket metadata from session-start:
 
 ```markdown
-# Progreso QA: {US-ID} - {Title}
+# QA Progress: {US-ID} - {Title}
 
 ## User Story
 - **ID**: {US-ID}
@@ -377,111 +515,120 @@ Copiar este template para trackear progreso de un US específico:
 - **Status**: Ready For QA → In Testing → QA Approved
 - **Staging URL**: {URL}
 
-## Stage 1: Shift-Left
-- [ ] ATP creado
-- Escenarios: {N}
-- Notas: {cualquier nota}
+## Stage 1: Planning
+- [ ] ATP created
+- Scenarios: {N}
+- Notes: {any notes}
 
-## Stage 2: Exploratory
+## Stage 2: Execution
 - [ ] Smoke: PASS / FAIL
-- [ ] Exploración: PASS / FAIL
-- Bugs: {lista o "ninguno"}
-- Decisión: {APROBAR / RECHAZAR}
+- [ ] Exploration: PASS / FAIL
+- Decision: {APPROVE / REJECT}
 
-## Stage 3: Documentation
-- [ ] Análisis completo
-- [ ] Tests en TMS: {TEST-001, TEST-002, ...}
-- Candidatos automatización: {N}
-- Solo manual: {N}
+## Stage 3: Reporting
+- Bugs: {list or "none"}
+- [ ] Bugs documented and linked
 
-## Stage 4: Automation
-| Test ID | Tipo | Status | Archivo |
-|---------|------|--------|---------|
-| TEST-001 | E2E | ✅ Done | qa/tests/e2e/... |
-| TEST-002 | API | 🔄 In Progress | qa/tests/integration/... |
+## Stage 4: Documentation
+- [ ] Analysis complete
+- [ ] Tests in TMS: {TEST-001, TEST-002, ...}
+- Automation candidates: {N}
+- Manual only: {N}
 
-## Stage 5: Regression
+## Stage 5: Automation
+| Test ID | Type | Status | File |
+|---------|------|--------|------|
+| TEST-001 | E2E | Done | tests/e2e/... |
+| TEST-002 | API | In Progress | tests/integration/... |
+
+## Stage 6: Regression
 - [ ] Sanity: PASS / FAIL
-- [ ] Regresión: N/A (US individual)
+- [ ] Regression: N/A (single US)
 
-## Completado
-- [ ] Todas las etapas completas
-- [ ] Listo para siguiente US
+## Completion
+- [ ] All stages complete
+- [ ] Ready for next US
 ```
 
 ---
 
-## Archivos de Contexto Requeridos
+## Related Documentation
 
-Antes de empezar, asegurar que estos archivos estén disponibles:
-
-| Archivo | Propósito |
-|---------|-----------|
-| `qa/.context/guidelines/TAE/KATA-AI-GUIDE.md` | Orientación rápida KATA |
-| `qa/.context/guidelines/TAE/automation-standards.md` | Estándares de código |
-| `qa/.context/guidelines/TAE/kata-architecture.md` | Arquitectura del framework |
-
----
-
-## Herramientas MCP Utilizadas
-
-| Herramienta | Stage | Propósito |
-|-------------|-------|-----------|
-| `mcp__atlassian__getJiraIssue` | Todos | Leer detalles del US |
-| `mcp__atlassian__createJiraIssue` | 2, 3 | Crear issues Test/Bug |
-| `mcp__atlassian__addCommentToJiraIssue` | Todos | Agregar comentarios |
-| `mcp__playwright__browser_navigate` | 2 | Navegar páginas |
-| `mcp__playwright__browser_snapshot` | 2 | Obtener estructura de página |
-| `mcp__playwright__browser_click` | 2 | Clickear elementos |
-| `mcp__playwright__browser_type` | 2 | Escribir texto |
-| `mcp__playwright__browser_take_screenshot` | 2 | Capturar evidencia |
-
----
-
-## Documentación Relacionada
-
-| Stage | Directorio de Prompts |
-|-------|----------------------|
-| Stage 1 | `.prompts/fase-5-shift-left-testing/` |
-| Stage 2 | `.prompts/fase-10-exploratory-testing/` |
-| Stage 3 | `.prompts/fase-11-test-documentation/` |
-| Stage 4 | `.prompts/fase-12-test-automation/` |
-| Stage 5 | `.prompts/fase-12-test-automation/regression/` |
+| Stage | Prompts Directory |
+|-------|-------------------|
+| Stage 1 - Planning | `.prompts/fase-5-shift-left-testing/` |
+| Stage 2 - Execution | `.prompts/fase-10-exploratory-testing/` |
+| Stage 3 - Reporting | `.prompts/fase-10-exploratory-testing/` |
+| Stage 4 - Documentation | `.prompts/fase-11-test-documentation/` |
+| Stage 5 - Automation | `.prompts/fase-12-test-automation/` |
+| Stage 6 - Regression | `.prompts/fase-12-test-automation/regression/` |
 
 ### Guidelines
 
-- `qa/.context/guidelines/TAE/KATA-AI-GUIDE.md` - Patrones KATA
-- `qa/.context/guidelines/TAE/automation-standards.md` - Estándares de código
+- `.context/guidelines/TAE/kata-ai-index.md` - KATA patterns
+- `.context/guidelines/TAE/automation-standards.md` - Coding standards
+- `.context/guidelines/QA/exploratory-testing.md` - Exploration techniques
 
 ### Utilities
 
-- `.prompts/kata-framework-setup.md` - Setup del framework
-- `.prompts/utilities/git-flow.md` - Workflow de Git
+- `.prompts/setup/test-framework-adaptation.md` - Framework adaptation
+- `.prompts/utilities/git-flow.md` - Git workflow
 
 ---
 
-## Manejo de Errores
+## Error Handling
 
-| Situación | Acción |
+| Situation | Action |
 |-----------|--------|
-| US no listo | Verificar status, esperar "Ready For QA" |
-| Staging caído | Verificar deployment, escalar a DevOps |
-| Bug crítico encontrado | Parar exploración, crear bug, esperar fix |
-| Automatización bloqueada | Marcar test como solo-manual, continuar con otros |
-| Test flaky | Debugear con `--debug` flag, agregar waits apropiados |
-| Fallo en CI | Verificar logs, verificar configuración de ambiente |
+| US not ready | Verify status, wait for "Ready For QA" |
+| Staging down | Check deployment, escalate to DevOps |
+| Critical bug found | Stop exploration, create bug, wait for fix |
+| Test automation blocked | Mark test as manual-only, continue with others |
+| Flaky test | Debug with `--debug` flag, add proper waits |
+| CI failure | Check logs, verify environment configuration |
 
 ---
 
-## Mejores Prácticas
+## Best Practices
 
-1. **Completar un US antes de empezar otro** - Evitar context switching
-2. **No saltarse exploratorio** - Testing manual valida antes de automatizar
-3. **Usar patrón de variables** - No datos de test hardcodeados
-4. **Seguir KATA** - Arquitectura consistente en todos los tests
-5. **Revisar antes de commit** - La calidad de código importa
-6. **Ejecutar sanity después de automatizar** - Verificar que nuevos tests funcionan en CI
+1. **Complete one US before starting another** - Avoid context switching
+2. **Don't skip exploratory** - Manual testing validates before automation
+3. **Use variable pattern** - No hardcoded test data
+4. **Follow KATA** - Consistent architecture across all tests
+5. **Review before commit** - Code quality matters
+6. **Run sanity after automation** - Verify new tests work in CI
 
 ---
 
-**Última actualización**: 2026-03-10
+## Bug Workflow (Alternative Path)
+
+For **bugs**, use a different workflow:
+
+```
+session-start.md (Entry Point)
+    ↓
+bug-qa-workflow.md (Complete Bug Workflow)
+├── PHASE 1: Triage + Planning
+├── PHASE 2: Execution
+└── PHASE 3: Reporting
+    ↓
+Done
+```
+
+**Key Differences:**
+
+| Aspect | User Story | Bug |
+|--------|------------|-----|
+| Entry Point | `session-start.md` | `session-start.md` |
+| Workflow | 6 stages (separate prompts) | 1 workflow (all phases in one) |
+| TCs | Created in Stage 1 | Not needed (bug = test case) |
+| ATP | Full Test Analysis | Bug Analysis |
+| Automation | Stage 5 (after QA Approved) | Assessed in PHASE 3 |
+
+**Bugs do NOT go through Stage 2-6.** The `bug-qa-workflow.md` is a hybrid that combines planning + execution + reporting.
+
+**See:** [Bug QA Workflow](./bug-qa-workflow.md)
+
+---
+
+**Last Updated**: 2026-04-02

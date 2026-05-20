@@ -18,6 +18,8 @@ next-env.d.ts
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+.playwright/user-data
+.playwright/output
 
 # ===== Auth Storage (Session State) =====
 /.auth/
@@ -78,3 +80,6 @@ dbhub.toml
 
 # Testing session artifacts (snapshots, screenshots, console logs)
 .context/PBI/testing-session/
+
+# Fix session progress (local tracking, not pushed)
+.context/FIX-SESSION-PROGRESS.md

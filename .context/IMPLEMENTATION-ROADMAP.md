@@ -1,6 +1,6 @@
 # Implementation Roadmap - SoloQ
 
-> **Documento provisional** - Generado: 2026-02-07 | **Última actualización:** 2026-03-09
+> **Documento provisional** - Generado: 2026-02-07 | **Ultima actualizacion:** 2026-03-31
 > **Proposito:** Panorama completo del estado actual y plan de implementacion ordenado por dependencias.
 
 ---
@@ -9,20 +9,21 @@
 
 **Para retomar el desarrollo en un nuevo chat:**
 
-1. **Workflow a seguir:** `.prompts/us-dev-workflow.md` (12 pasos)
-2. **Test Cases:** Buscar primero en **comentarios de Jira** de la US (Acceptance Test Plan del QA)
-3. **Siguiente tarea:** Ver sección "US en Trabajo Actual" abajo
-4. **Si la US actual esta completa:** Tomar la siguiente de "Lista Estratégica de Implementación"
+1. **Leer progreso:** `.context/FIX-SESSION-PROGRESS.md` (tracking local git-ignored)
+2. **Workflow a seguir:** `.prompts/us-dev-workflow.md` (12 pasos)
+3. **Test Cases:** Buscar primero en **comentarios de Jira** de la US (Acceptance Test Plan del QA)
+4. **Siguiente tarea:** Ver seccion "US en Trabajo Actual" abajo
+5. **Si la US actual esta completa:** Tomar la siguiente de "Lista Estrategica de Implementacion"
 
 **Comando sugerido para iniciar:**
 
 ```
-Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
+Continua con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 ```
 
 ---
 
-## Criterios de Transición de Estados
+## Criterios de Transicion de Estados
 
 ### User Stories
 
@@ -45,50 +46,17 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 
 ---
 
-## Auditoría de Assignees (2026-02-11) ✅ COMPLETADA
+## Estado Actual del Tablero Jira (2026-03-28)
 
-### Criterios de Asignación
+### Epic: SQ-1 - User Authentication & Onboarding
 
-| Status        | Debe estar asignado a         |
-| ------------- | ----------------------------- |
-| Ready For Dev | Ely (único desarrollador)     |
-| In Progress   | Ely (único desarrollador)     |
-| Ready For QA  | Tester que hizo Shift-Left    |
-| In Test       | Tester de QA                  |
-| Estimation    | Tester (status de transición) |
-| Shift-Left QA | Tester (status de transición) |
-
-### ✅ Correcciones Aplicadas
-
-| Key   | Summary                         | Assignee Anterior | Assignee Corregido               | Método de Identificación             |
-| ----- | ------------------------------- | ----------------- | -------------------------------- | ------------------------------------ |
-| SQ-15 | List All Clients                | Ely ❌            | Marco Antonio Camacho ✅         | Changelog: participó en transiciones |
-| SQ-24 | Add Taxes to Invoice            | Ely ❌            | Gloria Jesely Galindez Suárez ✅ | Changelog: participó en Shift-Left   |
-| SQ-43 | Include PDF Attachment in Email | Ely ❌            | yxsinell acosta zambrano ✅      | Changelog: hizo Shift-Left           |
-| SQ-34 | Include Payment Methods in PDF  | Sin asignar ❌    | Arkaitz ✅                       | Changelog: status anterior           |
-
-### ⚠️ Caso Especial: SQ-21
-
-| Key   | Summary                            | Assignee | Razón                                                  |
-| ----- | ---------------------------------- | -------- | ------------------------------------------------------ |
-| SQ-21 | Create Invoice by Selecting Client | Ely ✅   | Changelog muestra que Ely hizo todo (dev + Shift-Left) |
-
-### ✅ Ready For QA con Assignee Correcto
-
-| Key   | Summary                           | Assignee             | PR Shift-Left |
-| ----- | --------------------------------- | -------------------- | ------------- |
-| SQ-2  | User Registration                 | Samuel Amonzabel ✅  | #5 (MERGED)   |
-| SQ-17 | Add Client Tax Information        | YENNY BARBOSA ✅     | N/A           |
-| SQ-19 | Delete Client                     | Ronny Toro ✅        | N/A           |
-| SQ-28 | Set Invoice Due Date              | Yaneth Quintero ✅   | #10 (MERGED)  |
-| SQ-29 | Add Notes and Terms to Invoice    | Ximena Quintana ✅   | #17 (MERGED)  |
-| SQ-32 | Generate Professional PDF Invoice | Alfonso Hernandez ✅ | #8 (MERGED)   |
-| SQ-33 | Include Logo and Business Data    | Arkaitz ✅           | N/A           |
-| SQ-35 | Download PDF to Device            | Dedwison ✅          | #18 (MERGED)  |
-
----
-
-## Estado Actual del Tablero Jira (2026-03-09)
+| Key  | Story                                     | Status          | Priority | Assignee              | PR Shift-Left | PR Impl      |
+| ---- | ----------------------------------------- | --------------- | -------- | --------------------- | ------------- | ------------ |
+| SQ-2 | User Registration with Email and Password | **QA Approved** | Highest  | Samuel Amonzabel      | #5 (MERGED)   | -            |
+| SQ-3 | User Login with Credentials               | **QA Approved** | Highest  | Joel Armando Ramirez  | #4 (MERGED)   | -            |
+| SQ-4 | Password Recovery via Email               | **In Test**     | High     | Maxe Aguilera         | #12 (MERGED)  | #50 (MERGED) |
+| SQ-5 | Secure Logout                             | Shift-Left QA   | High     | German Luchesi        | -             | -            |
+| SQ-6 | Guided Onboarding for New Users           | Ready For QA    | Medium   | Juan Leites           | -             | #59 (MERGED) |
 
 ### Epic: SQ-13 - Client Management
 
@@ -96,11 +64,11 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | ----- | ------------------------------------ | --------------- | -------- | --------------------- | ------------- | ------------ |
 | SQ-14 | Add New Client                       | **QA Approved** | Medium   | Ely                   | -             | #21 (MERGED) |
 | SQ-15 | List All Clients                     | Ready For QA    | Medium   | Marco Antonio Camacho | #2 (MERGED)   | #25 (MERGED) |
-| SQ-16 | Edit Client Data                     | **QA Approved** | Medium   | Joel Armando Ramírez  | #14 (MERGED)  | #26 (MERGED) |
+| SQ-16 | Edit Client Data                     | **QA Approved** | Medium   | Joel Armando Ramirez  | #14 (MERGED)  | #26 (MERGED) |
 | SQ-17 | Add Client Tax Information           | Ready For QA    | Medium   | YENNY BARBOSA         | -             | #27 (MERGED) |
 | SQ-18 | View Client Invoice History          | Ready For QA    | Medium   | Rodrigo Godoy         | #43 (MERGED)  | #58 (MERGED) |
 | SQ-19 | Delete Client                        | Ready For QA    | Medium   | Ronny Toro            | -             | #28 (MERGED) |
-| SQ-68 | Validate client email deliverability | Backlog         | Medium   | -                     | -             | -            |
+| SQ-68 | Validate client email deliverability | **Ready For Dev** | Medium | Alfonso Hernandez     | -             | -            |
 
 ### Epic: SQ-20 - Invoice Creation
 
@@ -108,42 +76,131 @@ Continúa con el IMPLEMENTATION-ROADMAP.md siguiendo .prompts/us-dev-workflow.md
 | ----- | ---------------------------------------- | --------------- | -------- | ----------------------------- | ------------- | ------------ |
 | SQ-21 | Create Invoice by Selecting Client       | Ready For QA    | Medium   | Ely                           | #19 (MERGED)  | #29 (MERGED) |
 | SQ-22 | Add Line Items to Invoice                | Ready For QA    | Medium   | Ely                           | #55 (MERGED)  | #56 (MERGED) |
-| SQ-23 | Automatic Subtotal and Total Calculation | **QA Approved** | Medium   | Raúl González                 | #53 (MERGED)  | ✅           |
-| SQ-24 | Add Taxes to Invoice                     | **QA Approved** | Medium   | Gloria Jesely Galindez Suárez | #9 (MERGED)   | #32 (MERGED) |
-| SQ-25 | Add Discounts to Invoice                 | **In Test**     | Medium   | GENESIS OJOSE                 | #24 (MERGED)  | #51 (MERGED) |
+| SQ-23 | Automatic Subtotal and Total Calculation | **QA Approved** | Medium   | Raul Gonzalez                 | #53 (MERGED)  | ✅           |
+| SQ-24 | Add Taxes to Invoice                     | **QA Approved** | Medium   | Gloria Jesely Galindez Suarez | #9 (MERGED)   | #32 (MERGED) |
+| SQ-25 | Add Discounts to Invoice                 | **QA Approved** | Medium   | GENESIS OJOSE                 | #24 (MERGED)  | #51 (MERGED) |
 | SQ-26 | Preview Invoice Before Sending           | Ready For QA    | Medium   | Marianela Portas              | #15 (MERGED)  | #60 (MERGED) |
 | SQ-27 | Assign Unique Invoice Number             | Ready For QA    | Medium   | Froylan Rodriguez             | #13 (MERGED)  | #46 (MERGED) |
 | SQ-28 | Set Invoice Due Date                     | **In Test**     | Medium   | Yaneth Quintero               | #10 (MERGED)  | #33 (MERGED) |
 | SQ-29 | Add Notes and Terms to Invoice           | Ready For QA    | Medium   | Ximena Quintana               | #17 (MERGED)  | #34 (MERGED) |
 | SQ-30 | Save Invoice as Draft                    | **In Test**     | Medium   | Luis Eduardo Flores           | #30 (MERGED)  | #49 (MERGED) |
 
-### Epic: SQ-1 - User Authentication & Onboarding
-
-| Key  | Story                                     | Status          | Priority | Assignee              | PR Shift-Left | PR Impl      |
-| ---- | ----------------------------------------- | --------------- | -------- | --------------------- | ------------- | ------------ |
-| SQ-2 | User Registration with Email and Password | **In Test**     | Highest  | Samuel Amonzabel      | #5 (MERGED)   | -            |
-| SQ-3 | User Login with Credentials               | **QA Approved** | Highest  | Joel Armando Ramírez  | #4 (MERGED)   | -            |
-| SQ-4 | Password Recovery via Email               | **In Test**     | High     | Maxe Aguilera         | #12 (MERGED)  | #50 (MERGED) |
-| SQ-5 | Secure Logout                             | Shift-Left QA   | High     | German Luchesi        | -             | -            |
-| SQ-6 | Guided Onboarding for New Users           | Ready For QA    | Medium   | Juan Leites           | -             | #59 (MERGED) |
-
 ### Epic: SQ-31 - PDF Generation & Download
 
-| Key   | Story                                 | Status        | Priority | Assignee          | PR Shift-Left | PR Impl      |
-| ----- | ------------------------------------- | ------------- | -------- | ----------------- | ------------- | ------------ |
-| SQ-32 | Generate Professional PDF Invoice     | Ready For QA  | Medium   | Alfonso Hernandez | #8 (MERGED)   | #35 (MERGED) |
-| SQ-33 | Include Logo and Business Data in PDF | Ready For QA  | Medium   | Arkaitz           | -             | #36 (MERGED) |
-| SQ-34 | Include Payment Methods in PDF        | Shift-Left QA | Medium   | Arkaitz           | -             | -            |
-| SQ-35 | Download PDF to Device                | Ready For QA  | Medium   | Dedwison          | #18 (MERGED)  | #37 (MERGED) |
+| Key   | Story                                 | Status          | Priority | Assignee          | PR Shift-Left | PR Impl      |
+| ----- | ------------------------------------- | --------------- | -------- | ----------------- | ------------- | ------------ |
+| SQ-32 | Generate Professional PDF Invoice     | **QA Approved** | Medium   | Alfonso Hernandez | #8 (MERGED)   | #35 (MERGED) |
+| SQ-33 | Include Logo and Business Data in PDF | **In Test**     | Medium   | Arkaitz           | -             | #36 (MERGED) |
+| SQ-34 | Include Payment Methods in PDF        | Shift-Left QA   | Medium   | Arkaitz           | -             | -            |
+| SQ-35 | Download PDF to Device                | Ready For QA    | Medium   | Dedwison          | #18 (MERGED)  | #37 (MERGED) |
 
 ### Epic: SQ-37 - Invoice Sending
 
-| Key   | Story                              | Status        | Priority | Assignee                 | PR Shift-Left | PR Impl      |
-| ----- | ---------------------------------- | ------------- | -------- | ------------------------ | ------------- | ------------ |
-| SQ-42 | Send Invoice by Email with 1 Click | Backlog       | Medium   | -                        | -             | -            |
-| SQ-43 | Include PDF Attachment in Email    | Ready For QA  | Medium   | yxsinell acosta zambrano | #40 (MERGED)  | #62 (MERGED) |
-| SQ-44 | Include Payment Data in Email      | Ready For Dev | Medium   | Alicia Juste             | -             | -            |
-| SQ-46 | View Email Send Confirmation       | Shift-Left QA | Medium   | Miguel Millan            | -             | -            |
+| Key   | Story                              | Status          | Priority | Assignee                 | PR Shift-Left | PR Impl      |
+| ----- | ---------------------------------- | --------------- | -------- | ------------------------ | ------------- | ------------ |
+| SQ-42 | Send Invoice by Email with 1 Click | Backlog         | Medium   | -                        | -             | -            |
+| SQ-43 | Include PDF Attachment in Email    | **In Test**     | Medium   | yxsinell acosta zambrano | #40 (MERGED)  | #62 (MERGED) |
+| SQ-44 | Include Payment Data in Email      | **Ready For QA**| Medium   | Alicia Juste             | -             | -            |
+| SQ-46 | View Email Send Confirmation       | Shift-Left QA   | Medium   | Miguel Millan            | -             | -            |
+
+### Epic: SQ-38 - Invoice Dashboard & Tracking
+
+| Key   | Story                              | Status            | Priority | Assignee          | PR Shift-Left  | PR Impl |
+| ----- | ---------------------------------- | ----------------- | -------- | ----------------- | -------------- | ------- |
+| SQ-47 | Dashboard with all invoices        | **Ready For Dev** | Medium   | Alfonso Hernandez | #92 (MERGED)   | -       |
+| SQ-48 | Filter invoices by status          | **Ready For Dev** | Medium   | Ely               | #92 (MERGED)   | -       |
+| SQ-49 | Total pending amount               | **Ready For Dev** | Medium   | Unassigned        | #92 (MERGED)   | -       |
+| SQ-50 | Overdue invoice highlighting       | **Ready For Dev** | Medium   | Unassigned        | #92 (MERGED)   | -       |
+| SQ-51 | Search invoices by client/number   | **Ready For Dev** | Medium   | Fernando J. Masci | #88 (MERGED)   | -       |
+| SQ-52 | Monthly income summary             | **Ready For Dev** | Medium   | Unassigned        | #92 (MERGED)   | -       |
+
+**FIP:** ✅ Created — `.context/PBI/epics/EPIC-SQ-38-dashboard-tracking/feature-implementation-plan.md`
+**Implementation Order:** SQ-47 → SQ-49 → SQ-48 → SQ-50 → SQ-51 → SQ-52
+
+### Epic: SQ-39 - Payment Tracking
+
+| Key   | Story                              | Status            | Priority | Assignee          | PR Shift-Left  | PR Impl |
+| ----- | ---------------------------------- | ----------------- | -------- | ----------------- | -------------- | ------- |
+| SQ-53 | Mark invoice as paid               | **Ready For Dev** | Medium   | Unassigned        | #93 (MERGED)   | -       |
+| SQ-54 | Record payment method              | **Ready For Dev** | Medium   | Unassigned        | #93 (MERGED)   | -       |
+| SQ-55 | Record amount received             | **Ready For Dev** | Medium   | Fernando J. Masci | #88 (MERGED)   | -       |
+| SQ-56 | Add payment notes                  | **Ready For Dev** | Medium   | Unassigned        | #93 (MERGED)   | -       |
+| SQ-57 | Record payment date                | **Ready For Dev** | Medium   | Unassigned        | #93 (MERGED)   | -       |
+| SQ-58 | Revert payment                     | **Ready For Dev** | Medium   | Unassigned        | #93 (MERGED)   | -       |
+
+**FIP:** ✅ Created — `.context/PBI/epics/EPIC-SQ-39-payment-tracking/feature-implementation-plan.md`
+**Implementation Order:** SQ-53 → SQ-55 → SQ-54 → SQ-57 → SQ-56 → SQ-58
+
+---
+
+## Resumen Ejecutivo
+
+### User Stories Implementadas
+
+```
+FASE 1 - Client Management ✅ COMPLETADA
+  1. SQ-15: List All Clients ✅ (Ready For QA)
+  2. SQ-16: Edit Client Data ✅ (QA Approved)
+  3. SQ-17: Add Client Tax Information ✅ (Ready For QA)
+  4. SQ-19: Delete Client ✅ (Ready For QA)
+
+FASE 2 - Invoice Creation ✅ COMPLETADA
+  5. SQ-21: Create Invoice by Selecting Client ✅ (Ready For QA)
+  6. SQ-22: Add Line Items to Invoice ✅ (Ready For QA)
+  7. SQ-23: Automatic Subtotal and Total Calculation ✅ (QA Approved)
+  8. SQ-24: Add Taxes to Invoice ✅ (QA Approved)
+  9. SQ-25: Add Discounts to Invoice ✅ (QA Approved)
+  10. SQ-27: Assign Unique Invoice Number ✅ (Ready For QA)
+  11. SQ-28: Set Invoice Due Date ✅ (In Test)
+  12. SQ-29: Add Notes and Terms to Invoice ✅ (Ready For QA)
+  13. SQ-30: Save Invoice as Draft ✅ (In Test)
+
+FASE 3 - PDF Generation 🔶 EN PROGRESO (3/4)
+  14. SQ-32: Generate Professional PDF Invoice ✅ (QA Approved)
+  15. SQ-33: Include Logo and Business Data in PDF ✅ (In Test)
+  16. SQ-35: Download PDF to Device ✅ (Ready For QA)
+  17. SQ-34: Include Payment Methods in PDF ⏳ (Shift-Left QA)
+
+FASE 4 - Auth & Recovery + Avanzado ✅ COMPLETADA
+  18. SQ-3: User Login with Credentials ✅ (QA Approved)
+  19. SQ-4: Password Recovery via Email ✅ (In Test)
+  20. SQ-6: Guided Onboarding ✅ (Ready For QA)
+  21. SQ-18: View Client Invoice History ✅ (Ready For QA)
+  22. SQ-43: Include PDF Attachment in Email ✅ (In Test)
+  23. SQ-26: Preview Invoice Before Sending ✅ (Ready For QA)
+
+FASE 5 - Invoice Dashboard & Tracking (EPIC-SQ-38) ⏳ READY FOR DEV
+  FIP: ✅ Created | FTP: ✅ Ready | ATPs: ✅ All 6 stories
+  24. SQ-47: Dashboard with all invoices ⏳ (Ready For Dev)
+  25. SQ-49: Total pending amount ⏳ (Ready For Dev)
+  26. SQ-48: Filter invoices by status ⏳ (Ready For Dev)
+  27. SQ-50: Overdue invoice highlighting ⏳ (Ready For Dev)
+  28. SQ-51: Search invoices by client/number ⏳ (Ready For Dev)
+  29. SQ-52: Monthly income summary ⏳ (Ready For Dev)
+
+FASE 6 - Payment Tracking (EPIC-SQ-39) ⏳ READY FOR DEV
+  FIP: ✅ Created | FTP: ✅ Ready | ATPs: ✅ All 6 stories
+  30. SQ-53: Mark invoice as paid ⏳ (Ready For Dev)
+  31. SQ-55: Record amount received ⏳ (Ready For Dev)
+  32. SQ-54: Record payment method ⏳ (Ready For Dev)
+  33. SQ-57: Record payment date ⏳ (Ready For Dev)
+  34. SQ-56: Add payment notes ⏳ (Ready For Dev)
+  35. SQ-58: Revert payment ⏳ (Ready For Dev)
+```
+
+### Metricas (2026-03-31)
+
+- **Total US implementadas:** 23 (PRs mergeados en staging)
+- **US en QA Approved:** 8 (SQ-2, SQ-3, SQ-14, SQ-16, SQ-23, SQ-24, SQ-25, SQ-32)
+- **US en In Test:** 5 (SQ-4, SQ-28, SQ-30, SQ-33, SQ-43)
+- **US en Ready For QA:** 11 (listas para testing)
+- **US en BLOCKED:** 0 ✅
+- **US en Shift-Left QA:** 3 (SQ-5, SQ-34, SQ-46)
+- **US en Ready For Dev:** 15 (SQ-47-52, SQ-53-58, SQ-68)
+- **FIPs creados:** 2 (SQ-38 ✅, SQ-39 ✅)
+- **Bugs OPEN:** 8
+- **Bugs Ready For QA:** 4
+- **Improvements activos:** 3 (1 OPEN, 2 Ready For QA)
 
 ---
 
@@ -156,7 +213,7 @@ SQ-1 (Auth Epic)
 └────────────────────────────────────────┘
 
 SQ-13 (Client Management Epic)
-├── SQ-14: Add New Client ─────────────── YA IMPLEMENTADO (In Test)
+├── SQ-14: Add New Client ─────────────── YA IMPLEMENTADO (QA Approved)
 │   │
 │   ├── SQ-15: List All Clients ──────── Depende de SQ-14
 │   │   │
@@ -184,554 +241,73 @@ SQ-31 (PDF Generation Epic)
 
 ---
 
-## Lista Estrategica de Implementacion
+## Proximas US en Ready For Dev (15 disponibles)
 
-### FASE 1: Client Management ✅ COMPLETADA
+### EPIC-SQ-38: Invoice Dashboard & Tracking (Fase 5)
 
-| Orden | Key   | Story                      | Status       | Assignee              | PR Shift-Left | PR Impl      |
-| ----- | ----- | -------------------------- | ------------ | --------------------- | ------------- | ------------ |
-| 1     | SQ-15 | List All Clients           | Ready For QA | Marco Antonio Camacho | #2 (MERGED)   | #25 (MERGED) |
-| 2     | SQ-16 | Edit Client Data           | **In Test**  | Ely                   | #14 (MERGED)  | #26 (MERGED) |
-| 3     | SQ-17 | Add Client Tax Information | Ready For QA | YENNY BARBOSA         | -             | #27 (MERGED) |
-| 4     | SQ-19 | Delete Client              | Ready For QA | Ronny Toro            | -             | #28 (MERGED) |
+| Orden | Key   | Story                              | Status        | Assignee          |
+| ----- | ----- | ---------------------------------- | ------------- | ----------------- |
+| 1     | SQ-47 | Dashboard with all invoices        | Ready For Dev | Alfonso Hernandez |
+| 2     | SQ-49 | Total pending amount               | Ready For Dev | Unassigned        |
+| 3     | SQ-48 | Filter invoices by status          | Ready For Dev | Ely               |
+| 4     | SQ-50 | Overdue invoice highlighting       | Ready For Dev | Unassigned        |
+| 5     | SQ-51 | Search invoices by client/number   | Ready For Dev | Fernando J. Masci |
+| 6     | SQ-52 | Monthly income summary             | Ready For Dev | Unassigned        |
 
-**Nota:** SQ-18 (View Client Invoice History) esta en Shift-Left QA y ademas depende de tener facturas.
+### EPIC-SQ-39: Payment Tracking (Fase 6)
 
-### FASE 2: Invoice Creation ✅ COMPLETADA
+| Orden | Key   | Story                              | Status        | Assignee          |
+| ----- | ----- | ---------------------------------- | ------------- | ----------------- |
+| 7     | SQ-53 | Mark invoice as paid               | Ready For Dev | Unassigned        |
+| 8     | SQ-55 | Record amount received             | Ready For Dev | Fernando J. Masci |
+| 9     | SQ-54 | Record payment method              | Ready For Dev | Unassigned        |
+| 10    | SQ-57 | Record payment date                | Ready For Dev | Unassigned        |
+| 11    | SQ-56 | Add payment notes                  | Ready For Dev | Unassigned        |
+| 12    | SQ-58 | Revert payment                     | Ready For Dev | Unassigned        |
 
-| Orden | Key   | Story                              | Status       | Assignee                      | PR Shift-Left | PR Impl      |
-| ----- | ----- | ---------------------------------- | ------------ | ----------------------------- | ------------- | ------------ |
-| 5     | SQ-21 | Create Invoice by Selecting Client | Ready For QA | Ely                           | #19 (MERGED)  | #29 (MERGED) |
-| 6     | SQ-24 | Add Taxes to Invoice               | Ready For QA | Gloria Jesely Galindez Suárez | #9 (MERGED)   | #32 (MERGED) |
-| 7     | SQ-28 | Set Invoice Due Date               | Ready For QA | Yaneth Quintero               | #10 (MERGED)  | #33 (MERGED) |
-| 8     | SQ-29 | Add Notes and Terms to Invoice     | Ready For QA | Ximena Quintana               | #17 (MERGED)  | #34 (MERGED) |
+### Otras
 
-**Nota:** SQ-22, SQ-23, SQ-25, SQ-27, SQ-30 no estan en Ready For Dev. SQ-26 en In Review (PR #60).
-
-### FASE 3: PDF Generation 🔶 EN PROGRESO (3/4)
-
-| Orden | Key   | Story                             | Status        | Assignee          | PR Shift-Left | PR Impl      |
-| ----- | ----- | --------------------------------- | ------------- | ----------------- | ------------- | ------------ |
-| 9     | SQ-32 | Generate Professional PDF Invoice | Ready For QA  | Alfonso Hernandez | #8 (MERGED)   | #35 (MERGED) |
-| 10    | SQ-33 | Include Logo and Business Data    | Ready For QA  | Arkaitz           | -             | #36 (MERGED) |
-| 11    | SQ-35 | Download PDF to Device            | Ready For QA  | Dedwison          | #18 (MERGED)  | #37 (MERGED) |
-| 12    | SQ-34 | Include Payment Methods in PDF    | Shift-Left QA | Arkaitz           | -             | ⏳ BLOQUEADA |
-
-### FASE 4: Invoice Creation Avanzado 🔶 EN PROGRESO (1/6)
-
-| Orden | Key   | Story                       | Status        | Assignee | PR Shift-Left | PR Impl      |
-| ----- | ----- | --------------------------- | ------------- | -------- | ------------- | ------------ |
-| 13    | SQ-27 | Assign Unique Invoice No.   | Ready For QA  | Ely      | #13 (MERGED)  | #46 (MERGED) |
-| 14    | SQ-30 | Save Invoice as Draft       | Ready For QA  | Luis E.  | #30 (MERGED)  | #49 (MERGED) |
-| 15    | SQ-4  | Password Recovery via Email | Ready For QA  | Maxe A.  | #12 (MERGED)  | #50 (MERGED) |
-| 16    | SQ-25 | Add Discounts to Invoice    | Ready For QA  | GENESIS  | #24 (MERGED)  | #51 (MERGED) |
-| 17    | SQ-18 | View Client Invoice History | Ready For QA  | Rodrigo  | #43 (MERGED)  | #58 (MERGED) |
-| 18    | SQ-6  | Guided Onboarding for New Users | Ready For QA  | Juan L.  | -             | #59 (MERGED) |
-
-### FASE 5: US en Ready For Dev (2026-03-09)
-
-| Orden | Key   | Story                            | Status        | Assignee                   | PR Shift-Left | PR Impl      |
-| ----- | ----- | -------------------------------- | ------------- | -------------------------- | ------------- | ------------ |
-| 19    | SQ-23 | Auto Subtotal/Total Calculation  | **QA Approved** | Raúl González            | #53 (MERGED)  | ✅           |
-| 20    | SQ-26 | Preview Invoice Before Send      | Ready For QA  | Marianela P.               | #15 (MERGED)  | #60 (MERGED) |
-| 21    | SQ-43 | Include PDF Attachment in Email  | Ready For QA  | yxsinell acosta zambrano   | #40 (MERGED)  | #62 (MERGED) |
-| 22    | SQ-44 | Include Payment Data in Email    | Ready For Dev | Alicia Juste               | -             | -            |
-
-### OMITIDAS (No Ready For Dev o Dependencias Bloqueadas)
-
-| Key   | Story                  | Status          | Assignee              | Razon de Omision                 |
-| ----- | ---------------------- | --------------- | --------------------- | -------------------------------- |
-| SQ-2  | User Registration      | **In Test**     | Samuel Amonzabel      | En testing activo                |
-| SQ-3  | User Login             | **QA Approved** | Joel Armando Ramírez  | ✅ Desbloqueado y aprobado      |
-| SQ-16 | Edit Client Data       | **QA Approved** | Joel Armando Ramírez  | ✅ Desbloqueado y aprobado      |
-| SQ-22 | Add Line Items         | Ready For QA    | Ely                   | ✅ Implementado - PR #56        |
-| SQ-34 | Payment Methods in PDF | Shift-Left QA   | Arkaitz               | No Ready For Dev                 |
-| SQ-42 | Send Invoice by Email  | Backlog         | -                     | Regresó a Backlog                |
+| Orden | Key   | Story                                    | Status        | Assignee          |
+| ----- | ----- | ---------------------------------------- | ------------- | ----------------- |
+| -     | SQ-68 | Validate client email deliverability     | Ready For Dev | Alfonso Hernandez |
 
 ---
 
-## ✅ SQ-22 - Add Line Items to Invoice - IMPLEMENTADO
-
-### Estado Actual
-
-| Campo              | Valor                              |
-| ------------------ | ---------------------------------- |
-| **Status**         | Ready For QA                       |
-| **Assignee**       | Ely (Dev)                          |
-| **PR Shift-Left**  | #55 (MERGED)                       |
-| **PR Impl**        | #56 (MERGED)                       |
-| **Fecha**          | 2026-02-18                         |
-
-### Implementación Completada
-
-**Archivos creados/modificados (8 archivos, +1186/-30 líneas):**
-
-- `src/components/invoices/line-items-table.tsx` (NEW) - Tabla editable con useFieldArray
-- `src/lib/validations/invoice.ts` - Schemas lineItemSchema, lineItemsArraySchema
-- `src/lib/utils/invoice-calculations.ts` - calculateLineTotal, calculateSubtotal
-- `src/app/api/invoices/route.ts` - POST con items
-- `src/app/api/invoices/[id]/route.ts` - PUT/GET con items
-- `src/app/(app)/invoices/create/page.tsx` - Integración LineItemsTable
-- `src/app/(app)/invoices/[id]/edit/page.tsx` - Integración LineItemsTable
-
-**Test Cases cubiertos (15/15):**
-
-- TC-01 a TC-06: CRUD operations (add, edit, remove items)
-- TC-07 a TC-12: Validation rules (description, quantity, price)
-- TC-13 a TC-15: Edge cases (max 50 items, empty invoice)
-
-### Integración con SQ-25 (Discounts)
-
-✅ **Ahora integrado**: El subtotal se calcula automáticamente desde line items y los descuentos se aplican correctamente sobre el subtotal calculado.
-
----
-
-## Resumen Ejecutivo
-
-### User Stories Implementadas
-
-```
-FASE 1 - Client Management ✅ COMPLETADA
-  1. SQ-15: List All Clients ✅ (Ready For QA)
-  2. SQ-16: Edit Client Data ✅ (QA Approved)
-  3. SQ-17: Add Client Tax Information ✅ (Ready For QA)
-  4. SQ-19: Delete Client ✅ (Ready For QA)
-
-FASE 2 - Invoice Creation ✅ COMPLETADA
-  5. SQ-21: Create Invoice by Selecting Client ✅ (Ready For QA)
-  6. SQ-22: Add Line Items to Invoice ✅ (Ready For QA)
-  7. SQ-23: Automatic Subtotal and Total Calculation ✅ (QA Approved)
-  8. SQ-24: Add Taxes to Invoice ✅ (QA Approved)
-  9. SQ-25: Add Discounts to Invoice ✅ (In Test)
-  10. SQ-27: Assign Unique Invoice Number ✅ (Ready For QA)
-  11. SQ-28: Set Invoice Due Date ✅ (In Test)
-  12. SQ-29: Add Notes and Terms to Invoice ✅ (Ready For QA)
-  13. SQ-30: Save Invoice as Draft ✅ (In Test)
-
-FASE 3 - PDF Generation 🔶 EN PROGRESO (3/4)
-  14. SQ-32: Generate Professional PDF Invoice ✅ (Ready For QA)
-  15. SQ-33: Include Logo and Business Data in PDF ✅ (Ready For QA)
-  16. SQ-35: Download PDF to Device ✅ (Ready For QA)
-  17. SQ-34: Include Payment Methods in PDF ⏳ (Shift-Left QA)
-
-FASE 4 - Auth & Recovery ✅ COMPLETADA
-  18. SQ-3: User Login with Credentials ✅ (QA Approved)
-  19. SQ-4: Password Recovery via Email ✅ (In Test)
-```
-
-### Metricas (2026-03-09)
-
-- **Total US implementadas:** 19 (PRs mergeados en staging)
-- **US en QA Approved:** 4 (SQ-3, SQ-14, SQ-16, SQ-23, SQ-24 ✅)
-- **US en In Test:** 5 (SQ-2, SQ-4, SQ-25, SQ-28, SQ-30)
-- **US en Ready For QA:** 11 (listas para testing)
-- **US en BLOCKED:** 0 ✅
-- **US en Shift-Left QA:** 3 (SQ-5, SQ-34, SQ-46)
-- **US en Ready For Dev:** 1 (SQ-44)
-- **Bugs OPEN:** 4 (SQ-111, SQ-121, SQ-122, SQ-123)
-- **Bugs Ready For QA:** 3 (SQ-86, SQ-98, SQ-99)
-- **Bugs Enhancement/CLOSED:** 8 (cerrados o clasificados como mejoras)
-
----
-
-## Tracking de Progreso
-
-### US Completada: SQ-15 - List All Clients ✅
-
-| Paso | Estado     | Notas                       |
-| ---- | ---------- | --------------------------- |
-| 0-11 | Completado | PR #25 MERGED, Ready For QA |
-
----
-
-### US Completada: SQ-16 - Edit Client Data ✅
-
-| Paso | Estado     | Notas                            |
-| ---- | ---------- | -------------------------------- |
-| 0-11 | Completado | PR #26 MERGED, In Test (re-test) |
-
----
-
-### US Completada: SQ-17 - Add Client Tax Information ✅
-
-| Paso | Estado     | Notas                       |
-| ---- | ---------- | --------------------------- |
-| 0-11 | Completado | PR #27 MERGED, Ready For QA |
-
----
-
-### US Completada: SQ-19 - Delete Client ✅
-
-| Paso | Estado     | Notas                       |
-| ---- | ---------- | --------------------------- |
-| 0-11 | Completado | PR #28 MERGED, Ready For QA |
-
----
-
-### 🎉 FASE 1 COMPLETADA - Client Management
-
-Todas las US de FASE 1 implementadas:
-
-- SQ-15: List All Clients ✅
-- SQ-16: Edit Client Data ✅ (In Test)
-- SQ-17: Add Client Tax Information ✅
-- SQ-19: Delete Client ✅
-
----
-
-### US Completada: SQ-21 - Create Invoice by Selecting Client ✅
-
-| Paso | Estado     | Notas                       |
-| ---- | ---------- | --------------------------- |
-| 0-11 | Completado | PR #29 MERGED, Ready For QA |
-
----
-
-### 🎉 FASE 2 COMPLETADA - Invoice Creation
-
-Todas las US de FASE 2 implementadas:
-
-- SQ-21: Create Invoice by Selecting Client ✅ (PR #29)
-- SQ-24: Add Taxes to Invoice ✅ (PR #32)
-- SQ-28: Set Invoice Due Date ✅ (PR #33)
-- SQ-29: Add Notes and Terms to Invoice ✅ (PR #34)
-
----
-
-### US Completada: SQ-32 - Generate Professional PDF Invoice ✅
-
-| Paso | Estado     | Notas                       |
-| ---- | ---------- | --------------------------- |
-| 0-11 | Completado | PR #35 MERGED, Ready For QA |
-
----
-
-### US Completada: SQ-33 - Include Logo and Business Data in PDF ✅
-
-| Paso | Estado     | Notas                       |
-| ---- | ---------- | --------------------------- |
-| 0-11 | Completado | PR #36 MERGED, Ready For QA |
-
----
-
-### US Completada: SQ-35 - Download PDF to Device ✅
-
-| Paso | Estado     | Notas                       |
-| ---- | ---------- | --------------------------- |
-| 0-11 | Completado | PR #37 MERGED, Ready For QA |
-
----
-
-### 🎉 FASE 3 EN PROGRESO - PDF Generation (3/4)
-
-US de FASE 3 implementadas:
-
-- SQ-32: Generate Professional PDF Invoice ✅ (PR #35)
-- SQ-33: Include Logo and Business Data in PDF ✅ (PR #36)
-- SQ-35: Download PDF to Device ✅ (PR #37)
-- SQ-34: Include Payment Methods in PDF ⏳ (Shift-Left QA - BLOQUEADA)
-
----
-
-### US Completada: SQ-27 - Assign Unique Invoice Number ✅
-
-| Paso | Estado     | Notas                                               |
-| ---- | ---------- | --------------------------------------------------- |
-| 0    | Completado | Precondiciones verificadas                          |
-| 1    | Completado | Jira transitado a In Progress                       |
-| 2    | Completado | Plan de implementación creado                       |
-| 3    | Completado | 7 steps implementados (API, hooks, component, form) |
-| 4    | Completado | PR #46 creado                                       |
-| 5    | N/A        | E2E/UI testing por usuario                          |
-| 6    | Completado | Code review (self)                                  |
-| 7    | Completado | Documentación actualizada                           |
-| 8    | Completado | **PR #46 MERGED** ✅                                |
-| 9-11 | Completado | Ready For QA                                        |
-
----
-
-### US Completada: SQ-30 - Save Invoice as Draft ✅
-
-| Paso | Estado     | Notas                                       |
-| ---- | ---------- | ------------------------------------------- |
-| 0    | Completado | Precondiciones verificadas                  |
-| 1    | Completado | Jira transitado a In Progress               |
-| 2    | Completado | Plan de implementación creado               |
-| 3    | Completado | Implementación completa (API, hooks, pages) |
-| 4    | Completado | PR #49 creado                               |
-| 5    | N/A        | E2E/UI testing por usuario                  |
-| 6    | Completado | Code review (self)                          |
-| 7    | Completado | Documentación actualizada                   |
-| 8    | Completado | **PR #49 MERGED** ✅                        |
-| 9-11 | Completado | Ready For QA, asignado a Luis Eduardo       |
-
-**Implementación incluye:**
-
-- API: GET /api/invoices, PUT /api/invoices/[id], DELETE /api/invoices/[id]
-- Hooks: useInvoices, useUpdateInvoice, useDeleteInvoice, useAutoSave
-- Componentes: InvoiceStatusBadge, InvoiceNumberInput (updated)
-- Pages: /invoices (list con filtros), /invoices/[id]/edit (auto-save)
-
----
-
-### 🎉 FASE 4 COMPLETADA - Invoice Creation Avanzado (4/4)
-
-US de FASE 4 implementadas:
-
-- SQ-27: Assign Unique Invoice Number ✅ (PR #46)
-- SQ-30: Save Invoice as Draft ✅ (PR #49 MERGED)
-- SQ-4: Password Recovery via Email ✅ (PR #50 MERGED)
-- SQ-25: Add Discounts to Invoice ✅ (PR #51 MERGED)
-- SQ-6: Guided Onboarding for New Users ✅ (PR #59 MERGED)
-
----
-
-### 🚀 PRÓXIMAS US EN READY FOR DEV (1 disponible)
-
-1. **SQ-44** - Include Payment Data in Email (Alicia Juste) - Invoice Sending
-
-> **SQ-23** - Auto Subtotal/Total Calculation: ✅ **QA Approved**
-> **SQ-26** - Preview Invoice Before Sending: ✅ PR #60 MERGED (Ready For QA)
-> **SQ-43** - Include PDF Attachment in Email: ✅ PR #62 MERGED (Ready For QA)
-
----
-
-## PRs Pendientes de Revisión (2026-02-24)
-
-### 🔧 PRs de Bug Fixes (Todos Mergeados ✅)
-
-| PR # | Rama                             | Bug   | Summary                           | Autor    | Estado |
-| ---- | -------------------------------- | ----- | --------------------------------- | -------- | ------ |
-| #54  | fix/SQ-81-SQ-82/auth-client-fixes | SQ-81, SQ-82 | Resolve auth & client blocking bugs | saiotest | MERGED ✅ |
-| #45  | fix/SQ-76/business-profiles-406  | SQ-76 | Use maybeSingle() for optional profile | saiotest | MERGED ✅ |
-| #44  | fix/SQ-75/phone-validation       | SQ-75 | Add phone field format validation | saiotest | MERGED ✅ |
-
-### 📝 PRs de Shift-Left QA / Documentación ✅ (Todos Mergeados)
-
-| PR # | Rama                          | US    | Tipo       | Autor          | Score | Estado     |
-| ---- | ----------------------------- | ----- | ---------- | -------------- | ----- | ---------- |
-| #53  | test/SQ-23/auto-calculate     | SQ-23 | Shift-Left | GaslessQA      | 4.5/5 | MERGED ✅  |
-| #52  | test/SQ-36/pdf-templates      | SQ-36 | Shift-Left | marian-sanchez | 4/5   | MERGED ✅  |
-| #48  | docs/SQ-37/feature-test-plan  | SQ-37 | Docs       | yxsinell       | 4/5   | MERGED ✅  |
-| #40  | test/SQ-43/include-pdf-attach | SQ-43 | Shift-Left | yxsinell       | 3.5/5 | MERGED ✅  |
-
-### ✅ PRs de Implementación Recientemente Mergeados (saiotest)
-
-| PR # | Rama                         | US    | Summary                        | Fecha Merge  |
-| ---- | ---------------------------- | ----- | ------------------------------ | ------------ |
-| #56  | feat/SQ-22/add-line-items    | SQ-22 | Add Line Items to Invoice      | 2026-02-18   |
-| #55  | test/SQ-22/add-line-items    | SQ-22 | Shift-Left for Line Items      | 2026-02-18   |
-| #51  | feat/SQ-25/add-discounts     | SQ-25 | Add Discounts to Invoice       | 2026-02-12   |
-| #50  | feat/SQ-4/password-recovery  | SQ-4  | Password Recovery via Email    | 2026-02-12   |
-| #49  | feat/SQ-30/save-draft        | SQ-30 | Save Invoice as Draft          | 2026-02-12   |
-| #46  | feat/SQ-27/invoice-number    | SQ-27 | Assign Unique Invoice Number   | 2026-02-12   |
-
-### PRs Cerrados (No Mergeados)
-
-| PR # | Rama                            | Razón                                         |
-| ---- | ------------------------------- | --------------------------------------------- |
-| #38  | feature/add-new-client          | CLOSED - SQ-14 ya implementado, tarea no cumplida |
-| #47  | docs/SQ-37/git-flow-conventions | CLOSED (superseded)                           |
-| #39  | feat/SQ-37/feature-test-plan    | CLOSED (superseded by #48)                    |
-| #31  | feature/add-new-client          | CLOSED (superseded)                           |
-
----
-
-## Bloqueos por Defects (2026-03-09)
+## Bloqueos por Defects (2026-03-28)
 
 > **Ver:** [BUGFIX-ROADMAP.md](./BUGFIX-ROADMAP.md) para tracking completo de bugs
 
-### ✅ User Stories Desbloqueadas
+### ✅ User Stories Desbloqueadas (Bugs Cerrados)
 
-| Story | Summary          | Defect Resuelto | Status Actual   |
-| ----- | ---------------- | --------------- | --------------- |
-| SQ-3  | User Login       | SQ-81 ✅        | **QA Approved** |
-| SQ-16 | Edit Client Data | SQ-82 ✅        | **QA Approved** |
+| Story | Summary          | Defect(s) Resueltos | Status Actual   |
+| ----- | ---------------- | ------------------- | --------------- |
+| SQ-3  | User Login       | SQ-81 ✅            | **QA Approved** |
+| SQ-16 | Edit Client Data | SQ-82 ✅ (merged)   | **QA Approved** |
+| SQ-30 | Save Draft       | SQ-121, SQ-123 ✅   | **In Test**     |
+| SQ-2  | User Signup      | SQ-98, SQ-99 ✅     | **QA Approved** |
+| SQ-25 | Add Discounts    | SQ-97, SQ-96 ✅     | **QA Approved** |
 
-**Nota:** Ambas US pasaron QA exitosamente tras los fixes.
+### Bugs OPEN (Requieren Fix)
 
-### 🔴 Bugs OPEN (Requieren Fix)
+| Bug    | Summary                                                   | Prioridad | Afecta a | Assignee      |
+| ------ | --------------------------------------------------------- | --------- | -------- | ------------- |
+| SQ-74  | Logout no funciona despues de refresh                     | Highest   | Prod     | Ely           |
+| SQ-137 | Backend Endpoint Missing 404                              | Highest   | SQ-18    | Rodrigo Godoy |
+| SQ-139 | Formula descuento PDF inconsistente                       | High      | SQ-32    | Ely           |
+| SQ-138 | Payment methods ausentes del PDF                          | High      | SQ-32    | Ely           |
+| SQ-155 | Rate-limit expone error message                           | High      | SQ-4     | Maxe Aguilera |
+| SQ-142 | Ghost subtotal                                            | Medium    | SQ-32    | Ely           |
+| SQ-141 | tax_amount $0 con descuento                               | Medium    | SQ-32    | Ely           |
+| SQ-140 | PDF header vacio sin business_profile                     | Medium    | SQ-32    | Ely           |
 
-| Bug    | Summary                                                   | Prioridad | Afecta a | Assignee       |
-| ------ | --------------------------------------------------------- | --------- | -------- | -------------- |
-| SQ-123 | Dashboard: Skeleton permanente tras crash de Vista previa | High      | SQ-30    | Luis Eduardo   |
-| SQ-121 | Vista previa no ejecuta ninguna acción en /invoices/edit  | High      | SQ-26    | Luis Eduardo   |
-| SQ-122 | Sin advertencia al navegar con cambios no guardados       | Medium    | SQ-30    | Luis Eduardo   |
-| SQ-111 | Autosave: Estado alterna sin editar                       | Medium    | SQ-30    | Ely            |
+### Bugs Ready For QA (Fixeados, esperan re-test)
 
-### 🟢 Bugs Ready For QA (Fixeados)
-
-| Bug   | Summary                                  | Prioridad | Assignee         |
-| ----- | ---------------------------------------- | --------- | ---------------- |
-| SQ-86 | Password Reset: UI/UX for expired tokens | High      | Maxe Aguilera    |
-| SQ-98 | Signup: Password débil permite registro  | High      | Samuel Amonzabel |
-| SQ-99 | Signup: Email inválido no muestra error  | High      | Samuel Amonzabel |
-
-### ✅ Bugs Enhancement/CLOSED
-
-| Bug    | Summary                                   | Estado      |
-| ------ | ----------------------------------------- | ----------- |
-| SQ-109 | Faltan Foreign Key constraints            | Enhancement |
-| SQ-102 | Validaciones solo frontend sin rechazo BE | Enhancement |
-| SQ-101 | No hay icono para ver contraseña          | Enhancement |
-| SQ-100 | Email 254 chars sin feedback              | Enhancement |
-| SQ-97  | Porcentaje >100 no bloquea                | CLOSED ✅   |
-| SQ-96  | Porcentaje 60% se convierte en 600%       | CLOSED ✅   |
-| SQ-85  | Password strength feedback                | Enhancement |
-| SQ-84  | Forgot Password rate limit indication     | Enhancement |
-| SQ-72  | Jira bloquea update en Epics              | Enhancement |
-
----
-
-### US Completada: SQ-4 - Password Recovery via Email ✅
-
-| Paso | Estado     | Notas                                  |
-| ---- | ---------- | -------------------------------------- |
-| 0    | Completado | Precondiciones verificadas             |
-| 1    | Completado | Jira transitado a In Progress          |
-| 2    | Completado | Plan de implementación creado          |
-| 3    | Completado | Implementación completa (6 archivos)   |
-| 4    | Completado | PR #50 creado                          |
-| 5    | N/A        | E2E/UI testing por usuario             |
-| 6    | Completado | Code review (self)                     |
-| 7    | Completado | Documentación actualizada              |
-| 8    | Completado | **PR #50 MERGED** ✅                   |
-| 9-11 | Completado | Ready For QA, asignado a Maxe Aguilera |
-
-**Implementación incluye:**
-
-- Page: `/forgot-password` (formulario de solicitud)
-- API: `/api/auth/forgot-password` (rate limiting IP + email)
-- Page: `/reset-password` (formulario de nueva contraseña)
-- Component: `PasswordStrengthIndicator` (validación en tiempo real)
-- Update: `/login` (mensaje de éxito post-reset)
-
-**Test Cases cubiertos (19/19):**
-FT-SQ4-01 a FT-SQ4-19 (ver PR #50 para detalles)
-
----
-
-### US Completada: SQ-25 - Add Discounts to Invoice ✅
-
-| Paso | Estado     | Notas                                  |
-| ---- | ---------- | -------------------------------------- |
-| 0    | Completado | Precondiciones verificadas             |
-| 1    | Completado | Jira transitado a In Progress          |
-| 2    | Completado | Plan de implementación creado          |
-| 3    | Completado | Implementación completa (9 archivos)   |
-| 4    | Completado | PR #51 creado                          |
-| 5    | N/A        | E2E/UI testing por usuario             |
-| 6    | Completado | Code review (self)                     |
-| 7    | Completado | Documentación actualizada              |
-| 8    | Completado | **PR #51 MERGED** ✅                   |
-| 9-11 | Completado | Ready For QA, asignado a GENESIS OJOSE |
-
-**Implementación incluye:**
-
-- Utility: `calculateDiscountAmount` en `invoice-calculations.ts`
-- Component: `DiscountInput` (toggle buttons + numeric input + warning)
-- Validación: `discountType/discountValue` schemas con refinements
-- UI: InvoiceSummary muestra tipo de descuento (e.g., "Descuento (10%)")
-- API: POST/PUT routes calculan y persisten discount_amount
-
-**Test Cases cubiertos (7/7):**
-
-- TC-01: No discount by default
-- TC-02: Percentage discount calculation
-- TC-03: Fixed amount discount
-- TC-04: Discount capped at subtotal (+ warning)
-- TC-05: Tax on (subtotal - discount)
-- TC-06: Reject percentage > 100%
-- TC-07: Reject negative values
-
----
-
-### US Completada: SQ-22 - Add Line Items to Invoice ✅
-
-| Paso | Estado     | Notas                                    |
-| ---- | ---------- | ---------------------------------------- |
-| 0    | Completado | Precondiciones verificadas               |
-| 1    | Completado | Jira transitado a In Progress            |
-| 2    | Completado | Plan de implementación creado            |
-| 3    | Completado | Implementación completa (8 archivos)     |
-| 4    | Completado | PR #56 creado                            |
-| 5    | N/A        | E2E/UI testing por usuario               |
-| 6    | Completado | Code review (self)                       |
-| 7    | Completado | Documentación actualizada                |
-| 8    | Completado | **PR #56 MERGED** ✅                     |
-| 9-11 | Completado | Ready For QA                             |
-
----
-
-### US Completada: SQ-18 - View Client Invoice History ✅
-
-| Paso | Estado     | Notas                                    |
-| ---- | ---------- | ---------------------------------------- |
-| 0    | Completado | Precondiciones verificadas               |
-| 1    | Completado | Jira transitado a In Progress            |
-| 2    | Completado | Plan de implementación N/A (claro scope) |
-| 3    | Completado | Implementación completa (5 archivos)     |
-| 4    | Completado | PR #58 creado                            |
-| 5    | N/A        | E2E/UI testing por usuario               |
-| 6    | Completado | Code review (self)                       |
-| 7    | Completado | Documentación actualizada                |
-| 8    | Completado | **PR #58 MERGED** ✅                     |
-| 9-11 | Completado | Ready For QA, asignado a Rodrigo Godoy   |
-
-**Implementación incluye:**
-
-- API: `GET /api/clients/[id]/invoices` con totales calculados
-- Hook: `useClientInvoices` (React Query)
-- Component: `ClientInvoiceHistory` con TotalsSummary, InvoiceTable, EmptyState
-- Page: `/clients/[id]` con tabs (Datos + Facturas)
-
-**Test Cases cubiertos (7/15 - P0/P1):**
-
-- FTP-001: Ver historial con facturas existentes
-- FTP-002: Status badges con colores correctos
-- FTP-003: Click para navegar al detalle
-- FTP-004: Empty state con CTA
-- FTP-005: Total Invoiced (sent + paid + overdue)
-- FTP-006: Total Paid
-- FTP-007: Total Pending (sent + overdue)
-
----
-
-### US Completada: SQ-43 - Include PDF Attachment in Email ✅
-
-| Paso | Estado     | Notas                                           |
-| ---- | ---------- | ----------------------------------------------- |
-| 0    | Completado | Precondiciones verificadas                      |
-| 1    | Completado | Jira transitado a In Progress                   |
-| 2    | Completado | Plan de implementación creado                   |
-| 3    | Completado | Implementación completa (7 archivos)            |
-| 4    | Completado | PR #62 creado                                   |
-| 5    | N/A        | E2E/UI testing por usuario                      |
-| 6    | Completado | Code review (self)                              |
-| 7    | Completado | Documentación actualizada                       |
-| 8    | Completado | **PR #62 MERGED** ✅                            |
-| 9-11 | Completado | Ready For QA, asignado a yxsinell acosta zambrano |
-
-**Implementación incluye:**
-
-- API: `/api/invoices/[id]/pdf` - Server-side PDF generation
-- Service: `email-service.ts` - Resend integration con attachment
-- API: `/api/invoices/[id]/send` - Updated con PDF attachment
-- Migration: `email_logs` table para tracking de envíos
-- Tipos: Supabase types actualizados con email_logs
-
-**Test Cases cubiertos (10/10):**
-
-- TC-01: PDF adjunto incluido al enviar
-- TC-02: Nombre del adjunto usa número de factura
-- TC-03: Tamaño bajo límite con logos grandes
-- TC-04: El adjunto abre correctamente
-- TC-05: MIME type correcto (application/pdf)
-- TC-06: Tamaño al límite (max 5MB)
-- TC-07: Bloqueo cuando PDF supera límite
-- TC-08: Fallo cuando PDF está vacío
-- TC-09: Headers correctos en endpoint PDF
-- TC-10: Integración Backend to Resend
+| Bug    | Summary                                  | Prioridad | Assignee            |
+| ------ | ---------------------------------------- | --------- | ------------------- |
+| SQ-82  | Edit client unicidad email               | High      | Joel Ramirez        |
+| SQ-76  | Business_profiles 406                    | Medium    | Ximena Quintana     |
+| SQ-124 | Cuenta bancaria sin validacion           | Medium    | Arkaitz             |
+| SQ-122 | Sin advertencia unsaved changes          | Medium    | Luis Eduardo Flores |
 
 ---
 
@@ -739,32 +315,21 @@ FT-SQ4-01 a FT-SQ4-19 (ver PR #50 para detalles)
 
 | Fecha      | Cambios                                                                                     |
 | ---------- | ------------------------------------------------------------------------------------------- |
-| 2026-03-09 | **Sync Jira**: SQ-3, SQ-16, SQ-23, SQ-24 → QA Approved. SQ-2, SQ-28, SQ-30 → In Test. 4 nuevos bugs OPEN (SQ-111, SQ-121, SQ-122, SQ-123) |
-| 2026-03-09 | **US desbloqueadas**: SQ-3 (User Login) y SQ-16 (Edit Client) ahora QA Approved ✅         |
-| 2026-03-09 | **Ready For Dev**: Solo SQ-44 (Include Payment Data in Email) disponible                    |
-| 2026-03-01 | **SQ-43 implementado** - PR #62 MERGED, Include PDF Attachment in Email ✅ (7 archivos)    |
-| 2026-02-25 | **SQ-18 implementado** - PR #58 MERGED, View Client Invoice History ✅ (5 archivos)        |
-| 2026-02-25 | **PRs Shift-Left mergeados** - #53 (4.5/5), #52 (4/5), #48 (4/5), #40 (3.5/5) ✅           |
-| 2026-02-25 | **0 PRs pendientes** - Todos los PRs de implementación, bugs y shift-left mergeados        |
-| 2026-02-25 | **Limpieza de PRs completada** - Todos los bug fixes mergeados ✅                           |
-| 2026-02-25 | **SQ-6: PR #59 MERGED** - Guided Onboarding implementado, asignado a Juan Leites (QA)      |
-| 2026-02-25 | PR #44 (SQ-75 phone validation) mergeado, SQ-75 → Ready For QA                             |
-| 2026-02-25 | PR #38 cerrado con feedback (tarea no cumplida, SQ-14 ya implementado)                     |
-| 2026-02-25 | SQ-76 transitado a Ready For QA (PR #45 ya estaba mergeado)                                |
-| 2026-02-25 | PRs de Shift-Left (#40, #48, #52, #53) quedan pendientes de revisión exhaustiva            |
-| 2026-02-24 | **Sincronización completa del tablero Jira y GitHub PRs**                                   |
-| 2026-02-24 | SQ-4, SQ-24, SQ-25: Cambiaron de Ready For QA → **In Test** (testing activo)               |
-| 2026-02-24 | SQ-23: Cambió de Estimation → **Ready For Dev** (disponible para implementar)              |
-| 2026-02-24 | SQ-42: Regresó de Shift-Left QA → **Backlog**                                              |
-| 2026-02-24 | Bugs SQ-81/SQ-82: **Fixeados** con PR #54 MERGED, ahora Ready For QA                       |
-| 2026-02-26 | SQ-26: **PR #60 MERGED** ✅ - Preview Invoice Before Sending completado                   |
-| 2026-02-24 | Bug SQ-76: **Fixeado** con PR #45 MERGED                                                   |
-| 2026-02-24 | Nuevos bugs reportados: SQ-83 (due date warning), SQ-86 (password reset UX)                |
-| 2026-02-24 | US Ready For Dev actuales: SQ-6, SQ-18, SQ-23, SQ-43 (4 disponibles, SQ-26 movido)         |
-| 2026-02-18 | SQ-22: **PR #56 MERGED** ✅ - Add Line Items to Invoice completado (8 archivos, +1186/-30) |
-| 2026-02-17 | Sincronización completa: SQ-14 QA Approved, SQ-3/SQ-16 BLOCKED, nuevos bugs SQ-81/SQ-82    |
-| 2026-02-12 | SQ-25: PR #51 MERGED - Add Discounts to Invoice completado ✅                              |
+| 2026-03-31 | **FIPs creados**: EPIC-SQ-38 y EPIC-SQ-39. Synced a Jira con label `implementation-plan-ready`. |
+| 2026-03-31 | **Shift-Left QA completo**: 12 stories ahora Ready For Dev. PRs #92, #93 merged (ATPs).   |
+| 2026-03-31 | **Roadmap actualizado**: Fases 5 (Dashboard) y 6 (Payments) con orden de implementacion.  |
+| 2026-03-28 | **Sync Jira completa**: 7 bugs cerrados (SQ-81,86,98,99,111,121,123). 8 bugs nuevos OPEN. |
+| 2026-03-28 | **QA Approved nuevos**: SQ-2, SQ-25, SQ-32. **In Test nuevos**: SQ-33, SQ-43.             |
+| 2026-03-28 | **Ready For Dev nuevos**: SQ-47, SQ-48, SQ-68. **SQ-44**: Ready For Dev → Ready For QA.   |
+| 2026-03-28 | **Shift-Left QA nuevos**: SQ-51, SQ-55. **Creado FIX-SESSION-PROGRESS.md**.               |
+| 2026-03-09 | **Sync Jira**: SQ-3, SQ-16, SQ-23, SQ-24 → QA Approved. SQ-2, SQ-28, SQ-30 → In Test.   |
+| 2026-03-09 | **US desbloqueadas**: SQ-3 (User Login) y SQ-16 (Edit Client) ahora QA Approved ✅        |
+| 2026-03-01 | **SQ-43 implementado** - PR #62 MERGED, Include PDF Attachment in Email ✅                 |
+| 2026-02-25 | **SQ-18 implementado** - PR #58 MERGED, View Client Invoice History ✅                     |
+| 2026-02-25 | **SQ-6: PR #59 MERGED** - Guided Onboarding implementado                                   |
+| 2026-02-18 | SQ-22: **PR #56 MERGED** ✅ - Add Line Items to Invoice completado                        |
+| 2026-02-12 | SQ-25: PR #51 MERGED, SQ-4: PR #50 MERGED, SQ-30: PR #49 MERGED, SQ-27: PR #46 MERGED   |
 
 ---
 
-_Actualizado por Claude Code - 2026-03-09 (Sync completo con tablero Jira)_
+_Actualizado por Claude Code - 2026-03-31 (FIPs creados, Shift-Left completo, Roadmap Fases 5-6)_

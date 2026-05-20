@@ -8,6 +8,7 @@ import {
   calculateLineTotal,
   calculateSubtotal,
 } from '@/lib/utils/invoice-calculations';
+import { sanitizePlainText } from '@/lib/utils/sanitize';
 import type { InvoiceWithDetails } from '@/hooks/invoices/use-invoice';
 import type { Invoice, Client, DiscountType, InvoiceItem } from '@/lib/types';
 
@@ -152,6 +153,16 @@ export async function GET(
       console.error('Error fetching business profile:', profileError);
     }
 
+    // Fetch active payment methods for PDF display
+    const { data: paymentMethods } = await supabase
+      .from('payment_methods')
+      .select('type, label, value')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .order('is_default', { ascending: false })
+      .order('sort_order', { ascending: true })
+      .limit(3);
+
     // Build response
     const responseData: InvoiceWithDetails = {
       id: invoice.id,
@@ -172,6 +183,11 @@ export async function GET(
       client: invoice.client as unknown as InvoiceWithDetails['client'],
       items: items ?? [],
       business_profile: businessProfile ?? null,
+      payment_methods: (paymentMethods ?? []).map(pm => ({
+        type: pm.type,
+        label: pm.label,
+        value: typeof pm.value === 'string' ? pm.value : JSON.stringify(pm.value),
+      })),
     };
 
     return NextResponse.json({ data: responseData }, { status: 200 });
@@ -311,12 +327,15 @@ export async function PUT(
       updates.due_date = dueDate || null;
     }
 
+    // Sanitize free-text fields at the write trust boundary (SQ-156).
+    // Strips any HTML/script payloads so the DB stores plain text only. See
+    // .context/reports/incident-SQ-156-investigation.md.
     if (notes !== undefined) {
-      updates.notes = notes || null;
+      updates.notes = notes ? sanitizePlainText(notes) || null : null;
     }
 
     if (terms !== undefined) {
-      updates.terms = terms || null;
+      updates.terms = terms ? sanitizePlainText(terms) || null : null;
     }
 
     // Handle items update (SQ-22)
@@ -325,6 +344,11 @@ export async function PUT(
 
     if (itemsChanged && items) {
       // Delete existing items
+      // SQ-142 note: the AFTER trigger on invoice_items will recompute
+      // invoices.subtotal to 0 when the last item is deleted, keeping the
+      // subtotal invariant intact even if a subsequent failure interrupts
+      // the flow. tax_amount/total are still app-derived so we keep them
+      // consistent via the explicit UPDATE at the end of this handler.
       const { error: deleteItemsError } = await supabase
         .from('invoice_items')
         .delete()
@@ -353,6 +377,26 @@ export async function PUT(
 
         if (insertItemsError) {
           console.error('Error inserting invoice items:', insertItemsError);
+
+          // SQ-142: The old items were already deleted. To avoid leaving
+          // tax_amount/total out of sync with the now-empty items set
+          // (subtotal is already recomputed to 0 by the DB trigger), we
+          // zero out the derived totals on the parent row. This keeps the
+          // invariant subtotal = SUM(items) AND total = taxable_base + tax
+          // even in this partial-failure path.
+          const { error: syncError } = await supabase
+            .from('invoices')
+            .update({
+              tax_amount: 0,
+              total: 0,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', invoiceId);
+
+          if (syncError) {
+            console.error('Failed to sync totals after items failure', invoiceId, syncError);
+          }
+
           return NextResponse.json({ error: 'Error al actualizar los items' }, { status: 500 });
         }
 

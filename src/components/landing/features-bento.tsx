@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import {
   FileText,
@@ -24,6 +25,7 @@ const features = [
     iconColor: 'text-blue-600',
     size: 'large',
     gridClass: 'md:col-span-2 md:row-span-2',
+    image: '/images/landing/features-illustration.png',
   },
   {
     icon: Clock,
@@ -81,6 +83,7 @@ const features = [
     size: 'large',
     badge: 'Pro',
     gridClass: 'md:col-span-2 md:row-span-2',
+    image: '/images/landing/reminders-illustration.png',
   },
 ];
 
@@ -161,6 +164,7 @@ export function FeaturesBento() {
 
 function FeatureCard({ feature }: { feature: (typeof features)[0] }) {
   const isLarge = feature.size === 'large';
+  const hasImage = 'image' in feature && feature.image;
 
   return (
     <motion.div
@@ -168,7 +172,7 @@ function FeatureCard({ feature }: { feature: (typeof features)[0] }) {
       transition={{ duration: 0.2 }}
       className={cn(
         'group relative h-full overflow-hidden rounded-3xl border border-border/50 bg-background p-6 md:p-8 shadow-lg hover:shadow-xl hover:border-primary/20 transition-all duration-300',
-        isLarge && 'min-h-[280px] md:min-h-[320px]'
+        isLarge && 'min-h-[280px] md:min-h-[360px]'
       )}
     >
       {/* Gradient overlay */}
@@ -218,8 +222,21 @@ function FeatureCard({ feature }: { feature: (typeof features)[0] }) {
           </p>
         </div>
 
-        {/* Learn more link for large cards */}
-        {isLarge && (
+        {/* Image for large cards */}
+        {isLarge && hasImage && (
+          <div className="mt-4 -mx-2 -mb-2 rounded-xl overflow-hidden">
+            <Image
+              src={feature.image as string}
+              alt={feature.title}
+              width={688}
+              height={384}
+              className="w-full h-auto object-cover rounded-xl opacity-90 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-500"
+            />
+          </div>
+        )}
+
+        {/* Learn more link for large cards without image */}
+        {isLarge && !hasImage && (
           <div className="mt-6 flex items-center text-sm font-medium text-primary group-hover:underline">
             Saber más
             <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />

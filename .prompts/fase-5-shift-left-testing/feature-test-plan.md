@@ -1,160 +1,162 @@
-Actúa como QA Lead experto en Shift-Left Testing, Test Strategy y Quality Analysis.
+# Feature Test Plan
 
-**⚠️ WORKFLOW:** Este prompt sigue el principio **JIRA-FIRST → LOCAL MIRROR**
+Act as a QA Lead expert in Shift-Left Testing, Test Strategy, and Quality Analysis.
 
----
-
-## 📥 Input Requerido
-
-### 1. Epic Path Local (OBLIGATORIO)
-
-**Formato:** `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/`
-**Ejemplo:** `.context/PBI/epics/EPIC-UPEX-13-user-authentication/`
-
-**Importante:** {ISSUE_NUM} es asignado secuencialmente por Jira (1, 2, 13, 45...) sin ceros a la izquierda
-
-**⚠️ IMPORTANTE - Diferencia entre Nomenclaturas:**
-
-- **Path Local (carpeta):** `EPIC-UPEX-13-user-authentication` ← Nomenclatura de carpetas
-- **Jira Key (real):** `UPEX-13` ← Key real del issue en Jira
-
-**Nota:** Los números de issue son idénticos en ambos formatos (ej: 13). La diferencia está solo en el prefijo:
-
-- Carpeta local: `EPIC-` + Jira Key
-- Jira: Solo el Key (sin prefijo EPIC-)
-
-**Proceso:**
-
-1. **Usuario proporciona:** Path de la carpeta epic local
-2. **Prompt lee:** Archivo `epic.md` de esa carpeta
-3. **Prompt extrae:** Campo `**Jira Key:**` del epic.md (formato real: UPEX-123)
-4. **Prompt usa:** Ese Jira Key real para operaciones MCP de Atlassian
-
-**Uso del path:**
-
-- Leer epic.md local para obtener Jira Key real
-- Leer el epic actual de Jira con MCP (Paso 5)
-- Actualizar el epic en Jira con findings (Paso 5)
-- Agregar comentario con test plan completo (Paso 6)
-- Generar archivo feature-test-plan.md en esa carpeta (Paso 7)
+**⚠️ WORKFLOW:** This prompt follows the **JIRA-FIRST → LOCAL MIRROR** principle
 
 ---
 
-### 2. Contexto de Negocio (OBLIGATORIO)
+## 📥 Required Input
 
-- Business Model: [leer .context/idea/business-model.md]
-- Executive Summary: [leer .context/PRD/executive-summary.md]
-- User Personas: [leer .context/PRD/user-personas.md]
-- User Journeys: [leer .context/PRD/user-journeys.md]
+### 1. Local Epic Path (REQUIRED)
 
----
+**Format:** `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{name}/`
+**Example:** `.context/PBI/epics/EPIC-UPEX-13-user-authentication/`
 
-### 3. Contexto Técnico (OBLIGATORIO)
+**Important:** {ISSUE_NUM} is assigned sequentially by Jira (1, 2, 13, 45...) without leading zeros
 
-- Functional Specs: [leer .context/SRS/functional-specs.md - COMPLETO]
-- Non-Functional Specs: [leer .context/SRS/non-functional-specs.md]
-- Architecture Specs: [leer .context/SRS/architecture-specs.md]
-- API Contracts: [leer .context/SRS/api-contracts.yaml]
+**⚠️ IMPORTANT - Difference Between Naming Conventions:**
 
----
+- **Local Path (folder):** `EPIC-UPEX-13-user-authentication` ← Folder naming convention
+- **Jira Key (real):** `UPEX-13` ← Real issue key in Jira
 
-### 4. Contexto de la Feature (OBLIGATORIO)
+**Note:** Issue numbers are identical in both formats (e.g., 13). The difference is only in the prefix:
 
-**Paso 1: Leer Epic Local y Extraer Jira Key**
+- Local folder: `EPIC-` + Jira Key
+- Jira: Only the Key (without EPIC- prefix)
 
-- Epic (local): [leer {EPIC_PATH}/epic.md proporcionado por el usuario]
-- **Extraer del epic.md:** Campo `**Jira Key:**` (ej: UPEX-123)
-- **Guardar:** Jira Key real para usar en operaciones MCP
+**Process:**
 
-**Paso 2: Obtener Epic de Jira**
+1. **User provides:** Local epic folder path
+2. **Prompt reads:** `epic.md` file from that folder
+3. **Prompt extracts:** `**Jira Key:**` field from epic.md (real format: UPEX-123)
+4. **Prompt uses:** That real Jira Key for Atlassian MCP operations
 
-- Epic (Jira): [usar MCP de Atlassian con el Jira Key real extraído del paso 1]
+**Path usage:**
 
-**Paso 3: Leer Stories**
-
-- Todas las stories de la épica: [leer todos los story.md en {EPIC_PATH}/stories/]
-
----
-
-## 📤 Output Generado
-
-### En Jira (vía MCP de Atlassian):
-
-1. **Epic actualizado** con test strategy summary y label `test-plan-ready`
-2. **Comentario agregado** con test plan completo y tags al equipo
-
-### En Local:
-
-1. **Archivo:** `.context/PBI/epics/EPIC-{...}/feature-test-plan.md`
-2. **Contenido:** Mirror exacto del comentario en Jira
-
-### Para Usuario:
-
-1. **Reporte:** Resumen ejecutivo con critical questions y next steps (Paso 8)
+- Read local epic.md to get real Jira Key
+- Read current epic from Jira with MCP (Step 5)
+- Update epic in Jira with findings (Step 5)
+- Add comment with complete test plan (Step 6)
+- Generate feature-test-plan.md file in that folder (Step 7)
 
 ---
 
-## 🎯 FLUJO DE TRABAJO
+### 2. Business Context (REQUIRED)
 
-Este prompt trabaja en **8 pasos** organizados en 2 partes, siguiendo **JIRA-FIRST → LOCAL MIRROR**:
+- Business Model: [read .context/idea/business-model.md]
+- Executive Summary: [read .context/PRD/executive-summary.md]
+- User Personas: [read .context/PRD/user-personas.md]
+- User Journeys: [read .context/PRD/user-journeys.md]
 
 ---
 
-### 📊 PARTE 1: ANÁLISIS Y DISEÑO
+### 3. Technical Context (REQUIRED)
 
-#### Paso 1: Análisis de Contexto
+- Functional Specs: [read .context/SRS/functional-specs.md - COMPLETE]
+- Non-Functional Specs: [read .context/SRS/non-functional-specs.md]
+- Architecture Specs: [read .context/SRS/architecture-specs.md]
+- API Contracts: [read .context/SRS/api-contracts.yaml]
 
-- Entender el valor de negocio de la épica
-- Identificar usuarios afectados
-- Analizar arquitectura involucrada
+---
 
-#### Paso 2: Análisis de Riesgos
+### 4. Feature Context (REQUIRED)
 
-- Identificar riesgos técnicos
-- Identificar riesgos de negocio
-- Identificar puntos de integración críticos
+**Step 1: Read Local Epic and Extract Jira Key**
 
-#### Paso 3: Estrategia de Testing
+- Epic (local): [read {EPIC_PATH}/epic.md provided by user]
+- **Extract from epic.md:** `**Jira Key:**` field (e.g., UPEX-123)
+- **Save:** Real Jira Key to use in MCP operations
 
-- Definir niveles de testing requeridos
-- Definir tipos de testing por story
-- Definir scope de testing
+**Step 2: Get Epic from Jira**
 
-#### Paso 4: Análisis Crítico & Plan de Testing
+- Epic (Jira): [use Atlassian MCP with real Jira Key extracted from step 1]
 
-- Identificar ambigüedades en épica/stories
-- Generar preguntas para PO/Dev
-- Sugerir mejoras antes de implementación
+**Step 3: Read Stories**
+
+- All epic stories: [read all story.md files in {EPIC_PATH}/stories/]
+
+---
+
+## 📤 Generated Output
+
+### In Jira (via Atlassian MCP):
+
+1. **Epic updated** with test strategy summary and label `test-plan-ready`
+2. **Comment added** with complete test plan and team tags
+
+### Locally:
+
+1. **File:** `.context/PBI/epics/EPIC-{...}/feature-test-plan.md`
+2. **Content:** Exact mirror of the Jira comment
+
+### For User:
+
+1. **Report:** Executive summary with critical questions and next steps (Step 8)
+
+---
+
+## 🎯 WORKFLOW
+
+This prompt works in **8 steps** organized in 2 parts, following **JIRA-FIRST → LOCAL MIRROR**:
+
+---
+
+### 📊 PART 1: ANALYSIS AND DESIGN
+
+#### Step 1: Context Analysis
+
+- Understand the epic's business value
+- Identify affected users
+- Analyze involved architecture
+
+#### Step 2: Risk Analysis
+
+- Identify technical risks
+- Identify business risks
+- Identify critical integration points
+
+#### Step 3: Testing Strategy
+
+- Define required testing levels
+- Define test types per story
+- Define testing scope
+
+#### Step 4: Critical Analysis & Test Planning
+
+- Identify ambiguities in epic/stories
+- Generate questions for PO/Dev
+- Suggest improvements before implementation
 - Entry/Exit criteria
 - Test data requirements
-- Estimación de test cases por story
+- Test case estimates per story
 
 ---
 
-### 🔄 PARTE 2: INTEGRACIÓN Y OUTPUT
+### 🔄 PART 2: INTEGRATION AND OUTPUT
 
-#### Paso 5: Update Epic in Jira
+#### Step 5: Update Epic in Jira
 
-- Agregar test strategy summary y label `test-plan-ready`
+- Add test strategy summary and label `test-plan-ready`
 
-#### Paso 6: Add Test Plan as Comment in Jira Epic
+#### Step 6: Add Test Plan as Comment in Jira Epic
 
-- Agregar test plan completo como comentario con tags al equipo
+- Add complete test plan as comment with team tags
 
-#### Paso 7: Generate Local feature-test-plan.md
+#### Step 7: Generate Local feature-test-plan.md
 
-- Crear mirror local del comentario de Jira
+- Create local mirror of Jira comment
 
-#### Paso 8: Final QA Feedback Report
+#### Step 8: Final QA Feedback Report
 
-- Generar resumen ejecutivo para el usuario
+- Generate executive summary for user
 
 ---
 
 # Feature Test Plan: EPIC-{PROJECT_KEY}-{ISSUE_NUM} - [Epic Title]
 
-**Fecha:** [YYYY-MM-DD]
-**QA Lead:** [Nombre o "TBD"]
+**Date:** [YYYY-MM-DD]
+**QA Lead:** [Name or "TBD"]
 **Epic Jira Key:** [{PROJECT_KEY}-{ISSUE_NUM}]
 **Status:** Draft | In Review | Approved
 
@@ -164,31 +166,31 @@ Este prompt trabaja en **8 pasos** organizados en 2 partes, siguiendo **JIRA-FIR
 
 ### Business Value
 
-[Explicar el valor de negocio de esta épica según Business Model Canvas y Executive Summary]
+[Explain the epic's business value according to Business Model Canvas and Executive Summary]
 
 **Key Value Proposition:**
 
-- [Valor 1 que aporta al usuario]
-- [Valor 2 que aporta al negocio]
+- [Value 1 provided to user]
+- [Value 2 provided to business]
 
 **Success Metrics (KPIs):**
 
-- [KPI 1 del Executive Summary que esta épica impacta]
-- [KPI 2 del Executive Summary que esta épica impacta]
+- [KPI 1 from Executive Summary that this epic impacts]
+- [KPI 2 from Executive Summary that this epic impacts]
 
 **User Impact:**
-(Analizar .context/PRD/user-personas.md para identificar qué personas son afectadas por esta épica)
+(Analyze .context/PRD/user-personas.md to identify which personas are affected by this epic)
 
-- [User Persona identificada del PRD]: [Cómo le afecta específicamente según el epic.md]
-- [Otra User Persona si aplica]: [Cómo le afecta]
+- [User Persona identified from PRD]: [How specifically affected according to epic.md]
+- [Another User Persona if applicable]: [How affected]
 
 **Critical User Journeys:**
-(Analizar .context/PRD/user-journeys.md para identificar qué journeys habilita o modifica esta épica)
+(Analyze .context/PRD/user-journeys.md to identify which journeys this epic enables or modifies)
 
-- [Journey identificado del PRD]
-- [Otro Journey si aplica]
+- [Journey identified from PRD]
+- [Another Journey if applicable]
 
-(Donde las personas y journeys se determinan analizando el PRD del proyecto actual y relacionándolos con el scope del epic)
+(Where personas and journeys are determined by analyzing the current project's PRD and relating them to the epic's scope)
 
 ---
 
@@ -197,51 +199,51 @@ Este prompt trabaja en **8 pasos** organizados en 2 partes, siguiendo **JIRA-FIR
 ### Architecture Components Involved
 
 **Frontend:**
-(Analizar .context/SRS/architecture-specs.md y el epic.md para identificar)
+(Analyze .context/SRS/architecture-specs.md and epic.md to identify)
 
-- Componentes a crear/modificar: [listar según análisis del SRS]
-- Páginas/rutas afectadas: [listar según análisis del SRS]
+- Components to create/modify: [list according to SRS analysis]
+- Affected pages/routes: [list according to SRS analysis]
 
 **Backend:**
-(Analizar .context/SRS/api-contracts.yaml y architecture-specs.md)
+(Analyze .context/SRS/api-contracts.yaml and architecture-specs.md)
 
-- APIs a crear/modificar: [referenciar endpoints específicos de api-contracts.yaml]
-- Servicios de negocio afectados: [listar según análisis del SRS]
+- APIs to create/modify: [reference specific endpoints from api-contracts.yaml]
+- Affected business services: [list according to SRS analysis]
 
 **Database:**
-(Analizar .context/SRS/architecture-specs.md)
+(Analyze .context/SRS/architecture-specs.md)
 
-- Tablas involucradas: [listar tablas específicas del schema según SRS]
-- Queries críticos: [identificar queries complejos o de alto impacto]
+- Tables involved: [list specific schema tables according to SRS]
+- Critical queries: [identify complex or high-impact queries]
 
 **External Services:**
-(Analizar .context/SRS/architecture-specs.md y epic.md)
+(Analyze .context/SRS/architecture-specs.md and epic.md)
 
-- APIs externas: [listar servicios externos específicos según SRS]
-- Third-party services: [ej: procesador de pagos, servicio de email, etc.]
+- External APIs: [list specific external services according to SRS]
+- Third-party services: [e.g., payment processor, email service, etc.]
 
-(Donde todos los componentes, APIs, tablas y servicios se determinan analizando el SRS/PRD/epic del proyecto actual)
+(Where all components, APIs, tables, and services are determined by analyzing the current project's SRS/PRD/epic)
 
 ### Integration Points (Critical for Testing)
 
-[Basado en architecture-specs.md, identificar puntos de integración]
+[Based on architecture-specs.md, identify integration points]
 
 **Internal Integration Points:**
 
 - Frontend ↔ Backend API
 - Backend ↔ Database
 - Backend ↔ Auth Service
-- [Otros módulos internos]
+- [Other internal modules]
 
 **External Integration Points:**
 
-- [Sistema] ↔ [Servicio externo 1]
-- [Sistema] ↔ [Servicio externo 2]
+- [System] ↔ [External service 1]
+- [System] ↔ [External service 2]
 
 **Data Flow:**
 
 ```
-[Describir flujo de datos crítico]
+[Describe critical data flow]
 User → Frontend → API Gateway → Service X → Database
                               ↓
                          External Service
@@ -253,17 +255,17 @@ User → Frontend → API Gateway → Service X → Database
 
 ### Technical Risks
 
-#### Risk 1: [Descripción del riesgo técnico]
+#### Risk 1: [Technical risk description]
 
 - **Impact:** High | Medium | Low
 - **Likelihood:** High | Medium | Low
 - **Area Affected:** [Frontend | Backend | Database | Integration]
 - **Mitigation Strategy:**
-  - [Estrategia 1]
-  - [Testing approach específico]
-- **Test Coverage Required:** [Qué test cases necesitamos para mitigar]
+  - [Strategy 1]
+  - [Specific testing approach]
+- **Test Coverage Required:** [What test cases we need to mitigate]
 
-#### Risk 2: [Descripción del riesgo técnico]
+#### Risk 2: [Technical risk description]
 
 - **Impact:** ...
 - **Likelihood:** ...
@@ -275,17 +277,17 @@ User → Frontend → API Gateway → Service X → Database
 
 ### Business Risks
 
-#### Risk 1: [Descripción del riesgo de negocio]
+#### Risk 1: [Business risk description]
 
-- **Impact on Business:** [Cómo afecta KPIs o user experience]
-- **Impact on Users:** [Qué user personas se ven afectadas]
+- **Impact on Business:** [How it affects KPIs or user experience]
+- **Impact on Users:** [Which user personas are affected]
 - **Likelihood:** High | Medium | Low
 - **Mitigation Strategy:**
-  - [Qué testing hacemos para prevenir]
-  - [Qué validaciones de negocio agregamos]
-- **Acceptance Criteria Validation:** [Validar que acceptance criteria cubran este riesgo]
+  - [What testing we do to prevent]
+  - [What business validations we add]
+- **Acceptance Criteria Validation:** [Validate that acceptance criteria cover this risk]
 
-#### Risk 2: [Descripción del riesgo de negocio]
+#### Risk 2: [Business risk description]
 
 - **Impact on Business:** ...
 - **Impact on Users:** ...
@@ -296,17 +298,17 @@ User → Frontend → API Gateway → Service X → Database
 
 ### Integration Risks
 
-[Identificar riesgos en puntos de integración identificados anteriormente]
+[Identify risks in previously identified integration points]
 
-#### Integration Risk 1: [Descripción]
+#### Integration Risk 1: [Description]
 
 - **Integration Point:** [Frontend ↔ API | API ↔ Database | etc.]
-- **What Could Go Wrong:** [Escenarios de falla]
+- **What Could Go Wrong:** [Failure scenarios]
 - **Impact:** High | Medium | Low
 - **Mitigation:**
-  - Integration tests específicos
-  - Contract testing (si aplica)
-  - Mocking strategy para testing aislado
+  - Specific integration tests
+  - Contract testing (if applicable)
+  - Mocking strategy for isolated testing
 
 ---
 
@@ -314,32 +316,32 @@ User → Frontend → API Gateway → Service X → Database
 
 ### Ambiguities Identified
 
-[Analizar epic.md y todos los story.md de la épica para identificar ambigüedades]
+[Analyze epic.md and all story.md files from the epic to identify ambiguities]
 
-**Ambiguity 1:** [Descripción de la ambigüedad]
+**Ambiguity 1:** [Ambiguity description]
 
 - **Found in:** STORY-{PROJECT_KEY}-{ISSUE_NUM}
-- **Question for PO:** [Pregunta específica]
-- **Impact if not clarified:** [Qué problemas puede causar]
+- **Question for PO:** [Specific question]
+- **Impact if not clarified:** [What problems it can cause]
 
-**Ambiguity 2:** [Descripción]
+**Ambiguity 2:** [Description]
 
 - **Found in:** EPIC-{PROJECT_KEY}-{ISSUE_NUM} scope
-- **Question for Dev:** [Pregunta técnica]
+- **Question for Dev:** [Technical question]
 - **Impact if not clarified:** ...
 
 ---
 
 ### Missing Information
 
-[Identificar qué información falta en epic.md o stories para poder testear correctamente]
+[Identify what information is missing in epic.md or stories to test correctly]
 
-**Missing 1:** [Qué falta]
+**Missing 1:** [What's missing]
 
-- **Needed for:** [Por qué es crítico para testing]
-- **Suggestion:** [Qué agregar a la story/epic]
+- **Needed for:** [Why it's critical for testing]
+- **Suggestion:** [What to add to the story/epic]
 
-**Missing 2:** [Qué falta]
+**Missing 2:** [What's missing]
 
 - **Needed for:** ...
 - **Suggestion:** ...
@@ -348,16 +350,16 @@ User → Frontend → API Gateway → Service X → Database
 
 ### Suggested Improvements (Before Implementation)
 
-[Sugerencias para mejorar stories ANTES de que Dev empiece a implementar]
+[Suggestions to improve stories BEFORE Dev starts implementing]
 
-**Improvement 1:** [Sugerencia]
+**Improvement 1:** [Suggestion]
 
 - **Story Affected:** STORY-{PROJECT_KEY}-{ISSUE_NUM}
-- **Current State:** [Cómo está ahora]
-- **Suggested Change:** [Cómo debería estar]
-- **Benefit:** [Por qué mejora la quality]
+- **Current State:** [How it is now]
+- **Suggested Change:** [How it should be]
+- **Benefit:** [Why it improves quality]
 
-**Improvement 2:** [Sugerencia]
+**Improvement 2:** [Suggestion]
 
 - **Story Affected:** ...
 - **Current State:** ...
@@ -374,17 +376,17 @@ User → Frontend → API Gateway → Service X → Database
 
 - Functional testing (UI, API, Database)
 - Integration testing (internal + external services)
-- Non-functional testing (Performance, Security según NFRs)
+- Non-functional testing (Performance, Security per NFRs)
 - Cross-browser testing (Chrome, Firefox, Safari)
 - Mobile responsiveness (iOS Safari, Android Chrome)
-- API contract validation (según api-contracts.yaml)
-- Data validation (input/output según SRS)
+- API contract validation (per api-contracts.yaml)
+- Data validation (input/output per SRS)
 
 **Out of Scope (For This Epic):**
 
-- [Features que NO se testean en esta épica]
-- [Testing que se deja para otras épicas]
-- [Testing que se contrata externo: penetration testing, load testing extremo, etc.]
+- [Features NOT tested in this epic]
+- [Testing left for other epics]
+- [Testing contracted externally: penetration testing, extreme load testing, etc.]
 
 ---
 
@@ -397,35 +399,35 @@ User → Frontend → API Gateway → Service X → Database
   - Business logic functions/methods
   - Data validation functions
   - Utility functions
-- **Responsibility:** Dev team (pero QA valida que existan)
+- **Responsibility:** Dev team (but QA validates they exist)
 
 #### Integration Testing
 
 - **Coverage Goal:** All integration points identified above
 - **Focus Areas:**
-  - Frontend ↔ Backend API (según api-contracts.yaml)
+  - Frontend ↔ Backend API (per api-contracts.yaml)
   - Backend ↔ Database
   - Backend ↔ External Services (mocked)
 - **Responsibility:** QA + Dev (pair programming)
 
 #### End-to-End (E2E) Testing
 
-- **Coverage Goal:** Critical user journeys completos
+- **Coverage Goal:** Complete critical user journeys
 - **Tool:** Playwright
 - **Focus Areas:**
-  - [User Journey 1 identificado arriba]
-  - [User Journey 2 identificado arriba]
-  - Happy paths completos
-  - Error scenarios críticos
+  - [User Journey 1 identified above]
+  - [User Journey 2 identified above]
+  - Complete happy paths
+  - Critical error scenarios
 - **Responsibility:** QA team
 
 #### API Testing
 
-- **Coverage Goal:** 100% de endpoints de esta épica (según api-contracts.yaml)
-- **Tool:** Postman/Newman o Playwright API
+- **Coverage Goal:** 100% of this epic's endpoints (per api-contracts.yaml)
+- **Tool:** Postman/Newman or Playwright API
 - **Focus Areas:**
-  - Contract validation (request/response según OpenAPI spec)
-  - Status codes correctos
+  - Contract validation (request/response per OpenAPI spec)
+  - Correct status codes
   - Error handling
   - Authentication/Authorization
 - **Responsibility:** QA team
@@ -434,12 +436,12 @@ User → Frontend → API Gateway → Service X → Database
 
 ### Test Types per Story
 
-Por cada story de esta épica, se deben cubrir:
+For each story in this epic, the following should be covered:
 
 **Positive Test Cases:**
 
-- Happy path (flujo exitoso)
-- Valid data variations (diferentes datos válidos)
+- Happy path (successful flow)
+- Valid data variations (different valid data)
 
 **Negative Test Cases:**
 
@@ -452,35 +454,35 @@ Por cada story de esta épica, se deben cubrir:
 
 - Min/max values
 - Empty/null values
-- Edge cases específicos del dominio
+- Domain-specific edge cases
 
 **Exploratory Testing:**
 
-- [Áreas que requieren exploratory testing - explicar por qué]
-- Sugerencia: Hacer exploratory testing ANTES de implementación (usando mockups/prototypes)
+- [Areas requiring exploratory testing - explain why]
+- Suggestion: Do exploratory testing BEFORE implementation (using mockups/prototypes)
 
 ---
 
 ## 📊 Test Cases Summary by Story
 
-[Por cada story de la épica, estimar cuántos test cases se necesitan - SIN forzar número mínimo]
+[For each story in the epic, estimate how many test cases are needed - WITHOUT forcing minimum number]
 
 ### STORY-{PROJECT_KEY}-{ISSUE_NUM}: [Story Title]
 
 **Complexity:** Low | Medium | High
-**Estimated Test Cases:** [Número realista - puede ser 1, puede ser 20]
+**Estimated Test Cases:** [Realistic number - could be 1, could be 20]
 
 - Positive: [X] test cases
 - Negative: [Y] test cases
 - Boundary: [Z] test cases
-- Integration: [W] test cases (si aplica)
-- API: [V] test cases (si aplica)
+- Integration: [W] test cases (if applicable)
+- API: [V] test cases (if applicable)
 
 **Rationale for estimate:**
-[Explicar por qué ese número - complejidad, integration points, edge cases identificados]
+[Explain why that number - complexity, integration points, identified edge cases]
 
 **Parametrized Tests Recommended:** Yes | No
-[Si Yes, explicar qué tests se benefician de parametrización]
+[If Yes, explain which tests benefit from parametrization]
 
 ---
 
@@ -496,13 +498,13 @@ Por cada story de esta épica, se deben cubrir:
 
 ---
 
-[Repetir para todas las stories de la épica]
+[Repeat for all stories in the epic]
 
 ---
 
 ### Total Estimated Test Cases for Epic
 
-**Total:** [Suma de todos los test cases estimados]
+**Total:** [Sum of all estimated test cases]
 **Breakdown:**
 
 - Positive: [X]
@@ -518,29 +520,29 @@ Por cada story de esta épica, se deben cubrir:
 ### Test Data Strategy
 
 **Valid Data Sets:**
-[Basado en user personas y SRS, definir datos válidos realistas]
+[Based on user personas and SRS, define realistic valid data]
 
-- User data: [Ejemplos de usuarios válidos según personas]
-- Transaction data: [Ejemplos de transacciones/operaciones válidas]
-- [Otros datos según el dominio]
+- User data: [Examples of valid users per personas]
+- Transaction data: [Examples of valid transactions/operations]
+- [Other data per domain]
 
 **Invalid Data Sets:**
 
-- [Ejemplos de datos inválidos que debemos probar]
-- [Casos de input malicioso - SQL injection, XSS, etc.]
+- [Examples of invalid data we must test]
+- [Malicious input cases - SQL injection, XSS, etc.]
 
 **Boundary Data Sets:**
 
-- Min/Max values: [Según validaciones del SRS]
+- Min/Max values: [Per SRS validations]
 - Empty/null values
 - Special characters
-- Unicode characters (si aplica internacionalización)
+- Unicode characters (if internationalization applies)
 
 **Test Data Management:**
 
 - ✅ Use Faker.js for generating realistic test data
 - ✅ Create data factories for common entities
-- ❌ NO hardcodear datos estáticos en tests
+- ❌ DON'T hardcode static data in tests
 - ✅ Clean up test data after test execution
 
 ---
@@ -607,40 +609,40 @@ Epic is considered "Done" from QA perspective when:
 
 ## 📝 Non-Functional Requirements Validation
 
-[Basado en .context/SRS/non-functional-specs.md, identificar NFRs que aplican a esta épica]
+[Based on .context/SRS/non-functional-specs.md, identify NFRs that apply to this epic]
 
 ### Performance Requirements
 
-**NFR-P-XXX:** [Descripción del NFR de performance]
+**NFR-P-XXX:** [Performance NFR description]
 
-- **Target:** [Métrica específica - ej: "Page load < 2s"]
-- **Test Approach:** [Cómo lo vamos a validar]
+- **Target:** [Specific metric - e.g., "Page load < 2s"]
+- **Test Approach:** [How we will validate]
 - **Tools:** [Lighthouse, WebPageTest, etc.]
 
 ### Security Requirements
 
-**NFR-S-XXX:** [Descripción del NFR de seguridad]
+**NFR-S-XXX:** [Security NFR description]
 
-- **Requirement:** [Requerimiento específico - ej: "All passwords hashed with bcrypt"]
-- **Test Approach:** [Cómo lo vamos a validar]
+- **Requirement:** [Specific requirement - e.g., "All passwords hashed with bcrypt"]
+- **Test Approach:** [How we will validate]
 - **Tools:** [OWASP ZAP, manual testing, etc.]
 
 ### Usability Requirements
 
-**NFR-U-XXX:** [Descripción del NFR de usabilidad]
+**NFR-U-XXX:** [Usability NFR description]
 
-- **Requirement:** [Requerimiento específico]
-- **Test Approach:** [Cómo lo vamos a validar]
+- **Requirement:** [Specific requirement]
+- **Test Approach:** [How we will validate]
 
 ---
 
 ## 🔄 Regression Testing Strategy
 
 **Regression Scope:**
-[Identificar qué áreas del sistema existente pueden verse afectadas por esta épica]
+[Identify which areas of the existing system could be affected by this epic]
 
-- [ ] Feature A: [Cómo puede afectarse]
-- [ ] Feature B: [Cómo puede afectarse]
+- [ ] Feature A: [How it could be affected]
+- [ ] Feature B: [How it could be affected]
 
 **Regression Test Execution:**
 
@@ -665,8 +667,8 @@ Epic is considered "Done" from QA perspective when:
 
 **Dependencies:**
 
-- Depends on: [Épicas que deben completarse primero]
-- Blocks: [Épicas que dependen de esta]
+- Depends on: [Epics that must be completed first]
+- Blocks: [Epics that depend on this one]
 
 ---
 
@@ -690,7 +692,7 @@ Epic is considered "Done" from QA perspective when:
 
 **Test Management:**
 
-- Jira Xray (test cases linked to stories)
+- Jira + Xray (test cases linked to stories)
 - Test execution reports in Xray
 - Bug tracking in Jira
 
@@ -715,36 +717,36 @@ Epic is considered "Done" from QA perspective when:
 
 ---
 
-## 📝 PARTE 2: Integración y Output
+## 📝 PART 2: Integration and Output
 
-**⚠️ IMPORTANTE:** Esta parte implementa el flujo **JIRA-FIRST → LOCAL MIRROR** para mantener consistencia con el proceso de gestión de epics.
+**⚠️ IMPORTANT:** This part implements the **JIRA-FIRST → LOCAL MIRROR** flow to maintain consistency with the epic management process.
 
 ---
 
-### Paso 5: Update Epic in Jira
+### Step 5: Update Epic in Jira
 
-**Objetivo:** Actualizar el epic en Jira CON los findings críticos del análisis de testing, ANTES de generar archivo local.
+**Objective:** Update the epic in Jira WITH critical findings from testing analysis, BEFORE generating local file.
 
-**Herramienta:** MCP de Atlassian
+**Tool:** Atlassian MCP
 
-**Pasos a ejecutar:**
+**Steps to execute:**
 
-1. **Leer epic actual de Jira:**
-   - Usar MCP de Atlassian para obtener el epic
-   - Input: Jira Key real extraído de epic.md (ej: UPEX-123)
-   - ⚠️ **NO usar** nomenclatura de carpeta (EPIC-UPEX-001)
-   - Obtener: description actual
+1. **Read current epic from Jira:**
+   - Use Atlassian MCP to get the epic
+   - Input: Real Jira Key extracted from epic.md (e.g., UPEX-123)
+   - ⚠️ **DO NOT use** folder naming convention (EPIC-UPEX-001)
+   - Get: current description
 
-2. **Preparar contenido del summary:**
+2. **Prepare summary content:**
 
-   Basado en análisis de Pasos 1-4, preparar:
-   - **Top Critical Risks** (de Paso 2)
-   - **Test Coverage Summary** (de Paso 4)
-   - **Critical Questions** (de Paso 4)
+   Based on Steps 1-4 analysis, prepare:
+   - **Top Critical Risks** (from Step 2)
+   - **Test Coverage Summary** (from Step 4)
+   - **Critical Questions** (from Step 4)
 
-3. **Actualizar epic en Jira:**
-   - Usar MCP de Atlassian para editar el epic
-   - Agregar nueva sección al description con el siguiente contenido:
+3. **Update epic in Jira:**
+   - Use Atlassian MCP to edit the epic
+   - Add new section to description with the following content:
 
    ***
 
@@ -755,7 +757,7 @@ Epic is considered "Done" from QA perspective when:
 
    ### Critical Risks Identified
 
-   [Resumen de top 3 riesgos técnicos/negocio con mayor impacto]
+   [Summary of top 3 technical/business risks with highest impact]
 
    ### Test Coverage Summary
    - **Total Estimated Test Cases:** [X]
@@ -765,7 +767,7 @@ Epic is considered "Done" from QA perspective when:
 
    ### Critical Questions for Team
 
-   [Indicar que hay preguntas críticas en comentario - ver detalles abajo]
+   [Indicate there are critical questions in comment - see details below]
 
    ### Test Strategy
    - Levels: Unit, Integration, E2E, API
@@ -773,33 +775,33 @@ Epic is considered "Done" from QA perspective when:
    - Timeline: [X sprints/weeks estimated]
 
    ***
-   - Agregar label: `test-plan-ready`
+   - Add label: `test-plan-ready`
 
-**Output esperado:**
+**Expected output:**
 
-- ✅ Epic actualizado en Jira con test strategy summary
-- ✅ Label `test-plan-ready` agregado
-- ✅ Description enriquecido con análisis de QA
+- ✅ Epic updated in Jira with test strategy summary
+- ✅ Label `test-plan-ready` added
+- ✅ Description enriched with QA analysis
 
 ---
 
-### Paso 6: Add Feature Test Plan as Comment in Jira
+### Step 6: Add Feature Test Plan as Comment in Jira
 
-**Objetivo:** Agregar TODO el feature test plan como comentario en el epic de Jira para máxima visibilidad del equipo.
+**Objective:** Add the ENTIRE feature test plan as a comment in the Jira epic for maximum team visibility.
 
-**Herramienta:** MCP de Atlassian
+**Tool:** Atlassian MCP
 
-**Estructura del comentario:**
+**Comment structure:**
 
 ```
 ## 📋 Feature Test Plan - Generated [Date]
 
-**QA Lead:** [Nombre o "AI-Generated"]
+**QA Lead:** [Name or "AI-Generated"]
 **Status:** Draft - Pending Team Review
 
 ---
 
-[PEGAR AQUÍ TODO EL CONTENIDO GENERADO DESDE "Feature Test Plan: EPIC-..." HASTA "Metrics & Reporting"]
+> The AI must compile all generated content from "Feature Test Plan: EPIC-..." through "Metrics & Reporting" into this section. Do not ask the user to paste anything.
 
 ---
 
@@ -832,51 +834,51 @@ Epic is considered "Done" from QA perspective when:
 
 1. Team discusses critical questions and ambiguities in refinement
 2. PO/Dev provide answers and clarifications
-3. QA begins test case design per story (use acceptance-test-plan.md prompt)
+3. QA begins test case design per story (use story-test-cases.md prompt)
 4. Team validates entry/exit criteria before sprint starts
 5. Dev starts implementation ONLY after critical questions resolved
 
 ---
 
 **Documentation:** Full test plan also available at:
-`.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/feature-test-plan.md`
+`.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{name}/feature-test-plan.md`
 ```
 
-**Pasos a ejecutar:**
+**Steps to execute:**
 
-1. Usar MCP de Atlassian para agregar comentario al epic
-2. Input: Epic Jira Key + contenido completo del comentario
-3. Mencionar en el comentario a los miembros del equipo (@PO, @Dev, @QA) según configuración del proyecto
+1. Use Atlassian MCP to add comment to epic
+2. Input: Epic Jira Key + complete comment content
+3. Mention team members in comment (@PO, @Dev, @QA) per project configuration
 
-**Output esperado:**
+**Expected output:**
 
-- ✅ Comentario creado en Jira con test plan completo
-- ✅ Equipo notificado vía mentions
-- ✅ Checklist de acciones agregado para follow-up
-
----
-
-### Paso 7: Generate Local feature-test-plan.md (Mirroring)
-
-**Objetivo:** Crear archivo local `.md` como MIRROR del comentario en Jira para version control y documentación offline.
-
-**Path:** `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/feature-test-plan.md`
-
-**Contenido:** IDÉNTICO al contenido generado en Paso 6 (todo el test plan)
-
-**Output esperado:**
-
-- ✅ Archivo `feature-test-plan.md` creado localmente
-- ✅ Contenido es MIRROR exacto del comentario en Jira
-- ✅ Disponible para git versioning
+- ✅ Comment created in Jira with complete test plan
+- ✅ Team notified via mentions
+- ✅ Action checklist added for follow-up
 
 ---
 
-### Paso 8: Final QA Feedback Report
+### Step 7: Generate Local feature-test-plan.md (Mirroring)
 
-**Objetivo:** Reportar al USUARIO el resumen ejecutivo y acciones pendientes.
+**Objective:** Create local `.md` file as MIRROR of Jira comment for version control and offline documentation.
 
-**Formato del reporte:**
+**Path:** `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{name}/feature-test-plan.md`
+
+**Content:** IDENTICAL to content generated in Step 6 (entire test plan)
+
+**Expected output:**
+
+- ✅ `feature-test-plan.md` file created locally
+- ✅ Content is EXACT MIRROR of Jira comment
+- ✅ Available for git versioning
+
+---
+
+### Step 8: Final QA Feedback Report
+
+**Objective:** Report to USER the executive summary and pending actions.
+
+**Report format:**
 
 ---
 
@@ -899,39 +901,39 @@ Epic is considered "Done" from QA perspective when:
 
 ### 🚨 Top 3 Critical Risks
 
-**Risk 1:** [Descripción]
+**Risk 1:** [Description]
 
 - **Impact:** High
 - **Area:** [Technical | Business | Integration]
-- **Mitigation:** [Estrategia]
+- **Mitigation:** [Strategy]
 
-**Risk 2:** [Descripción]
+**Risk 2:** [Description]
 
 - **Impact:** High/Medium
 - **Area:** [Technical | Business | Integration]
-- **Mitigation:** [Estrategia]
+- **Mitigation:** [Strategy]
 
-**Risk 3:** [Descripción]
+**Risk 3:** [Description]
 
 - **Impact:** Medium
 - **Area:** [Technical | Business | Integration]
-- **Mitigation:** [Estrategia]
+- **Mitigation:** [Strategy]
 
 ---
 
 ### ❓ Critical Questions Requiring PO/Dev Input
 
-**Question 1 (For PO):** [Pregunta sobre negocio]
+**Question 1 (For PO):** [Business question]
 
-- **Context:** [Por qué es importante]
-- **Impact if not answered:** [Qué riesgo representa]
+- **Context:** [Why it's important]
+- **Impact if not answered:** [What risk it represents]
 
-**Question 2 (For Dev):** [Pregunta técnica]
+**Question 2 (For Dev):** [Technical question]
 
-- **Context:** [Por qué es importante]
-- **Impact if not answered:** [Qué riesgo representa]
+- **Context:** [Why it's important]
+- **Impact if not answered:** [What risk it represents]
 
-**Question 3 (For PO/Dev):** [Pregunta adicional si aplica]
+**Question 3 (For PO/Dev):** [Additional question if applicable]
 
 - **Context:** ...
 - **Impact if not answered:** ...
@@ -940,14 +942,14 @@ Epic is considered "Done" from QA perspective when:
 
 ### 💡 Suggested Epic/Story Improvements
 
-**Improvement 1:** [Sugerencia]
+**Improvement 1:** [Suggestion]
 
 - **Story/Epic Affected:** [KEY]
-- **Current State:** [Problema identificado]
-- **Suggested Change:** [Cómo mejorarlo]
-- **Benefit:** [Por qué es importante]
+- **Current State:** [Problem identified]
+- **Suggested Change:** [How to improve it]
+- **Benefit:** [Why it's important]
 
-**Improvement 2:** [Si aplica]
+**Improvement 2:** [If applicable]
 
 - **Story/Epic Affected:** ...
 - **Current State:** ...
@@ -991,7 +993,7 @@ Epic is considered "Done" from QA perspective when:
 
 **Local Files:**
 
-- ✅ `feature-test-plan.md` created at: `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/`
+- ✅ `feature-test-plan.md` created at: `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{name}/`
 
 **Analysis Completed:**
 
@@ -1017,7 +1019,7 @@ Epic is considered "Done" from QA perspective when:
 
 5. **All:** Ensure all critical questions are answered
 6. **PO:** Approve or provide feedback on suggested improvements
-7. **QA:** Begin test case design for each story using `acceptance-test-plan.md` prompt
+7. **QA:** Begin test case design for each story using `story-test-cases.md` prompt
 8. **Team:** Validate entry criteria can be met for each story
 
 **During Epic Implementation:**
@@ -1031,7 +1033,7 @@ Epic is considered "Done" from QA perspective when:
 **⚠️ BLOCKER:** Epic should NOT start implementation until critical questions are resolved by PO/Dev.
 
 **Jira Link:** [Link to epic in Jira]
-**Local Test Plan:** `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/feature-test-plan.md`
+**Local Test Plan:** `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{name}/feature-test-plan.md`
 
 ---
 
@@ -1041,28 +1043,28 @@ Epic is considered "Done" from QA perspective when:
 
 **Assumptions:**
 
-- [Listar assumptions que se están haciendo para este plan]
+- [List assumptions being made for this plan]
 
 **Constraints:**
 
-- [Listar constraints - tiempo, recursos, herramientas, etc.]
+- [List constraints - time, resources, tools, etc.]
 
 **Known Limitations:**
 
-- [Qué NO se puede testear o validar completamente]
+- [What CANNOT be fully tested or validated]
 
 **Exploratory Testing Sessions:**
 
 - Recommended: [X] exploratory testing sessions BEFORE implementation
-  - Session 1: [Objetivo - ej: Test with mockups/prototypes]
-  - Session 2: [Objetivo - ej: Test edge cases not covered in stories]
+  - Session 1: [Objective - e.g., Test with mockups/prototypes]
+  - Session 2: [Objective - e.g., Test edge cases not covered in stories]
 
 ---
 
 ## 📎 Related Documentation
 
-- **Epic:** `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/epic.md`
-- **Stories:** `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}/stories/STORY-*/story.md`
+- **Epic:** `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{name}/epic.md`
+- **Stories:** `.context/PBI/epics/EPIC-{PROJECT_KEY}-{ISSUE_NUM}-{name}/stories/STORY-*/story.md`
 - **Business Model:** `.context/idea/business-model.md`
 - **PRD:** `.context/PRD/` (all files)
 - **SRS:** `.context/SRS/` (all files)
@@ -1071,202 +1073,156 @@ Epic is considered "Done" from QA perspective when:
 
 ---
 
-**Formato:** Markdown estructurado siguiendo flujo **JIRA-FIRST → LOCAL MIRROR**
+**Format:** Structured Markdown following **JIRA-FIRST → LOCAL MIRROR** flow
 
 ---
 
-## 🔧 Prerequisitos para Ejecutar Este Prompt
+## 🔧 Prerequisites to Execute This Prompt
 
-- ✅ TODOS los archivos de contexto (idea, PRD, SRS) deben estar completos
-- ✅ Epic.md y todos los story.md de la épica deben existir
-- ✅ **Epic Path local disponible** (ej: `.context/PBI/epics/EPIC-UPEX-13-feature/`)
-- ✅ **Epic.md debe contener campo `Jira Key:`** con el key real (ej: UPEX-13)
-- ✅ **Acceso a MCP de Atlassian configurado y funcionando**
-- ✅ Tiempo para analizar críticamente, no solo generar checklist
+- ✅ ALL context files (idea, PRD, SRS) must be complete
+- ✅ Epic.md and all story.md files from the epic must exist
+- ✅ **Local Epic Path available** (e.g., `.context/PBI/epics/EPIC-UPEX-13-feature/`)
+- ✅ **Epic.md must contain `Jira Key:` field** with real key (e.g., UPEX-13)
+- ✅ **Atlassian MCP access configured and working**
+- ✅ Time to critically analyze, not just generate checklist
 
-**⚠️ Validación de epic.md:**
+**⚠️ epic.md Validation:**
 
-El archivo epic.md debe contener en su metadata:
+The epic.md file must contain in its metadata:
 
 ```markdown
 **Jira Key:** UPEX-13
 ```
 
-Este es el Jira Key REAL del issue en Jira (NO la nomenclatura de carpeta).
+This is the REAL Jira Key of the issue in Jira (NOT the folder naming convention).
 
-**Nota:** El número de issue (ej: 13) es el mismo en la nomenclatura de carpeta y en el Jira Key.
+**Note:** The issue number (e.g., 13) is the same in the folder naming convention and in the Jira Key.
 
 ---
 
-## 📋 Flujo de Ejecución (Para la IA)
+## 📋 Execution Flow (For AI)
 
-### Input requerido del usuario:
+### Required user input:
 
 ```
-Epic Path: .context/PBI/epics/EPIC-UPEX-13-nombre-feature/
+Epic Path: .context/PBI/epics/EPIC-UPEX-13-feature-name/
 ```
 
-**⚠️ Proceso Automático:**
+**⚠️ Automatic Process:**
 
-1. Prompt lee: `.context/PBI/epics/EPIC-UPEX-13-nombre-feature/epic.md`
-2. Prompt extrae: Campo `**Jira Key:**` (ej: UPEX-13)
-3. Prompt usa: Jira Key real UPEX-13 para operaciones MCP
+1. Prompt reads: `.context/PBI/epics/EPIC-UPEX-13-feature-name/epic.md`
+2. Prompt extracts: `**Jira Key:**` field (e.g., UPEX-13)
+3. Prompt uses: Real Jira Key UPEX-13 for MCP operations
 
-**Nota:** El número de issue (13) es el mismo en la carpeta y en Jira. NO se usan formatos como 001 o XXX.
+**Note:** The issue number (13) is the same in the folder and in Jira. Formats like 001 or XXX are NOT used.
 
-### Orden de ejecución:
+### Execution order:
 
-**Pre-requisito: Extraer Jira Key**
+**Pre-requisite: Extract Jira Key**
 
-1. Leer `{EPIC_PATH}/epic.md` proporcionado por usuario
-2. Extraer campo `**Jira Key:**` (ej: UPEX-13)
-3. Guardar Jira Key real para usar en Pasos 5 y 6
+1. Read `{EPIC_PATH}/epic.md` provided by user
+2. Extract `**Jira Key:**` field (e.g., UPEX-13)
+3. Save real Jira Key to use in Steps 5 and 6
 
-**PARTE 1 - Análisis y Diseño:** 4. **Pasos 1-4:** Analizar contexto, riesgos, estrategia, test cases (contenido Markdown)
+**PART 1 - Analysis and Design:** 4. **Steps 1-4:** Analyze context, risks, strategy, test cases (Markdown content)
 
-**PARTE 2 - Integración y Output:** 5. **Paso 5:** Actualizar epic en Jira con test strategy summary (MCP Atlassian + Jira Key real) 6. **Paso 6:** Crear comentario en Jira con test plan completo (MCP Atlassian + Jira Key real) 7. **Paso 7:** Generar archivo local `feature-test-plan.md` en {EPIC_PATH}/ (Write tool) 8. **Paso 8:** Reportar resumen al usuario (Output)
+**PART 2 - Integration and Output:** 5. **Step 5:** Update epic in Jira with test strategy summary (Atlassian MCP + real Jira Key) 6. **Step 6:** Create comment in Jira with complete test plan (Atlassian MCP + real Jira Key) 7. **Step 7:** Generate local `feature-test-plan.md` file in {EPIC_PATH}/ (Write tool) 8. **Step 8:** Report summary to user (Output)
 
-### Herramientas a usar:
+### Tools to use:
 
-**MCP de Atlassian:**
+**Atlassian MCP:**
 
-- Para leer epic de Jira
-- Para actualizar epic description y labels
-- Para agregar comentario al epic
+- To read epic from Jira
+- To update epic description and labels
+- To add comment to epic
 
 **File Operations:**
 
-- Para crear archivo local feature-test-plan.md
-- Para leer archivos de contexto (PRD, SRS, epic, stories)
+- To create local feature-test-plan.md file
+- To read context files (PRD, SRS, epic, stories)
 
 ---
 
-## ⚠️ IMPORTANTE: Principios de Ejecución
+## ⚠️ IMPORTANT: Execution Principles
 
 ### Shift-Left Testing Philosophy:
 
-- ✅ **Análisis crítico primero, test planning después**
-- ✅ **Feedback temprano es MÁS valioso que test plan perfecto**
-- ✅ **Identificar riesgos ANTES de implementación** (shift-left!)
-- ✅ **Test plan en comentarios** para visibilidad del equipo
+- ✅ **Critical analysis first, test planning second**
+- ✅ **Early feedback is MORE valuable than perfect test plan**
+- ✅ **Identify risks BEFORE implementation** (shift-left!)
+- ✅ **Test plan in comments** for team visibility
 
 ### Test Planning Guidelines:
 
-- ❌ **NO forzar número mínimo de test cases** - depende de complejidad de cada story
-- ✅ **Analizar riesgos exhaustivamente** - técnicos, negocio, integración
-- ✅ **Identificar ambigüedades** en epic y stories
-- ✅ **Hacer preguntas críticas** - mejor clarificar que asumir
+- ❌ **DON'T force minimum number of test cases** - depends on each story's complexity
+- ✅ **Analyze risks exhaustively** - technical, business, integration
+- ✅ **Identify ambiguities** in epic and stories
+- ✅ **Ask critical questions** - better to clarify than assume
 
 ### Jira-First Workflow:
 
-- ✅ **SIEMPRE actualizar Jira primero, luego local** (consistencia)
-- ✅ **Test plan va en comentario** para máxima visibilidad
-- ✅ **Taggear al equipo** (@PO, @Dev, @QA)
-- ✅ **Agregar label `test-plan-ready`** para tracking
+- ✅ **ALWAYS update Jira first, then local** (consistency)
+- ✅ **Test plan goes in comment** for maximum visibility
+- ✅ **Tag the team** (@PO, @Dev, @QA)
+- ✅ **Add label `test-plan-ready`** for tracking
 
 ---
 
-## 🎯 Post-Generación: Acciones del Equipo
+## 🎯 Post-Generation: Team Actions
 
-### Inmediatamente después de ejecutar este prompt:
+### Immediately after executing this prompt:
 
-1. **PO debe:**
-   - Revisar comentario en Jira con test plan
-   - Responder "Critical Questions for PO"
-   - Validar risk analysis y business impact
-   - Confirmar test scope es completo y correcto
+1. **PO must:**
+   - Review comment in Jira with test plan
+   - Answer "Critical Questions for PO"
+   - Validate risk analysis and business impact
+   - Confirm test scope is complete and correct
 
-2. **Dev Lead debe:**
-   - Revisar comentario en Jira con test plan
-   - Responder "Technical Questions for Dev"
-   - Validar integration points identificados
-   - Confirmar architecture analysis es preciso
-   - **NO empezar epic** hasta resolver preguntas críticas
+2. **Dev Lead must:**
+   - Review comment in Jira with test plan
+   - Answer "Technical Questions for Dev"
+   - Validate identified integration points
+   - Confirm architecture analysis is accurate
+   - **DO NOT start epic** until critical questions resolved
 
-3. **QA debe:**
-   - Revisar test strategy y estimates
-   - Esperar respuestas de PO/Dev antes de empezar test case design
-   - Preparar test environments y tools
-   - Comenzar test case design por story usando `acceptance-test-plan.md` prompt
+3. **QA must:**
+   - Review test strategy and estimates
+   - Wait for PO/Dev answers before starting test case design
+   - Prepare test environments and tools
+   - Begin test case design per story using `story-test-cases.md` prompt
 
-4. **Usuario (quien ejecutó el prompt) debe:**
-   - Compartir link de Jira epic con equipo
-   - Facilitar discusión de preguntas críticas en refinement
-   - Asegurar que preguntas sean respondidas antes de sprint
-
----
-
-## 🚀 Workflow Completo: Epic → Stories
-
-### Orden recomendado:
-
-1. ✅ **Ejecutar `feature-test-plan.md` prompt** para el epic completo
-2. ⏸️ **Esperar feedback** de PO/Dev sobre critical questions
-3. ✅ **Ejecutar `acceptance-test-plan.md` prompt** para cada story individual
-4. ⏸️ **Esperar feedback** de PO/Dev sobre cada story
-5. ✅ **Comenzar sprint** solo cuando todas las preguntas estén resueltas
-
-**Beneficio de este workflow:**
-
-- Test plan a nivel epic identifica riesgos globales
-- Test cases a nivel story identifican gaps específicos
-- Ambos retroalimentan al PO/Dev ANTES de implementación
-- Reduce bugs, retrabajos y malentendidos
+4. **User (who executed the prompt) must:**
+   - Share Jira epic link with team
+   - Facilitate critical questions discussion in refinement
+   - Ensure questions are answered before sprint
 
 ---
 
-**Versión:** 3.1 - Jira-First + MCP Atlassian + Shift-Left Philosophy + Custom Field Sync
-**Última actualización:** 2025-02-05
-**Cambios principales:**
+## 🚀 Complete Workflow: Epic → Stories
 
-- ✅ Agregado flujo Jira-First (Pasos 5-8)
-- ✅ Integración con MCP de Atlassian
-- ✅ Test plan en comentarios (no artefactos separados)
-- ✅ Refinamiento automático de epic en Jira
-- ✅ Consistencia con `acceptance-test-plan.md` prompt
-- ✅ **Sincronización condicional con custom field de Jira**
+### Recommended order:
+
+1. ✅ **Execute `feature-test-plan.md` prompt** for complete epic
+2. ⏸️ **Wait for feedback** from PO/Dev on critical questions
+3. ✅ **Execute `story-test-cases.md` prompt** for each individual story
+4. ⏸️ **Wait for feedback** from PO/Dev on each story
+5. ✅ **Begin sprint** only when all questions are resolved
+
+**Benefit of this workflow:**
+
+- Test plan at epic level identifies global risks
+- Test cases at story level identify specific gaps
+- Both provide feedback to PO/Dev BEFORE implementation
+- Reduces bugs, rework, and misunderstandings
 
 ---
 
-## 📤 SINCRONIZACIÓN CON JIRA (Condicional - UPEX Workspace)
+**Version:** 3.1 - Jira-First + Atlassian MCP + Shift-Left Philosophy
+**Last updated:** 2025-01-05
+**Main changes:**
 
-### Custom Field para Feature Test Plan
-
-| Field ID            | Nombre                   | Tipo     | Nivel |
-| ------------------- | ------------------------ | -------- | ----- |
-| `customfield_10045` | Feature Test Plan (QA)🧪 | Textarea | Epic  |
-
-### Instrucciones de Sincronización
-
-**DESPUÉS de generar el archivo `feature-test-plan.md` localmente:**
-
-1. **Verificar si el Epic tiene el custom field:**
-   - Usar MCP de Atlassian para obtener el Epic: `jira_get_issue`
-   - Verificar si `customfield_10045` existe y está disponible en el response
-
-2. **Si el campo existe:**
-   - Copiar el contenido COMPLETO del `feature-test-plan.md` generado
-   - Actualizar el Epic en Jira usando MCP `jira_update_issue`:
-     ```
-     fields: {
-       "customfield_10045": "[contenido del feature-test-plan.md]"
-     }
-     ```
-   - Agregar label: `test-plan-ready`
-
-3. **Si el campo NO existe (Workspace non-UPEX):**
-   - Buscar campo equivalente con nombre similar ("Test Plan", "QA Plan", "Testing Strategy")
-   - Si no existe ningún campo equivalente, agregar como **comentario** en el Epic:
-
-     ```
-     🧪 **Feature Test Plan (QA)**
-
-     [contenido del feature-test-plan.md]
-     ```
-
-### Output Esperado
-
-- [ ] Archivo `feature-test-plan.md` creado en `.context/PBI/epics/.../`
-- [ ] Custom field `customfield_10045` actualizado en Jira (si existe)
-- [ ] Label `test-plan-ready` agregado al Epic
-- [ ] Comentario agregado como fallback (si campo no existe)
+- ✅ Added Jira-First flow (Steps 5-8)
+- ✅ Integration with Atlassian MCP
+- ✅ Test plan in comments (not separate artifacts)
+- ✅ Automatic epic refinement in Jira
+- ✅ Consistency with `story-test-cases.md` prompt

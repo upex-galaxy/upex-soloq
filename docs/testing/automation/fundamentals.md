@@ -37,7 +37,7 @@
 
 ## ¿Cuándo Automatizar?
 
-### Automatizar
+### Automatizar ✅
 
 | Criterio                      | Ejemplo                                           |
 | ----------------------------- | ------------------------------------------------- |
@@ -47,7 +47,7 @@
 | **Tests críticos de negocio** | Login, checkout, pagos                            |
 | **Tests de API**              | Validación de contratos, respuestas               |
 
-### NO Automatizar
+### NO Automatizar ❌
 
 | Criterio                    | Razón                           |
 | --------------------------- | ------------------------------- |
@@ -80,11 +80,11 @@
                                  Muy estables
 ```
 
-| Nivel           | Qué prueba                   | Velocidad    | Cantidad  | Ejemplo                                        |
-| --------------- | ---------------------------- | ------------ | --------- | ---------------------------------------------- |
-| **Unit**        | Una función/método aislado   | Milisegundos | Muchos    | `calculateTotal()` retorna correctamente       |
-| **Integration** | Múltiples componentes juntos | Segundos     | Moderados | API endpoint crea usuario en DB                |
-| **E2E**         | Flujo completo como usuario  | Minutos      | Pocos     | Usuario se registra, hace compra, recibe email |
+| Nivel           | Qué prueba                   | Velocidad       | Cantidad  | Ejemplo                                        |
+| --------------- | ---------------------------- | --------------- | --------- | ---------------------------------------------- |
+| **Unit**        | Una función/método aislado   | ⚡ Milisegundos | Muchos    | `calculateTotal()` retorna correctamente       |
+| **Integration** | Múltiples componentes juntos | ⏱️ Segundos     | Moderados | API endpoint crea usuario en DB                |
+| **E2E**         | Flujo completo como usuario  | 🐢 Minutos      | Pocos     | Usuario se registra, hace compra, recibe email |
 
 ---
 
@@ -181,12 +181,16 @@ testUser('user can update profile', async ({ user, page }) => {
 });
 ```
 
-### Page Objects
+### Patrones de Abstracción de UI
+
+Existen varios patrones para organizar la interacción con la UI en tests automatizados. A continuación los más comunes:
+
+#### Page Objects (Patrón Tradicional)
 
 Encapsulan la estructura de una página en un objeto reutilizable:
 
 ```typescript
-// Sin Page Object
+// Sin Page Object ❌
 test('login', async ({ page }) => {
   await page.goto('/login');
   await page.fill('#email', 'test@example.com');
@@ -194,7 +198,7 @@ test('login', async ({ page }) => {
   await page.click('button[type="submit"]');
 });
 
-// Con Page Object
+// Con Page Object ✅
 class LoginPage {
   constructor(private page: Page) {}
 
@@ -211,6 +215,47 @@ test('login', async ({ page }) => {
   await loginPage.login('test@example.com', 'password123');
 });
 ```
+
+#### Component-Based Architecture (KATA)
+
+En lugar de agrupar locators en un objeto, los **componentes** agrupan acciones completas (ATCs) con assertions incluidas:
+
+```typescript
+// Component-based (KATA Architecture)
+class LoginPage extends UiBase {
+  @atc('UPEX-101')
+  async loginSuccessfully(email: string, password: string) {
+    await this.page.goto('/login');
+    await this.page.fill('#email', email);
+    await this.page.fill('#password', password);
+    await this.page.click('button[type="submit"]');
+    // Assertions included in the component
+    await expect(this.page).toHaveURL(/.*dashboard.*/);
+  }
+}
+```
+
+**Ventajas**: Cada método es un test case completo (acción + verificación), reutilizable, y con trazabilidad directa a tickets del TMS.
+
+> **Nota**: Este boilerplate usa el enfoque Component-based (KATA). Para más detalles, ver `.context/guidelines/TAE/automation-standards.md`.
+
+#### Screenplay Pattern
+
+Modela las interacciones como tareas que realizan actores:
+
+```typescript
+// Screenplay pattern (conceptual)
+await actor.attemptsTo(
+  Navigate.to('/login'),
+  Fill.field('#email', email),
+  Click.on('button[type="submit"]'),
+  Ensure.that(CurrentPage.url(), containsString('dashboard'))
+);
+```
+
+**Ventajas**: Muy legible, desacopla "qué" de "cómo". Usado en frameworks como Serenity/JS.
+
+---
 
 ### Assertions
 
@@ -283,7 +328,7 @@ test.describe('Feature: User Registration', () => {
 Cada test debe poder ejecutarse solo:
 
 ```typescript
-// Malo - depende del test anterior
+// ❌ Malo - depende del test anterior
 test('test 1: create user', async () => {
   /* crea usuario */
 });
@@ -291,7 +336,7 @@ test('test 2: edit user', async () => {
   /* asume que test 1 creó usuario */
 });
 
-// Bueno - cada test es autosuficiente
+// ✅ Bueno - cada test es autosuficiente
 test('edit user', async () => {
   const user = await createTestUser(); // Crea su propio dato
   // ... edita usuario
@@ -301,17 +346,17 @@ test('edit user', async () => {
 ### 2. Nombres Descriptivos
 
 ```typescript
-// Malo
+// ❌ Malo
 test('test1', async () => {});
 
-// Bueno
+// ✅ Bueno
 test('user with expired subscription cannot access premium features', async () => {});
 ```
 
 ### 3. Una Cosa por Test
 
 ```typescript
-// Malo - prueba muchas cosas
+// ❌ Malo - prueba muchas cosas
 test('user flow', async () => {
   // login
   // create order
@@ -319,7 +364,7 @@ test('user flow', async () => {
   // logout
 });
 
-// Bueno - una verificación clara
+// ✅ Bueno - una verificación clara
 test('logged in user can create order', async () => {});
 test('user can cancel pending order', async () => {});
 ```
@@ -327,11 +372,11 @@ test('user can cancel pending order', async () => {});
 ### 4. Evitar Sleeps Fijos
 
 ```typescript
-// Malo - espera arbitraria
+// ❌ Malo - espera arbitraria
 await page.click('button');
 await page.waitForTimeout(3000); // ¿Por qué 3 segundos?
 
-// Bueno - espera condiciones
+// ✅ Bueno - espera condiciones
 await page.click('button');
 await expect(page.locator('.result')).toBeVisible();
 ```
@@ -339,10 +384,10 @@ await expect(page.locator('.result')).toBeVisible();
 ### 5. Datos Únicos
 
 ```typescript
-// Malo - puede colisionar
+// ❌ Malo - puede colisionar
 const email = 'test@example.com';
 
-// Bueno - único por ejecución
+// ✅ Bueno - único por ejecución
 const email = `test-${Date.now()}-${Math.random()}@example.com`;
 // O con faker:
 const email = faker.internet.email();
@@ -361,16 +406,16 @@ const email = faker.internet.email();
 | **Vitest**     | TypeScript          | Unit + Integration | Rápido, compatible con Jest      |
 | **Pytest**     | Python              | Todos              | Muy flexible, fixtures potentes  |
 
-En este proyecto usamos **Playwright** por su versatilidad (E2E + API) y excelente developer experience.
+En este boilerplate usamos **Playwright** por su versatilidad (E2E + API) y excelente developer experience.
 
 ---
 
 ## Próximos Pasos
 
-1. **Dependency Injection:** [dependency-injection.md](./dependency-injection.md) - Arquitectura de tests
-2. **Playwright:** [playwright-framework.md](./playwright-framework.md) - Configurar el framework
-3. **API Testing:** [playwright-api-testing.md](./playwright-api-testing.md) - Tests de API con Playwright
-4. **Data-Driven:** [data-driven-testing.md](./data-driven-testing.md) - Parametrización de tests
+1. **Dependency Injection:** [dependency-injection.md](docs/testing/automation/dependency-injection.md) - Arquitectura de tests
+2. **Playwright:** [playwright-framework.md](docs/testing/automation/playwright-framework.md) - Configurar el framework
+3. **API Testing:** [playwright-api-testing.md](docs/testing/automation/playwright-api-testing.md) - Tests de API con Playwright
+4. **Data-Driven:** [data-driven-testing.md](docs/testing/automation/data-driven-testing.md) - Parametrización de tests
 
 ---
 

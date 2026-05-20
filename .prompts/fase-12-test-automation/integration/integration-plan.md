@@ -19,8 +19,8 @@
 
 **Opcional (para exploración de API):**
 
-- Usar OpenAPI MCP (`mcp__openapi__*`) si está disponible
-- Usar DBHub MCP (`mcp__dbhub__*`) para verificar datos
+- Usar `[API_TOOL]` si está disponible para explorar la API spec
+- Usar `[DB_TOOL]` para verificar datos
 
 ---
 

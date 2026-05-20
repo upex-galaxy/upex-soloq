@@ -413,12 +413,12 @@ const token = process.env.TEST_AUTH_TOKEN;
 
 ### Genéricos
 
-- [fundamentals.md](./fundamentals.md) - Conceptos básicos de API testing
-- [contract-testing.md](./contract-testing.md) - Validación de contratos
+- [fundamentals.md](docs/testing/api/fundamentals.md) - Conceptos básicos de API testing
+- [contract-testing.md](docs/testing/api/contract-testing.md) - Validación de contratos
 
 ### Específicos por Stack
 
-- [../../architectures/supabase-nextjs/auth-tokens.md](../../architectures/supabase-nextjs/auth-tokens.md) - Tokens en Supabase
+- [docs/architectures/supabase-nextjs/auth-tokens.md](docs/architectures/supabase-nextjs/auth-tokens.md) - Tokens en Supabase
 
 ---
 

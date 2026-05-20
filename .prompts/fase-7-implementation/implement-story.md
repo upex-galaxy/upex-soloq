@@ -14,7 +14,7 @@ Implementar la story **STORY-{PROJECT_KEY}-{ISSUE_NUM}-{nombre}** siguiendo su i
 
 ### Context7 MCP
 
-**¿Está disponible?** [Verificar si puedes acceder a `mcp__context7__get-library-docs`]
+**¿Está disponible?** [Verificar si puedes acceder a `[DOCS_TOOL]`]
 
 **Si NO está disponible:**
 
@@ -43,7 +43,7 @@ Puedo continuar, pero usaré conocimiento interno (puede estar desactualizado).
 
 ### Supabase MCP (Si proyecto usa Supabase)
 
-**¿Está disponible?** [Verificar si puedes acceder a `mcp__supabase__*`]
+**¿Está disponible?** [Verificar si puedes acceder a Supabase MCP]
 
 **Si NO está disponible y la story requiere DB:**
 
@@ -53,7 +53,7 @@ Puedo continuar, pero usaré conocimiento interno (puede estar desactualizado).
 
 ### shadcn/ui MCP (Si proyecto usa shadcn)
 
-**¿Está disponible?** [Verificar si puedes acceder a `mcp__shadcn__*`]
+**¿Está disponible?** [Verificar si puedes acceder a shadcn/ui MCP]
 
 **¿Cuándo usarlo?**
 
@@ -86,7 +86,7 @@ Puedo continuar, pero usaré conocimiento interno (puede estar desactualizado).
 
 **Acceptance Test Plan (Test Cases):** Usar el siguiente orden de descubrimiento:
 
-1. **Jira Comments** (preferido): Buscar en comentarios de la US usando `mcp__atlassian__jira_get_issue` con `comment_limit: 50`
+1. **Jira Comments** (preferido): Buscar en comentarios de la US usando `[ISSUE_TRACKER_TOOL]` para obtener el issue con `comment_limit: 50`
 2. **Jira Custom Field**: Campo `customfield_12400` ("Acceptance Test Plan (QA)🧪") usando `fields: "*all"`
 3. **Archivo Local** (fallback): `.context/.../stories/.../test-cases.md` o `acceptance-test-plan.md`
 
@@ -112,16 +112,6 @@ Puedo continuar, pero usaré conocimiento interno (puede estar desactualizado).
 - Manejo de errores estructurado
 - **Atributos `data-testid` para testing E2E**
 - Principios de Spec-Driven Development
-
-### 2.1 Guidelines de MCP (si necesitas herramientas):
-
-```
-.context/guidelines/MCP/
-├── README.md      # Decision tree: ¿Qué MCP usar?
-├── supabase.md    # Para queries de DB
-├── context7.md    # Para docs oficiales
-└── ...            # Otros MCPs según necesidad
-```
 
 ### 3. Design System (Si story tiene UI):
 
@@ -176,7 +166,7 @@ Puedo continuar, pero usaré conocimiento interno (puede estar desactualizado).
    - Si usas biblioteca nueva: consulta su documentación oficial actualizada
    - Si hay duda técnica sobre una API: verifica con Context7
    - Antes de implementar: confirma que la API/método existe en la versión actual
-   - Ejemplo: `mcp__context7__get-library-docs` para Next.js, React, Supabase, etc.
+   - Ejemplo: usar `[DOCS_TOOL]` para consultar docs de Next.js, React, Supabase, etc.
 
 5. **Consulta shadcn MCP (si proyecto usa shadcn)**
    - Si necesitas componentes UI: busca componentes shadcn disponibles

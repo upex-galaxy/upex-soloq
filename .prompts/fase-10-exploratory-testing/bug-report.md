@@ -16,8 +16,8 @@ Identify, validate, and report defects found during exploratory testing. This pr
 **Prerequisites:**
 
 - Bug identified during exploratory testing
-- Access to Playwright MCP tools (`mcp__playwright__*`)
-- Access to Atlassian MCP tools (`mcp__atlassian__*`)
+- `[AUTOMATION_TOOL]` available for browser-based retesting
+- `[ISSUE_TRACKER_TOOL]` available for Jira bug creation
 
 **Important:** This prompt is primarily configured for the **UPEX Galaxy Jira Workspace**. The custom field IDs below are shared across all projects in this workspace. For external workspaces, see the **Fallback Strategy** section.
 
@@ -31,75 +31,75 @@ Identify, validate, and report defects found during exploratory testing. This pr
 
 | Field ID            | Jira Field Name                   | Type     | What to Fill                                                                                                                                                    |
 | ------------------- | --------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `customfield_10109` | 🐞 Actual Result (Comportamiento) | Textarea | Describe exactly what happened (the bug behavior). Include error messages, unexpected UI states, or incorrect data shown.                                       |
-| `customfield_10110` | ✅ Expected Result (Output)       | Textarea | Describe what SHOULD have happened according to requirements or standard UX patterns.                                                                           |
-| `customfield_10112` | Error Type                        | Dropdown | `Functional`, `Visual`, `Content`, `Performance`, `Crash`, `Data`, `Integration`, `Security`                                                                    |
-| `customfield_10116` | SEVERITY                          | Dropdown | `Crítica`, `Mayor`, `Moderada`, `Menor`, `Trivial`                                                                                                              |
-| `customfield_12210` | Test Environment                  | Dropdown | `Dev`, `QA`, `UAT`, `Staging`, `Production`                                                                                                                     |
-| `customfield_10701` | Root Cause🐞                      | Dropdown | `Code Error`, `Config/Env Error`, `Environment Error`, `Requirement Error`, `Working As Designed (WAD)`, `Third-Party Error`, `Integration Error`, `Data Error` |
+| `{{jira.actual_result_comportamiento}}` | Actual Result (Behavior)          | Textarea | Describe exactly what happened (the bug behavior). Include error messages, unexpected UI states, or incorrect data shown.                                       |
+| `{{jira.expected_result_output}}` | Expected Result (Output)          | Textarea | Describe what SHOULD have happened according to requirements or standard UX patterns.                                                                           |
+| `{{jira.error_type}}` | Error Type                        | Dropdown | `Functional`, `Visual`, `Content`, `Performance`, `Crash`, `Data`, `Integration`, `Security`                                                                    |
+| `{{jira.severity}}` | SEVERITY                          | Dropdown | `Critical`, `Major`, `Moderate`, `Minor`, `Trivial`                                                                                                             |
+| `{{jira.test_environment}}` | Test Environment                  | Dropdown | `Dev`, `QA`, `UAT`, `Staging`, `Production`                                                                                                                     |
+| `{{jira.root_cause}}` | Root Cause                        | Dropdown | `Code Error`, `Config/Env Error`, `Environment Error`, `Requirement Error`, `Working As Designed (WAD)`, `Third-Party Error`, `Integration Error`, `Data Error` |
 
 ### Optional Fields
 
 | Field ID            | Jira Field Name | Type     | When to Use                                                                                                                    |
 | ------------------- | --------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `customfield_10111` | 🚩 Workaround   | Textarea | Only if a temporary solution exists. Otherwise, omit.                                                                          |
-| `customfield_10607` | 🧫 EVIDENCE     | Textarea | Additional notes about evidence (e.g., "See attached screenshot", "Video in attachments"). Omit if using attachments parameter |
-| `customfield_12212` | Fix             | Radio    | `Bugfix` (estándar) o `Hotfix` (crítico para deploy inmediato). Para bugs normales usar `Bugfix`.                              |
+| `{{jira.workaround}}` | Workaround      | Textarea | Only if a temporary solution exists. Otherwise, omit.                                                                          |
+| `{{jira.evidence}}` | EVIDENCE        | Textarea | Additional notes about evidence (e.g., "See attached screenshot", "Video in attachments"). Omit if using attachments parameter |
+| `{{jira.fix}}` | Fix             | Radio    | `Bugfix` (standard) or `Hotfix` (critical for immediate deploy). For normal bugs use `Bugfix`.                                 |
 | N/A                 | Web Link        | URL      | Only if the bug relates to a specific external URL or documentation. Omit if not applicable.                                   |
 
 ### Dropdown Values Reference
 
-**`customfield_10112` (Error Type) - Use exact string:**
+**`{{jira.error_type}}` (Error Type) - Use exact string:**
 
 ```
-"Functional"  → Feature no funciona según spec o AC
-"Visual"      → UI/UX: layout, estilos, responsive, alineación
-"Content"     → Texto incorrecto, typos, traducciones, contenido faltante
-"Performance" → Lentitud, timeouts, memory leaks
-"Crash"       → App crash, error 500, pantalla blanca, excepción fatal
-"Data"        → Datos incorrectos, cálculos erróneos, inconsistencia
-"Integration" → Fallo con servicios externos, APIs, webhooks
-"Security"    → Auth bypass, exposición datos, XSS, CSRF, permisos
+"Functional"  → Feature doesn't work as specified or AC
+"Visual"      → UI/UX: layout, styles, responsive, alignment
+"Content"     → Incorrect text, typos, translations, missing content
+"Performance" → Slowness, timeouts, memory leaks
+"Crash"       → App crash, error 500, white screen, fatal exception
+"Data"        → Incorrect data, calculation errors, inconsistency
+"Integration" → External service failure, APIs, webhooks
+"Security"    → Auth bypass, data exposure, XSS, CSRF, permissions
 ```
 
-**`customfield_10116` (SEVERITY) - Use exact string (Spanish):**
+**`{{jira.severity}}` (SEVERITY) - Use exact string:**
 
 ```
-"Crítica"  → Funcionalidad core bloqueada, sin workaround, bloquea release
-"Mayor"    → Feature principal afectado, workaround difícil, fix urgente
-"Moderada" → Funcionalidad afectada con workaround fácil, próximo sprint
-"Menor"    → Issue menor, impacto limitado, baja prioridad
-"Trivial"  → Cosmético, muy bajo impacto, arreglar cuando haya tiempo
+"Critical"  → Core functionality blocked, no workaround, blocks release
+"Major"     → Main feature affected, difficult workaround, urgent fix
+"Moderate"  → Functionality affected with easy workaround, next sprint
+"Minor"     → Minor issue, limited impact, low priority
+"Trivial"   → Cosmetic, very low impact, fix when there's time
 ```
 
-**`customfield_12210` (Test Environment) - Use exact string:**
+**`{{jira.test_environment}}` (Test Environment) - Use exact string:**
 
 ```
-"Dev"        → Desarrollo local (localhost, 127.0.0.1)
-"QA"         → Ambiente de testing/QA, datos de prueba
-"UAT"        → User Acceptance Testing, validación stakeholders
-"Staging"    → Pre-producción (staging.*, *-staging.*, preview URLs)
-"Production" → Ambiente productivo en vivo
+"Dev"        → Local development (localhost, 127.0.0.1)
+"QA"         → Testing/QA environment, test data
+"UAT"        → User Acceptance Testing, stakeholder validation
+"Staging"    → Pre-production (staging.*, *-staging.*, preview URLs)
+"Production" → Live production environment
 ```
 
-**`customfield_10701` (Root Cause🐞) - Use exact string:**
+**`{{jira.root_cause}}` (Root Cause) - Use exact string:**
 
 ```
-"Code Error"                → Bug en código fuente, lógica incorrecta
-"Config/Env Error"          → Variables de entorno, configs, feature flags
-"Environment Error"         → Infraestructura, servidor, deploy, CI/CD
-"Requirement Error"         → Spec incorrecta, AC ambiguos, requisito faltante
-"Working As Designed (WAD)" → No es bug, funciona según diseño
-"Third-Party Error"         → Bug en librería externa, dependencia, framework
-"Integration Error"         → Servicio externo caído, API de terceros falló
-"Data Error"                → Datos corruptos en DB, migración fallida
+"Code Error"                → Bug in source code, incorrect logic
+"Config/Env Error"          → Environment variables, configs, feature flags
+"Environment Error"         → Infrastructure, server, deploy, CI/CD
+"Requirement Error"         → Incorrect spec, ambiguous AC, missing requirement
+"Working As Designed (WAD)" → Not a bug, works as intended
+"Third-Party Error"         → Bug in external library, dependency, framework
+"Integration Error"         → External service down, third-party API failed
+"Data Error"                → Corrupted data in DB, failed migration
 ```
 
-**`customfield_12212` (Fix) - Use exact string:**
+**`{{jira.fix}}` (Fix) - Use exact string:**
 
 ```
-"Bugfix" → Fix estándar para bugs normales
-"Hotfix" → Fix crítico para deploy inmediato a producción
+"Bugfix" → Standard fix for normal bugs
+"Hotfix" → Critical fix for immediate production deploy
 ```
 
 ---
@@ -114,7 +114,7 @@ When Jira returns an error about a custom field (e.g., "Field customfield_XXXXX 
 2. **Inform the user** with this message:
 
 ```
-⚠️ Custom Field Error
+Custom Field Error
 
 The custom field `customfield_XXXXX` ([Field Name]) returned an error.
 This may indicate the field was disabled or renamed in Jira.
@@ -138,7 +138,7 @@ I will proceed to create the bug WITHOUT this field for now.
 If a dropdown value is rejected (e.g., "Option 'X' is not valid"):
 
 ```
-⚠️ Dropdown Value Error
+Dropdown Value Error
 
 The value "[Value]" for field `[Field Name]` is not valid.
 Available options may have changed in Jira.
@@ -159,15 +159,14 @@ The custom field IDs in this prompt are specific to UPEX Galaxy workspace. For o
 
 ### Fallback 1: Search for Equivalent Field
 
-When a custom field ID fails (e.g., `customfield_10116` doesn't exist), use `mcp__atlassian__jira_search_fields` to find the equivalent field:
+When a custom field ID fails (e.g., `{{jira.severity}}` doesn't exist), search for the equivalent field:
 
 ```
-# Search for the field by name
-Tool: mcp__atlassian__jira_search_fields
-{
-  "keyword": "severity"  // or "root cause", "error type", etc.
-}
+[ISSUE_TRACKER_TOOL] Search fields:
+  - keyword: {from failed field name}
 ```
+
+> Resolved via [ISSUE_TRACKER_TOOL] — see Tool Resolution in CLAUDE.md
 
 If a matching field is found:
 
@@ -180,7 +179,7 @@ If a matching field is found:
 If no equivalent field is found via search:
 
 ```
-⚠️ Custom Field Not Found
+Custom Field Not Found
 
 The field "[Field Name]" (UPEX ID: `customfield_XXXXX`) doesn't exist in this workspace.
 
@@ -198,7 +197,7 @@ Wait for user response before proceeding.
 
 As a last resort, if the custom field cannot be resolved:
 
-1. **Omit the custom field** from `additional_fields`
+1. **Omit the custom field** from the issue creation
 2. **Add the information to the Description** using this format:
 
 ```markdown
@@ -215,7 +214,7 @@ _ADDITIONAL FIELDS (Custom fields not available)_
 3. **Add a note to the user:**
 
 ```
-ℹ️ Some custom fields were unavailable in this Jira workspace.
+Some custom fields were unavailable in this Jira workspace.
 I've included that information in the bug description instead.
 Consider asking your Jira Admin to add these fields for better tracking.
 ```
@@ -258,22 +257,26 @@ Would you like me to:
 
 **Determine retest approach based on bug type:**
 
-| Bug Type     | Retest Method                         |
-| ------------ | ------------------------------------- |
-| **UI Bug**   | Use Playwright MCP to reproduce steps |
-| **API Bug**  | Use API calls or network observation  |
-| **Data Bug** | Query database or verify via API      |
+| Bug Type     | Retest Method                                  |
+| ------------ | ---------------------------------------------- |
+| **UI Bug**   | `[AUTOMATION_TOOL]` — reproduce steps in browser |
+| **API Bug**  | `[API_TOOL]` — replay API calls                  |
+| **Data Bug** | `[DB_TOOL]` — query database or verify via API   |
 
 **For UI Retest:**
 
 ```
-Tools:
-- mcp__playwright__browser_navigate
-- mcp__playwright__browser_snapshot
-- mcp__playwright__browser_click
-- mcp__playwright__browser_type
-- mcp__playwright__browser_take_screenshot
+[AUTOMATION_TOOL] Navigate:
+  - url: {from bug reproduction steps}
+
+[AUTOMATION_TOOL] Interact:
+  - actions: {from steps to reproduce}
+
+[AUTOMATION_TOOL] Capture screenshot:
+  - purpose: bug evidence
 ```
+
+> Resolved via [AUTOMATION_TOOL] — see Tool Resolution in CLAUDE.md
 
 **Document retest results:**
 
@@ -308,12 +311,12 @@ Tools:
 ```markdown
 ## Bug Details
 
-**Title:** [Formato estándar: <EPICNAME>: <COMPONENT>: <ISSUE_SUMMARY>]
-Ejemplo: "CheckoutFlow: Payment: No se muestra error al ingresar contraseña incorrecta"
+**Title:** {per bug naming convention}
+Format: `<EPICNAME>: <COMPONENT>: <ISSUE_SUMMARY>`
 
 **Error Type:** [Functional/Visual/Content/Performance/Crash/Data/Integration/Security]
 
-**SEVERITY:** [Crítica/Mayor/Moderada/Menor/Trivial]
+**SEVERITY:** [Critical/Major/Moderate/Minor/Trivial]
 
 **Test Environment:** [Dev/QA/UAT/Staging/Production]
 
@@ -363,14 +366,14 @@ I've documented the following bug:
 **Summary:** [Brief description]
 
 **Custom Fields to populate:**
-- 🐞 Actual Result: ✅ Ready
-- ✅ Expected Result: ✅ Ready
-- Error Type: ✅ Ready
-- SEVERITY: ✅ Ready
-- Test Environment: ✅ Ready
-- Root Cause (Category): ✅ Ready
-- Root Cause (Text): ✅ Ready
-- Fix: ✅ Ready (Bugfix)
+- Actual Result: Ready
+- Expected Result: Ready
+- Error Type: Ready
+- SEVERITY: Ready
+- Test Environment: Ready
+- Root Cause (Category): Ready
+- Root Cause (Text): Ready
+- Fix: Ready (Bugfix)
 - Workaround: [Ready/N/A]
 - Evidence: [Ready/N/A]
 
@@ -389,68 +392,72 @@ Do you want me to:
 
 **Step 1: Create the issue with all custom fields**
 
-Use the EXACT JSON structure below. Replace only the values in `[brackets]`:
-
-```json
-Tool: mcp__atlassian__jira_create_issue
-
-{
-  "project_key": "[PROJECT_KEY]",  // e.g., "SQ", "UPEX", "QA", etc.
-  "summary": "[Formato: <EPICNAME>: <COMPONENT>: <ISSUE_SUMMARY>]",
-  "issue_type": "Bug",
-  "description": "[See Jira Description Template below]",
-  "additional_fields": {
-    "priority": {"name": "[Highest|High|Medium|Low]"},
-    "labels": ["bug", "exploratory-testing"],
-
-    "customfield_10109": "[ACTUAL RESULT: What happened - the bug behavior]",
-    "customfield_10110": "[EXPECTED RESULT: What should have happened]",
-    "customfield_10112": {"value": "[Functional|Visual|Content|Performance|Crash|Data|Integration|Security]"},
-    "customfield_10116": {"value": "[Crítica|Mayor|Moderada|Menor|Trivial]"},
-    "customfield_12210": {"value": "[Dev|QA|UAT|Staging|Production]"},
-    "customfield_10701": {"value": "[Code Error|Config/Env Error|Environment Error|Requirement Error|Working As Designed (WAD)|Third-Party Error|Integration Error|Data Error]"},
-
-    "customfield_10111": "[WORKAROUND: Temporary solution - omit if none]",
-    "customfield_10607": "[EVIDENCE: Notes about attachments - omit if using attachments parameter]",
-    "customfield_12212": {"value": "Bugfix"}
-  }
-}
 ```
+[ISSUE_TRACKER_TOOL] Create issue:
+  - project: {{PROJECT_KEY}}
+  - type: Bug
+  - title: {per bug naming convention}
+  - description: {from Jira Description Template below}
+  - priority: {from severity mapping}
+  - labels: bug, exploratory-testing
+  - custom fields:
+    - Actual Result:      {from bug documentation}
+    - Expected Result:    {from bug documentation}
+    - Error Type:         {from error type analysis}
+    - SEVERITY:           {from severity analysis}
+    - Test Environment:   {from environment detection}
+    - Root Cause:         {from root cause analysis}
+    - Root Cause Text:    {from technical analysis}
+    - Workaround:         {from bug documentation, omit if none}
+    - Evidence:           {from evidence notes, omit if using attachments}
+    - Fix:                Bugfix
+```
+
+> Resolved via [ISSUE_TRACKER_TOOL] — see Tool Resolution in CLAUDE.md
+
+**Custom Field ID Mapping (UPEX Galaxy Workspace):**
+
+| Domain Field     | Field ID            | Format   |
+| ---------------- | ------------------- | -------- |
+| Actual Result    | `{{jira.actual_result_comportamiento}}` | String   |
+| Expected Result  | `{{jira.expected_result_output}}` | String   |
+| Error Type       | `{{jira.error_type}}` | Dropdown |
+| SEVERITY         | `{{jira.severity}}` | Dropdown |
+| Test Environment | `{{jira.test_environment}}` | Dropdown |
+| Root Cause       | `{{jira.root_cause}}` | Dropdown |
+| Workaround       | `{{jira.workaround}}` | String   |
+| Evidence         | `{{jira.evidence}}` | String   |
+| Fix              | `{{jira.fix}}` | Dropdown |
 
 **Field Format Rules:**
 
-- **Textarea fields** (`customfield_10109`, `10110`, `10111`, `10607`): Plain string
-- **Dropdown fields** (`customfield_10112`, `10116`, `10701`, `12210`, `12212`): Object with `{"value": "Option"}`
+- **String fields**: Plain string value
+- **Dropdown fields**: Object with `{"value": "Option"}`
 - **Omit optional fields** by not including them (don't set to `null`)
 
 **Step 2: Attach evidence files (if user provided)**
 
-```json
-Tool: mcp__atlassian__jira_update_issue
-
-{
-  "issue_key": "[PROJ-XXX]",  // Use the issue key returned from create
-  "fields": {},
-  "attachments": "/absolute/path/to/file1.png,/absolute/path/to/file2.mp4"
-}
+```
+[ISSUE_TRACKER_TOOL] Attach files:
+  - issue: {from created issue key}
+  - files: {from evidence file paths}
 ```
 
 **Attachment Rules:**
 
-- Use **absolute paths** only (e.g., `/home/user/screenshots/bug.png`)
-- Comma-separated for multiple files
+- Use **absolute paths** only
 - Supported formats: `.png`, `.jpg`, `.gif`, `.mp4`, `.log`, `.txt`, `.pdf`
 - If user says "attach this file" or provides a path, use it here
 
 **Priority Mapping (SEVERITY → Jira Priority):**
 
-| SEVERITY (Spanish) | priority.name |
-| ------------------ | ------------- |
-| Crítica            | Highest       |
-| Mayor              | High          |
-| Moderada           | Medium        |
-| Menor              | Low           |
-| Trivial            | Lowest        |
+| SEVERITY   | priority.name |
+| ---------- | ------------- |
+| Critical   | Highest       |
+| Major      | High          |
+| Moderate   | Medium        |
+| Minor      | Low           |
+| Trivial    | Lowest        |
 
 ---
 
@@ -463,32 +470,31 @@ Tool: mcp__atlassian__jira_update_issue
    ```
    Bug created successfully!
 
-   Issue Key: [PROJ-XXX]
-   URL: https://upexgalaxy62.atlassian.net/browse/[PROJ-XXX]
+   Issue Key: [TICKET-ID]
+   URL: https://[workspace].atlassian.net/browse/[TICKET-ID]
 
-   ✅ All custom fields populated
-   ✅ Attachments uploaded (if any)
-   ✅ Ready for QA triage
+   All custom fields populated
+   Attachments uploaded (if any)
+   Ready for QA triage
    ```
 
 2. **Link to related story** (if applicable):
 
    ```
-   Tool: mcp__atlassian__jira_add_comment
-
-   Add comment to the original story:
-   "Bug encontrado durante exploratory testing: [PROJ-XXX] - [Title]"
+   [ISSUE_TRACKER_TOOL] Add comment:
+     - issue: {from related story key}
+     - comment: "Bug found during exploratory testing: {from created issue key} - {from bug title}"
    ```
 
 3. **Assign to team member** (if specified):
 
    ```
-   Tool: mcp__atlassian__jira_update_issue
-
-   Parameters:
-   - issue_key: "[PROJ-XXX]"
-   - fields: {"assignee": "email@example.com"}
+   [ISSUE_TRACKER_TOOL] Update issue:
+     - issue: {from created issue key}
+     - assignee: {from user specification}
    ```
+
+> Resolved via [ISSUE_TRACKER_TOOL] — see Tool Resolution in CLAUDE.md
 
 ---
 
@@ -497,7 +503,7 @@ Tool: mcp__atlassian__jira_update_issue
 Use this format for the `description` field:
 
 ```
-_RESUMEN_
+_SUMMARY_
 [One-paragraph summary of the bug and its impact]
 
 ----
@@ -516,14 +522,23 @@ h4. [Step 4 - Observe bug]
 
 _TECHNICAL ANALYSIS_
 
-* _Archivo:_ [File path if known]
-* _Función:_ [Function/Component name]
+* _File:_ [File path if known]
+* _Function:_ [Function/Component name]
 * _Network:_ [API call info if relevant]
 * _Console:_ [Error messages if any]
 
 ----
 
-_IMPACTO_
+_ROOT CAUSE_
+
+* [Narrative explanation of WHY the bug happens — what is broken at the source level. Use when triage has identified the cause.]
+* [If unknown after triage: "Investigation needed - <hypothesis or area to investigate>"]
+
+> Note: the categorical value (Code Error / Config Error / etc.) goes in the Root Cause dropdown custom field separately. This body section is the free-text supplement — narrative goes here, classification goes in the field.
+
+----
+
+_IMPACT_
 
 * [Who is affected]
 * [What functionality is blocked]
@@ -533,47 +548,47 @@ _IMPACTO_
 
 _RELATED STORIES_
 
-* Relacionado: [STORY-XXX if applicable]
-* Bloquea: [Other issues blocked by this bug]
+* Related: [STORY-XXX if applicable]
+* Blocks: [Other issues blocked by this bug]
 ```
 
 ---
 
-## Nomenclatura de Bugs
+## Bug Naming Convention
 
-**Formato estándar para títulos de Bug/Defect:**
+**Standard format for Bug/Defect titles:**
 
 ```
 <EPICNAME>: <COMPONENT>: <ISSUE_SUMMARY>
 ```
 
-| Componente      | Descripción                        |
-| --------------- | ---------------------------------- |
-| `EPICNAME`      | Nombre de la épica o sistema (SUT) |
-| `COMPONENT`     | Módulo donde ocurre el error       |
-| `ISSUE_SUMMARY` | Breve descripción de la falla      |
+| Component       | Description                          |
+| --------------- | ------------------------------------ |
+| `EPICNAME`      | Name of the epic or system (SUT)     |
+| `COMPONENT`     | Module where the error occurs        |
+| `ISSUE_SUMMARY` | Brief description of the failure     |
 
-**Ejemplos:**
+**Examples:**
 
 ```
-CheckoutFlow: Payment: No se muestra error al ingresar contraseña incorrecta
-UserAuth: Login: Sesión expira sin mensaje de advertencia
-Dashboard: Charts: Gráfico de ventas muestra datos incorrectos
-API: Users: PUT /users/settings retorna 500 al guardar
+CheckoutFlow: Payment: Error message not shown for incorrect password
+UserAuth: Login: Session expires without warning message
+Dashboard: Charts: Sales chart shows incorrect data
+API: Users: PUT /users/settings returns 500 on save
 ```
 
-**Referencia completa:** `.context/guidelines/QA/jira-test-management.md` → Sección "Nomenclatura de Tickets en Jira"
+**Complete reference:** `.context/guidelines/QA/jira-test-management.md` → Section "Ticket Naming Convention in Jira"
 
 ---
 
-## Severity Guidelines (Spanish Values)
+## Severity Guidelines
 
 | SEVERITY     | Criteria                                             | Impact             | Examples                                          |
 | ------------ | ---------------------------------------------------- | ------------------ | ------------------------------------------------- |
-| **Crítica**  | Core functionality blocked, no workaround, data loss | Blocks release     | Login broken, checkout fails, data corruption     |
-| **Mayor**    | Major feature broken, workaround is difficult        | Affects many users | Search returns wrong results, form doesn't submit |
-| **Moderada** | Feature issue with easy workaround                   | Secondary flow     | Sorting doesn't work, but filtering does          |
-| **Menor**    | Minor issue, limited impact                          | Low priority       | Minor validation missing, edge case               |
+| **Critical** | Core functionality blocked, no workaround, data loss | Blocks release     | Login broken, checkout fails, data corruption     |
+| **Major**    | Major feature broken, workaround is difficult        | Affects many users | Search returns wrong results, form doesn't submit |
+| **Moderate** | Feature issue with easy workaround                   | Secondary flow     | Sorting doesn't work, but filtering does          |
+| **Minor**    | Minor issue, limited impact                          | Low priority       | Minor validation missing, edge case               |
 | **Trivial**  | Cosmetic, very low impact                            | Fix when possible  | Typo, slight alignment, minor UI glitch           |
 
 ---
@@ -584,7 +599,7 @@ API: Users: PUT /users/settings retorna 500 al guardar
 | --------------- | -------------------------------------- | -------------------------------------- |
 | **Functional**  | Feature doesn't work as specified      | Button doesn't execute expected action |
 | **Visual**      | Layout, styling, responsive, UX issues | Misaligned elements, wrong colors      |
-| **Content**     | Wrong text, typos, translations        | "Guardra" instead of "Guardar"         |
+| **Content**     | Wrong text, typos, translations        | "Savr" instead of "Save"               |
 | **Performance** | Slow loading, timeouts, memory leaks   | Page takes >5s to load                 |
 | **Crash**       | App crash, error 500, white screen     | Server error, React white screen       |
 | **Data**        | Incorrect calculations, corrupted data | Invoice total calculated wrong         |
@@ -615,10 +630,10 @@ API: Users: PUT /users/settings retorna 500 al guardar
    - Production domain → `Production`
 
 3. **SEVERITY**: Infer from impact:
-   - Blocks user flow completely → `Crítica`
-   - Major feature broken → `Mayor`
-   - Has easy workaround → `Moderada`
-   - Minor issue → `Menor`
+   - Blocks user flow completely → `Critical`
+   - Major feature broken → `Major`
+   - Has easy workaround → `Moderate`
+   - Minor issue → `Minor`
    - Cosmetic only → `Trivial`
 
 4. **Root Cause (Category)**: Infer from analysis:
@@ -656,17 +671,19 @@ API: Users: PUT /users/settings retorna 500 al guardar
 
 ---
 
-## Quick Reference: MCP Tools
+## Quick Reference: Capabilities
 
-| Action                | Tool                                       |
-| --------------------- | ------------------------------------------ |
-| Create bug            | `mcp__atlassian__jira_create_issue`        |
-| Update/attach files   | `mcp__atlassian__jira_update_issue`        |
-| Add comment           | `mcp__atlassian__jira_add_comment`         |
-| Search for duplicates | `mcp__atlassian__jira_search`              |
-| Get issue details     | `mcp__atlassian__jira_get_issue`           |
-| Transition status     | `mcp__atlassian__jira_transition_issue`    |
-| Take screenshot       | `mcp__playwright__browser_take_screenshot` |
+| Action                | Tool Tag               |
+| --------------------- | ---------------------- |
+| Create bug            | `[ISSUE_TRACKER_TOOL]` |
+| Update/attach files   | `[ISSUE_TRACKER_TOOL]` |
+| Add comment           | `[ISSUE_TRACKER_TOOL]` |
+| Search for duplicates | `[ISSUE_TRACKER_TOOL]` |
+| Get issue details     | `[ISSUE_TRACKER_TOOL]` |
+| Transition status     | `[ISSUE_TRACKER_TOOL]` |
+| Take screenshot       | `[AUTOMATION_TOOL]`    |
+
+> Resolved via respective tool tags — see Tool Resolution in CLAUDE.md
 
 ---
 
@@ -674,33 +691,32 @@ API: Users: PUT /users/settings retorna 500 al guardar
 
 Here's a real example of creating a bug with all fields:
 
-```json
-// Step 1: Create the bug
-mcp__atlassian__jira_create_issue({
-  "project_key": "SQ",  // Replace with actual project key
-  "summary": "ClientManagement: AddClient: Email case-insensitive validation missing",
-  "issue_type": "Bug",
-  "description": "_RESUMEN_\nEl sistema permite crear clientes duplicados cuando el email usa diferente capitalización (ej: user@email.com vs USER@email.com).\n\n----\n\n_STEPS TO REPRODUCE_\n\nh4. Crear cliente con email 'test@email.com'\n\nh4. Crear otro cliente con email 'TEST@email.com'\n\nh4. Observar que ambos clientes se crean sin error\n\n----\n\n_TECHNICAL ANALYSIS_\n\n* _Archivo:_ src/app/(app)/clients/page.tsx\n* _Función:_ handleSubmit\n* _Problema:_ Comparación de email es case-sensitive\n\n----\n\n_IMPACTO_\n\n* Usuarios pueden crear clientes duplicados accidentalmente\n* Inconsistencia en la base de datos",
-  "additional_fields": {
-    "priority": {"name": "High"},
-    "labels": ["bug", "exploratory-testing", "clients"],
-    "customfield_10109": "Al intentar crear un cliente con email 'TEST@email.com' cuando ya existe 'test@email.com', el sistema lo acepta y crea un cliente duplicado.",
-    "customfield_10110": "El sistema debería detectar que el email ya existe (comparación case-insensitive) y mostrar un mensaje de advertencia.",
-    "customfield_10112": {"value": "Functional"},
-    "customfield_10116": {"value": "Mayor"},
-    "customfield_12210": {"value": "Staging"},
-    "customfield_10701": {"value": "Code Error"},
-    "customfield_12212": {"value": "Bugfix"}
-  }
-})
-
-// Step 2: Attach screenshot (if user provided one)
-mcp__atlassian__jira_update_issue({
-  "issue_key": "SQ-69",  // Use the actual issue key returned from step 1
-  "fields": {},
-  "attachments": "/home/user/screenshots/duplicate-email-bug.png"
-})
 ```
+# Step 1: Create the bug
+[ISSUE_TRACKER_TOOL] Create issue:
+  - project: {{PROJECT_KEY}}
+  - type: Bug
+  - title: {per bug naming convention}
+  - description: {from Jira Description Template}
+  - priority: High
+  - labels: bug, exploratory-testing, clients
+  - custom fields:
+    - Actual Result:      {from bug observation}
+    - Expected Result:    {from expected behavior}
+    - Error Type:         Functional
+    - SEVERITY:           Major
+    - Test Environment:   Staging
+    - Root Cause:         Code Error
+    - Root Cause Text:    {from technical analysis}
+    - Fix:                Bugfix
+
+# Step 2: Attach screenshot (if user provided one)
+[ISSUE_TRACKER_TOOL] Attach files:
+  - issue: {from created issue key}
+  - files: {from evidence file paths}
+```
+
+> Resolved via [ISSUE_TRACKER_TOOL] — see Tool Resolution in CLAUDE.md
 
 ---
 

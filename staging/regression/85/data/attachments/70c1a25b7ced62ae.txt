@@ -1,0 +1,9 @@
+[API Setup] Starting API authentication...
+[API Setup] Target: https://staging-upexsoloq.vercel.app/auth/v1/token?grant_type=password
+---- API OK: 200 - https://czuusjchqpgvanvbdrnz.supabase.co/auth/v1/token
+---- API OK: 200 - https://czuusjchqpgvanvbdrnz.supabase.co/auth/v1/user
+✅ [SQ-XXX] authenticateSuccessfully - PASS (443ms)
+[API Setup] Authentication successful
+[API Setup] Token type: bearer
+[API Setup] Expires in: 604800 seconds
+[API Setup] Token saved to .auth/api-state.json

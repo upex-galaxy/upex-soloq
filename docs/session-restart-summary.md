@@ -44,6 +44,10 @@
 - Si se actualizan comentarios en Jira, correr:
   - `bun jira-sync pull --story SQ-51 --include-comments`
   - `bun jira-sync pull --story SQ-55 --include-comments`
+- Resultado de verificacion en este reinicio (2026-04-02):
+  - Local OK: existen ATPs y labels en `SQ-51`/`SQ-55`.
+  - Jira sync OK usando `ATLASSIAN_URL=https://upexgalaxy65.atlassian.net` (alias compatible con `JIRA_URL`).
+  - Pull con comentarios ejecutado para `SQ-51` y `SQ-55`.
 
 ## Cambios recientes
 
@@ -52,6 +56,14 @@
 - Publicacion de comentarios de "proposed defaults" para destrabar decisiones PO/Dev.
 - Creacion de `feature-test-plan.md` local para `EPIC-SQ-39`.
 - Limpieza de nomenclatura en documentacion interna hacia `acceptance-test-plan.md`.
+- Sync 2026-04-02 confirma transicion de estado en Jira:
+  - `SQ-51` -> `Ready For QA`
+  - `SQ-55` -> `Ready For QA`
+- Se detecta ruido de formato en `comments.md` de `SQ-55` tras pull (`@@Ely` embebido en una linea).
+- Se configuro automatizacion de Jira Sync con PR automatico a `staging`:
+  - Workflow: `.github/workflows/jira-sync-smart.yml`
+  - Modos: `repository_dispatch` (event-driven), `workflow_dispatch`, `schedule` (cada 6h)
+  - Documentacion: `docs/jira-sync-automation.md`
 
 ## Regla de mantenimiento
 
@@ -61,4 +73,4 @@
 
 ## Ultima actualizacion
 
-- 2026-03-29
+- 2026-04-02

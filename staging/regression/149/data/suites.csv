@@ -1,0 +1,7 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","30073","SQ-XXX: should get current user with valid token","integration","2026-08-19","failed","2026-08-19","SQ-XXX: User Session API","integration/auth/user-session.test.ts","",""
+"","586","SQ-XXX: should be able to re-authenticate","integration","2026-08-19","passed","2026-08-19","SQ-XXX: User Session API","integration/auth/user-session.test.ts","",""
+"","279","SQ-XXX: should fail without token","integration","2026-08-19","passed","2026-08-19","SQ-XXX: User Session API","integration/auth/user-session.test.ts","",""
+"","4","Global Teardown: generate reports and sync TMS","global-teardown","2026-08-19","passed","2026-08-19","","teardown/global.teardown.ts","",""
+"","627","API Setup: authenticate via API","api-setup","2026-08-19","passed","2026-08-19","","setup/api-auth.setup.ts","",""
+"","4","Global Setup: prepare environment","global-setup","2026-08-19","passed","2026-08-19","","setup/global.setup.ts","",""

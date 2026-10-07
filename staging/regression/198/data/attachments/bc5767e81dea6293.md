@@ -1,0 +1,114 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e5]:
+      - link "SoloQ" [ref=e7] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e9]
+        - generic [ref=e12]: SoloQ
+      - generic [ref=e14]:
+        - generic [ref=e15]: Navegación
+        - list [ref=e16]:
+          - listitem [ref=e17]:
+            - link "Dashboard" [ref=e18] [cursor=pointer]:
+              - /url: /dashboard
+              - img [ref=e19]
+              - generic [ref=e24]: Dashboard
+          - listitem [ref=e25]:
+            - link "Facturas" [ref=e26] [cursor=pointer]:
+              - /url: /invoices
+              - img [ref=e27]
+              - generic [ref=e30]: Facturas
+          - listitem [ref=e31]:
+            - link "Clientes" [ref=e32] [cursor=pointer]:
+              - /url: /clients
+              - img [ref=e33]
+              - generic [ref=e38]: Clientes
+          - listitem [ref=e39]:
+            - link "Configuración" [ref=e40] [cursor=pointer]:
+              - /url: /settings
+              - img [ref=e41]
+              - generic [ref=e44]: Configuración
+      - list [ref=e46]:
+        - listitem [ref=e47]:
+          - button [ref=e48]
+        - listitem [ref=e53]:
+          - button "Cerrar Sesión" [ref=e54]:
+            - img [ref=e55]
+            - generic [ref=e58]: Cerrar Sesión
+      - button "Toggle Sidebar" [ref=e59]
+    - main [ref=e60]:
+      - generic [ref=e61]:
+        - button "Toggle Sidebar" [ref=e62]:
+          - img
+          - generic [ref=e63]: Toggle Sidebar
+        - navigation "breadcrumb" [ref=e64]:
+          - list [ref=e65]:
+            - listitem [ref=e66]:
+              - link "Clientes" [disabled] [ref=e67]
+      - main [ref=e68]:
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - generic [ref=e71]:
+              - heading "Clientes" [level=1] [ref=e72]
+              - paragraph [ref=e73]: Administra tu base de clientes y su historial de facturación.
+            - link "Nuevo Cliente" [ref=e74] [cursor=pointer]:
+              - /url: /clients/create
+              - img
+              - text: Nuevo Cliente
+          - generic [ref=e77]:
+            - generic [ref=e79]:
+              - img [ref=e80]
+              - textbox "Buscar por nombre o email..." [active] [ref=e83]: Test Client
+              - button "Limpiar búsqueda" [ref=e84]:
+                - img
+                - generic [ref=e85]: Limpiar búsqueda
+            - table [ref=e87]:
+              - rowgroup [ref=e88]:
+                - row "Nombre Email Empresa Creado Acciones" [ref=e89]:
+                  - columnheader "Nombre" [ref=e90]
+                  - columnheader "Email" [ref=e91]
+                  - columnheader "Empresa" [ref=e92]
+                  - columnheader "Creado" [ref=e93]
+                  - columnheader "Acciones" [ref=e94]:
+                    - generic [ref=e95]: Acciones
+              - rowgroup [ref=e96]:
+                - row [ref=e97]:
+                  - cell [ref=e98]
+                  - cell [ref=e100]
+                  - cell [ref=e102]
+                  - cell [ref=e104]
+                  - cell [ref=e106]
+                - row [ref=e108]:
+                  - cell [ref=e109]
+                  - cell [ref=e111]
+                  - cell [ref=e113]
+                  - cell [ref=e115]
+                  - cell [ref=e117]
+                - row [ref=e119]:
+                  - cell [ref=e120]
+                  - cell [ref=e122]
+                  - cell [ref=e124]
+                  - cell [ref=e126]
+                  - cell [ref=e128]
+                - row [ref=e130]:
+                  - cell [ref=e131]
+                  - cell [ref=e133]
+                  - cell [ref=e135]
+                  - cell [ref=e137]
+                  - cell [ref=e139]
+                - row [ref=e141]:
+                  - cell [ref=e142]
+                  - cell [ref=e144]
+                  - cell [ref=e146]
+                  - cell [ref=e148]
+                  - cell [ref=e150]
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=e152]:
+        - img [ref=e154]
+        - generic [ref=e158]: Cliente guardado correctamente
+  - alert [ref=e159]
+```

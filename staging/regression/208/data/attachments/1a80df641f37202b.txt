@@ -1,0 +1,15 @@
+
+============================================================
+KATA Framework - Global Teardown
+============================================================
+
+ATC Coverage:
+   2 unique ATC tracked (2 total executions)
+   ✅ Passed: 2 | ❌ Failed: 0 | ⏭️ Skipped: 0
+
+[SKIP] TMS sync disabled (set AUTO_SYNC=true to enable)
+
+============================================================
+[OK] Global teardown complete
+============================================================
+

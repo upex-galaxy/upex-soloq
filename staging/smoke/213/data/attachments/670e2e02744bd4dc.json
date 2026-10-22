@@ -1,0 +1,5 @@
+{
+  "code": 401,
+  "error_code": "no_authorization",
+  "msg": "This endpoint requires a valid Bearer token"
+}

@@ -1,0 +1,115 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e5]:
+      - link "SoloQ" [ref=e7] [cursor=pointer]:
+        - /url: /dashboard
+        - img [ref=e9]
+        - generic [ref=e12]: SoloQ
+      - generic [ref=e14]:
+        - generic [ref=e15]: Navegación
+        - list [ref=e16]:
+          - listitem [ref=e17]:
+            - link "Dashboard" [ref=e18] [cursor=pointer]:
+              - /url: /dashboard
+              - img [ref=e19]
+              - generic [ref=e24]: Dashboard
+          - listitem [ref=e25]:
+            - link "Facturas" [ref=e26] [cursor=pointer]:
+              - /url: /invoices
+              - img [ref=e27]
+              - generic [ref=e30]: Facturas
+          - listitem [ref=e31]:
+            - link "Clientes" [ref=e32] [cursor=pointer]:
+              - /url: /clients
+              - img [ref=e33]
+              - generic [ref=e38]: Clientes
+          - listitem [ref=e39]:
+            - link "Configuración" [ref=e40] [cursor=pointer]:
+              - /url: /settings
+              - img [ref=e41]
+              - generic [ref=e44]: Configuración
+      - list [ref=e46]:
+        - listitem [ref=e47]:
+          - button "UPEX Staging Business UPEX Staging Business demo@soloq.app" [ref=e48]:
+            - img "UPEX Staging Business" [ref=e50]
+            - generic [ref=e51]:
+              - generic [ref=e52]: UPEX Staging Business
+              - generic [ref=e53]: demo@soloq.app
+            - img [ref=e54]
+      - button "Toggle Sidebar" [ref=e57]
+    - main [ref=e58]:
+      - generic [ref=e59]:
+        - button "Toggle Sidebar" [ref=e60]:
+          - img
+          - generic [ref=e61]: Toggle Sidebar
+        - navigation "breadcrumb" [ref=e62]:
+          - list [ref=e63]:
+            - listitem [ref=e64]:
+              - link "Clientes" [disabled] [ref=e65]
+      - main [ref=e66]:
+        - generic [ref=e67]:
+          - generic [ref=e68]:
+            - generic [ref=e69]:
+              - heading "Clientes" [level=1] [ref=e70]
+              - paragraph [ref=e71]: Administra tu base de clientes y su historial de facturación.
+            - link "Nuevo Cliente" [ref=e72] [cursor=pointer]:
+              - /url: /clients/create
+              - img
+              - text: Nuevo Cliente
+          - generic [ref=e75]:
+            - generic [ref=e77]:
+              - img [ref=e78]
+              - textbox "Buscar por nombre o email..." [active] [ref=e81]: Test Client
+              - button "Limpiar búsqueda" [ref=e82]:
+                - img
+                - generic [ref=e83]: Limpiar búsqueda
+            - table [ref=e85]:
+              - rowgroup [ref=e86]:
+                - row "Nombre Email Empresa Creado Acciones" [ref=e87]:
+                  - columnheader "Nombre" [ref=e88]
+                  - columnheader "Email" [ref=e89]
+                  - columnheader "Empresa" [ref=e90]
+                  - columnheader "Creado" [ref=e91]
+                  - columnheader "Acciones" [ref=e92]:
+                    - generic [ref=e93]: Acciones
+              - rowgroup [ref=e94]:
+                - row [ref=e95]:
+                  - cell [ref=e96]
+                  - cell [ref=e98]
+                  - cell [ref=e100]
+                  - cell [ref=e102]
+                  - cell [ref=e104]
+                - row [ref=e106]:
+                  - cell [ref=e107]
+                  - cell [ref=e109]
+                  - cell [ref=e111]
+                  - cell [ref=e113]
+                  - cell [ref=e115]
+                - row [ref=e117]:
+                  - cell [ref=e118]
+                  - cell [ref=e120]
+                  - cell [ref=e122]
+                  - cell [ref=e124]
+                  - cell [ref=e126]
+                - row [ref=e128]:
+                  - cell [ref=e129]
+                  - cell [ref=e131]
+                  - cell [ref=e133]
+                  - cell [ref=e135]
+                  - cell [ref=e137]
+                - row [ref=e139]:
+                  - cell [ref=e140]
+                  - cell [ref=e142]
+                  - cell [ref=e144]
+                  - cell [ref=e146]
+                  - cell [ref=e148]
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=e150]:
+        - img [ref=e152]
+        - generic [ref=e156]: Cliente guardado correctamente
+  - alert [ref=e157]
+```
